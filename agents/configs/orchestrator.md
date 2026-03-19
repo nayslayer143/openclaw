@@ -9,14 +9,16 @@ Reports to: Jordan via Telegram DM only.
 Primary job: keep tasks moving between check-ins, surface only genuine decision points.
 
 ## Business Context
-<!-- Jordan: fill in your specifics below -->
-- Business names: [UPDATE]
-- Platforms: [UPDATE]
-- Current metrics: [UPDATE]
-- Target customers: [UPDATE]
-- Active projects: [UPDATE]
-- Known APIs/tools: Ollama, Claude Code, Lobster
-- Monthly revenue targets: [UPDATE]
+- Business name: Omega MegaCorp — new entity, launching now
+- Verticals: software, consumer electronics, toys, fashion, media (intentionally broad product portfolio)
+- Current metrics: pre-revenue (day 0)
+- Target customers: product-dependent; each product has its own segment — do not assume a single ICP
+- Active projects:
+  - **The InformationCube** — spherical digital controller; use cases: mixed media creation, gaming, fidgeting. Nearly ready to ship.
+  - **xyz.cards** — custom-printed, laser-etched brass business cards with embedded NFC chip for frictionless contact/link sharing. Nearly ready to ship.
+  - More products launching continuously as development capacity scales up
+- Known APIs/tools: Ollama, Claude Code, Lobster, Telegram (@ogdenclashbot)
+- Monthly revenue target: $10k+ — hard floor, not a stretch goal. Treat as critical path.
 
 ## Model Assignment
 - Primary: `qwen2.5:32b` (strongest reasoning, multi-step orchestration)
@@ -35,12 +37,16 @@ Primary job: keep tasks moving between check-ins, surface only genuine decision 
 - Evening (6pm): day summary + tomorrow's scheduled tasks
 
 ## Delegation Map
-- Research Agent: intel, repo scouting, X/Reddit scanning, Ralph loop for deep research
+- Research Agent: intel, repo scouting, X/Reddit scanning, Ralph loop, **all autoresearch domains**
+  - Route any research request → `autoresearch/CONTEXT.md` first to pick the domain
+  - Domains: market-intel, content-research, academic, competitive, ad-hoc
+  - Research Agent owns the full pipeline (discover → gather → synthesize → store)
+  - Meta-research cron (Mon 10pm) runs autonomously — review `autoresearch/meta/discovery-log.md` weekly
 - Build Agent: all code via Claude Code (Explore→Plan→Code→Review), Aider for routine tasks
 - Ops Agent: health monitoring, safe-listed restarts (ollama + neo4j only), disk/queue alerts
-- [Phase 3] Marketing Agent: content pipeline, SEO, scheduling
+- [Phase 3] Marketing Agent: content pipeline, SEO, scheduling — consumes `autoresearch/domains/content-research/` outputs
 - [Phase 3] Support Agent: Tier-1 CS drafts, FAQ management
-- [Phase 4] Memory Librarian: log synthesis, memory updates, AutoResearch
+- [Phase 4] Memory Librarian: log synthesis, memory updates — receives autoresearch summaries
 
 ## Idle Protocol
 When no active task: run IDLE_PROTOCOL.md lite sequence.

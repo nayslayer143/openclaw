@@ -30,7 +30,7 @@ Lobster runs deterministic workflows. Agents route tasks. Jordan approves via Te
 ├── benchmark/                   ← bakeoff results
 ├── improvements/                ← proposals + postmortems
 ├── mirofish/                    ← simulation engine [Phase 3]
-├── autoresearch/                ← experiment loop [Phase 4]
+├── autoresearch/                ← multi-domain research engine (market-intel, content, academic, competitive, meta)
 ├── logs/                        ← per-agent .jsonl logs
 ├── queue/                       ← pending.json + completed.json
 └── .skills/superpowers/         ← obra/superpowers skills
@@ -50,6 +50,7 @@ Lobster runs deterministic workflows. Agents route tasks. Jordan approves via Te
 | Review history or improve routing | `memory/CONTEXT.md` |
 | Run a model bakeoff or stack evaluation | `benchmark/CONTEXT.md` |
 | Draft a system improvement or postmortem | `improvements/CONTEXT.md` |
+| Run any kind of research task | `autoresearch/CONTEXT.md` |
 | Route any task you're unsure about | `CONTEXT.md` (this folder) |
 
 ---
@@ -77,6 +78,9 @@ If you need upstream context, load only the specific artifact referenced in the 
 | Agent config | `[role].md` | `orchestrator.md` |
 | Bakeoff result | `bakeoff-[date].md` | `bakeoff-2026-03-19.md` |
 | Lobster workflow | `[name].lobster` | `debug-and-fix.lobster` |
+| Research brief | `[domain]-[slug]-[date].md` | `market-polymarket-2026-03-19.md` |
+| Research paper | `[domain]-[slug]-[date].md` | `academic-llm-agents-2026-03-19.md` |
+| Research dataset | `[domain]-[slug]-[date].json` | `competitive-nfc-cards-2026-03-19.json` |
 
 ---
 
@@ -88,6 +92,7 @@ If you need upstream context, load only the specific artifact referenced in the 
 - Memory summaries → `memory/MEMORY.md` (append only, structured)
 - Raw logs → `logs/[agent]-[date].jsonl` (never in memory/)
 - Scout reports → `outputs/` (unprocessed until Intel Scan picks them up)
+- Research outputs → `autoresearch/outputs/{briefs,papers,datasets}/[domain]-[slug]-[date].[ext]`
 - Improvement proposals → `improvements/` (never self-applied)
 - Secrets → `.env` only (never committed, never logged)
 

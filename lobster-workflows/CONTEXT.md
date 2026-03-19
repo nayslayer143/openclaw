@@ -29,7 +29,10 @@ lobster-workflows/
 ├── evening-summary.lobster
 ├── release-candidate.lobster   [Phase 2]
 ├── daily-market-intel.lobster  [Phase 3]
-└── model-benchmark.lobster     [Phase 4]
+├── model-benchmark.lobster     [Phase 4]
+│
+│   # AutoResearch workflows (live in autoresearch/meta/, referenced here)
+└── autoresearch/meta/usecase-discovery.lobster  [cron: Mon 10pm]
 ```
 
 ---

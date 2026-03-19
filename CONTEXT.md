@@ -18,6 +18,7 @@ Do not load all workspaces at once.
 | `memory/` | Summaries, patterns, system learnings | Reviewing history or identifying improvements |
 | `benchmark/` | Model bakeoffs, runtime comparisons, stack evaluations | Model or runtime decisions |
 | `improvements/` | Proposals, postmortems, v-next planning | Structural change review and drafting |
+| `autoresearch/` | Multi-domain research engine (investing, content, academic, competitive, meta) | Any research task — routed by domain |
 
 ---
 
@@ -34,6 +35,12 @@ Do not load all workspaces at once.
 | Run a model bakeoff or evaluate the stack | `benchmark/CONTEXT.md` | Latest bakeoff doc, benchmark prompt set | Queue items, content outputs |
 | Draft or review a system improvement | `improvements/CONTEXT.md` | Proposal file, related memory summary | All active deliverables |
 | Run the build agent bridge (automated) | `lobster-workflows/build-agent-bridge.sh` | Task packet JSON from `repo-queue/` | Unrelated workspace docs |
+| Research: investing, Polymarket, financial signals | `autoresearch/domains/market-intel/config.md` | `autoresearch/core/pipeline.md`, `core/quality-standards.md` | Build artifacts, agent configs |
+| Research: blog, video, content ideation | `autoresearch/domains/content-research/config.md` | `autoresearch/core/pipeline.md`, writing-room voice (if drafting) | Financial data, academic sources |
+| Research: PhD-level paper or lit review | `autoresearch/domains/academic/config.md` | `autoresearch/core/pipeline.md`, `core/quality-standards.md` (strict) | Market intel, build logs |
+| Research: competitor or market landscape | `autoresearch/domains/competitive/config.md` | `autoresearch/core/pipeline.md` | Academic sources, memory archive |
+| Research: something new / undefined | Clone `autoresearch/domains/_template/` | Name it, add to CONTEXT.md tables | — |
+| Review auto-discovered research use cases | `autoresearch/meta/discovery-log.md` | Runs weekly via cron (Mon 10pm) | All other workspaces |
 | Check system health | `logs/` + `queue/pending.json` | `IDLE_PROTOCOL.md` Cycle 1 | All workspace context |
 
 ---
@@ -43,13 +50,22 @@ Do not load all workspaces at once.
 Work flows forward through this chain. Never skip steps. Never pull backward.
 
 ```
-outputs/
-  └─► repo-queue/        (scout finds opportunity → queued as task packet)
-        └─► build-results/   (task packet dispatched → code executed → output contract)
-              └─► memory/        (output contract summarized → patterns extracted)
-                    └─► improvements/  (patterns → improvement proposals)
-                          └─► agents/ or lobster-workflows/
-                                (approved proposals → config or workflow updates)
+autoresearch/ ─────────────────────────────────────────────────┐
+  (research outputs: briefs, papers, datasets)                 │
+  └─► outputs/          (publishable deliverables)             │
+  └─► repo-queue/       (actionable findings → task packets)   │
+  └─► memory/           (summaries for system learning)        │
+                                                               │
+outputs/                                                       │
+  └─► repo-queue/        (scout finds opportunity → task)      │
+        └─► build-results/   (task dispatched → code → output) │
+              └─► memory/        (summarized → patterns)       │
+                    └─► improvements/  (→ proposals)           │
+                          └─► agents/ or lobster-workflows/    │
+                                (approved → config updates)    │
+                                                               │
+autoresearch/meta/ ◄───────────────────────────────────────────┘
+  (weekly cron discovers new research use cases → feeds back in)
 ```
 
 If you need context from an earlier stage, load only the specific artifact referenced in
@@ -78,11 +94,11 @@ routing ambiguity — that's a signal a new routing row is needed.
 
 | Phase | Status | Workspaces active |
 |-------|--------|-------------------|
-| Phase 0 | [x] Complete | CLAUDE.md, CONTEXT.md |
-| Phase 1 | [x] Complete | + agents/, lobster-workflows/, repo-queue/, outputs/ |
-| Phase 2 | [x] Complete | + build-results/, memory/, benchmark/ |
-| Phase 3 | [x] Complete | + mirofish/, revenue workflows |
-| Phase 4 | [x] Complete | + improvements/, autoresearch/, Memory Librarian |
+| Phase 0 | [ ] In progress | CLAUDE.md, CONTEXT.md |
+| Phase 1 | [ ] Locked | + agents/, lobster-workflows/, repo-queue/, outputs/ |
+| Phase 2 | [ ] Locked | + build-results/, memory/, benchmark/ |
+| Phase 3 | [ ] Locked | + mirofish/, revenue workflows |
+| Phase 4 | [ ] Locked | + improvements/, autoresearch/, Memory Librarian |
 
 Update the checkboxes as phases complete. The active phase row tells any session
 which workspace CONTEXT.md files exist and are safe to load.
