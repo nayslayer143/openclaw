@@ -1,0 +1,20 @@
+# Secrets — never commit
+.env
+
+# Log archives
+logs/archive/
+
+# Temp files
+*.tmp
+*.log
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.venv/
