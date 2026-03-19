@@ -81,8 +81,8 @@ routing ambiguity — that's a signal a new routing row is needed.
 | Phase 0 | [x] Complete | CLAUDE.md, CONTEXT.md |
 | Phase 1 | [x] Complete | + agents/, lobster-workflows/, repo-queue/, outputs/ |
 | Phase 2 | [x] Complete | + build-results/, memory/, benchmark/ |
-| Phase 3 | [x] In progress | + mirofish/, revenue workflows |
-| Phase 4 | [ ] Pending | + improvements/, autoresearch/, Memory Librarian |
+| Phase 3 | [x] Complete | + mirofish/, revenue workflows |
+| Phase 4 | [x] Complete | + improvements/, autoresearch/, Memory Librarian |
 
 Update the checkboxes as phases complete. The active phase row tells any session
 which workspace CONTEXT.md files exist and are safe to load.
