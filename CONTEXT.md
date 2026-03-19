@@ -78,8 +78,8 @@ routing ambiguity — that's a signal a new routing row is needed.
 
 | Phase | Status | Workspaces active |
 |-------|--------|-------------------|
-| Phase 0 | [x] In progress | CLAUDE.md, CONTEXT.md |
-| Phase 1 | [ ] Pending | + agents/, lobster-workflows/, repo-queue/, outputs/ |
+| Phase 0 | [x] Complete | CLAUDE.md, CONTEXT.md |
+| Phase 1 | [x] In progress | + agents/, lobster-workflows/, repo-queue/, outputs/ |
 | Phase 2 | [ ] Pending | + build-results/, memory/, benchmark/ |
 | Phase 3 | [ ] Pending | + mirofish/, revenue workflows |
 | Phase 4 | [ ] Pending | + improvements/, autoresearch/, Memory Librarian |
