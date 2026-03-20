@@ -1,0 +1,19 @@
+# Clawmson / OpenClaw dispatcher dependencies
+
+# Core (already in use)
+requests
+
+# Link ingestion — extracts clean readable text from web pages
+trafilatura
+
+# PDF extraction
+pdfplumber
+
+# Excel/spreadsheet parsing
+openpyxl
+
+# Audio transcription (voice notes, audio files)
+# Only needed if Ollama does not have a whisper model loaded.
+# Install with: pip install openai-whisper
+# Requires ffmpeg: brew install ffmpeg
+openai-whisper
