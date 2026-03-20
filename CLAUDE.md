@@ -98,16 +98,16 @@ If you need upstream context, load only the specific artifact referenced in the 
 
 ---
 
-## Model Assignment (strength-based — current local inventory)
+## Model Assignment (confirmed by role-specialist bakeoff 2026-03-19)
 
-| Role | Model | Strength |
-|------|-------|----------|
-| Orchestrator, Research, Planning | `qwen2.5:32b` | Strongest reasoning, multi-step |
-| Build/Code (Claude Code fallback) | `deepseek-coder:33b` | Purpose-built for code |
-| Ops, Fast triage, Routing | `qwen2.5:7b` | Fast, simple tasks |
-| Medium complexity (backup) | `qwen2.5:14b` | Balance of speed + quality |
-| Light coding fallback (Aider) | `deepseek-coder:6.7b` | Lighter code model |
-| Quick drafts, simple templates | `llama3.2:3b` | Fastest available |
+| Role | Model | Result |
+|------|-------|--------|
+| Orchestrator / Memory / Synthesis | `qwen3:32b` | 10/10 tool-calls, 2/2 memory tasks |
+| Research / Planning / Business | `qwen3:30b` | 3/3 research, 6/6 business — 2x faster than 32b |
+| Build / Code (primary) | `qwen3-coder-next` | 10/10 tool-calls, purpose-built agentic coder |
+| Build / Code (fallback) | `devstral-small-2` | 10/10 tool-calls, 16GB lightweight option |
+| Ops / Fast triage / Routing | `qwen2.5:7b` | 3/3 ops tasks, 18.6s avg — 4.5x faster than 32b |
+| Vision (Phase 3+) | `qwen3-vl:32b` | Activate in Phase 3 — not yet tested |
 | Embeddings | `nomic-embed-text` | Always loaded |
 
 ---

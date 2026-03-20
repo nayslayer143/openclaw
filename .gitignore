@@ -11,6 +11,9 @@ logs/archive/
 # Node
 node_modules/
 
+# ChatGPT MCP runtime artifacts
+chatgpt-mcp/.terminal-insights.md
+
 # OS
 .DS_Store
 

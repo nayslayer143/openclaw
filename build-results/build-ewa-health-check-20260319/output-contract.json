@@ -1,0 +1,17 @@
+{
+  "task_id": "build-ewa-health-check-20260319",
+  "status": "success",
+  "changed_files": [
+    "backend/server.py",
+    "tests/test_health.py"
+  ],
+  "tests_run": 2,
+  "tests_passed": 2,
+  "tests_failed": 0,
+  "unresolved_risks": [
+    "version field in /health response (\"1.0.0\") is inconsistent with FastAPI app metadata version (\"2.0.0\") — intentional per task spec but worth aligning eventually"
+  ],
+  "rollback_command": "git checkout main && git branch -D feature/health-endpoint",
+  "summary": "Added GET /health endpoint directly on FastAPI app (not api_router) returning {\"status\": \"ok\", \"version\": \"1.0.0\"} with no authentication. Created tests/test_health.py with two pytest tests verifying HTTP 200 and status field. Both tests pass. Branch: feature/health-endpoint, commit: 791e771.",
+  "suggested_next": "Merge feature/health-endpoint to main via PR (Tier-2 approval required). Optionally align /health version field with app metadata version."
+}

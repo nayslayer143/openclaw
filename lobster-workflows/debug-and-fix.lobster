@@ -18,7 +18,8 @@ steps:
         "repo_path": "{{input.repo_path}}",
         "goal": "{{input.goal}}",
         "acceptance_criteria": {{input.acceptance_criteria | default: []}},
-        "forbidden_operations": ["never touch main branch"],
+        "branch_name": "{{input.type | default: 'feat'}}/{{slug}}",
+        "forbidden_operations": ["never touch main branch", "never git push origin main", "never git push --force"],
         "time_budget_minutes": {{input.time_budget | default: 30}},
         "risk_level": "{{input.risk_level | default: 'low'}}",
         "output_location": "~/openclaw/build-results/build-{{timestamp}}/"
@@ -46,7 +47,7 @@ steps:
       {{result.summary}}
       Changed: {{result.changed_files | join: ', '}}
       Tests: {{result.tests_passed}}/{{result.tests_run}} passed
-      🟡 Tier-2: Reply /approve-{{result.task_id}} to merge
+      🟡 Tier-2: Reply /approve-{{result.task_id}}
       {% elif result.status == 'blocked' %}
       🔴 Build blocked: {{result.task_id}}
       Reason: {{result.summary}}

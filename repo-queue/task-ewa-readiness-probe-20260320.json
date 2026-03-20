@@ -1,0 +1,19 @@
+{
+  "task_id": "build-ewa-readiness-probe-20260320",
+  "repo_path": "/Users/nayslayer/projects/EmergentWebActions",
+  "goal": "Add a GET /ready endpoint to backend/server.py that checks whether the service is ready to accept traffic. It should verify: (1) the app is running, (2) any required env vars are set. Return {\"ready\": true, \"checks\": {\"app\": \"ok\"}} on success with HTTP 200, or {\"ready\": false, \"checks\": {...}} with HTTP 503 if not ready. Add pytest tests for both the ready and not-ready cases.",
+  "acceptance_criteria": [
+    "GET /ready returns 200 and ready:true when service is healthy",
+    "Response includes a checks object",
+    "New pytest tests pass",
+    "All existing tests still pass"
+  ],
+  "forbidden_operations": [
+    "never touch main branch directly",
+    "never commit .env",
+    "never push --force"
+  ],
+  "time_budget_minutes": 20,
+  "risk_level": "low",
+  "output_location": "/Users/nayslayer/openclaw/build-results/build-ewa-readiness-probe-20260320/"
+}

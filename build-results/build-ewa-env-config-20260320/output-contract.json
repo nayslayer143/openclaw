@@ -1,0 +1,20 @@
+{
+  "task_id": "build-ewa-env-config-20260320",
+  "status": "success",
+  "changed_files": [
+    "backend/server.py",
+    "tests/test_config.py"
+  ],
+  "tests_run": 33,
+  "tests_passed": 32,
+  "tests_failed": 1,
+  "unresolved_risks": [
+    "test_intentional_failure in tests/test_health.py is a pre-existing intentional DR drill failure — not caused by this change",
+    "Dynamic env-override tests not covered (PORT/HOST/DEBUG/APP_ENV set at module import time; reload-based testing out of scope)",
+    "backend_test.py excluded from run due to pre-existing missing aiohttp dependency",
+    "/version endpoint still hardcodes env=development instead of using APP_ENV — inconsistency noted, out of scope"
+  ],
+  "rollback_command": "git checkout main && git branch -D feat/build-ewa-env-config-20260320",
+  "summary": "Added PORT, HOST, DEBUG, APP_ENV env vars with defaults (8000, 0.0.0.0, false, development) near top of server.py. Added GET /config endpoint returning non-sensitive config as JSON. Added 8 pytest tests — all pass. All pre-existing tests pass except the pre-existing intentional DR drill failure.",
+  "suggested_next": "Merge feat/build-ewa-env-config-20260320 to main (Tier-2 approval required). Follow-up: update /version endpoint to use APP_ENV instead of hardcoded 'development'."
+}

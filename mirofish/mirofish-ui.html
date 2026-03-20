@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiroFish — Simulation Runner</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    background: #0a0a0a;
+    color: #e0e0e0;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+  a { color: #ff4500; }
+  .shell { max-width: 900px; margin: 0 auto; }
+
+  /* Header */
+  .header { display: flex; align-items: baseline; gap: 16px; margin-bottom: 40px; border-bottom: 1px solid #222; padding-bottom: 20px; }
+  .header h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: 2px; color: #fff; }
+  .header .sub { font-size: 0.75rem; color: #555; }
+  .header .tag { font-size: 0.7rem; background: #ff4500; color: #fff; padding: 2px 8px; letter-spacing: 1px; margin-left: auto; }
+
+  /* Steps indicator */
+  .steps { display: flex; gap: 0; margin-bottom: 40px; }
+  .step { flex: 1; padding: 12px 16px; border: 1px solid #222; font-size: 0.72rem; color: #444; position: relative; }
+  .step + .step { border-left: none; }
+  .step .num { font-size: 1rem; font-weight: 700; display: block; margin-bottom: 4px; }
+  .step.active { border-color: #ff4500; color: #ff4500; }
+  .step.active .num { color: #ff4500; }
+  .step.done { border-color: #2a6e2a; color: #4caf50; background: #0d1f0d; }
+  .step.done .num { color: #4caf50; }
+
+  /* Panels */
+  .panel { border: 1px solid #222; margin-bottom: 24px; }
+  .panel-header { background: #111; border-bottom: 1px solid #222; padding: 10px 16px; font-size: 0.72rem; color: #555; display: flex; justify-content: space-between; align-items: center; }
+  .panel-header .label { color: #888; }
+  .panel-body { padding: 20px; }
+
+  /* Upload zone */
+  .upload-zone {
+    border: 1px dashed #333;
+    background: #0d0d0d;
+    min-height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    text-align: center;
+  }
+  .upload-zone:hover, .upload-zone.drag-over { border-color: #ff4500; background: #110800; }
+  .upload-zone.has-files { align-items: flex-start; justify-content: flex-start; padding: 16px; flex-direction: column; gap: 8px; }
+  .upload-icon { font-size: 1.5rem; margin-bottom: 8px; color: #444; }
+  .upload-title { font-size: 0.85rem; color: #888; margin-bottom: 4px; }
+  .upload-hint { font-size: 0.7rem; color: #444; }
+  .file-item { display: flex; align-items: center; gap: 10px; background: #161616; border: 1px solid #2a2a2a; padding: 8px 12px; width: 100%; font-size: 0.8rem; }
+  .file-name { flex: 1; color: #ccc; }
+  .file-size { color: #555; font-size: 0.7rem; }
+  .remove-btn { background: none; border: none; color: #555; cursor: pointer; font-size: 1rem; padding: 0 4px; }
+  .remove-btn:hover { color: #ff4500; }
+
+  /* Textarea */
+  .prompt-input {
+    width: 100%;
+    background: #0d0d0d;
+    border: 1px solid #222;
+    color: #e0e0e0;
+    font-family: inherit;
+    font-size: 0.85rem;
+    padding: 16px;
+    resize: vertical;
+    min-height: 120px;
+    outline: none;
+    line-height: 1.6;
+  }
+  .prompt-input:focus { border-color: #ff4500; }
+  .prompt-input::placeholder { color: #333; }
+
+  /* Launch button */
+  .launch-btn {
+    width: 100%;
+    background: #ff4500;
+    color: #fff;
+    border: none;
+    padding: 18px 24px;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+  }
+  .launch-btn:hover:not(:disabled) { background: #cc3700; }
+  .launch-btn:disabled { background: #222; color: #444; cursor: not-allowed; }
+
+  /* Log / status */
+  .log-box {
+    background: #060606;
+    border: 1px solid #1a1a1a;
+    padding: 16px;
+    font-size: 0.75rem;
+    line-height: 1.8;
+    min-height: 120px;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+  .log-line { display: flex; gap: 12px; }
+  .log-time { color: #333; flex-shrink: 0; }
+  .log-msg { color: #888; }
+  .log-ok { color: #4caf50; }
+  .log-err { color: #f44336; }
+  .log-info { color: #2196f3; }
+
+  /* Progress bar */
+  .progress-wrap { background: #111; height: 4px; margin: 0; }
+  .progress-fill { height: 4px; background: #ff4500; transition: width 0.4s; }
+
+  /* Results */
+  .result-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #222; margin-top: 16px; }
+  .result-card { background: #0d0d0d; padding: 20px; text-align: center; }
+  .result-val { font-size: 2rem; font-weight: 700; color: #fff; }
+  .result-label { font-size: 0.7rem; color: #555; margin-top: 4px; }
+
+  .ontology-section { margin-top: 20px; }
+  .ontology-title { font-size: 0.72rem; color: #555; margin-bottom: 10px; border-bottom: 1px solid #1a1a1a; padding-bottom: 6px; }
+  .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { background: #161616; border: 1px solid #2a2a2a; padding: 4px 10px; font-size: 0.72rem; color: #888; }
+  .tag.entity { border-color: #1a3a5c; color: #4a9eff; }
+  .tag.relation { border-color: #2a1a3a; color: #9b59ff; }
+
+  .summary-box { background: #060606; border: 1px solid #1a1a1a; padding: 16px; font-size: 0.8rem; color: #888; line-height: 1.8; margin-top: 16px; }
+
+  .hidden { display: none; }
+  input[type=file] { display: none; }
+
+  /* Spinner */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid #333; border-top-color: #ff4500; border-radius: 50%; animation: spin 0.8s linear infinite; vertical-align: middle; margin-right: 8px; }
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- Header -->
+  <div class="header">
+    <h1>MIROFISH</h1>
+    <span class="sub">Swarm Intelligence Simulation Engine</span>
+    <span class="tag">v0.1</span>
+  </div>
+
+  <!-- Step indicator -->
+  <div class="steps">
+    <div class="step" id="step1"><span class="num">01</span>Upload &amp; Ontology</div>
+    <div class="step" id="step2"><span class="num">02</span>Graph Build</div>
+    <div class="step" id="step3"><span class="num">03</span>Complete</div>
+  </div>
+
+  <!-- Upload panel -->
+  <div class="panel" id="inputPanel">
+    <div class="panel-header">
+      <span class="label">01 / SEED FILES</span>
+      <span>PDF · MD · TXT</span>
+    </div>
+    <div class="panel-body">
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" multiple accept=".pdf,.md,.txt">
+        <div id="uploadPlaceholder">
+          <div class="upload-icon">↑</div>
+          <div class="upload-title">Drag files here or click to browse</div>
+          <div class="upload-hint">Seed the simulation with any report, article, or dataset</div>
+        </div>
+        <div id="fileList" class="hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prompt panel -->
+  <div class="panel" id="promptPanel">
+    <div class="panel-header">
+      <span class="label">02 / SIMULATION PROMPT</span>
+    </div>
+    <div class="panel-body">
+      <textarea
+        class="prompt-input"
+        id="promptInput"
+        placeholder="Describe your simulation goal in plain English — e.g. 'If AI agent adoption accelerates 10x over 18 months, what market shifts emerge and which player archetypes win?'"
+      ></textarea>
+    </div>
+  </div>
+
+  <!-- Launch -->
+  <button class="launch-btn" id="launchBtn" disabled onclick="launch()">
+    <span id="launchText">LAUNCH ENGINE</span>
+    <span>→</span>
+  </button>
+
+  <!-- Progress bar -->
+  <div class="progress-wrap">
+    <div class="progress-fill" id="progressFill" style="width:0%"></div>
+  </div>
+
+  <!-- Log panel -->
+  <div class="panel" id="logPanel" style="margin-top:24px">
+    <div class="panel-header">
+      <span class="label">SYSTEM LOG</span>
+      <span id="statusBadge">IDLE</span>
+    </div>
+    <div class="log-box" id="logBox">
+      <div class="log-line"><span class="log-time">--:--:--</span><span class="log-msg">Ready. Upload seed files and enter your simulation prompt.</span></div>
+    </div>
+  </div>
+
+  <!-- Results panel (hidden until complete) -->
+  <div class="panel hidden" id="resultsPanel">
+    <div class="panel-header">
+      <span class="label">RESULTS</span>
+      <span id="projectIdBadge"></span>
+    </div>
+    <div class="panel-body">
+      <div class="result-grid">
+        <div class="result-card"><div class="result-val" id="resNodes">—</div><div class="result-label">ENTITY NODES</div></div>
+        <div class="result-card"><div class="result-val" id="resEdges">—</div><div class="result-label">EDGES</div></div>
+        <div class="result-card"><div class="result-val" id="resChunks">—</div><div class="result-label">TEXT CHUNKS</div></div>
+      </div>
+      <div class="ontology-section">
+        <div class="ontology-title">ENTITY TYPES</div>
+        <div class="tag-list" id="entityTypes"></div>
+      </div>
+      <div class="ontology-section">
+        <div class="ontology-title">RELATION TYPES</div>
+        <div class="tag-list" id="relationTypes"></div>
+      </div>
+      <div class="summary-box hidden" id="analysisSummary"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = 'http://localhost:5001/api';
+let files = [];
+let pollTimer = null;
+
+// ── File handling ──────────────────────────────────────────────────
+const uploadZone = document.getElementById('uploadZone');
+const fileInput  = document.getElementById('fileInput');
+const fileList   = document.getElementById('fileList');
+const placeholder = document.getElementById('uploadPlaceholder');
+const promptInput = document.getElementById('promptInput');
+const launchBtn   = document.getElementById('launchBtn');
+
+uploadZone.addEventListener('click', () => fileInput.click());
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('drag-over'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag-over'));
+uploadZone.addEventListener('drop', e => { e.preventDefault(); uploadZone.classList.remove('drag-over'); addFiles(Array.from(e.dataTransfer.files)); });
+fileInput.addEventListener('change', e => addFiles(Array.from(e.target.files)));
+promptInput.addEventListener('input', checkReady);
+
+function addFiles(newFiles) {
+  const valid = newFiles.filter(f => /\.(pdf|md|txt)$/i.test(f.name));
+  files.push(...valid);
+  renderFiles();
+  checkReady();
+}
+
+function removeFile(i) {
+  files.splice(i, 1);
+  renderFiles();
+  checkReady();
+}
+
+function renderFiles() {
+  if (files.length === 0) {
+    placeholder.classList.remove('hidden');
+    fileList.classList.add('hidden');
+    uploadZone.classList.remove('has-files');
+    return;
+  }
+  placeholder.classList.add('hidden');
+  fileList.classList.remove('hidden');
+  uploadZone.classList.add('has-files');
+  fileList.innerHTML = files.map((f, i) => `
+    <div class="file-item">
+      <span class="file-name">${f.name}</span>
+      <span class="file-size">${(f.size/1024).toFixed(1)} KB</span>
+      <button class="remove-btn" onclick="event.stopPropagation();removeFile(${i})">×</button>
+    </div>
+  `).join('');
+}
+
+function checkReady() {
+  launchBtn.disabled = files.length === 0 || !promptInput.value.trim();
+}
+
+// ── Logging ──────────────────────────────────────────────────────
+const logBox = document.getElementById('logBox');
+const statusBadge = document.getElementById('statusBadge');
+
+function log(msg, type = '') {
+  const t = new Date().toTimeString().slice(0, 8);
+  const div = document.createElement('div');
+  div.className = 'log-line';
+  div.innerHTML = `<span class="log-time">${t}</span><span class="log-msg ${type ? 'log-'+type : ''}">${msg}</span>`;
+  logBox.appendChild(div);
+  logBox.scrollTop = logBox.scrollHeight;
+}
+
+function setStatus(text) { statusBadge.textContent = text; }
+function setProgress(pct) { document.getElementById('progressFill').style.width = pct + '%'; }
+
+// ── Steps ─────────────────────────────────────────────────────────
+function setStep(n) {
+  for (let i = 1; i <= 3; i++) {
+    const el = document.getElementById('step' + i);
+    el.className = 'step' + (i < n ? ' done' : i === n ? ' active' : '');
+  }
+}
+
+// ── Main launch ───────────────────────────────────────────────────
+async function launch() {
+  launchBtn.disabled = true;
+  document.getElementById('inputPanel').style.opacity = '0.5';
+  document.getElementById('promptPanel').style.opacity = '0.5';
+  document.getElementById('resultsPanel').classList.add('hidden');
+  setProgress(0);
+  setStep(1);
+  setStatus('RUNNING');
+
+  // ── Step 1: Ontology generation ──
+  log('Uploading seed files and generating ontology...', 'info');
+  const form = new FormData();
+  files.forEach(f => form.append('files', f));
+  form.append('simulation_requirement', promptInput.value.trim());
+  form.append('project_name', 'MiroFish-' + Date.now());
+
+  let projectId, ontology, summary;
+  try {
+    setProgress(5);
+    const r = await fetch(`${API}/graph/ontology/generate`, { method: 'POST', body: form });
+    const data = await r.json();
+    if (!data.success) throw new Error(data.error || 'Ontology generation failed');
+
+    projectId = data.data.project_id;
+    ontology  = data.data.ontology;
+    summary   = data.data.analysis_summary;
+    const textLen = data.data.total_text_length || 0;
+
+    log(`Project created: ${projectId}`, 'ok');
+    log(`Text extracted: ${textLen.toLocaleString()} chars`);
+    log(`Entity types: ${(ontology.entity_types||[]).length} | Relation types: ${(ontology.edge_types||ontology.relation_types||[]).length}`, 'ok');
+    document.getElementById('projectIdBadge').textContent = projectId;
+    setProgress(30);
+  } catch (err) {
+    log('Ontology generation failed: ' + err.message, 'err');
+    setStatus('FAILED');
+    resetUI();
+    return;
+  }
+
+  // ── Step 2: Graph build ──
+  setStep(2);
+  log('Starting graph build...', 'info');
+  let taskId;
+  try {
+    const r = await fetch(`${API}/graph/build`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ project_id: projectId })
+    });
+    const data = await r.json();
+    if (!data.success) throw new Error(data.error || 'Graph build start failed');
+    taskId = data.data.task_id;
+    log(`Build task started: ${taskId}`);
+    setProgress(35);
+  } catch (err) {
+    log('Graph build failed: ' + err.message, 'err');
+    setStatus('FAILED');
+    resetUI();
+    return;
+  }
+
+  // ── Poll task ──
+  await pollTask(taskId, ontology, summary);
+}
+
+async function pollTask(taskId, ontology, summary) {
+  return new Promise(resolve => {
+    pollTimer = setInterval(async () => {
+      try {
+        const r = await fetch(`${API}/graph/task/${taskId}`);
+        const data = await r.json();
+        if (!data.success) return;
+        const task = data.data;
+
+        // Update progress
+        const pct = 35 + Math.round((task.progress || 0) * 0.6);
+        setProgress(pct);
+        if (task.message) log(task.message);
+
+        if (task.status === 'completed') {
+          clearInterval(pollTimer);
+          setProgress(100);
+          setStep(3);
+          setStatus('COMPLETE');
+          log('Graph build complete!', 'ok');
+          showResults(task.result, ontology, summary);
+          resetUI(true);
+          resolve();
+        } else if (task.status === 'failed') {
+          clearInterval(pollTimer);
+          setStatus('FAILED');
+          log('Build failed: ' + (task.error || task.message || 'unknown error'), 'err');
+          resetUI();
+          resolve();
+        }
+      } catch (e) {
+        // network glitch — keep polling
+      }
+    }, 3000);
+  });
+}
+
+function showResults(result, ontology, summary) {
+  document.getElementById('resultsPanel').classList.remove('hidden');
+  document.getElementById('resNodes').textContent  = result?.node_count  ?? '—';
+  document.getElementById('resEdges').textContent  = result?.edge_count  ?? '—';
+  document.getElementById('resChunks').textContent = result?.chunk_count ?? '—';
+
+  const entityTypes   = ontology?.entity_types   || [];
+  const relationTypes = ontology?.edge_types || ontology?.relation_types || [];
+
+  document.getElementById('entityTypes').innerHTML =
+    entityTypes.map(e => `<span class="tag entity">${e.name || e}</span>`).join('');
+
+  document.getElementById('relationTypes').innerHTML =
+    relationTypes.slice(0, 20).map(r =>
+      `<span class="tag relation">${r.source_type || ''} → ${r.name || r} → ${r.target_type || ''}</span>`
+    ).join('');
+
+  if (summary) {
+    const box = document.getElementById('analysisSummary');
+    box.textContent = summary;
+    box.classList.remove('hidden');
+  }
+
+  document.getElementById('resultsPanel').scrollIntoView({ behavior: 'smooth' });
+}
+
+function resetUI(success = false) {
+  launchBtn.disabled = !success;
+  launchBtn.disabled = false;
+  checkReady();
+  document.getElementById('inputPanel').style.opacity = '1';
+  document.getElementById('promptPanel').style.opacity = '1';
+}
+</script>
+</body>
+</html>

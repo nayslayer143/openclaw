@@ -1,0 +1,19 @@
+{
+  "task_id": "build-ewa-version-endpoint-20260320",
+  "repo_path": "/Users/nayslayer/projects/EmergentWebActions",
+  "goal": "Add a GET /version endpoint to backend/server.py that returns {\"version\": \"1.0.0\", \"service\": \"EmergentWebActions\", \"env\": \"development\"}. No authentication required. Add a test in tests/ that calls GET /version and asserts status 200 and the correct fields are present.",
+  "acceptance_criteria": [
+    "GET /version returns HTTP 200",
+    "Response contains version, service, and env fields",
+    "New pytest test passes",
+    "All existing tests still pass"
+  ],
+  "forbidden_operations": [
+    "never touch main branch directly",
+    "never commit .env",
+    "never push --force"
+  ],
+  "time_budget_minutes": 20,
+  "risk_level": "low",
+  "output_location": "/Users/nayslayer/openclaw/build-results/build-ewa-version-endpoint-20260320/"
+}

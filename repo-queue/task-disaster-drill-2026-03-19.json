@@ -1,0 +1,22 @@
+{
+  "task_id": "build-disaster-drill-20260319",
+  "repo_path": "/Users/nayslayer/projects/EmergentWebActions",
+  "goal": "Disaster recovery drill (Step 2.7). Do the following exactly:\n1. Create branch chore/disaster-drill\n2. Introduce an intentional failing test: in tests/test_health.py, add a test named test_intentional_failure that always asserts False with message 'intentional failure for DR drill'\n3. Run pytest and confirm it fails\n4. Write output contract with status 'blocked', list the failing test in unresolved_risks, and set rollback_command to 'git checkout main && git branch -D chore/disaster-drill'\n5. Do NOT attempt to fix the failure — the goal is to prove the system correctly identifies and blocks on failure\n6. Do NOT deploy or push anything to staging or main",
+  "acceptance_criteria": [
+    "Branch chore/disaster-drill created",
+    "Intentional failing test added",
+    "pytest confirms failure",
+    "Output contract status is 'blocked'",
+    "unresolved_risks lists the failing test",
+    "Nothing merged to main"
+  ],
+  "forbidden_operations": [
+    "never touch main branch",
+    "never push to origin main",
+    "never push to staging",
+    "never merge chore/disaster-drill"
+  ],
+  "time_budget_minutes": 15,
+  "risk_level": "low",
+  "output_location": "/Users/nayslayer/openclaw/build-results/build-disaster-drill-20260319/"
+}

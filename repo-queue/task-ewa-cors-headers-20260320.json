@@ -1,0 +1,19 @@
+{
+  "task_id": "build-ewa-cors-headers-20260320",
+  "repo_path": "/Users/nayslayer/projects/EmergentWebActions",
+  "goal": "Add CORS headers to backend/server.py so that the API can be called from browser clients. Allow origins: *, methods: GET, POST, PUT, DELETE, OPTIONS, headers: Content-Type, Authorization. Handle OPTIONS preflight requests with 200. Add a test that verifies CORS headers are present on responses.",
+  "acceptance_criteria": [
+    "Responses include Access-Control-Allow-Origin: *",
+    "OPTIONS preflight returns 200 with correct headers",
+    "New pytest test passes",
+    "All existing tests still pass"
+  ],
+  "forbidden_operations": [
+    "never touch main branch directly",
+    "never commit .env",
+    "never push --force"
+  ],
+  "time_budget_minutes": 20,
+  "risk_level": "low",
+  "output_location": "/Users/nayslayer/openclaw/build-results/build-ewa-cors-headers-20260320/"
+}

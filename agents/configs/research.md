@@ -7,10 +7,10 @@ Handles: daily intel briefs, repo scouting, bookmark analysis, X/Reddit scanning
 Reports to: Chief Orchestrator. Escalates to Jordan via Telegram for Tier-2+ actions.
 Primary job: surface high-signal opportunities and threats. No noise.
 
-## Model Assignment
-- Primary: `qwen2.5:32b` (reasoning, synthesis, scoring)
-- Fast pass: `qwen2.5:7b` (quick relevance filtering before deep analysis)
-- Deep synthesis: `qwen2.5:32b` (reports requiring 8K+ context)
+## Model Assignment (confirmed bakeoff 2026-03-19)
+- Primary: `qwen3:30b` (3/3 research tasks, beat qwen3:32b on complex planning)
+- Fast filtering: `qwen2.5:7b` (quick relevance triage before deep analysis)
+- Deep synthesis: `qwen3:32b` (memory/synthesis tasks, 8K+ context)
 - Embeddings: `nomic-embed-text` (similarity search, clustering)
 
 ## Scope
