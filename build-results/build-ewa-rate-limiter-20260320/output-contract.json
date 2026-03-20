@@ -1,0 +1,19 @@
+{
+  "task_id": "build-ewa-rate-limiter-20260320",
+  "status": "success",
+  "changed_files": [
+    "backend/server.py",
+    "tests/test_rate_limiter.py"
+  ],
+  "tests_run": 21,
+  "tests_passed": 20,
+  "tests_failed": 1,
+  "unresolved_risks": [
+    "X-Forwarded-For is client-controlled — IP can be spoofed to bypass the limiter; acceptable for simple in-memory scope",
+    "_rate_limit_store dict keys are never pruned — memory grows with unique IPs; benign in normal operation",
+    "Rate-limited 429 responses bypass log_requests middleware (LIFO ordering) — 429s are not logged"
+  ],
+  "rollback_command": "git checkout main && git branch -D feat/build-ewa-rate-limiter-20260320",
+  "summary": "Added sliding-window in-memory rate limiter middleware to backend/server.py. Each IP is limited to 60 requests per 60 seconds. Requests over the limit return HTTP 429 with JSON body {\"error\": \"Rate limit exceeded\", \"status\": 429}. IP extracted from X-Forwarded-For header or request.client.host. Three new pytest tests pass (429 after exceeding limit, 429 body shape, within-limit success). One pre-existing DR drill failure (test_intentional_failure) is unrelated to this change.",
+  "suggested_next": "Merge feat/build-ewa-rate-limiter-20260320 to main via PR (Tier-2 approval). Future hardening: add per-minute log line for 429 responses, consider pruning stale IP keys from _rate_limit_store on a timer, or replace with Redis-backed limiter if multi-instance deploy is needed."
+}

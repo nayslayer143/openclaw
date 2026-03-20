@@ -1,0 +1,17 @@
+{
+  "task_id": "build-ewa-request-id-20260320",
+  "status": "success",
+  "changed_files": [
+    "backend/server.py",
+    "tests/test_request_id.py"
+  ],
+  "tests_run": 37,
+  "tests_passed": 36,
+  "tests_failed": 1,
+  "unresolved_risks": [
+    "Log injection: client-supplied X-Request-ID containing newlines embeds them in log output. Low severity — no execution path, only cosmetic log pollution. Mitigate later with a log sanitizer or header value length cap."
+  ],
+  "rollback_command": "git checkout main && git branch -D feat/build-ewa-request-id-20260320",
+  "summary": "Added request_id middleware to backend/server.py. Clients can supply X-Request-ID (echoed back) or the server generates a UUID4. ID is set on request.state before log_requests runs, so it appears in every log line as rid=<id> and in every response header. 4 new pytest tests cover all acceptance criteria. 1 pre-existing failure (test_intentional_failure DR drill) unchanged. Pre-existing backend_test.py collection error (missing aiohttp) is unrelated.",
+  "suggested_next": "Merge feat/build-ewa-request-id-20260320 to main via PR (Tier-2 approval). Optionally add X-Request-ID to CORS expose_headers so browser clients can read it."
+}

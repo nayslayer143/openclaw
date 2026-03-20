@@ -1,0 +1,10 @@
+{
+  "task_id": "build-what-are-you-currently-working-on-and-wh-20260320005846",
+  "status": "blocked",
+  "summary": "Claude Code did not produce an output contract. Exit code: 127. Check /Users/nayslayer/openclaw/logs/build-agent-2026-03-20.jsonl for details.",
+  "changed_files": [],
+  "tests_run": 0, "tests_passed": 0, "tests_failed": 0,
+  "unresolved_risks": ["No output contract produced — session may have failed or timed out"],
+  "rollback_command": "git checkout main -- .",
+  "suggested_next": "Needs human review — run task interactively in Claude Code"
+}

@@ -1,0 +1,18 @@
+{
+  "task_id": "build-ewa-health-check-20260319",
+  "repo_path": "/Users/nayslayer/projects/EmergentWebActions",
+  "goal": "Add a GET /health endpoint to backend/server.py that returns {\"status\": \"ok\", \"version\": \"1.0.0\"}. The endpoint should not require authentication. Add a corresponding test in tests/ that calls GET /health and asserts status 200 and status=ok.",
+  "acceptance_criteria": [
+    "GET /health returns HTTP 200",
+    "Response body contains {\"status\": \"ok\"}",
+    "New test passes via pytest"
+  ],
+  "forbidden_operations": [
+    "never touch main branch directly",
+    "never modify Stripe payment routes",
+    "never commit .env"
+  ],
+  "time_budget_minutes": 20,
+  "risk_level": "low",
+  "output_location": "/Users/nayslayer/openclaw/build-results/build-ewa-health-check-20260319/"
+}

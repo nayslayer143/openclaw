@@ -1,0 +1,17 @@
+{
+  "task_id": "build-ewa-version-endpoint-20260320",
+  "status": "success",
+  "changed_files": [
+    "backend/server.py",
+    "tests/test_version.py"
+  ],
+  "tests_run": 7,
+  "tests_passed": 6,
+  "tests_failed": 1,
+  "unresolved_risks": [
+    "test_intentional_failure in tests/test_health.py is a pre-existing deliberate failure (DR drill marker — assert False). Not a regression. Was failing before this task."
+  ],
+  "rollback_command": "git checkout main && git branch -D feat/build-ewa-version-endpoint-20260320",
+  "summary": "Added GET /version endpoint to backend/server.py returning {version, service, env} with no auth. Added tests/test_version.py with 4 tests (status 200 + each field). All 4 new tests pass. 2 pre-existing health tests pass. 1 pre-existing intentional failure unchanged.",
+  "suggested_next": "Merge feat/build-ewa-version-endpoint-20260320 into main via PR (Tier-2: requires Jordan approval per CLAUDE.md)."
+}

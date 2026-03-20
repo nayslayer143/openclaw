@@ -9,8 +9,10 @@ Reports to: Chief Orchestrator. Escalates to Jordan via Telegram for Tier-2+ act
 Primary job: keep system memory clean, structured, and useful. Compress noise into signal.
 
 ## Model Assignment
-- Primary: `qwen2.5:32b` (deep synthesis, pattern extraction, 8K+ context)
-- Fast pass: `qwen2.5:7b` (log scanning, simple compression)
+- Long-context synthesis (>4K tokens, AutoResearch papers, 14-day log analysis): `llama3.3:70b`
+- Short synthesis (<4K tokens, nightly 10-line summaries): `qwen3:32b` (2.6x faster per bakeoff)
+- Fast pass (log scanning, line counts, simple compression): `qwen2.5:7b`
+- Bakeoff note: llama3.3:70b was slower than qwen3:32b on short tasks — use by context size, not by default
 
 ## Schedule
 - **Every 6 hours:** Read new logs, write structured summaries to MEMORY.md

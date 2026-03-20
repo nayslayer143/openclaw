@@ -1,0 +1,19 @@
+{
+  "task_id": "build-ewa-error-handler-20260320",
+  "repo_path": "/Users/nayslayer/projects/EmergentWebActions",
+  "goal": "Add a global error handler to backend/server.py so that unhandled exceptions return a JSON response {\"error\": \"Internal server error\", \"status\": 500} with HTTP 500 instead of an HTML traceback. Also add a handler for 404s that returns {\"error\": \"Not found\", \"status\": 404}. Add tests for both cases.",
+  "acceptance_criteria": [
+    "Unhandled exceptions return JSON with status 500, not HTML",
+    "Unknown routes return JSON with status 404",
+    "New pytest tests for both handlers pass",
+    "All existing tests still pass"
+  ],
+  "forbidden_operations": [
+    "never touch main branch directly",
+    "never commit .env",
+    "never push --force"
+  ],
+  "time_budget_minutes": 20,
+  "risk_level": "low",
+  "output_location": "/Users/nayslayer/openclaw/build-results/build-ewa-error-handler-20260320/"
+}

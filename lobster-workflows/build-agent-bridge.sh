@@ -15,6 +15,9 @@
 
 set -euo pipefail
 
+# Ensure claude is always findable regardless of how this script is invoked
+export PATH="/Users/nayslayer/.local/bin:/usr/local/bin:/opt/homebrew/bin:${PATH}"
+
 # ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
@@ -93,7 +96,7 @@ TASK_PACKET_CONTENTS=$(cat "$TASK_PACKET_FILE")
 PROMPT=$(cat <<PROMPT
 Read ${BUILD_AGENT_CONFIG} and ${BUILD_CONTEXT}.
 
-You are the Build Agent in Jordan's OpenClaw system.
+You are the Build Agent in the OpenClaw system.
 Execute the 4-mode sequence (Explore→Plan→Code→Review) for this task packet.
 
 TASK PACKET:
@@ -124,7 +127,8 @@ Output contract must match this exact schema:
 }
 
 CONSTRAINTS:
-- Never edit main branch directly
+- Never edit main branch directly — all work on feature branches: feat/task-id, fix/task-id, chore/task-id
+- Never run: git push origin main, git push --force, git reset --hard
 - Never run destructive commands (rm -rf, DROP TABLE, curl | sh, eval)
 - Time budget: ${TIME_BUDGET} minutes — if you exceed it, write a partial output contract
 - If blocked at any stage, stop and write output contract with status: "blocked" and reason
@@ -144,9 +148,8 @@ fi
 # Run Claude Code non-interactively
 # --allowedTools scopes what Claude Code can do in this session
 # Remove --dangerously-skip-permissions only after confirming pre-bash-check.sh hook is active
-CLAUDE_OUTPUT=$(claude --print \
-  --allowedTools "Read,Edit,Write,Bash,Glob,Grep" \
-  "$PROMPT" 2>&1) || CLAUDE_EXIT=$?
+CLAUDE_OUTPUT=$(echo "$PROMPT" | claude --print \
+  --allowedTools "Read,Edit,Write,Bash,Glob,Grep" 2>&1) || CLAUDE_EXIT=$?
 
 CLAUDE_EXIT="${CLAUDE_EXIT:-0}"
 

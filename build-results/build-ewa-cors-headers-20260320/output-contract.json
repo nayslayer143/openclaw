@@ -1,0 +1,17 @@
+{
+  "task_id": "build-ewa-cors-headers-20260320",
+  "status": "success",
+  "changed_files": [
+    "backend/server.py",
+    "tests/test_cors.py"
+  ],
+  "tests_run": 18,
+  "tests_passed": 17,
+  "tests_failed": 1,
+  "unresolved_risks": [
+    "tests/test_health.py::test_intentional_failure is a pre-existing DR drill failure (assert False) — not a regression from this change"
+  ],
+  "rollback_command": "git checkout main && git branch -D feat/build-ewa-cors-headers-20260320",
+  "summary": "Updated CORSMiddleware in backend/server.py to use explicit allowed methods (GET, POST, PUT, DELETE, OPTIONS) and headers (Content-Type, Authorization), and removed invalid allow_credentials=True + allow_origins=['*'] combination. Added tests/test_cors.py with 4 tests covering allow-origin header, OPTIONS preflight 200 status, allowed methods, and allowed headers. All 4 new CORS tests pass. Branch: feat/build-ewa-cors-headers-20260320.",
+  "suggested_next": "Merge feat/build-ewa-cors-headers-20260320 to main (Tier-2 approval required per CLAUDE.md). Consider removing test_intentional_failure from test_health.py if DR drill is complete."
+}

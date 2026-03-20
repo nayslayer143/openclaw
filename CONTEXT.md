@@ -94,9 +94,9 @@ routing ambiguity — that's a signal a new routing row is needed.
 
 | Phase | Status | Workspaces active |
 |-------|--------|-------------------|
-| Phase 0 | [ ] In progress | CLAUDE.md, CONTEXT.md |
-| Phase 1 | [ ] Locked | + agents/, lobster-workflows/, repo-queue/, outputs/ |
-| Phase 2 | [ ] Locked | + build-results/, memory/, benchmark/ |
+| Phase 0 | [x] Complete | CLAUDE.md, CONTEXT.md |
+| Phase 1 | [x] Complete | + agents/, lobster-workflows/, repo-queue/, outputs/ |
+| Phase 2 | [ ] Active | + build-results/, memory/, benchmark/ |
 | Phase 3 | [ ] Locked | + mirofish/, revenue workflows |
 | Phase 4 | [ ] Locked | + improvements/, autoresearch/, Memory Librarian |
 

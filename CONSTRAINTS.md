@@ -43,16 +43,16 @@ Message format: `🔴 Tier-3 [task-id]: [action + exact impact]`
 - Deploy: Staging only
 - Payments/secrets: Never autonomous
 
-## Model Assignment (static — do not override without bakeoff evidence)
+## Model Assignment (confirmed by role-specialist bakeoff 2026-03-19 — do not override without new bakeoff)
 
 | Role | Model |
 |------|-------|
-| Orchestrator, Research, Planning | `qwen2.5:32b` |
-| Build/Code (Claude Code fallback) | `deepseek-coder:33b` |
-| Ops, Fast triage, Routing | `qwen2.5:7b` |
-| Medium complexity (backup) | `qwen2.5:14b` |
-| Light coding fallback (Aider) | `deepseek-coder:6.7b` |
-| Quick drafts, simple templates | `llama3.2:3b` |
+| Orchestrator / Memory / Synthesis | `qwen3:32b` |
+| Research / Planning / Business | `qwen3:30b` |
+| Build / Code (primary) | `qwen3-coder-next` |
+| Build / Code (fallback) | `devstral-small-2` |
+| Ops / Fast triage / Routing | `qwen2.5:7b` |
+| Vision (Phase 3+) | `qwen3-vl:32b` |
 | Embeddings | `nomic-embed-text` |
 
 ## Failure Handling

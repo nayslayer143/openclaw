@@ -56,7 +56,7 @@ memory/
 | Tool / Skill | Use for | When to use | Do not use for |
 |--------------|---------|-------------|----------------|
 | Orchestrator / Memory Librarian [Phase 4] | Summarization, pattern extraction | Daily consolidation | Code implementation |
-| `qwen2.5:32b` | Deep synthesis of patterns | When 8K+ context needed | Simple log archival |
+| `qwen3:32b` | Deep synthesis of patterns | When 8K+ context needed | Simple log archival |
 
 ---
 

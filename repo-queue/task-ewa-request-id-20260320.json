@@ -1,0 +1,21 @@
+{
+  "task_id": "build-ewa-request-id-20260320",
+  "repo_path": "/Users/nayslayer/projects/EmergentWebActions",
+  "goal": "Add request ID middleware to backend/server.py. Each request should be assigned a unique UUID (X-Request-ID header). If the client sends an X-Request-ID header, use that value; otherwise generate a new UUID. The request ID should appear in the response headers and in the request log line. Add a pytest test that verifies the X-Request-ID header is present in responses.",
+  "acceptance_criteria": [
+    "Every response includes an X-Request-ID header",
+    "Client-provided X-Request-ID is echoed back",
+    "Server-generated X-Request-ID is a valid UUID",
+    "Request ID appears in log output",
+    "New pytest tests pass",
+    "All existing tests still pass"
+  ],
+  "forbidden_operations": [
+    "never touch main branch directly",
+    "never commit .env",
+    "never push --force"
+  ],
+  "time_budget_minutes": 20,
+  "risk_level": "low",
+  "output_location": "/Users/nayslayer/openclaw/build-results/build-ewa-request-id-20260320/"
+}

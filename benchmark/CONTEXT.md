@@ -42,17 +42,19 @@ benchmark/
 
 ---
 
-## Current Model Inventory
+## Confirmed Model Assignments (bakeoff 2026-03-19)
 
-| Model | Size | Role |
-|-------|------|------|
-| `qwen2.5:32b` | 19 GB | Orchestrator, Research, Planning |
-| `deepseek-coder:33b` | 18 GB | Build/Code |
-| `qwen2.5:14b` | 9 GB | Medium complexity backup |
-| `qwen2.5:7b` | 4.7 GB | Ops, fast triage |
-| `deepseek-coder:6.7b` | 3.8 GB | Light coding fallback |
-| `llama3.2:3b` | 2 GB | Quick drafts |
-| `nomic-embed-text` | 274 MB | Embeddings (always loaded) |
+| Model | Role |
+|-------|------|
+| `qwen3:32b` | Orchestrator / Memory / Synthesis |
+| `qwen3:30b` | Research / Planning / Business |
+| `qwen3-coder-next` | Build / Code (primary) |
+| `devstral-small-2` | Build / Code (fallback) |
+| `qwen2.5:7b` | Ops / Fast triage / Routing |
+| `nomic-embed-text` | Embeddings (always loaded) |
+
+See `bakeoff-role-specialist-2026-03-19.md` for full results.
+v4.2 policy patch: `openclaw-v4.2-model-patch.md` (MoE ban lifted for agent-optimized models).
 
 ---
 
@@ -71,7 +73,7 @@ benchmark/
 - Never change model assignments in CONSTRAINTS.md without bakeoff evidence
 - Never run bakeoffs during active build tasks (resource contention)
 - Never trust subjective quality assessment — use structured scoring only
-- Never benchmark MoE models for agent tool-calling (they loop on multi-step chains)
+- MoE models allowed for agent tool-calling if agent-optimized (see v4.2 patch)
 
 ---
 

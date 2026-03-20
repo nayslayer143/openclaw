@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#060606">
+<title>GONZOCLAW ✦ Dashboard</title>
+<link rel="manifest" href="/manifest.json">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #060606;
+  --surface:    rgba(10,10,10,0.98);
+  --surface2:   rgba(15,15,15,0.98);
+  --orange:     #e86800;
+  --orange-hi:  #ff7c1a;
+  --orange-dim: rgba(232,104,0,0.10);
+  --white:      #f0ece4;
+  --offwhite:   #d8d4ca;
+  --grey1:      #aaa69e;
+  --grey2:      #666360;
+  --grey3:      #2e2c2a;
+  --dim:        rgba(200,195,185,0.36);
+  --border:     rgba(232,104,0,0.13);
+  --border-mid: rgba(232,104,0,0.28);
+  --border-hi:  rgba(232,104,0,0.60);
+  /* Rare neon — used only for live status and failed alerts */
+  --neon-green: #00ff88;
+  --neon-red:   #ff002e;
+  --neon-cyan:  #00d4ff;
+}
+
+body {
+  font-family: 'SF Mono', 'JetBrains Mono', 'Fira Code', monospace;
+  background: var(--bg);
+  color: var(--offwhite);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Background ────────────────────────────────────────────────── */
+/* Halftone dots */
+.bg-dots {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.022) 1px, transparent 1px);
+  background-size: 10px 10px;
+}
+/* Ambient lamp glow — top right, like a street lamp in rain */
+.bg-lamp {
+  position: fixed; top: -120px; right: -80px;
+  width: 600px; height: 600px; z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse, rgba(232,104,0,0.07) 0%, transparent 65%);
+}
+/* Scanlines */
+.bg-scan {
+  position: fixed; inset: 0; z-index: 998; pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 3px,
+    rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px
+  );
+}
+/* Ink vignette */
+.bg-vignette {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.7) 100%);
+}
+
+/* ── Nav ───────────────────────────────────────────────────────── */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(4,4,4,0.98);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--grey3);
+  padding: 0 28px; height: 58px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+/* Double-rule under nav — manga panel border feel */
+.nav::after {
+  content: '';
+  position: absolute; bottom: -4px; left: 0; right: 0; height: 1px;
+  background: var(--border);
+}
+.nav-brand {
+  font-size: 1.05rem; font-weight: 900; letter-spacing: 8px;
+  color: var(--orange-hi);
+  text-shadow:
+    0 0 18px rgba(255,124,26,0.55),
+    0 0 40px rgba(255,124,26,0.15);
+  animation: brand-breathe 5s ease-in-out infinite alternate;
+}
+@keyframes brand-breathe {
+  0%   { text-shadow: 0 0 14px rgba(255,124,26,0.45), 0 0 32px rgba(255,124,26,0.10); }
+  100% { text-shadow: 0 0 24px rgba(255,124,26,0.70), 0 0 50px rgba(255,124,26,0.22); }
+}
+.nav-right { display: flex; align-items: center; gap: 16px; }
+.clawmpson-btn {
+  font-size: 0.56rem; letter-spacing: 2px; padding: 4px 14px;
+  border: 1px solid var(--orange); border-radius: 1px;
+  background: transparent; color: var(--orange);
+  cursor: pointer; font-family: inherit;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.clawmpson-btn:hover,
+.clawmpson-btn.active {
+  background: var(--orange); color: #000;
+  box-shadow: 0 0 14px rgba(232,104,0,0.5);
+}
+.live-pill {
+  font-size: 0.56rem; letter-spacing: 2px; padding: 3px 12px;
+  border: 1px solid; border-radius: 1px;
+}
+.live-pill.live {
+  border-color: var(--neon-green); color: var(--neon-green);
+  box-shadow: 0 0 8px rgba(0,255,136,0.25);
+  animation: pill-pulse 2.5s ease-in-out infinite;
+}
+.live-pill.dead { border-color: var(--neon-red); color: var(--neon-red); }
+@keyframes pill-pulse { 50% { box-shadow: 0 0 16px rgba(0,255,136,0.50); } }
+.nav-user { font-size: 0.60rem; color: var(--grey2); letter-spacing: 1px; }
+.logout-btn {
+  font-size: 0.58rem; color: var(--grey2); background: none;
+  border: none; cursor: pointer; font-family: inherit; letter-spacing: 1px;
+}
+.logout-btn:hover { color: var(--orange-hi); }
+
+/* ── Shell ─────────────────────────────────────────────────────── */
+.shell {
+  position: relative; z-index: 1;
+  max-width: 1440px; margin: 0 auto;
+  padding: 28px 28px 88px;
+}
+
+/* ── Stat cards ────────────────────────────────────────────────── */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(6,1fr);
+  gap: 1px; margin-bottom: 20px;
+  background: var(--grey3);
+  border: 1px solid var(--grey3);
+}
+@media (max-width:900px) { .stats-grid { grid-template-columns: repeat(3,1fr); } }
+.stat-card {
+  background: var(--surface);
+  padding: 18px 12px 14px;
+  text-align: center; position: relative; overflow: hidden;
+  transition: background 0.2s;
+}
+/* Halftone on hover */
+.stat-card:hover { background: rgba(16,14,12,0.98); }
+.stat-card::after {
+  content: '';
+  position: absolute; inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.018) 1px, transparent 1px);
+  background-size: 8px 8px;
+  pointer-events: none;
+}
+/* Top accent line — orange only on highlight cards */
+.stat-card.accent::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: var(--orange);
+  box-shadow: 0 0 8px rgba(232,104,0,0.5);
+}
+.stat-emoji { font-size: 1rem; margin-bottom: 4px; display: block; }
+.stat-val {
+  font-size: 2.2rem; font-weight: 900; line-height: 1;
+  color: var(--white);
+}
+.stat-val.ok     { color: var(--white); }
+.stat-val.warn   { color: var(--orange); text-shadow: 0 0 12px rgba(232,104,0,0.4); }
+.stat-val.err    { color: var(--neon-red); text-shadow: 0 0 12px rgba(255,0,46,0.5); }
+.stat-val.mid    { color: var(--grey1); }
+.stat-val.hi     { color: var(--orange-hi); text-shadow: 0 0 16px rgba(255,124,26,0.4); }
+.stat-lbl {
+  font-size: 0.52rem; color: var(--grey2);
+  letter-spacing: 2px; margin-top: 8px; text-transform: uppercase;
+}
+.stat-val.pop { animation: num-pop 0.3s ease-out; }
+@keyframes num-pop { 40% { transform: scale(1.25); } }
+
+/* ── Phase bar ─────────────────────────────────────────────────── */
+.phase-wrap {
+  background: var(--surface);
+  border: 1px solid var(--grey3);
+  border-left: 2px solid var(--orange);
+  padding: 18px 24px; margin-bottom: 20px;
+  position: relative;
+}
+.phase-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 14px;
+}
+.phase-label { font-size: 0.58rem; letter-spacing: 2.5px; color: var(--grey2); }
+.phase-count {
+  font-size: 0.65rem; color: var(--orange-hi); font-weight: 700; letter-spacing: 1px;
+}
+.phase-track {
+  background: rgba(255,255,255,0.04);
+  height: 10px; border-radius: 1px;
+  border: 1px solid var(--grey3);
+  position: relative; overflow: visible;
+}
+.phase-fill {
+  height: 100%; border-radius: 1px; position: relative;
+  background: linear-gradient(90deg, #5a2a00, var(--orange), var(--orange-hi));
+  transition: width 1.2s cubic-bezier(0.34,1.56,0.64,1);
+  box-shadow: 0 0 12px rgba(232,104,0,0.35);
+}
+.phase-cat {
+  position: absolute; top: 50%; right: -16px;
+  transform: translateY(-55%);
+  font-size: 1.1rem; line-height: 1; user-select: none;
+  animation: cat-walk 0.5s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 4px rgba(232,104,0,0.6));
+  transition: right 1.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes cat-walk {
+  0%   { transform: translateY(-55%) rotate(-6deg); }
+  100% { transform: translateY(-65%) rotate(6deg); }
+}
+.phase-cat.done { animation: cat-party 0.4s ease-in-out infinite alternate; }
+@keyframes cat-party {
+  0%   { transform: translateY(-55%) rotate(-15deg) scale(1.2); }
+  100% { transform: translateY(-75%) rotate(15deg) scale(1.5); }
+}
+.milestones {
+  display: flex; justify-content: space-between;
+  margin-top: 8px; padding: 0 2px;
+}
+.milestone { font-size: 0.46rem; color: var(--grey3); letter-spacing: 1px; }
+.milestone.reached { color: var(--orange); }
+
+/* ── Columns ───────────────────────────────────────────────────── */
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--grey3); }
+@media (max-width:900px) { .cols { grid-template-columns: 1fr; } }
+
+/* ── Panel ─────────────────────────────────────────────────────── */
+.panel { background: var(--surface); position: relative; overflow: hidden; }
+.panel-hdr {
+  padding: 11px 18px;
+  border-bottom: 1px solid var(--grey3);
+  background: var(--surface2);
+  display: flex; justify-content: space-between; align-items: center;
+  /* halftone texture */
+  background-image:
+    linear-gradient(var(--surface2), var(--surface2)),
+    radial-gradient(circle, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: auto, 8px 8px;
+}
+.panel-hdr-title {
+  font-size: 0.56rem; letter-spacing: 3px; color: var(--grey2); text-transform: uppercase;
+}
+.panel-hdr-count { font-size: 0.65rem; font-weight: 700; color: var(--panel-count, var(--orange)); }
+.panel-body { max-height: 500px; overflow-y: auto; }
+
+/* ── Build rows ────────────────────────────────────────────────── */
+.build-row {
+  padding: 12px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: grid;
+  grid-template-columns: 30px 1fr auto;
+  gap: 10px; align-items: center;
+  transition: background 0.15s;
+  position: relative;
+}
+.build-row:hover { background: rgba(255,255,255,0.02); }
+.build-row:last-child { border-bottom: none; }
+/* Left accent */
+.build-row::after {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+}
+.build-row.r-success::after { background: var(--offwhite); }
+.build-row.r-blocked::after { background: var(--orange); box-shadow: 0 0 6px rgba(232,104,0,0.4); }
+.build-row.r-failed::after  { background: var(--neon-red); box-shadow: 0 0 8px rgba(255,0,46,0.5); animation: fail-bar 1.2s ease-in-out infinite; }
+.build-row.r-running::after { background: var(--offwhite); animation: run-bar 1.5s ease-in-out infinite; }
+@keyframes fail-bar { 50% { box-shadow: 0 0 14px rgba(255,0,46,0.7); } }
+@keyframes run-bar  { 50% { opacity: 0.3; } }
+
+.bicon {
+  font-size: 1.1rem; text-align: center; line-height: 1;
+  width: 30px; user-select: none;
+}
+.bicon.success { animation: star-bob 2.5s ease-in-out infinite; }
+.bicon.blocked { animation: angry-shake 0.35s ease-in-out infinite alternate; }
+.bicon.failed  { animation: ghost-pulse 2s ease-in-out infinite; }
+.bicon.running { animation: cat-type 0.3s ease-in-out infinite alternate; }
+@keyframes star-bob     { 50% { transform: translateY(-4px) rotate(12deg); } }
+@keyframes angry-shake  { 0% { transform: rotate(-5deg) translateX(-1px); } 100% { transform: rotate(5deg) translateX(1px); } }
+@keyframes ghost-pulse  { 50% { opacity: 0.3; transform: scale(0.88); } }
+@keyframes cat-type     { 0% { transform: translateY(0) rotate(-3deg); } 100% { transform: translateY(-3px) rotate(3deg); } }
+
+.build-name {
+  font-size: 0.70rem; color: var(--offwhite);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.build-meta { font-size: 0.56rem; color: var(--grey2); margin-top: 3px; }
+.bbadge {
+  font-size: 0.50rem; letter-spacing: 1.5px; padding: 3px 9px;
+  border: 1px solid; border-radius: 1px; white-space: nowrap; flex-shrink: 0;
+}
+.bbadge.success { border-color: rgba(240,236,228,0.25); color: var(--grey1); }
+.bbadge.blocked { border-color: rgba(232,104,0,0.45); color: var(--orange); }
+.bbadge.failed  { border-color: rgba(255,0,46,0.45);  color: var(--neon-red); animation: badge-blink 1s ease-in-out infinite; }
+.bbadge.running { border-color: rgba(240,236,228,0.20); color: var(--grey1); animation: badge-blink 1.5s ease-in-out infinite; }
+@keyframes badge-blink { 50% { opacity: 0.4; } }
+
+/* ── Queue rows ────────────────────────────────────────────────── */
+.queue-row {
+  padding: 13px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  position: relative;
+  animation: queue-hum 4s ease-in-out infinite;
+}
+.queue-row:last-child { border-bottom: none; }
+@keyframes queue-hum {
+  0%,100% { background: transparent; }
+  50%     { background: rgba(232,104,0,0.02); }
+}
+.queue-row::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+  background: var(--orange);
+  animation: border-hum 4s ease-in-out infinite;
+}
+@keyframes border-hum {
+  0%,100% { opacity: 0.18; }
+  50%     { opacity: 0.55; box-shadow: 2px 0 8px rgba(232,104,0,0.18); }
+}
+.queue-top {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;
+}
+.queue-id { font-size: 0.56rem; color: var(--grey2); }
+.queue-char { font-size: 0.85rem; user-select: none; animation: float 2.5s ease-in-out infinite alternate; }
+@keyframes float { 0% { transform: translateY(0); } 100% { transform: translateY(-5px); } }
+.queue-goal { font-size: 0.70rem; color: var(--offwhite); line-height: 1.55; }
+
+/* ── HST Narration ─────────────────────────────────────────────── */
+.hst-panel {
+  background: var(--surface);
+  border: 1px solid var(--grey3);
+  border-left: 2px solid var(--orange);
+  margin-bottom: 20px;
+  position: relative;
+}
+.hst-panel-hdr {
+  padding: 11px 18px;
+  border-bottom: 1px solid var(--grey3);
+  background: var(--surface2);
+  display: flex; justify-content: space-between; align-items: center;
+  background-image:
+    linear-gradient(var(--surface2), var(--surface2)),
+    radial-gradient(circle, rgba(255,255,255,0.02) 1px, transparent 1px);
+  background-size: auto, 8px 8px;
+}
+.hst-title { font-size: 0.56rem; letter-spacing: 3px; color: var(--grey2); }
+.hst-byline {
+  font-size: 0.54rem; color: var(--orange); opacity: 0.65; letter-spacing: 1px;
+  animation: byline-flicker 10s ease-in-out infinite;
+}
+@keyframes byline-flicker {
+  0%,94%,100% { opacity: 0.65; }
+  95%          { opacity: 0.15; }
+  96%          { opacity: 0.75; }
+  97%          { opacity: 0.20; }
+}
+.hst-feed {
+  height: 168px; overflow-y: auto;
+  display: flex; flex-direction: column-reverse;
+}
+.hst-entry {
+  padding: 11px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  display: grid; grid-template-columns: 76px 1fr; gap: 16px;
+  align-items: start;
+  animation: entry-slide 0.45s ease-out;
+}
+.hst-entry:last-child { border-bottom: none; }
+@keyframes entry-slide {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hst-ts { font-size: 0.52rem; color: rgba(232,104,0,0.30); padding-top: 2px; white-space: nowrap; }
+.hst-text {
+  font-size: 0.70rem; line-height: 1.72; color: var(--grey1);
+  font-style: italic;
+}
+.hst-text .hst-name { color: var(--offwhite); font-style: normal; font-weight: 700; }
+.hst-text .hst-ok   { color: var(--white); }
+.hst-text .hst-bad  { color: var(--neon-red); }
+.hst-cursor {
+  display: inline-block; width: 6px; height: 11px;
+  background: var(--orange); opacity: 0.75; margin-left: 2px;
+  animation: blink 1s step-end infinite; vertical-align: text-bottom;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ── Empty states ──────────────────────────────────────────────── */
+.empty {
+  padding: 48px 24px; text-align: center;
+  color: var(--grey2); font-size: 0.70rem; line-height: 2;
+}
+.empty-char { font-size: 2rem; display: block; margin-bottom: 12px; animation: float 2.5s ease-in-out infinite alternate; }
+
+/* ── Toast ─────────────────────────────────────────────────────── */
+.toast-wrap {
+  position: fixed; top: 70px; right: 24px;
+  z-index: 999; display: flex; flex-direction: column; gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: rgba(10,10,10,0.98);
+  border: 1px solid var(--border-mid);
+  border-left: 2px solid var(--orange);
+  padding: 11px 18px;
+  font-size: 0.66rem; color: var(--offwhite);
+  box-shadow: 0 0 20px rgba(0,0,0,0.6), 0 0 40px rgba(232,104,0,0.08);
+  animation: toast-in 0.3s ease-out, toast-out 0.3s ease-in 3.2s forwards;
+  max-width: 300px; line-height: 1.6;
+}
+@keyframes toast-in  { from { opacity:0; transform: translateX(16px); } }
+@keyframes toast-out { to   { opacity:0; transform: translateX(16px); } }
+
+/* ── Confetti (monochrome + orange) ────────────────────────────── */
+.confetti-piece {
+  position: fixed; pointer-events: none; z-index: 999;
+  width: 7px; height: 7px; border-radius: 1px;
+  animation: confetti-drop 2.8s ease-in forwards;
+}
+@keyframes confetti-drop {
+  0%   { opacity: 1; transform: translateY(-10px) rotate(0deg); }
+  100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
+}
+
+/* ── Ticker ────────────────────────────────────────────────────── */
+.ticker {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(4,4,4,0.98);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--grey3);
+  padding: 8px 28px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 0.56rem; color: var(--grey2);
+}
+.ticker-ts { color: rgba(232,104,0,0.35); }
+
+/* ── Scrollbar ─────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--grey3); border-radius: 1px; }
+
+/* ══════════════════════════════════════════════════════════════════
+   CLAWMPSON MODE — lofi × ascii × japanese crime noir journal
+   ══════════════════════════════════════════════════════════════════ */
+.lo-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 200;
+  background: #0b0906;
+  font-family: 'SF Mono', 'JetBrains Mono', monospace;
+  overflow: hidden;
+}
+.lo-overlay.active { display: flex; flex-direction: column; }
+
+/* Grain texture */
+.lo-overlay::before {
+  content: ''; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 256px 256px;
+  opacity: 0.5;
+}
+/* Warm lamp glow — lofi desk lamp from upper left */
+.lo-overlay::after {
+  content: ''; position: absolute; top: -100px; left: 10%; z-index: 0; pointer-events: none;
+  width: 700px; height: 700px;
+  background: radial-gradient(ellipse, rgba(232,104,0,0.06) 0%, rgba(180,80,0,0.03) 30%, transparent 65%);
+}
+
+/* ── Lofi stats bar ─────────────────────────────────────────────── */
+.lo-stats {
+  position: relative; z-index: 10;
+  display: flex; align-items: center; gap: 24px;
+  padding: 8px 28px;
+  background: rgba(10,8,5,0.9);
+  border-bottom: 1px solid rgba(232,104,0,0.12);
+  font-size: 0.58rem; color: rgba(196,176,144,0.55);
+  flex-shrink: 0;
+}
+.lo-stats b { color: rgba(232,104,0,0.85); font-weight: 700; }
+.lo-stats .lo-brand { color: rgba(255,124,26,0.7); letter-spacing: 4px; font-weight: 900; font-size: 0.6rem; margin-right: 8px; }
+.lo-phase-mini {
+  flex: 1; height: 2px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 1px; overflow: hidden; max-width: 120px;
+}
+.lo-phase-fill {
+  height: 100%; background: linear-gradient(90deg, #5a2a00, var(--orange));
+  transition: width 1.2s ease; border-radius: 1px;
+}
+.lo-clock { margin-left: auto; color: rgba(196,176,144,0.35); letter-spacing: 2px; }
+.lo-live { color: rgba(0,255,136,0.5); }
+
+/* ── Scene layout ────────────────────────────────────────────────── */
+.lo-scene {
+  position: relative; z-index: 1;
+  flex: 1; display: grid;
+  grid-template-columns: 300px 1fr 220px;
+  gap: 0; overflow: hidden;
+}
+
+/* ── Rain layer (absolute, behind everything) ───────────────────── */
+.lo-rain {
+  position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+}
+.lo-raindrop {
+  position: absolute; top: -30px;
+  color: rgba(180,160,120,0.15);
+  font-size: 0.8rem; line-height: 1;
+  animation: lo-fall linear infinite;
+  user-select: none;
+}
+@keyframes lo-fall {
+  0%   { transform: translateY(-40px); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 0.6; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+/* ── Left: ASCII room ────────────────────────────────────────────── */
+.lo-room {
+  position: relative; z-index: 2;
+  padding: 24px 16px;
+  border-right: 1px solid rgba(232,104,0,0.08);
+  display: flex; flex-direction: column; gap: 8px;
+  overflow: hidden;
+}
+.lo-ascii-block {
+  color: rgba(196,176,144,0.5);
+  font-size: 0.65rem; line-height: 1.5;
+  white-space: pre; user-select: none;
+  letter-spacing: 0.5px;
+}
+.lo-ascii-block .hi  { color: rgba(232,104,0,0.7); }
+.lo-ascii-block .dim { color: rgba(196,176,144,0.2); }
+.lo-window {
+  position: relative;
+  color: rgba(196,176,144,0.4);
+  font-size: 0.65rem; line-height: 1.4;
+  white-space: pre; user-select: none;
+}
+.lo-cat {
+  color: rgba(232,104,0,0.65);
+  font-size: 0.65rem; line-height: 1.5;
+  white-space: pre; user-select: none;
+  animation: cat-breathe 4s ease-in-out infinite;
+}
+@keyframes cat-breathe {
+  0%,100% { opacity: 0.65; }
+  50%      { opacity: 0.9; }
+}
+.lo-section-label {
+  font-size: 0.44rem; letter-spacing: 3px; color: rgba(232,104,0,0.3);
+  text-transform: uppercase; margin-bottom: 4px;
+}
+
+/* ── Gonzo Lobster: psychedelic HST ascii art ─────────────────────── */
+.gonzo-stage {
+  position: relative;
+  flex: 1;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.gonzo-canvas {
+  position: relative; z-index: 2;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  max-width: 260px;
+  height: auto;
+  animation: gonzo-hue 4s ease-in-out infinite;
+}
+@keyframes gonzo-hue {
+  0%,100% { filter: hue-rotate(0deg) brightness(1) contrast(1.1); }
+  25%     { filter: hue-rotate(25deg) brightness(1.15) contrast(1.2); }
+  50%     { filter: hue-rotate(-15deg) brightness(1.05) contrast(1.15); }
+  75%     { filter: hue-rotate(12deg) brightness(1.2) contrast(1.1); }
+}
+/* Glyph storm behind the lobster */
+.gonzo-glyph-storm {
+  position: absolute; inset: 0; z-index: 1;
+  overflow: hidden; pointer-events: none;
+}
+.gonzo-glyph {
+  position: absolute;
+  font-size: 1rem;
+  user-select: none; pointer-events: none;
+  animation: gonzo-glyph-fly linear infinite;
+}
+@keyframes gonzo-glyph-fly {
+  0%   { transform: translate(0,0) rotate(0deg) scale(0.5); opacity: 0; }
+  15%  { opacity: 1; }
+  50%  { transform: translate(var(--gx), var(--gy)) rotate(180deg) scale(1.2); }
+  85%  { opacity: 0.7; }
+  100% { transform: translate(var(--gx2), var(--gy2)) rotate(360deg) scale(0.3); opacity: 0; }
+}
+.gonzo-glyph.psyche-a { color: rgba(255,0,180,0.35); }
+.gonzo-glyph.psyche-b { color: rgba(0,255,200,0.3); }
+.gonzo-glyph.psyche-c { color: rgba(255,180,0,0.35); }
+.gonzo-glyph.psyche-d { color: rgba(120,80,255,0.3); }
+.gonzo-glyph.psyche-e { color: rgba(255,60,60,0.3); }
+
+/* Smoke particles from cigarette */
+.gonzo-smoke {
+  position: absolute;
+  font-size: 0.7rem;
+  user-select: none; pointer-events: none;
+  color: rgba(196,176,144,0.25);
+  animation: gonzo-smoke-rise 3s ease-out forwards;
+}
+@keyframes gonzo-smoke-rise {
+  0%   { transform: translate(0,0) scale(0.6); opacity: 0.4; }
+  30%  { transform: translate(8px,-20px) scale(0.9); opacity: 0.3; }
+  60%  { transform: translate(-5px,-45px) scale(1.1); opacity: 0.2; }
+  100% { transform: translate(12px,-80px) scale(1.4); opacity: 0; }
+}
+
+/* The subtitle scrawl */
+.gonzo-scrawl {
+  font-size: 0.42rem; letter-spacing: 2px;
+  color: rgba(196,176,144,0.35);
+  text-align: center; white-space: pre;
+  user-select: none;
+  animation: gonzo-scrawl-color 6s ease-in-out infinite;
+}
+@keyframes gonzo-scrawl-color {
+  0%,100% { color: rgba(196,176,144,0.35); }
+  33%     { color: rgba(255,0,180,0.3); }
+  66%     { color: rgba(0,255,180,0.3); }
+}
+
+/* ── Center: The Book ────────────────────────────────────────────── */
+.lo-book {
+  position: relative; z-index: 2;
+  display: flex; flex-direction: column;
+  background: #0f0d09;
+  border-left: 1px solid rgba(232,104,0,0.06);
+  border-right: 1px solid rgba(232,104,0,0.06);
+  overflow: hidden;
+}
+/* Ruled lines background */
+.lo-book::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+  background-image: repeating-linear-gradient(
+    0deg, transparent, transparent 27px,
+    rgba(196,176,144,0.04) 27px, rgba(196,176,144,0.04) 28px
+  );
+  background-position: 0 52px;
+}
+/* Left margin line */
+.lo-book::after {
+  content: ''; position: absolute; left: 56px; top: 0; bottom: 0;
+  width: 1px; background: rgba(232,104,0,0.08); z-index: 0; pointer-events: none;
+}
+.lo-book-head {
+  position: relative; z-index: 1;
+  padding: 16px 24px 10px 64px;
+  border-bottom: 1px solid rgba(196,176,144,0.07);
+  flex-shrink: 0;
+}
+.lo-book-title {
+  display: block; font-size: 0.56rem; letter-spacing: 4px;
+  color: rgba(232,104,0,0.5); margin-bottom: 3px;
+}
+.lo-book-author {
+  display: block; font-size: 0.68rem; font-weight: 700; font-style: italic;
+  color: rgba(196,176,144,0.6); letter-spacing: 1px;
+}
+.lo-book-body {
+  position: relative; z-index: 1;
+  flex: 1; overflow-y: auto;
+  padding: 20px 32px 20px 64px;
+}
+.lo-entry {
+  margin-bottom: 24px;
+  animation: lo-entry-in 0.6s ease-out;
+}
+@keyframes lo-entry-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.lo-entry-ts {
+  font-size: 0.48rem; color: rgba(232,104,0,0.28);
+  letter-spacing: 2px; margin-bottom: 6px;
+}
+.lo-entry-text {
+  font-size: 0.74rem; line-height: 1.9;
+  color: rgba(196,176,144,0.75); font-style: italic;
+}
+.lo-entry-text .lo-em  { color: rgba(240,228,208,0.9); font-style: normal; font-weight: 700; }
+.lo-entry-text .lo-ok  { color: rgba(240,228,208,0.85); }
+.lo-entry-text .lo-bad { color: rgba(255,80,60,0.8); }
+.lo-entry-divider {
+  text-align: center; font-size: 0.6rem;
+  color: rgba(232,104,0,0.25); margin-bottom: 20px; letter-spacing: 4px;
+}
+/* Typewriter cursor */
+.lo-cursor {
+  display: inline-block; width: 6px; height: 0.8em;
+  background: rgba(232,104,0,0.7); vertical-align: text-bottom;
+  margin-left: 2px; animation: blink 1s step-end infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ── Right: floating glyphs ──────────────────────────────────────── */
+.lo-right {
+  position: relative; z-index: 2;
+  padding: 24px 12px;
+  border-left: 1px solid rgba(232,104,0,0.08);
+  overflow: hidden;
+}
+.lo-glyph {
+  position: absolute;
+  font-size: 1.4rem; user-select: none; pointer-events: none;
+  color: rgba(196,176,144,0.12);
+  animation: lo-glyph-drift linear infinite;
+}
+.lo-glyph.kanji { color: rgba(232,104,0,0.10); font-size: 1.6rem; }
+.lo-glyph.geo   { color: rgba(196,176,144,0.08); font-size: 1.1rem; }
+@keyframes lo-glyph-drift {
+  0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 0.6; }
+  100% { transform: translateY(-100px) rotate(15deg); opacity: 0; }
+}
+</style>
+</head>
+<body>
+
+<div class="bg-dots"></div>
+<div class="bg-lamp"></div>
+<div class="bg-scan"></div>
+<div class="bg-vignette"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<nav class="nav">
+  <div class="nav-brand">GONZOCLAW</div>
+  <div class="nav-right">
+    <button class="clawmpson-btn" id="clawmpsonBtn" onclick="toggleClawmpson()">◈ CLAWMPSON MODE</button>
+    <span class="live-pill dead" id="livePill">● CONNECTING</span>
+    <span class="nav-user" id="navUser"></span>
+    <form action="/auth/logout" method="post" style="display:inline">
+      <button class="logout-btn" type="submit">sign out</button>
+    </form>
+  </div>
+</nav>
+
+<div class="shell">
+
+  <!-- Stats -->
+  <div class="stats-grid">
+    <div class="stat-card accent">
+      <span class="stat-emoji">🌟</span>
+      <div class="stat-val ok" id="sSuccess">—</div>
+      <div class="stat-lbl">Success</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-emoji">😤</span>
+      <div class="stat-val warn" id="sBlocked">—</div>
+      <div class="stat-lbl">Blocked</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-emoji">💀</span>
+      <div class="stat-val err" id="sFailed">—</div>
+      <div class="stat-lbl">Failed</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-emoji">🔭</span>
+      <div class="stat-val mid" id="sTotal">—</div>
+      <div class="stat-lbl">Total Builds</div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-emoji">💤</span>
+      <div class="stat-val mid" id="sQueue">—</div>
+      <div class="stat-lbl">Queued</div>
+    </div>
+    <div class="stat-card accent">
+      <span class="stat-emoji">🏆</span>
+      <div class="stat-val hi" id="sPhase">—</div>
+      <div class="stat-lbl">Phase 2</div>
+    </div>
+  </div>
+
+  <!-- Phase 2 bar -->
+  <div class="phase-wrap">
+    <div class="phase-header">
+      <span class="phase-label">PHASE 2 EXIT — 10 STABLE BUILDS</span>
+      <span class="phase-count" id="phaseCount">0 / 10</span>
+    </div>
+    <div class="phase-track">
+      <div class="phase-fill" id="phaseFill" style="width:0%">
+        <span class="phase-cat" id="phaseCat">🐈</span>
+      </div>
+    </div>
+    <div class="milestones" id="milestones"></div>
+  </div>
+
+  <!-- HST Narration -->
+  <div class="hst-panel">
+    <div class="hst-panel-hdr">
+      <span class="hst-title">GONZOCLAW DISPATCH — LIVE FROM THE BUILD PIPELINE</span>
+      <span class="hst-byline">by Gunther X Clawmpson · bat country edition</span>
+    </div>
+    <div class="hst-feed" id="hstFeed"></div>
+  </div>
+
+  <!-- Builds + Queue -->
+  <div class="cols">
+    <div class="panel" style="--panel-count:var(--offwhite)">
+      <div class="panel-hdr">
+        <span class="panel-hdr-title">Build History</span>
+        <span class="panel-hdr-count" id="buildCount">0</span>
+      </div>
+      <div class="panel-body" id="buildList">
+        <div class="empty"><span class="empty-char">🐣</span>no builds yet — go get 'em</div>
+      </div>
+    </div>
+    <div class="panel" style="--panel-count:var(--orange)">
+      <div class="panel-hdr">
+        <span class="panel-hdr-title">Task Queue</span>
+        <span class="panel-hdr-count" id="queueCount">0</span>
+      </div>
+      <div class="panel-body" id="queueList">
+        <div class="empty">
+          <span class="empty-char">✨</span>
+          nothing queued<br>
+          <span style="color:var(--grey3);font-size:0.6rem">living the dream</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ CLAWMPSON MODE OVERLAY ══ -->
+<div class="lo-overlay" id="loOverlay">
+  <div class="lo-rain" id="loRain"></div>
+
+  <!-- Mini stats bar -->
+  <div class="lo-stats">
+    <span class="lo-brand">GONZOCLAW</span>
+    <span class="lo-live" id="loLive">● LIVE</span>
+    <span>✓ <b id="loSuccess">—</b></span>
+    <span>😤 <b id="loBlocked">—</b></span>
+    <span>💀 <b id="loFailed">—</b></span>
+    <span>Q: <b id="loQueue">—</b></span>
+    <span>PHASE <b id="loPhase">—</b></span>
+    <div class="lo-phase-mini"><div class="lo-phase-fill" id="loPhaseFill" style="width:0%"></div></div>
+    <span class="lo-clock" id="loClock">00:00:00</span>
+    <button class="clawmpson-btn" style="margin-left:16px;font-size:0.52rem;padding:3px 10px" onclick="toggleClawmpson()">✕ MAIN VIEW</button>
+  </div>
+
+  <!-- Scene -->
+  <div class="lo-scene">
+
+    <!-- Left: Gonzo Lobster -->
+    <div class="lo-room" id="loRoom">
+      <div class="lo-section-label">▸ BAT COUNTRY DISPATCH</div>
+      <div class="gonzo-stage" id="gonzoStage">
+        <div class="gonzo-glyph-storm" id="gonzoGlyphStorm"></div>
+        <canvas class="gonzo-canvas" id="gonzoCanvas"></canvas>
+      </div>
+      <div class="gonzo-scrawl" id="gonzoScrawl">
+ ∿ FEAR & LOATHING ∿
+  IN THE PIPELINE</div>
+    </div>
+
+    <!-- Center: The Book -->
+    <div class="lo-book">
+      <div class="lo-book-head">
+        <span class="lo-book-title">FIELD NOTES // PIPELINE DISPATCH</span>
+        <span class="lo-book-author">Gunther X Clawmpson</span>
+      </div>
+      <div class="lo-book-body" id="loBookBody">
+        <div class="lo-entry" id="loTypingEntry">
+          <div class="lo-entry-ts" id="loTypingTs"></div>
+          <div class="lo-entry-text" id="loTypingText"><span class="lo-cursor"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: glyphs + vinyl -->
+    <div class="lo-right" id="loRight">
+    </div>
+
+  </div>
+</div>
+
+<div class="ticker">
+  <span id="tickerMsg">reaching out to the mothership...</span>
+  <span class="ticker-ts" id="tickerTs"></span>
+</div>
+
+<script>
+// Clawmpson state — declared early so hstEntry/updateSummary can reference it
+let clawmpsonActive = false
+
+// ── Milestones ─────────────────────────────────────────────────────────────
+const milestonesEl = document.getElementById('milestones')
+for (let i = 1; i <= 10; i++) {
+  const m = document.createElement('span')
+  m.className = 'milestone'
+  m.id = `ms-${i}`
+  m.textContent = i
+  milestonesEl.appendChild(m)
+}
+
+// ── Auth ───────────────────────────────────────────────────────────────────
+function getCookie(n) {
+  return document.cookie.split(';').map(c=>c.trim()).find(c=>c.startsWith(n+'='))?.split('=')[1]||''
+}
+const token = getCookie('oc_token')
+fetch('/auth/me').then(r=>r.json()).then(d=>{
+  document.getElementById('navUser').textContent = d.user ? `[ ${d.user} ]` : ''
+}).catch(()=>{})
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+const QUEUE_CHARS = ['💤','🍵','🦥','🎮','🌸','🧸','🐢','🍩','📺','😴']
+
+const TICKER_MSGS = [
+  'builds running faster than my exes ran from commitment',
+  'your codebase is in good hands (paws?)',
+  'deploying vibes at the speed of light',
+  'no force pushes were harmed in the making of this dashboard',
+  'if this bar reaches 100% i am legally required to celebrate',
+  'the cat is working hard. please don\'t disturb the cat.',
+  'all systems nominal. emotionally? less so.',
+  'git blame has never pointed at me. this is a lie.',
+]
+let tickerIdx = 0
+
+function timeAgo(ts) {
+  const s = Math.floor(Date.now()/1000 - ts)
+  if (s < 60)    return `${s}s ago`
+  if (s < 3600)  return `${Math.floor(s/60)}m ago`
+  return `${Math.floor(s/3600)}h ago`
+}
+
+function pop(el) {
+  el.classList.remove('pop')
+  void el.offsetWidth
+  el.classList.add('pop')
+}
+
+// ── Toast ──────────────────────────────────────────────────────────────────
+function toast(msg, char='') {
+  const tw = document.getElementById('toastWrap')
+  const t  = document.createElement('div')
+  t.className = 'toast'
+  t.textContent = char ? `${char}  ${msg}` : msg
+  tw.appendChild(t)
+  setTimeout(()=>t.remove(), 3600)
+}
+
+// ── Confetti (greyscale + orange) ──────────────────────────────────────────
+const CONFETTI_COLORS = ['#e86800','#ff7c1a','#f0ece4','#888580','#2e2c2a','#c8c4bc']
+function confetti() {
+  for (let i = 0; i < 55; i++) {
+    const c = document.createElement('div')
+    c.className = 'confetti-piece'
+    c.style.cssText = `left:${Math.random()*100}vw;top:${-20+Math.random()*-60}px;background:${CONFETTI_COLORS[Math.floor(Math.random()*CONFETTI_COLORS.length)]};animation-delay:${Math.random()*0.8}s;animation-duration:${2.2+Math.random()*1.4}s;`
+    document.body.appendChild(c)
+    setTimeout(()=>c.remove(), 4200)
+  }
+}
+
+// ── HST Narration ──────────────────────────────────────────────────────────
+const hstLog  = []
+let seenBuilds = new Set()
+
+const HST_SUCCESS = [
+  n=>`We have <span class="hst-name">${n}</span>. <span class="hst-ok">It shipped.</span> God help us, the thing actually works. I had my doubts — serious, career-ending doubts — but here we are, standing in the wreckage of our own expectations with a passing badge and a pulse.`,
+  n=>`<span class="hst-name">${n}</span> — <span class="hst-ok">merged and clean.</span> The machine did not explode. No tests were harmed. I am briefly at peace, which I distrust completely.`,
+  n=>`The pipeline delivered <span class="hst-name">${n}</span> like a golden calf. <span class="hst-ok">All tests passed.</span> We danced. Briefly. Then remembered there are more builds. There are always more builds.`,
+  n=>`<span class="hst-ok">SUCCESS.</span> <span class="hst-name">${n}</span> is live. I want to scream this from a moving convertible. Instead I am staring at a terminal. This is fine. This is exactly what I wanted from my life.`,
+  n=>`<span class="hst-name">${n}</span> went through clean. <span class="hst-ok">Not a single test flinched.</span> The American Dream is real and it lives inside a git branch on a machine I built in a garage. Do not argue with me about this.`,
+]
+const HST_BLOCKED = [
+  n=>`<span class="hst-name">${n}</span> has <span class="hst-bad">stalled.</span> The pipeline looked at what we asked and said: no. Not today. Maybe not ever. I'm not saying the machine has opinions but I am saying the machine has opinions.`,
+  n=>`<span class="hst-bad">Blocked.</span> <span class="hst-name">${n}</span> sat down in the middle of the road and refused to move. I understand this impulse. I respect it. I also need it to merge by end of day.`,
+  n=>`<span class="hst-name">${n}</span> is <span class="hst-bad">blocked</span> and so, in some spiritual sense, am I. We are both waiting for something we cannot name. The tests know what it is. They are not telling.`,
+]
+const HST_FAILED = [
+  n=>`<span class="hst-name">${n}</span> has <span class="hst-bad">failed catastrophically.</span> There will be no celebration today. The stack trace is seventeen lines of accusation and every single one of them is directed at me personally.`,
+  n=>`<span class="hst-bad">FAILED.</span> <span class="hst-name">${n}</span> is down. The logs are a crime scene. I will not look at the logs. Looking at the logs is how you lose the rest of the afternoon.`,
+]
+const HST_OPENING = [
+  `We were somewhere around the build pipeline when the dashboard finally loaded. The queue was deep and full of ambition. Somewhere in the logs, something was already going wrong.`,
+  `The machine was running when I found it. Seven builds deep, three blocked, the phase bar past the halfway mark and humming with quiet menace. We were not losing. But we were not winning. We were in the pipeline.`,
+  `I have been watching this dashboard for what feels like a geological epoch. The builds come and go. The cat on the progress bar keeps walking. None of us are getting any closer to shore.`,
+]
+
+function hstEntry(text) {
+  const feed = document.getElementById('hstFeed')
+  const ts   = new Date().toLocaleTimeString('en-US',{hour12:false})
+  const div  = document.createElement('div')
+  div.className = 'hst-entry'
+  div.innerHTML = `<div class="hst-ts">${ts}</div><div class="hst-text">${text}</div>`
+  hstLog.unshift(div)
+  feed.prepend(div)
+  if (hstLog.length > 40) { const old = hstLog.pop(); old?.parentNode?.removeChild(old) }
+  // Feed into Clawmpson book if active
+  if (clawmpsonActive) {
+    const loText = text
+      .replace(/class="hst-name"/g,'class="lo-em"')
+      .replace(/class="hst-ok"/g,  'class="lo-ok"')
+      .replace(/class="hst-bad"/g, 'class="lo-bad"')
+    enqueueType(loText, ts)
+  }
+}
+
+function pick(arr, ...args) { return arr[Math.floor(Math.random()*arr.length)](...args) }
+
+function shortName(id) {
+  return id.replace(/^build-ewa-/,'').replace(/-\d{8,}$/,'').replace(/-/g,' ')
+}
+
+// ── State ──────────────────────────────────────────────────────────────────
+let prevPhase = 0, initialized = false
+
+function processNewBuilds(builds) {
+  builds.forEach(b => {
+    const id = b.task_id || b._file
+    if (!id || seenBuilds.has(id)) return
+    seenBuilds.add(id)
+    if (!initialized) return
+    const n = shortName(id), s = b.status
+    if      (s==='success') hstEntry(pick(HST_SUCCESS, n))
+    else if (s==='blocked') hstEntry(pick(HST_BLOCKED, n))
+    else if (s==='failed')  hstEntry(pick(HST_FAILED,  n))
+  })
+}
+
+// ── Render ─────────────────────────────────────────────────────────────────
+function renderBuilds(builds) {
+  document.getElementById('buildCount').textContent = builds.length
+  const el = document.getElementById('buildList')
+  if (!builds.length) {
+    el.innerHTML = `<div class="empty"><span class="empty-char">🐣</span>no builds yet — go get 'em</div>`
+    return
+  }
+  el.innerHTML = builds.map(b => {
+    const status = b.status||'unknown'
+    const name   = b.task_id||b._file||'?'
+    const tests  = b.tests_run ? `${b.tests_passed}/${b.tests_run} tests` : ''
+    const files  = b.changed_files?.length ? `${b.changed_files.length} files` : ''
+    const ago    = b._mtime ? timeAgo(b._mtime) : ''
+    const meta   = [tests,files,ago].filter(Boolean).join(' · ')
+    let icon,rowCls,badgeCls,label
+    if      (status==='success') { icon='🌟'; rowCls='r-success'; badgeCls='success'; label='SUCCESS' }
+    else if (status==='blocked') { icon='😤'; rowCls='r-blocked'; badgeCls='blocked'; label='BLOCKED' }
+    else if (status==='failed')  { icon='💀'; rowCls='r-failed';  badgeCls='failed';  label='FAILED'  }
+    else                         { icon='🐱'; rowCls='r-running'; badgeCls='running'; label='RUNNING' }
+    return `<div class="build-row ${rowCls}">
+      <div class="bicon ${status}">${icon}</div>
+      <div>
+        <div class="build-name">${name}</div>
+        ${meta?`<div class="build-meta">${meta}</div>`:''}
+      </div>
+      <span class="bbadge ${badgeCls}">${label}</span>
+    </div>`
+  }).join('')
+}
+
+function renderQueue(queue) {
+  document.getElementById('queueCount').textContent = queue.length
+  const el = document.getElementById('queueList')
+  if (!queue.length) {
+    el.innerHTML = `<div class="empty"><span class="empty-char">✨</span>nothing queued<br><span style="color:var(--grey3);font-size:0.6rem">living the dream</span></div>`
+    return
+  }
+  el.innerHTML = queue.map((q,i) => {
+    const goal = q.goal||'—'
+    const char = QUEUE_CHARS[i%QUEUE_CHARS.length]
+    return `<div class="queue-row">
+      <div class="queue-top">
+        <span class="queue-id">${q.task_id||q._file}</span>
+        <span class="queue-char">${char}</span>
+      </div>
+      <div class="queue-goal">${goal.slice(0,110)}${goal.length>110?'…':''}</div>
+    </div>`
+  }).join('')
+}
+
+function updateSummary(s) {
+  function set(id,val) {
+    const el = document.getElementById(id)
+    if (el.textContent!==String(val)) { el.textContent=val; pop(el) }
+  }
+  set('sSuccess', s.success??'—')
+  set('sBlocked', s.blocked??'—')
+  set('sFailed',  s.failed ??'—')
+  set('sTotal',   s.total  ??'—')
+  set('sQueue',   s.queue  ??'—')
+  const p2=s.phase2||{}, done=p2.done??0, pct=p2.pct??0
+  set('sPhase', `${done}/10`)
+  document.getElementById('phaseCount').textContent = `${done} / 10`
+  document.getElementById('phaseFill').style.width  = pct+'%'
+  for (let i=1;i<=10;i++) {
+    const m=document.getElementById(`ms-${i}`)
+    if(m) m.className=i<=done?'milestone reached':'milestone'
+  }
+  const cat=document.getElementById('phaseCat')
+  if      (done>=10) { cat.textContent='🎉'; cat.classList.add('done'); }
+  else if (done>=7)  { cat.textContent='😤'; cat.classList.remove('done'); }
+  else               { cat.textContent='🐈'; cat.classList.remove('done'); }
+  if (initialized && done>prevPhase) {
+    if (done>=10) { confetti(); toast('PHASE 2 COMPLETE — the cat did it','🎉') }
+    else          { toast(`build ${done}/10 merged — ${10-done} to go`) }
+  }
+  prevPhase=done; initialized=true
+  // Sync to Clawmpson panel if active
+  if (clawmpsonActive) loSyncStats(s)
+}
+
+// ── SSE ────────────────────────────────────────────────────────────────────
+let es
+function connect() {
+  es = new EventSource(`/api/stream?token=${token}`)
+  es.onopen = () => {
+    document.getElementById('livePill').textContent = '● LIVE'
+    document.getElementById('livePill').className   = 'live-pill live'
+    document.getElementById('tickerMsg').textContent = TICKER_MSGS[tickerIdx%TICKER_MSGS.length]
+    tickerIdx++
+    setTimeout(()=>hstEntry(HST_OPENING[Math.floor(Math.random()*HST_OPENING.length)]+' <span class="hst-cursor"></span>'), 800)
+  }
+  es.onmessage = e => {
+    try {
+      const d=JSON.parse(e.data)
+      if(d.error) return
+      processNewBuilds(d.builds||[])
+      renderBuilds(d.builds||[])
+      renderQueue(d.queue||[])
+      updateSummary(d.summary||{})
+      document.getElementById('tickerTs').textContent=new Date().toLocaleTimeString()
+    } catch(_){}
+  }
+  es.onerror = () => {
+    document.getElementById('livePill').textContent = '● RECONNECTING'
+    document.getElementById('livePill').className   = 'live-pill dead'
+    document.getElementById('tickerMsg').textContent = '(っ˘ω˘ς ) reconnecting...'
+    es.close(); setTimeout(connect,4000)
+  }
+}
+
+setInterval(()=>{
+  const el=document.getElementById('tickerMsg')
+  if(el&&document.getElementById('livePill').classList.contains('live')) {
+    el.textContent=TICKER_MSGS[tickerIdx%TICKER_MSGS.length]; tickerIdx++
+  }
+},30000)
+
+connect()
+window.addEventListener('beforeinstallprompt',e=>{})
+
+// ── Gunther idle narration — fires every 60s ──────────────────────────────
+const HST_IDLE = [
+  ()=>{
+    const q = parseInt(document.getElementById('sQueue')?.textContent)||0
+    return q > 0
+      ? `The queue holds <span class="hst-name">${q} task${q!==1?'s':''}</span>. They are waiting. They have always been waiting. Patience is the only virtue the pipeline respects, and even then grudgingly.`
+      : `The queue is empty. A rare condition, like a perfect silence before something very loud. I don't trust it.`
+  },
+  ()=>{
+    const phase = document.getElementById('sPhase')?.textContent||'?'
+    const done = parseInt(phase)||0
+    return `Phase 2 sits at <span class="hst-name">${phase}</span> — ${Math.round(done/10*100)}% of the way to something we've been calling an exit criterion. I'm not sure what exits after it. I've stopped asking.`
+  },
+  ()=>{
+    const s = parseInt(document.getElementById('sSuccess')?.textContent)||0
+    const b = parseInt(document.getElementById('sBlocked')?.textContent)||0
+    return `Running tally: <span class="hst-ok">${s} successful</span>, <span class="hst-bad">${b} blocked</span>. The machine is ${b===0?'cooperating, which I find suspicious':'pushing back, which is at least honest'}.`
+  },
+  ()=>`Still here. Still watching. The cat on the progress bar has not moved. Cats never move when you need them to. This is a universal law.`,
+  ()=>`The pipeline breathes. Nothing has moved in the last sixty seconds. I've been counting the cursor blinks. This is what it's come to.`,
+  ()=>{
+    const hr = new Date().getHours()
+    const t = hr<5?'The hour is ungodly':hr<12?'Morning':hr<17?'Afternoon':hr<21?'Evening':'Deep night'
+    return `${t}. The builds don't know what time it is. They never do. They have the temporal awareness of a very dedicated rock.`
+  },
+  ()=>`Everything is nominal. I am writing this because <span class="hst-name">nominal</span> is the most ominous word in any engineer's vocabulary. Nothing that is truly nominal needs to be called nominal.`,
+  ()=>{
+    const total = parseInt(document.getElementById('sTotal')?.textContent)||0
+    return `<span class="hst-name">${total} contracts</span> on file. Each one a small miracle of automated labor. Each one a reason to briefly believe that the system is working as designed.`
+  },
+]
+let idleIdx = 0
+setInterval(()=>{
+  if(document.getElementById('livePill').classList.contains('live')) {
+    hstEntry(HST_IDLE[idleIdx % HST_IDLE.length]())
+    idleIdx++
+  }
+}, 60000)
+
+// ══════════════════════════════════════════════════════════════════
+// CLAWMPSON MODE
+// ══════════════════════════════════════════════════════════════════
+
+function toggleClawmpson() {
+  clawmpsonActive = !clawmpsonActive
+  const overlay = document.getElementById('loOverlay')
+  const btn     = document.getElementById('clawmpsonBtn')
+  overlay.classList.toggle('active', clawmpsonActive)
+  btn.classList.toggle('active', clawmpsonActive)
+  if (clawmpsonActive) {
+    startLofi()
+  } else {
+    stopLofi()
+  }
+}
+
+// ── Rain ─────────────────────────────────────────────────────────
+const RAIN_CHARS = ['│','╎','ı','⌇','╏','│','│','╎','|','╎']
+let rainIntervals = []
+
+function startRain() {
+  const container = document.getElementById('loRain')
+  container.innerHTML = ''
+  const cols = Math.floor(window.innerWidth / 18)
+  for (let i = 0; i < cols; i++) {
+    const drop = document.createElement('div')
+    drop.className = 'lo-raindrop'
+    drop.style.cssText = `left:${i*18 + Math.random()*10}px;animation-duration:${2.5+Math.random()*4}s;animation-delay:${Math.random()*5}s`
+    drop.textContent = RAIN_CHARS[Math.floor(Math.random()*RAIN_CHARS.length)]
+    container.appendChild(drop)
+  }
+  // Mutate characters periodically
+  const iv = setInterval(()=>{
+    if (!clawmpsonActive) return
+    container.querySelectorAll('.lo-raindrop').forEach(d=>{
+      if (Math.random() < 0.1) d.textContent = RAIN_CHARS[Math.floor(Math.random()*RAIN_CHARS.length)]
+    })
+  }, 800)
+  rainIntervals.push(iv)
+}
+
+// ── Gonzo Portrait: degraded pixel HST as lobster-claw-bot ───────
+const GONZO_PX = 48, GONZO_PY = 64, GONZO_SC = 5
+const GONZO_DW = GONZO_PX * GONZO_SC, GONZO_DH = GONZO_PY * GONZO_SC
+let gonzoRAF = null, gonzoGlyphIv = null, gonzoSmokeIv = null
+let gonzoTick = 0, gonzoOffCanvas = null, gonzoOffCtx = null
+const gonzoSmoke = []
+
+const GONZO_GLYPHS = [
+  '🦞','⚡','☠','✦','◈','∞','☽','♠','⌁','▓','░','▒',
+  '螯','蟹','恐','怒','狂','夢','毒','雷',
+  '◉','◎','⊙','⊗','⊕','※','❖','△','▽','◇',
+  '₿','λ','Ψ','Ω','φ','π','∑','∆','∇','≈',
+  '🍸','💊','🎰','🔥','🌀','💀','🦂','🃏',
+]
+const PSYCHE_CLASSES = ['psyche-a','psyche-b','psyche-c','psyche-d','psyche-e']
+
+// Draw low-res HST portrait (48x64)
+function drawHST(ctx) {
+  ctx.clearRect(0, 0, GONZO_PX, GONZO_PY)
+  const r = (c,x,y,w,h) => { ctx.fillStyle=c; ctx.fillRect(x,y,w,h) }
+
+  // ── HAT ──
+  r('#c0a47e', 17, 1, 14, 2)   // crown top
+  r('#b89c78', 15, 2, 18, 3)   // crown upper
+  r('#b49872', 14, 5, 20, 4)   // crown lower
+  r('#a08460', 13, 5, 22, 1)   // crown crease
+  r('#7a6244', 13, 9, 22, 2)   // hat band
+  r('#c4a882', 8, 11, 32, 2)   // brim
+  r('#b89c78', 6, 12, 36, 2)   // brim wide
+  r('#a8906e', 6, 13, 36, 1)   // brim shadow edge
+
+  // ── FOREHEAD / SHADOW ──
+  r('#161210', 15, 14, 18, 3)
+  r('#1a1610', 16, 14, 16, 1)
+
+  // ── SUNGLASSES ──
+  // Left lens housing
+  r('#c0a880', 13, 17, 10, 8)  // frame
+  r('#100e0a', 14, 18, 8, 6)   // lens dark
+  r('#1a1610', 15, 19, 6, 3)   // lens reflection hint
+  // Right lens housing
+  r('#c0a880', 25, 17, 10, 8)  // frame
+  r('#100e0a', 26, 18, 8, 6)   // lens dark
+  r('#1a1610', 27, 19, 6, 3)   // lens reflection hint
+  // Bridge + temple arms
+  r('#c0a880', 23, 20, 2, 2)   // bridge
+  r('#a89470', 11, 20, 2, 2)   // left temple
+  r('#a89470', 35, 20, 2, 2)   // right temple
+
+  // ── FACE ──
+  r('#a88868', 19, 25, 10, 2)  // cheeks under glasses
+  r('#9a7a5c', 21, 27, 6, 2)   // upper nose
+  r('#8a6a4c', 22, 28, 5, 2)   // nose tip
+  r('#7a5e44', 23, 29, 4, 1)   // nose shadow
+
+  // ── MOUTH ──
+  r('#8a6e52', 20, 30, 8, 2)   // mouth area
+  r('#6a5038', 21, 31, 6, 1)   // lip shadow
+
+  // ── CIGARETTE HOLDER ── (angled down-right, long)
+  r('#e8dcc8', 28, 31, 2, 1)
+  r('#e0d4c0', 30, 32, 2, 1)
+  r('#dcd0bc', 32, 33, 2, 1)
+  r('#d8ccb8', 34, 34, 2, 1)
+  r('#d4c8b4', 36, 35, 3, 1)
+  r('#d0c4b0', 39, 36, 3, 1)
+  // Ember — bright, pulsing
+  const emberBright = 200 + Math.floor(Math.sin(gonzoTick * 0.2) * 55)
+  r(`rgb(255,${Math.floor(emberBright*0.5)},0)`, 42, 36, 3, 2)
+  r(`rgb(255,${Math.floor(emberBright*0.8)},${Math.floor(emberBright*0.3)})`, 43, 36, 1, 1)
+
+  // ── BANDANA / SCARF ──
+  r('#b8a088', 18, 32, 9, 2)
+  r('#a89078', 17, 34, 12, 2)
+  r('#c0a890', 19, 33, 2, 1)   // pattern dot
+  r('#c0a890', 23, 34, 2, 1)   // pattern dot
+  r('#c0a890', 26, 33, 2, 1)   // pattern dot
+
+  // ── JACKET ──
+  r('#1e1a14', 15, 36, 18, 4)
+  r('#1e1a14', 13, 39, 22, 4)
+  r('#1e1a14', 11, 43, 26, 5)
+  r('#1e1a14', 9, 47, 30, 6)
+  // Lapel lines
+  r('#2a241c', 18, 36, 2, 12)
+  r('#2a241c', 28, 36, 2, 12)
+  // Collar
+  r('#2e2820', 15, 36, 3, 2)
+  r('#2e2820', 30, 36, 3, 2)
+
+  // ── LOBSTER CLAWS ──
+  // Left claw
+  r('#e86800', 4, 48, 6, 3)
+  r('#e86800', 2, 50, 5, 7)
+  r('#e86800', 7, 50, 4, 7)
+  r('#c05500', 3, 52, 3, 4)
+  r('#c05500', 8, 52, 2, 4)
+  r('#ff8c20', 4, 50, 2, 1)    // claw highlight
+  // Right claw
+  r('#e86800', 38, 48, 6, 3)
+  r('#e86800', 37, 50, 5, 7)
+  r('#e86800', 42, 50, 4, 7)
+  r('#c05500', 38, 52, 3, 4)
+  r('#c05500', 43, 52, 2, 4)
+  r('#ff8c20', 40, 50, 2, 1)   // claw highlight
+
+  // ── LOBSTER LEGS ──
+  r('#e86800', 15, 54, 2, 6)
+  r('#e86800', 19, 55, 2, 6)
+  r('#e86800', 27, 55, 2, 6)
+  r('#e86800', 31, 54, 2, 6)
+}
+
+// ── Smoke particle system ────────────────────────────────────────
+function spawnSmoke() {
+  if (gonzoSmoke.length >= 100) return
+  // Spawn near ember: pixel (43,36) * 5 = (215, 180) on display canvas
+  gonzoSmoke.push({
+    x: 215 + (Math.random() - 0.3) * 12,
+    y: 180 + (Math.random() - 0.5) * 8,
+    vx: (Math.random() - 0.3) * 1.0,
+    vy: -(0.8 + Math.random() * 2.8),
+    life: 1.0,
+    decay: 0.003 + Math.random() * 0.007,
+    size: 2 + Math.random() * 4,
+    grow: 0.1 + Math.random() * 0.2,
+    wobble: Math.random() * Math.PI * 2,
+    wobbleAmp: 0.4 + Math.random() * 1.0,
+    wobbleSpd: 0.02 + Math.random() * 0.06,
+    bright: Math.random() < 0.3  // some particles glow brighter
+  })
+}
+
+function renderSmoke(ctx) {
+  for (let i = gonzoSmoke.length - 1; i >= 0; i--) {
+    const p = gonzoSmoke[i]
+    p.wobble += p.wobbleSpd
+    p.x += p.vx + Math.sin(p.wobble) * p.wobbleAmp
+    p.y += p.vy
+    p.vy *= 0.997
+    p.vx *= 0.999
+    p.life -= p.decay
+    p.size += p.grow
+
+    if (p.life <= 0) { gonzoSmoke.splice(i, 1); continue }
+
+    // Outer smoke cloud
+    const a = p.life * (p.bright ? 0.45 : 0.25)
+    ctx.beginPath()
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+    ctx.fillStyle = `rgba(${p.bright?200:160},${p.bright?180:150},${p.bright?150:120},${a})`
+    ctx.fill()
+
+    // Inner wisp for fresh particles
+    if (p.life > 0.6) {
+      ctx.beginPath()
+      ctx.arc(p.x + Math.sin(p.wobble*2)*2, p.y, p.size * 0.4, 0, Math.PI * 2)
+      ctx.fillStyle = `rgba(220,210,190,${a * 0.6})`
+      ctx.fill()
+    }
+
+    // Hot glow near source
+    if (p.life > 0.85) {
+      ctx.beginPath()
+      ctx.arc(p.x, p.y, p.size * 0.6, 0, Math.PI * 2)
+      ctx.fillStyle = `rgba(255,${140+Math.floor(p.life*60)},${50+Math.floor(p.life*40)},${p.life * 0.15})`
+      ctx.fill()
+    }
+  }
+}
+
+// ── Main render loop ─────────────────────────────────────────────
+function gonzoRender() {
+  if (!clawmpsonActive) { gonzoRAF = null; return }
+  gonzoTick++
+
+  const canvas = document.getElementById('gonzoCanvas')
+  if (!canvas) { gonzoRAF = null; return }
+  const ctx = canvas.getContext('2d')
+  ctx.imageSmoothingEnabled = false
+
+  // Clear
+  ctx.fillStyle = '#0b0906'
+  ctx.fillRect(0, 0, GONZO_DW, GONZO_DH)
+
+  // Draw portrait to offscreen
+  drawHST(gonzoOffCtx)
+
+  // Glitch: shift random rows
+  if (Math.random() < 0.1) {
+    const gy = Math.floor(Math.random() * GONZO_PY)
+    const gh = 1 + Math.floor(Math.random() * 3)
+    const shift = Math.floor((Math.random() - 0.5) * 14)
+    try {
+      const d = gonzoOffCtx.getImageData(0, gy, GONZO_PX, Math.min(gh, GONZO_PY - gy))
+      gonzoOffCtx.clearRect(0, gy, GONZO_PX, gh)
+      gonzoOffCtx.putImageData(d, shift, gy)
+    } catch(e) {}
+  }
+
+  // Big glitch: duplicate a chunk
+  if (Math.random() < 0.03) {
+    const sy = Math.floor(Math.random() * 40)
+    const sh = 3 + Math.floor(Math.random() * 8)
+    try {
+      const d = gonzoOffCtx.getImageData(0, sy, GONZO_PX, Math.min(sh, GONZO_PY - sy))
+      const dy = Math.floor(Math.random() * GONZO_PY)
+      gonzoOffCtx.putImageData(d, Math.floor((Math.random()-0.5)*6), dy)
+    } catch(e) {}
+  }
+
+  // Scale up to display — crisp pixels
+  ctx.drawImage(gonzoOffCanvas, 0, 0, GONZO_PX, GONZO_PY, 0, 0, GONZO_DW, GONZO_DH)
+
+  // Scanlines
+  ctx.fillStyle = 'rgba(0,0,0,0.1)'
+  for (let y = 0; y < GONZO_DH; y += 2) ctx.fillRect(0, y, GONZO_DW, 1)
+
+  // Noise
+  for (let i = 0; i < 35; i++) {
+    const b = 20 + Math.random() * 70
+    ctx.fillStyle = `rgba(${b+40},${b+20},${b},${Math.random()*0.18})`
+    ctx.fillRect(
+      Math.floor(Math.random() * GONZO_PX) * GONZO_SC,
+      Math.floor(Math.random() * GONZO_PY) * GONZO_SC,
+      GONZO_SC, GONZO_SC
+    )
+  }
+
+  // Ember glow (radial)
+  const eg = 0.12 + Math.sin(gonzoTick * 0.15) * 0.08
+  const grad = ctx.createRadialGradient(218, 183, 2, 218, 183, 30)
+  grad.addColorStop(0, `rgba(255,140,20,${eg + 0.1})`)
+  grad.addColorStop(0.5, `rgba(255,80,0,${eg})`)
+  grad.addColorStop(1, 'rgba(255,60,0,0)')
+  ctx.fillStyle = grad
+  ctx.fillRect(188, 153, 60, 60)
+
+  // Spawn smoke — heavy, dramatic
+  const rate = 3 + Math.floor(Math.abs(Math.sin(gonzoTick * 0.04)) * 3)
+  for (let i = 0; i < rate; i++) spawnSmoke()
+
+  // Render smoke
+  renderSmoke(ctx)
+
+  gonzoRAF = requestAnimationFrame(gonzoRender)
+}
+
+function startGonzo() {
+  // Offscreen portrait canvas
+  gonzoOffCanvas = document.createElement('canvas')
+  gonzoOffCanvas.width = GONZO_PX
+  gonzoOffCanvas.height = GONZO_PY
+  gonzoOffCtx = gonzoOffCanvas.getContext('2d')
+
+  // Display canvas
+  const canvas = document.getElementById('gonzoCanvas')
+  if (canvas) { canvas.width = GONZO_DW; canvas.height = GONZO_DH }
+
+  gonzoTick = 0
+  gonzoSmoke.length = 0
+  gonzoRender()
+
+  // Psychedelic glyph storm (HTML overlay)
+  const storm = document.getElementById('gonzoGlyphStorm')
+  function spawnGonzoGlyph() {
+    if (!clawmpsonActive || !storm) return
+    const g = document.createElement('div')
+    g.className = 'gonzo-glyph ' + PSYCHE_CLASSES[Math.floor(Math.random() * PSYCHE_CLASSES.length)]
+    const cx = 20 + Math.random() * 60, cy = 10 + Math.random() * 80
+    const spread = 80
+    const gx = (Math.random()-0.5)*spread*2, gy = (Math.random()-0.5)*spread*2
+    const gx2 = (Math.random()-0.5)*spread*3, gy2 = (Math.random()-0.5)*spread*3
+    const dur = 3 + Math.random() * 5
+    g.style.cssText = `left:${cx}%;top:${cy}%;font-size:${0.7+Math.random()*0.9}rem;`
+      + `--gx:${gx}px;--gy:${gy}px;--gx2:${gx2}px;--gy2:${gy2}px;`
+      + `animation-duration:${dur}s;animation-delay:${Math.random()*0.5}s;`
+    g.textContent = GONZO_GLYPHS[Math.floor(Math.random() * GONZO_GLYPHS.length)]
+    storm.appendChild(g)
+    setTimeout(() => g.remove(), (dur + 1) * 1000)
+  }
+  for (let i = 0; i < 8; i++) setTimeout(() => spawnGonzoGlyph(), i * 200)
+  gonzoGlyphIv = setInterval(() => { if (clawmpsonActive) spawnGonzoGlyph() }, 600)
+
+  // Extra HTML smoke for particles that escape the canvas
+  const SMOKE_CHARS = ['~','≈','∿','∼','⌇','░','·','˙','ˑ','∽']
+  gonzoSmokeIv = setInterval(() => {
+    if (!clawmpsonActive || !storm) return
+    const s = document.createElement('div')
+    s.className = 'gonzo-smoke'
+    s.style.cssText = `left:${58+Math.random()*15}%;top:${32+Math.random()*10}%;`
+    s.textContent = SMOKE_CHARS[Math.floor(Math.random()*SMOKE_CHARS.length)]
+    storm.appendChild(s)
+    setTimeout(() => s.remove(), 3500)
+  }, 200)
+}
+
+function stopGonzo() {
+  if (gonzoRAF)     { cancelAnimationFrame(gonzoRAF); gonzoRAF = null }
+  if (gonzoGlyphIv) { clearInterval(gonzoGlyphIv); gonzoGlyphIv = null }
+  if (gonzoSmokeIv) { clearInterval(gonzoSmokeIv); gonzoSmokeIv = null }
+  gonzoSmoke.length = 0
+  const storm = document.getElementById('gonzoGlyphStorm')
+  if (storm) storm.innerHTML = ''
+}
+
+// ── Floating glyphs ───────────────────────────────────────────────
+const KANJI  = ['雨','猫','夜','静','夢','音','風','波','空','月','花','山','川','火','水']
+const GEO    = ['◈','◇','◉','○','◎','✦','✧','⬡','※','∞','◊','⋄','△','▽','❖']
+let glyphIv  = null
+
+function spawnGlyph() {
+  const right  = document.getElementById('loRight')
+  if (!right || !clawmpsonActive) return
+  const isKanji = Math.random() < 0.5
+  const chars   = isKanji ? KANJI : GEO
+  const g = document.createElement('div')
+  g.className  = `lo-glyph ${isKanji ? 'kanji' : 'geo'}`
+  const dur    = 8 + Math.random() * 12
+  const delay  = Math.random() * 2
+  g.style.cssText = `left:${10+Math.random()*80}%;bottom:${Math.random()*40}%;animation-duration:${dur}s;animation-delay:${delay}s`
+  g.textContent = chars[Math.floor(Math.random()*chars.length)]
+  right.appendChild(g)
+  setTimeout(()=>g.remove(), (dur+delay+1)*1000)
+}
+
+function startGlyphs() {
+  spawnGlyph()
+  glyphIv = setInterval(()=>{ if (clawmpsonActive) spawnGlyph() }, 1800)
+}
+
+// ── Clock ─────────────────────────────────────────────────────────
+let clockIv = null
+function startClock() {
+  function tick() {
+    const el = document.getElementById('loClock')
+    if (el) el.textContent = new Date().toLocaleTimeString('en-US',{hour12:false})
+  }
+  tick()
+  clockIv = setInterval(tick, 1000)
+}
+
+// ── Typewriter ────────────────────────────────────────────────────
+let typeQueue = []
+let isTyping  = false
+
+function enqueueType(rawHtml, ts) {
+  typeQueue.push({rawHtml, ts})
+  if (!isTyping) drainTypeQueue()
+}
+
+function drainTypeQueue() {
+  if (!typeQueue.length) { isTyping = false; return }
+  isTyping = true
+  const {rawHtml, ts} = typeQueue.shift()
+
+  const body   = document.getElementById('loBookBody')
+  const tsEl   = document.getElementById('loTypingTs')
+  const textEl = document.getElementById('loTypingText')
+
+  // Finish previous entry — move typing entry up as a committed entry
+  const typingEntry = document.getElementById('loTypingEntry')
+  if (typingEntry && tsEl.textContent) {
+    const committed = document.createElement('div')
+    committed.className = 'lo-entry'
+    committed.innerHTML = `<div class="lo-entry-ts">${tsEl.textContent}</div><div class="lo-entry-text">${textEl.innerHTML.replace('<span class="lo-cursor"></span>','')}</div><div class="lo-entry-divider">── ○ ──</div>`
+    body.insertBefore(committed, typingEntry)
+    body.scrollTop = 0
+  }
+
+  tsEl.textContent  = ts
+  textEl.innerHTML  = '<span class="lo-cursor"></span>'
+
+  // Strip HTML tags for typing, keep span markers for color
+  // We'll type plain text then inject final html at end
+  const plain = rawHtml.replace(/<[^>]+>/g,'')
+  let i = 0
+  function typeChar() {
+    if (!clawmpsonActive) { textEl.innerHTML = rawHtml + '<span class="lo-cursor"></span>'; drainTypeQueue(); return }
+    if (i < plain.length) {
+      textEl.innerHTML = plain.slice(0,i+1) + '<span class="lo-cursor"></span>'
+      i++
+      setTimeout(typeChar, 28 + Math.random()*14)
+    } else {
+      // Swap in full html version
+      textEl.innerHTML = rawHtml + '<span class="lo-cursor"></span>'
+      setTimeout(drainTypeQueue, 1200)
+    }
+  }
+  typeChar()
+}
+
+// ── Sync stats to lofi panel ───────────────────────────────────────
+function loSyncStats(s) {
+  if (!clawmpsonActive) return
+  function set(id, v) { const el=document.getElementById(id); if(el) el.textContent=v }
+  set('loSuccess', s.success??'—')
+  set('loBlocked', s.blocked??'—')
+  set('loFailed',  s.failed ??'—')
+  set('loQueue',   s.queue  ??'—')
+  const p2=s.phase2||{}, done=p2.done??0, pct=p2.pct??0
+  set('loPhase', `${done}/10`)
+  const fill = document.getElementById('loPhaseFill')
+  if (fill) fill.style.width = pct+'%'
+}
+
+
+// ── Start / stop ───────────────────────────────────────────────────
+function startLofi() {
+  startRain()
+  startGonzo()
+  startGlyphs()
+  startClock()
+  // Seed the book with the last known hst entry or an opening line
+  const existing = Array.from(document.querySelectorAll('.hst-entry')).slice(0,1)
+  if (existing.length) {
+    const txt = existing[0].querySelector('.hst-text')?.innerHTML || ''
+    if (txt) {
+      const ts = existing[0].querySelector('.hst-ts')?.textContent || ''
+      const loText = txt
+        .replace(/class="hst-name"/g, 'class="lo-em"')
+        .replace(/class="hst-ok"/g,   'class="lo-ok"')
+        .replace(/class="hst-bad"/g,  'class="lo-bad"')
+      enqueueType(loText, ts)
+    }
+  }
+  // Sync current stats
+  const sumEl = document.getElementById('sSuccess')
+  if (sumEl) loSyncStats({
+    success: document.getElementById('sSuccess')?.textContent,
+    blocked: document.getElementById('sBlocked')?.textContent,
+    failed:  document.getElementById('sFailed')?.textContent,
+    queue:   document.getElementById('sQueue')?.textContent,
+    phase2:  { done: parseInt(document.getElementById('sPhase')?.textContent)||0, pct: parseInt(document.getElementById('phaseFill')?.style.width)||0 }
+  })
+}
+
+function stopLofi() {
+  rainIntervals.forEach(clearInterval); rainIntervals = []
+  stopGonzo()
+  if (glyphIv)      { clearInterval(glyphIv);      glyphIv      = null }
+  if (clockIv)      { clearInterval(clockIv);      clockIv      = null }
+}
+
+</script>
+</body>
+</html>

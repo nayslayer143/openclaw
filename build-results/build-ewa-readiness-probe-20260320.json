@@ -1,0 +1,18 @@
+{
+  "task_id": "build-ewa-readiness-probe-20260320",
+  "status": "success",
+  "changed_files": [
+    "backend/server.py",
+    "tests/test_health.py"
+  ],
+  "tests_run": 25,
+  "tests_passed": 24,
+  "tests_failed": 1,
+  "unresolved_risks": [
+    "tests_failed=1 is pre-existing: test_intentional_failure is a DR drill assertion (assert False) — not introduced by this change",
+    "Branch mismatch during execution: git checkout -b landed on feat/build-ewa-env-config-20260320 (already existed); commit was cherry-picked to correct branch feat/build-ewa-readiness-probe-20260320"
+  ],
+  "rollback_command": "git checkout main && git branch -D feat/build-ewa-readiness-probe-20260320",
+  "summary": "Added GET /ready endpoint to backend/server.py that checks app liveness and MONGO_URL env var presence. Returns HTTP 200 {ready:true, checks:{...}} on success, HTTP 503 {ready:false, checks:{...}} on failure. Added 4 pytest tests (3 happy-path, 1 not-ready via env patch). All 24 non-DR-drill tests pass.",
+  "suggested_next": "Merge feat/build-ewa-readiness-probe-20260320 into main (Tier-2 approval required per CLAUDE.md). Consider wiring /ready to Render health check config in render.yaml."
+}

@@ -61,7 +61,7 @@ fi
 echo ""
 echo "→ Checking critical models..."
 MISSING=0
-for MODEL in "qwen2.5:32b" "qwen2.5:7b" "nomic-embed-text"; do
+for MODEL in "qwen3:32b" "glm4:7b-flash" "nomic-embed-text"; do
   if ollama list 2>/dev/null | grep -q "$MODEL"; then
     echo "  ✓ $MODEL"
   else

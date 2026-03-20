@@ -21,6 +21,12 @@ DENYLIST=(
   "> /dev/sda"
   "mkfs."
   ":(){:|:&};:"
+  "git push origin main"
+  "git push --force"
+  "git push -f "
+  "git commit --amend"
+  "git reset --hard"
+  "git checkout main --"
 )
 
 COMMAND="$1"
