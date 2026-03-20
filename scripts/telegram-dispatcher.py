@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 """
 OpenClaw Telegram Dispatcher — Clawmson Edition
 Full conversational AI assistant + build pipeline in one bot.
