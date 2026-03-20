@@ -4,6 +4,7 @@ Clawmson Ollama chat integration.
 Sends rolling conversation context (last 50 msgs) to Ollama, returns reply.
 System prompt loaded from agents/configs/clawmson-chat.md.
 """
+from __future__ import annotations
 
 import os
 import json
