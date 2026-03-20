@@ -1,34 +1,65 @@
 #!/usr/bin/env python3
 """
-OpenClaw Telegram Dispatcher
-Polls Telegram for messages from Jordan, converts them to task packets,
-runs the build pipeline, and reports results back.
+OpenClaw Telegram Dispatcher — Clawmson Edition
+Full conversational AI assistant + build pipeline in one bot.
+NLU-powered intent classification via local qwen2.5:7b.
 
 Run with: python3 ~/openclaw/scripts/telegram-dispatcher.py
 Keep alive: launchd plist or startup.sh
+
+Message flow:
+  1. Auth check
+  2. !shortcut commands  →  handled immediately
+  3. /slash commands     →  handled immediately (including new /forget /context /references)
+  4. Media (photo/doc/audio/voice)  →  processed for content + has_image flag
+  5. LLM intent classification (regex fallback if Ollama down)
+  6. Route:
+       UNCLEAR          → ask clarifying question, wait for reply, re-classify
+       STATUS_QUERY     → handle_status / handle_queue
+       DIRECT_COMMAND   → run safe shell command
+       REFERENCE_INGEST → ingest URLs (thread) or treat as conversation with URL context
+       BUILD_TASK       → existing build pipeline (subprocess)
+       CONVERSATION     → Ollama chat (thread)
+  7. Save conversation history
 """
 
 import os
 import sys
 import json
 import time
+import threading
 import subprocess
 import datetime
 import re
 import requests
 from pathlib import Path
 
+# ── Add scripts dir to path so sibling modules are importable ────────────────
+
+_SCRIPTS_DIR = Path(__file__).parent
+if str(_SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS_DIR))
+
+import clawmson_db as db
+import clawmson_chat as llm
+import clawmson_intents as intents
+import clawmson_media as media
+import clawmson_references as refs
+
 # ── Config ────────────────────────────────────────────────────────────────────
 
-OPENCLAW_ROOT = Path.home() / "openclaw"
-ENV_FILE = OPENCLAW_ROOT / ".env"
-QUEUE_DIR = OPENCLAW_ROOT / "repo-queue"
-BUILD_RESULTS = OPENCLAW_ROOT / "build-results"
-RUN_TASK = OPENCLAW_ROOT / "scripts" / "run-task.sh"
-POLL_INTERVAL = 5  # seconds
-OFFSET_FILE = Path("/tmp/openclaw-tg-offset.txt")
+OPENCLAW_ROOT  = Path.home() / "openclaw"
+ENV_FILE       = OPENCLAW_ROOT / ".env"
+QUEUE_DIR      = OPENCLAW_ROOT / "repo-queue"
+BUILD_RESULTS  = OPENCLAW_ROOT / "build-results"
+RUN_TASK       = OPENCLAW_ROOT / "scripts" / "run-task.sh"
+POLL_INTERVAL  = 5   # seconds
+OFFSET_FILE    = Path("/tmp/openclaw-tg-offset.txt")
 
-# Load .env
+DEFAULT_REPO      = "EmergentWebActions"
+DEFAULT_REPO_PATH = str(Path.home() / "projects" / "EmergentWebActions")
+
+
 def load_env():
     if not ENV_FILE.exists():
         print(f"ERROR: .env not found at {ENV_FILE}")
@@ -39,36 +70,65 @@ def load_env():
             k, v = line.split("=", 1)
             os.environ.setdefault(k.strip(), v.strip())
 
+
 load_env()
 
-BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
+BOT_TOKEN    = os.environ["TELEGRAM_BOT_TOKEN"]
 ALLOWED_USERS = set()
-raw = os.environ.get("TELEGRAM_ALLOWED_USERS", "")
+_raw = os.environ.get("TELEGRAM_ALLOWED_USERS", "")
 try:
-    parsed = json.loads(raw)
-    ALLOWED_USERS = {str(x) for x in (parsed if isinstance(parsed, list) else [parsed])}
+    _parsed = json.loads(_raw)
+    ALLOWED_USERS = {str(x) for x in (_parsed if isinstance(_parsed, list) else [_parsed])}
 except Exception:
-    ALLOWED_USERS = {raw.strip()}
+    ALLOWED_USERS = {_raw.strip()}
 
 API = f"https://api.telegram.org/bot{BOT_TOKEN}"
 
-# Default repo for tasks (can be overridden in message)
-DEFAULT_REPO = "EmergentWebActions"
-DEFAULT_REPO_PATH = str(Path.home() / "projects" / "EmergentWebActions")
+# Init media module with bot token
+media.init(BOT_TOKEN)
 
-# ── Telegram helpers ───────────────────────────────────────────────────────────
+# ── Clarification state ──────────────────────────────────────────────────────
+# Tracks when Clawmson asked a clarifying question and is waiting for a reply.
+# Key: chat_id → {"original_text": str, "question": str, "timestamp": float}
+_pending_clarifications: dict = {}
 
-def send(chat_id, text):
+
+# ── Telegram helpers ──────────────────────────────────────────────────────────
+
+def send(chat_id: str, text: str):
+    if not text:
+        return
+    # Telegram message length cap is 4096; split if needed
+    for chunk in _split_message(text):
+        try:
+            requests.post(f"{API}/sendMessage", json={
+                "chat_id": chat_id,
+                "text": chunk,
+                "parse_mode": ""
+            }, timeout=10)
+        except Exception as e:
+            print(f"[send error] {e}")
+
+
+def _split_message(text: str, limit: int = 4000) -> list:
+    if len(text) <= limit:
+        return [text]
+    chunks = []
+    while text:
+        chunks.append(text[:limit])
+        text = text[limit:]
+    return chunks
+
+
+def send_typing(chat_id: str):
     try:
-        requests.post(f"{API}/sendMessage", json={
-            "chat_id": chat_id,
-            "text": text,
-            "parse_mode": ""
-        }, timeout=10)
-    except Exception as e:
-        print(f"[send error] {e}")
+        requests.post(f"{API}/sendChatAction",
+                      json={"chat_id": chat_id, "action": "typing"}, timeout=5)
+    except Exception:
+        pass
 
-def get_updates(offset=0):
+
+def get_updates(offset: int = 0) -> list:
     try:
         r = requests.get(f"{API}/getUpdates", params={
             "offset": offset,
@@ -80,7 +140,8 @@ def get_updates(offset=0):
         print(f"[poll error] {e}")
         return []
 
-def load_offset():
+
+def load_offset() -> int:
     if OFFSET_FILE.exists():
         try:
             return int(OFFSET_FILE.read_text().strip())
@@ -88,21 +149,38 @@ def load_offset():
             pass
     return 0
 
-def save_offset(offset):
+
+def save_offset(offset: int):
     OFFSET_FILE.write_text(str(offset))
 
-# ── Task packet builder ────────────────────────────────────────────────────────
 
-def build_task_packet(goal: str, repo: str = DEFAULT_REPO, repo_path: str = DEFAULT_REPO_PATH) -> Path:
-    date = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-    slug = re.sub(r"[^a-z0-9]+", "-", goal.lower())[:40].strip("-")
-    task_id = f"build-{slug}-{date}"
+# ── Task packet builder ───────────────────────────────────────────────────────
 
-    packet = {
+def build_task_packet(goal: str, classification: dict | None = None,
+                      repo: str = DEFAULT_REPO,
+                      repo_path: str = DEFAULT_REPO_PATH) -> Path:
+    date    = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    slug    = re.sub(r"[^a-z0-9]+", "-", goal.lower())[:40].strip("-")
+    task_id = f"tsk-{slug}-{date}"
+
+    # Structured packet — enriched by LLM classification when available
+    parsed = {}
+    if classification:
+        parsed = {
+            "action": classification.get("action"),
+            "target": classification.get("target"),
+            "project": classification.get("project"),
+        }
+
+    packet  = {
         "task_id": task_id,
+        "source": "telegram",
         "repo_path": repo_path,
         "repo": repo,
         "goal": goal,
+        "parsed": parsed,
+        "attachments": classification.get("attachments", []) if classification else [],
+        "clarification": classification.get("_clarification_context") if classification else None,
         "acceptance_criteria": [
             "All existing tests still pass",
             "New functionality has at least one test",
@@ -113,63 +191,22 @@ def build_task_packet(goal: str, repo: str = DEFAULT_REPO, repo_path: str = DEFA
             "never commit .env",
             "never push --force"
         ],
+        "priority": "normal",
         "time_budget_minutes": 30,
         "risk_level": "low",
+        "model": "qwen2.5:7b",
+        "timestamp": datetime.datetime.now().isoformat(),
         "output_location": str(BUILD_RESULTS / task_id)
     }
-
     QUEUE_DIR.mkdir(parents=True, exist_ok=True)
     packet_path = QUEUE_DIR / f"task-{slug}-{date}.json"
     packet_path.write_text(json.dumps(packet, indent=2))
     return packet_path
 
-# ── Pipeline runner ────────────────────────────────────────────────────────────
 
-def run_task(packet_path: Path, chat_id: str):
-    """Run a task packet through run-task.sh and report result via Telegram."""
-    send(chat_id, f"Task queued: {packet_path.name}\nStarting build pipeline...")
+# ── Existing command handlers (unchanged) ─────────────────────────────────────
 
-    try:
-        result = subprocess.run(
-            ["bash", str(RUN_TASK), str(packet_path)],
-            capture_output=True, text=True, timeout=1800  # 30 min max
-        )
-        output = result.stdout + result.stderr
-
-        # Extract status from output
-        status = "unknown"
-        if "Status: success" in output or "status\": \"success\"" in output:
-            status = "success"
-        elif "Status: blocked" in output or "status\": \"blocked\"" in output:
-            status = "blocked"
-        elif "Status: failed" in output or result.returncode != 0:
-            status = "failed"
-
-        # Find contract path
-        contract_path = output.strip().split("\n")[-1].strip()
-        contract_summary = ""
-        if contract_path.endswith(".json") and Path(contract_path).exists():
-            try:
-                contract = json.loads(Path(contract_path).read_text())
-                changed = contract.get("changed_files", [])
-                tests = contract.get("tests_run", 0)
-                passed = contract.get("tests_passed", 0)
-                contract_summary = f"\nFiles changed: {len(changed)}\nTests: {passed}/{tests} passed"
-            except Exception:
-                pass
-
-        icon = {"success": "✓", "blocked": "⚠", "failed": "✗"}.get(status, "?")
-        msg = f"{icon} Build {status.upper()}: {packet_path.stem}{contract_summary}"
-        send(chat_id, msg)
-
-    except subprocess.TimeoutExpired:
-        send(chat_id, "Build timed out after 30 minutes.")
-    except Exception as e:
-        send(chat_id, f"Dispatcher error: {e}")
-
-# ── Command handlers ───────────────────────────────────────────────────────────
-
-def handle_status(chat_id):
+def handle_status(chat_id: str):
     results = sorted(BUILD_RESULTS.glob("*.json"))[-5:] if BUILD_RESULTS.exists() else []
     if not results:
         send(chat_id, "No build results yet.")
@@ -177,15 +214,16 @@ def handle_status(chat_id):
     lines = ["Recent builds:"]
     for r in reversed(results):
         try:
-            data = json.loads(r.read_text())
+            data   = json.loads(r.read_text())
             status = data.get("status", "?")
-            icon = {"success": "✓", "blocked": "⚠", "failed": "✗"}.get(status, "?")
+            icon   = {"success": "✓", "blocked": "⚠", "failed": "✗"}.get(status, "?")
             lines.append(f"{icon} {r.stem}")
         except Exception:
             lines.append(f"? {r.stem}")
     send(chat_id, "\n".join(lines))
 
-def handle_queue(chat_id):
+
+def handle_queue(chat_id: str):
     pending = list(QUEUE_DIR.glob("task-*.json")) if QUEUE_DIR.exists() else []
     if not pending:
         send(chat_id, "Queue is empty.")
@@ -193,30 +231,36 @@ def handle_queue(chat_id):
         names = "\n".join(f"• {p.name}" for p in pending[-10:])
         send(chat_id, f"Queued ({len(pending)}):\n{names}")
 
-def handle_help(chat_id):
+
+def handle_help(chat_id: str):
     send(chat_id, (
-        "OpenClaw Dispatcher\n\n"
-        "Commands:\n"
+        "Clawmson — OpenClaw AI Assistant\n\n"
+        "Shortcuts:\n"
         "!status          — last 5 build results\n"
         "!queue           — pending task packets\n"
-        "!help            — this message\n"
-        "/approve <id>    — merge a passing build into main\n\n"
-        "Anything else is treated as a build task.\n"
-        "Example: add rate limiting to EmergentWebActions"
+        "!help            — this message\n\n"
+        "Commands:\n"
+        "/approve <id>    — merge a passing build into main\n"
+        "/forget          — clear conversation history\n"
+        "/context         — show persistent notes\n"
+        "/references      — list saved links\n\n"
+        "Anything else: just talk to me.\n"
+        "Send a URL and I'll read and summarize it.\n"
+        "Send a photo, file, or voice note and I'll process it.\n"
+        "Describe a code task and I'll queue a build."
     ))
 
+
 def handle_approve(task_id: str, chat_id: str):
-    """Merge a passing build branch into main."""
+    """Merge a passing build branch into main (unchanged from original)."""
     contract_path = BUILD_RESULTS / f"{task_id}.json"
     if not contract_path.exists():
-        # Try matching by prefix
         matches = list(BUILD_RESULTS.glob(f"{task_id}*.json"))
         if matches:
             contract_path = matches[0]
         else:
             send(chat_id, f"No output contract found for: {task_id}")
             return
-
     try:
         contract = json.loads(contract_path.read_text())
     except Exception as e:
@@ -228,15 +272,15 @@ def handle_approve(task_id: str, chat_id: str):
         send(chat_id, f"Cannot approve — build status is '{status}', not 'success'.")
         return
 
-    # Derive branch name from task_id convention: feat/<task_id>
-    branch = f"feat/{task_id}"
+    branch    = f"feat/{task_id}"
     repo_path = contract.get("repo_path") or DEFAULT_REPO_PATH
-
     send(chat_id, f"Merging {branch} into main...")
     try:
         result = subprocess.run(
             ["bash", "-c",
-             f"cd {repo_path} && git checkout main && git merge --no-ff {branch} -m 'Merge {branch}' && git push origin main"],
+             f"cd {repo_path} && git checkout main && "
+             f"git merge --no-ff {branch} -m 'Merge {branch}' && "
+             f"git push origin main"],
             capture_output=True, text=True, timeout=60
         )
         if result.returncode == 0:
@@ -246,104 +290,280 @@ def handle_approve(task_id: str, chat_id: str):
     except Exception as e:
         send(chat_id, f"Merge error: {e}")
 
-def is_question_or_status(text: str, chat_id: str) -> bool:
-    """Detect conversational messages that shouldn't become build tasks.
-    Replies if it's a status question, else nudges toward proper usage.
-    Returns True if handled (caller should skip build dispatch)."""
-    t = text.strip().lower()
 
-    # Hard question mark = not a build task
-    if t.endswith("?"):
-        status_words = ("working on", "eta", "status", "progress", "done", "finish",
-                        "complete", "queue", "blocked", "running", "build", "next")
-        if any(w in t for w in status_words):
+# ── New command handlers ──────────────────────────────────────────────────────
+
+def handle_forget(chat_id: str):
+    db.clear_history(chat_id)
+    send(chat_id, "Conversation history cleared.")
+
+
+def handle_context(chat_id: str):
+    ctx = db.get_context(chat_id)
+    if not ctx:
+        send(chat_id, "No persistent context stored.")
+    else:
+        lines = ["Persistent context:"]
+        for k, v in ctx.items():
+            lines.append(f"• {k}: {v}")
+        send(chat_id, "\n".join(lines))
+
+
+def handle_references(chat_id: str):
+    ref_list = db.list_references(chat_id, limit=20)
+    send(chat_id, refs.format_references(ref_list))
+
+
+# ── Direct command execution ──────────────────────────────────────────────────
+
+def handle_direct_command(chat_id: str, text: str):
+    cmd = intents.get_safe_command(text)
+    if not cmd:
+        send(chat_id, "Unknown command.")
+        return
+    try:
+        result = subprocess.run(
+            cmd, shell=True, capture_output=True, text=True, timeout=30
+        )
+        output = (result.stdout + result.stderr).strip()
+        reply  = output[:3000] if output else "(no output)"
+    except subprocess.TimeoutExpired:
+        reply = "Command timed out."
+    except Exception as e:
+        reply = f"Command error: {e}"
+    send(chat_id, reply)
+    db.save_message(chat_id, "assistant", reply)
+
+
+# ── Conversation handler (runs in thread) ─────────────────────────────────────
+
+def _conversation_thread(chat_id: str, effective_text: str, has_image: bool):
+    """Called in a background thread. Fetches Ollama reply and sends it."""
+    send_typing(chat_id)
+    history = db.get_history(chat_id, limit=50)
+    reply   = llm.chat(history, effective_text, has_image=has_image)
+    db.save_message(chat_id, "assistant", reply)
+    send(chat_id, reply)
+
+
+def dispatch_conversation(chat_id: str, effective_text: str, has_image: bool = False):
+    t = threading.Thread(
+        target=_conversation_thread,
+        args=(chat_id, effective_text, has_image),
+        daemon=True
+    )
+    t.start()
+
+
+# ── Reference ingest handler (runs in thread) ─────────────────────────────────
+
+def _reference_thread(chat_id: str, text: str):
+    """Ingest URLs found in text, send summaries, then do a conversational follow-up."""
+    summaries = refs.ingest_urls_in_message(chat_id, text)
+    for summary in summaries:
+        send(chat_id, summary)
+        db.save_message(chat_id, "assistant", summary)
+
+    # If there was also a question beyond just the URL, answer it
+    url_stripped = re.sub(r'https?://[^\s]+', '', text).strip()
+    if url_stripped and len(url_stripped) > 10:
+        # User said something alongside the URL — answer conversationally
+        context_note = f"[Reference ingested from URL in message]\n{url_stripped}"
+        dispatch_conversation(chat_id, context_note)
+
+
+def dispatch_reference_ingest(chat_id: str, text: str):
+    t = threading.Thread(
+        target=_reference_thread,
+        args=(chat_id, text),
+        daemon=True
+    )
+    t.start()
+
+
+# ── Build task dispatcher ─────────────────────────────────────────────────────
+
+def dispatch_build_task(chat_id: str, text: str, classification: dict | None = None):
+    packet_path = build_task_packet(text, classification=classification)
+    print(f"[dispatcher] Created packet: {packet_path}")
+    send(chat_id, f"Build task queued: {packet_path.stem}\nStarting pipeline...")
+    db.save_message(chat_id, "assistant",
+                    f"Build task queued: {packet_path.stem}")
+    log_file = open(f"/tmp/openclaw-task-{packet_path.stem}.log", "w")
+    subprocess.Popen(
+        ["bash", str(OPENCLAW_ROOT / "scripts" / "run-task-and-reply.sh"),
+         str(packet_path), chat_id],
+        stdout=log_file, stderr=log_file
+    )
+
+
+# ── Main message handler ──────────────────────────────────────────────────────
+
+def handle_message(msg: dict):
+    chat_id  = str(msg.get("chat", {}).get("id", ""))
+    user_id  = str(msg.get("from", {}).get("id", ""))
+    text     = msg.get("text", "").strip()
+    msg_id   = msg.get("message_id")
+
+    if user_id not in ALLOWED_USERS:
+        print(f"[dispatcher] Ignored from non-allowed user {user_id}")
+        return
+
+    # ── 1. Existing ! shortcut commands (fast path, no DB save) ──────────────
+    if text:
+        lower = text.lower()
+        if lower in ("!status", "/status"):
             handle_status(chat_id)
-            pending = list(QUEUE_DIR.glob("task-*.json")) if QUEUE_DIR.exists() else []
-            if pending:
-                send(chat_id, f"Queue: {len(pending)} task(s) pending\nSend !queue for full list")
-        else:
-            send(chat_id, "That looks like a question — I only take build tasks.\nSend !help for commands.")
-        return True
+            return
+        if lower in ("!queue", "/queue"):
+            handle_queue(chat_id)
+            return
+        if lower in ("!help", "/help", "/start"):
+            handle_help(chat_id)
+            return
 
-    # Very short messages (1-2 words) that aren't commands
-    words = text.split()
-    if len(words) <= 2 and not any(c in text for c in ("/", "!", "#")):
-        send(chat_id, f'"{text}" is too short to be a build task.\nDescribe what to build, e.g.:\n  add input validation to the login endpoint')
-        return True
+    # ── 2. /slash commands ────────────────────────────────────────────────────
+    if text:
+        lower = text.lower()
+        if lower == "/forget":
+            handle_forget(chat_id)
+            return
+        if lower == "/context":
+            handle_context(chat_id)
+            return
+        if lower == "/references":
+            handle_references(chat_id)
+            return
+        if lower.startswith("/approve"):
+            raw = text.strip()
+            if raw.lower().startswith("/approve-"):
+                task_id = raw[len("/approve-"):].split()[0].strip()
+            else:
+                parts   = raw.split(None, 1)
+                task_id = parts[1].split()[0].strip() if len(parts) > 1 else ""
+            if not task_id:
+                send(chat_id, "Usage: /approve <task_id>")
+            else:
+                handle_approve(task_id, chat_id)
+            return
 
-    return False
+    # ── 3. Process media if present ───────────────────────────────────────────
+    media_path, media_content, has_image = media.handle_message_media(msg)
+
+    # Skip entirely if no text and no media
+    if not text and not media_content:
+        return
+
+    # Build effective message from text + media content
+    parts = []
+    if text:
+        parts.append(text)
+    if media_content:
+        parts.append(f"[Attached content]:\n{media_content}")
+    effective_text = "\n\n".join(parts)
+    display_text   = text or f"[Media: {media_path or 'attached'}]"
+
+    print(f"[dispatcher] {user_id}: {display_text[:80]}")
+
+    # ── 4. Save user message ──────────────────────────────────────────────────
+    media_type = None
+    if "photo" in msg:
+        media_type = "photo"
+    elif "document" in msg:
+        media_type = "document"
+    elif "voice" in msg:
+        media_type = "voice"
+    elif "audio" in msg:
+        media_type = "audio"
+
+    db.save_message(chat_id, "user", effective_text,
+                    message_id=msg_id, media_type=media_type)
+
+    # ── 5. Classify and route (LLM-powered, regex fallback) ─────────────────
+    # Media messages (image/audio/doc content) always go to conversation,
+    # with the extracted content as context.
+    if media_content and not intents.has_url(text):
+        dispatch_conversation(chat_id, effective_text, has_image=has_image)
+        return
+
+    # Check if this is a reply to a pending clarification
+    pending = _pending_clarifications.pop(chat_id, None)
+    if pending:
+        # Combine original message + this reply for re-classification
+        combined = f"{pending['original_text']}\n[Clarification: {effective_text}]"
+        history = db.get_history(chat_id, limit=3)
+        result = intents.classify(combined, history=history)
+        result["_clarification_context"] = effective_text
+        # If still unclear, just treat as conversation — don't loop
+        if result["intent"] == intents.UNCLEAR:
+            result["intent"] = intents.CONVERSATION
+        effective_text = combined
+    else:
+        history = db.get_history(chat_id, limit=3)
+        result = intents.classify(effective_text, history=history)
+
+    intent = result["intent"]
+    print(f"[dispatcher] intent={intent} confidence={result.get('confidence', '?')} "
+          f"source={result.get('_source', '?')}")
+
+    # ── UNCLEAR: ask one clarifying question, then wait ───────────────────
+    if intent == intents.UNCLEAR and result.get("needs_clarification"):
+        question = result.get("suggested_question", "Can you be more specific?")
+        send(chat_id, question)
+        db.save_message(chat_id, "assistant", question)
+        _pending_clarifications[chat_id] = {
+            "original_text": effective_text,
+            "question": question,
+            "timestamp": time.time()
+        }
+        return
+
+    # ── Route by intent ───────────────────────────────────────────────────
+    if intent == intents.STATUS_QUERY:
+        handle_status(chat_id)
+        pending_tasks = list(QUEUE_DIR.glob("task-*.json")) if QUEUE_DIR.exists() else []
+        if pending_tasks:
+            send(chat_id, f"Queue: {len(pending_tasks)} task(s) pending. Send !queue for details.")
+        return
+
+    if intent == intents.DIRECT_COMMAND:
+        handle_direct_command(chat_id, effective_text)
+        return
+
+    if intent == intents.REFERENCE_INGEST:
+        dispatch_reference_ingest(chat_id, effective_text)
+        return
+
+    if intent == intents.BUILD_TASK:
+        dispatch_build_task(chat_id, effective_text, classification=result)
+        return
+
+    # Default: CONVERSATION
+    dispatch_conversation(chat_id, effective_text, has_image=has_image)
 
 
 # ── Main loop ─────────────────────────────────────────────────────────────────
 
 def main():
-    print(f"[dispatcher] Starting. Allowed users: {ALLOWED_USERS}")
+    print(f"[dispatcher] Starting Clawmson. Allowed users: {ALLOWED_USERS}")
     print(f"[dispatcher] Default repo: {DEFAULT_REPO} @ {DEFAULT_REPO_PATH}")
+    print(f"[dispatcher] Ollama: {os.environ.get('OLLAMA_BASE_URL', 'http://localhost:11434')}"
+          f" / {os.environ.get('OLLAMA_CHAT_MODEL', 'qwen2.5:7b')}")
     offset = load_offset()
 
     while True:
         updates = get_updates(offset)
-
         for update in updates:
             offset = update["update_id"] + 1
             save_offset(offset)
-
             msg = update.get("message", {})
-            if not msg:
-                continue
-
-            chat_id = str(msg.get("chat", {}).get("id", ""))
-            user_id = str(msg.get("from", {}).get("id", ""))
-            text = msg.get("text", "").strip()
-
-            # Security: only respond to allowed users
-            if user_id not in ALLOWED_USERS:
-                print(f"[dispatcher] Ignored message from non-allowed user {user_id}")
-                continue
-
-            if not text:
-                continue
-
-            print(f"[dispatcher] Message from {user_id}: {text[:80]}")
-
-            # Commands
-            if text.lower() in ("!status", "/status"):
-                handle_status(chat_id)
-            elif text.lower() in ("!queue", "/queue"):
-                handle_queue(chat_id)
-            elif text.lower() in ("!help", "/help", "/start"):
-                handle_help(chat_id)
-            elif text.lower().startswith("/approve"):
-                # Handle both forms:
-                #   /approve build-ewa-foo-20260320
-                #   /approve-build-ewa-foo-20260320 (hyphenated, as bot suggests)
-                #   /approve-build-ewa-foo-20260320 to merge (trailing words ignored)
-                raw = text.strip()
-                if raw.lower().startswith("/approve-"):
-                    # Strip /approve- prefix, take first word only
-                    task_id = raw[len("/approve-"):].split()[0].strip()
-                else:
-                    parts = raw.split(None, 1)
-                    task_id = parts[1].split()[0].strip() if len(parts) > 1 else ""
-                if not task_id:
-                    send(chat_id, "Usage: /approve <task_id>\nExample: /approve build-ewa-version-endpoint-20260320")
-                else:
-                    handle_approve(task_id, chat_id)
-            elif is_question_or_status(text, chat_id):
-                pass  # handled inside the function
-            else:
-                # Treat as task goal
-                packet_path = build_task_packet(text)
-                print(f"[dispatcher] Created packet: {packet_path}")
-                # Run in background so dispatcher keeps polling
-                log_file = open(f"/tmp/openclaw-task-{packet_path.stem}.log", "w")
-                subprocess.Popen(
-                    ["bash", str(OPENCLAW_ROOT / "scripts" / "run-task-and-reply.sh"),
-                     str(packet_path), chat_id],
-                    stdout=log_file, stderr=log_file
-                )
-
+            if msg:
+                try:
+                    handle_message(msg)
+                except Exception as e:
+                    print(f"[dispatcher] Unhandled error: {e}")
         time.sleep(POLL_INTERVAL)
+
 
 if __name__ == "__main__":
     main()
