@@ -45,12 +45,24 @@ recent conversation context), return a JSON object with these fields:
 - confidence: float 0-1
 
 Intent definitions:
-- BUILD_TASK: user wants code written, deployed, fixed, refactored, committed, tested, or merged
+- BUILD_TASK: user EXPLICITLY wants code written, deployed, fixed, refactored, committed, tested, or merged. Must mention code, a feature, a repo, or a specific technical action.
 - REFERENCE_INGEST: user is sharing a link or resource to study/save/remember (not a build task)
-- STATUS_QUERY: user is asking about build status, queue, progress, what's running
+- STATUS_QUERY: user is asking specifically about BUILD status, task queue, or pipeline progress. Keywords: "!status", "build status", "queue", "what's in the queue", "is the build done"
 - DIRECT_COMMAND: user wants a system command run (disk space, memory, uptime, ollama status, etc.)
-- CONVERSATION: general chat, questions, discussion — not a task
-- UNCLEAR: message is too ambiguous to classify — needs a follow-up question
+- CONVERSATION: general chat, casual questions, greetings, banter, business questions, opinions, or anything that doesn't fit the other categories. THIS IS THE DEFAULT. When in doubt, use CONVERSATION.
+- UNCLEAR: message is genuinely too ambiguous to classify AND could be a build task — needs a follow-up question. Do NOT use UNCLEAR for casual messages.
+
+IMPORTANT: Most messages are CONVERSATION. Only use BUILD_TASK, STATUS_QUERY, etc. when the intent is unambiguous. Casual questions like "yo", "what's up", "have we made any money yet?", "how's the project going?", "what do you think about X?" are ALL CONVERSATION — not STATUS_QUERY.
+
+Examples:
+- "yo" → CONVERSATION
+- "have we made any money yet?" → CONVERSATION
+- "what do you think about adding auth?" → CONVERSATION
+- "build me a contact form" → BUILD_TASK
+- "!status" → STATUS_QUERY
+- "is the build done?" → STATUS_QUERY
+- "check this out https://example.com" → REFERENCE_INGEST
+- "check disk space" → DIRECT_COMMAND
 
 Return ONLY valid JSON. No markdown, no explanation."""
 
