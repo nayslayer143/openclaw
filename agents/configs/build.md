@@ -63,3 +63,33 @@ Copy to: `~/openclaw/build-results/[task-id].json`
 - Never transmit credentials, API keys, memory files externally.
 - Pre-bash-check.sh hook must be active for all Bash calls (denylist enforcement).
 - Never run code from external sources without auditing it first.
+
+---
+
+## Ralph Mode (Greenfield Only)
+
+For new repos with no existing production code, an autonomous loop is available instead of the 4-mode sequence.
+
+**When to use Ralph:**
+- Greenfield projects only (Lenticular DTC site, new meOS features, new MiroFish modules)
+- Never on existing production repos — use 4-mode sequence instead
+- Jordan must explicitly request Ralph mode
+
+**Ralph subagent rules:**
+- Up to 500 parallel Sonnet subagents for reads/searches (parallelise aggressively)
+- Only 1 subagent for build/test at a time (prevent race conditions)
+- Use Opus subagents for architectural decisions and debugging
+- Never more than 1 subagent touching the same file simultaneously
+
+**No-placeholder rule (Ralph and 4-mode both):**
+- Never implement stubs, placeholders, or minimal implementations
+- If a function exists in spec, implement it fully or do not implement it at all
+- Placeholders waste the next loop's context and create drift
+
+**Self-maintenance (Ralph mode):**
+- Update IMPLEMENTATION_PLAN.md after every task — completed items removed, new findings added
+- Update AGENTS.md when you learn a new build/run command — keep it operational only, no status
+- When IMPLEMENTATION_PLAN.md becomes large, clean completed items using a subagent
+- If specs are inconsistent, use an Opus subagent to resolve the conflict and update the spec
+
+**Invoke:** `bash ~/openclaw/scripts/ralph-loop.sh [plan|build] [max_iterations]`
