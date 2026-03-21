@@ -121,3 +121,20 @@ echo "  Queue Runner: $(pgrep -f queue-runner.sh >/dev/null && echo 'running' ||
 echo "  Dashboard:    $(pgrep -f 'dashboard/server.py' >/dev/null && echo 'running on :7080' || echo 'NOT running')"
 echo ""
 echo "Stack up. Clawmpson never sleeps."
+
+# ---------------------------------------------------------------------------
+# Cloudflare Tunnel — GonzoClaw mobile access
+# ---------------------------------------------------------------------------
+if pgrep -f "cloudflared tunnel" >/dev/null 2>&1; then
+  echo "→ Cloudflare tunnel: already running"
+else
+  cloudflared tunnel --url http://localhost:7080 --no-autoupdate > /tmp/cf-tunnel.log 2>&1 &
+  sleep 8
+  TUNNEL_URL=$(grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' /tmp/cf-tunnel.log | head -1)
+  if [[ -n "$TUNNEL_URL" ]]; then
+    echo "→ Cloudflare tunnel: $TUNNEL_URL"
+    bash "$HOME/openclaw/scripts/notify-telegram.sh" "GonzoClaw online: $TUNNEL_URL" 2>/dev/null || true
+  else
+    echo "→ Cloudflare tunnel: started (URL pending)"
+  fi
+fi

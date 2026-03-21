@@ -755,6 +755,80 @@ async def update_project(project_id: str, request: Request, user: str = Depends(
     PROJECTS_FILE.write_text(json.dumps(projects, indent=2))
     return {"updated": project_id}
 
+AGENTS_STATE_FILE = OPENCLAW_ROOT / "agents" / "agent-state.json"
+AGENT_CONFIGS_DIR = OPENCLAW_ROOT / "agents" / "configs"
+
+AGENT_REGISTRY = [
+    {"id": "orchestrator", "codename": "AXIS",  "role": "Chief Orchestrator", "model": "qwen3:32b",        "icon": "⬡"},
+    {"id": "research",     "codename": "SCOUT", "role": "Research Agent",      "model": "qwen3:30b",        "icon": "◉"},
+    {"id": "build",        "codename": "FORGE", "role": "Build Agent",          "model": "claude-opus-4-6",  "icon": "◈"},
+    {"id": "ops",          "codename": "VIGIL", "role": "Ops Agent",            "model": "qwen2.5:7b",       "icon": "◎"},
+    {"id": "marketing",    "codename": "WAVE",  "role": "Marketing Agent",      "model": "qwen3:30b",        "icon": "◐"},
+    {"id": "support",      "codename": "SHORE", "role": "Support Agent",        "model": "qwen3:30b",        "icon": "◑"},
+    {"id": "memory-librarian", "codename": "VAULT", "role": "Memory Librarian", "model": "llama3.3:70b",    "icon": "▣"},
+]
+
+def _agent_last_activity(agent_id: str) -> dict:
+    """Read last log entry for an agent."""
+    log_dir = LOGS_DIR
+    today = datetime.now().strftime("%Y-%m-%d")
+    pattern = f"{agent_id}-{today}.jsonl"
+    log_file = log_dir / pattern
+    last_task = None
+    last_time = None
+    if log_file.exists():
+        lines = [l.strip() for l in log_file.read_text().splitlines() if l.strip()]
+        if lines:
+            try:
+                entry = json.loads(lines[-1])
+                last_task = entry.get("task") or entry.get("event") or entry.get("summary")
+                last_time = entry.get("timestamp") or entry.get("ts")
+            except Exception:
+                last_task = lines[-1][:80]
+    return {"last_task": last_task, "last_seen": last_time}
+
+def _read_agent_state() -> dict:
+    if AGENTS_STATE_FILE.exists():
+        try:
+            return json.loads(AGENTS_STATE_FILE.read_text())
+        except Exception:
+            pass
+    return {}
+
+@app.get("/api/agents")
+async def get_agents(user: str = Depends(get_current_user)):
+    state = _read_agent_state()
+    result = []
+    for ag in AGENT_REGISTRY:
+        aid = ag["id"]
+        activity = _agent_last_activity(aid)
+        agent_state = state.get(aid, {})
+        result.append({
+            **ag,
+            "status":      agent_state.get("status", "idle"),
+            "current_task": agent_state.get("current_task"),
+            "workflow":    agent_state.get("workflow"),
+            "progress":    agent_state.get("progress"),
+            "last_task":   activity["last_task"],
+            "last_seen":   activity["last_seen"],
+            "tasks_today": agent_state.get("tasks_today", 0),
+            "errors_today": agent_state.get("errors_today", 0),
+        })
+    return result
+
+@app.patch("/api/agents/{agent_id}")
+async def update_agent_state(agent_id: str, request: Request, user: str = Depends(get_current_user)):
+    """Let agents report their own status — called by cron scripts."""
+    data = await request.json()
+    state = _read_agent_state()
+    if agent_id not in state:
+        state[agent_id] = {}
+    state[agent_id].update(data)
+    state[agent_id]["updated_at"] = datetime.now().isoformat()
+    AGENTS_STATE_FILE.parent.mkdir(exist_ok=True)
+    AGENTS_STATE_FILE.write_text(json.dumps(state, indent=2))
+    return {"updated": agent_id}
+
 # ── Serve PWA ─────────────────────────────────────────────────────────────────
 @app.get("/manifest.json")
 async def manifest():

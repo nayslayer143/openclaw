@@ -1133,6 +1133,64 @@ body {
 .projects-summary { display: flex; gap: 20px; margin-bottom: 12px; flex-wrap: wrap; }
 .projects-stat .stat-val { color: var(--neon-green); font-weight: 700; font-size: 0.7rem; }
 .projects-stat { font-size: 0.55rem; letter-spacing: 2px; color: var(--grey2); }
+
+/* ── Agents ───────────────────────────────────────────────────────────────── */
+.agents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+.agent-card {
+  background: var(--surface);
+  border: 1px solid var(--grey3);
+  border-radius: 6px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  transition: border-color 0.2s;
+}
+.agent-card.status-active  { border-left: 3px solid var(--neon-green); }
+.agent-card.status-idle    { border-left: 3px solid var(--grey3); }
+.agent-card.status-blocked { border-left: 3px solid var(--neon-red); }
+.agent-card.status-running { border-left: 3px solid var(--neon-cyan); }
+.agent-header { display: flex; align-items: center; gap: 10px; }
+.agent-icon { font-size: 1.2rem; }
+.agent-codename { font-size: 0.9rem; font-weight: 700; letter-spacing: 3px; color: var(--fg); }
+.agent-role { font-size: 0.52rem; color: var(--grey2); letter-spacing: 1px; margin-top: 1px; }
+.agent-status-pill {
+  margin-left: auto;
+  font-size: 0.46rem;
+  letter-spacing: 2px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  border: 1px solid;
+  text-transform: uppercase;
+}
+.pill-active  { color: var(--neon-green); border-color: var(--neon-green); background: rgba(0,255,136,0.07); }
+.pill-idle    { color: var(--grey2);      border-color: var(--grey3);      background: transparent; }
+.pill-blocked { color: var(--neon-red);   border-color: var(--neon-red);   background: rgba(255,50,50,0.07); }
+.pill-running { color: var(--neon-cyan);  border-color: var(--neon-cyan);  background: rgba(0,229,255,0.07); animation: pulse-pill 1.5s infinite; }
+@keyframes pulse-pill { 0%,100%{opacity:1} 50%{opacity:0.5} }
+.agent-model { font-size: 0.5rem; color: var(--tan); letter-spacing: 1px; font-family: var(--mono); }
+.agent-workflow {
+  font-size: 0.54rem; color: var(--neon-cyan); letter-spacing: 0.5px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  min-height: 1em;
+}
+.agent-progress-bar { background: var(--grey3); border-radius: 2px; height: 3px; margin-top: 2px; }
+.agent-progress-fill { height: 3px; border-radius: 2px; background: var(--neon-cyan); transition: width 0.4s; }
+.agent-last-task {
+  font-size: 0.50rem; color: var(--grey2); letter-spacing: 0.3px;
+  line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical; overflow: hidden;
+  min-height: 1.4em;
+}
+.agent-footer { display: flex; gap: 16px; margin-top: 4px; }
+.agent-stat { font-size: 0.48rem; letter-spacing: 1px; color: var(--grey2); }
+.agent-stat span { color: var(--fg); font-weight: 700; }
 </style>
 </head>
 <body>
@@ -1158,6 +1216,7 @@ body {
     <button class="nav-tab" id="tabJordan" onclick="showPage('jordan')">⚡ JORDAN</button>
     <button class="nav-tab" id="tabIdeas" onclick="showPage('ideas')">◉ IDEAS LAB</button>
     <button class="nav-tab" id="tabProjects" onclick="showPage('projects')">◎ PROJECTS</button>
+    <button class="nav-tab" id="tabAgents" onclick="showPage('agents')">⬡ AGENTS</button>
   </div>
   <div class="nav-right">
     <button class="clawmpson-btn" id="clawmpsonBtn" onclick="toggleClawmpson()">◈ CLAWMPSON MODE</button>
@@ -1361,6 +1420,23 @@ body {
 
   </div><!-- /pageProjects -->
 
+  <!-- ═══ AGENTS PAGE ═══ -->
+  <div class="page" id="pageAgents">
+
+    <div class="ideas-header">
+      <div>
+        <div class="ideas-title">AGENT SWARM</div>
+        <div class="ideas-subtitle">OMEGA MEGACORP — CLAWMPSON SUBAGENTS</div>
+      </div>
+      <div id="agentsSummary" style="font-size:0.55rem;color:var(--grey2);letter-spacing:1px;text-align:right"></div>
+    </div>
+
+    <div class="agents-grid" id="agentsList">
+      <div class="empty"><span class="empty-char">⬡</span>loading agents...</div>
+    </div>
+
+  </div><!-- /pageAgents -->
+
 </div>
 
 <!-- Edit Project Modal -->
@@ -1528,6 +1604,10 @@ function showPage(page) {
     document.getElementById('pageProjects').classList.add('active')
     document.getElementById('tabProjects').classList.add('active')
     loadProjects()
+  } else if (page === 'agents') {
+    document.getElementById('pageAgents').classList.add('active')
+    document.getElementById('tabAgents').classList.add('active')
+    loadAgents()
   } else {
     document.getElementById('pageDashboard').classList.add('active')
     document.getElementById('tabDashboard').classList.add('active')
@@ -1655,6 +1735,64 @@ async function submitEditProject() {
     toast('Project updated', '◎')
     await loadProjects()
   } catch(e) { toast('Failed to update project', '💀') }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// AGENTS
+// ══════════════════════════════════════════════════════════════════
+let agentsCache = []
+let agentsInterval = null
+
+async function loadAgents() {
+  try {
+    const r = await fetch('/api/agents')
+    if (!r.ok) throw new Error('failed')
+    agentsCache = await r.json()
+    renderAgents()
+    if (!agentsInterval) agentsInterval = setInterval(loadAgents, 8000)
+  } catch(e) {
+    document.getElementById('agentsList').innerHTML = `<div class="empty"><span class="empty-char">⬡</span>failed to load agents</div>`
+  }
+}
+
+function renderAgents() {
+  const el = document.getElementById('agentsList')
+  if (!agentsCache.length) {
+    el.innerHTML = `<div class="empty"><span class="empty-char">⬡</span>no agents registered</div>`
+    return
+  }
+  const active = agentsCache.filter(a => a.status === 'active' || a.status === 'running').length
+  const summary = document.getElementById('agentsSummary')
+  if (summary) summary.innerHTML = `<span style="color:var(--neon-green);font-weight:700">${active}</span> ACTIVE &nbsp;·&nbsp; ${agentsCache.length} TOTAL`
+
+  el.innerHTML = agentsCache.map(a => {
+    const statusClass = a.status || 'idle'
+    const pillClass = `pill-${statusClass}`
+    const progress = a.progress ?? 0
+    const showProgress = a.status === 'running' || a.status === 'active'
+    return `
+    <div class="agent-card status-${statusClass}">
+      <div class="agent-header">
+        <div class="agent-icon">${a.icon}</div>
+        <div>
+          <div class="agent-codename">${a.codename}</div>
+          <div class="agent-role">${a.role.toUpperCase()}</div>
+        </div>
+        <div class="agent-status-pill ${pillClass}">${statusClass}</div>
+      </div>
+      <div class="agent-model">${a.model}</div>
+      ${a.workflow || a.current_task ? `
+        <div class="agent-workflow">▶ ${a.workflow || a.current_task || ''}</div>
+        ${showProgress ? `<div class="agent-progress-bar"><div class="agent-progress-fill" style="width:${progress}%"></div></div>` : ''}
+      ` : `<div class="agent-workflow" style="color:var(--grey3)">— idle —</div>`}
+      <div class="agent-last-task">${a.last_task || 'No activity logged today'}</div>
+      <div class="agent-footer">
+        <div class="agent-stat">TASKS TODAY <span>${a.tasks_today ?? 0}</span></div>
+        <div class="agent-stat">ERRORS <span style="color:${(a.errors_today??0)>0?'var(--neon-red)':'var(--fg)'}">${a.errors_today ?? 0}</span></div>
+        ${a.last_seen ? `<div class="agent-stat">LAST SEEN <span>${a.last_seen}</span></div>` : ''}
+      </div>
+    </div>`
+  }).join('')
 }
 
 // ── Auth ───────────────────────────────────────────────────────────────────
