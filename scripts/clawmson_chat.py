@@ -16,7 +16,7 @@ CHAT_MODEL      = os.environ.get("OLLAMA_CHAT_MODEL",   "qwen2.5:7b")
 VISION_MODEL    = os.environ.get("OLLAMA_VISION_MODEL", "qwen3-vl:32b")
 
 _SYSTEM_PROMPT_PATH = Path.home() / "openclaw" / "agents" / "configs" / "clawmson-chat.md"
-_SYSTEM_PROMPT_CACHE: str | None = None
+_SYSTEM_PROMPT_CACHE = None
 
 
 def _load_system_prompt() -> str:

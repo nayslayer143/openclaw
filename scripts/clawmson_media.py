@@ -30,7 +30,7 @@ def _ts_name(prefix: str, ext: str) -> str:
     return f"{prefix}_{ts}.{ext}"
 
 
-def _get_file_url(file_id: str) -> str | None:
+def _get_file_url(file_id: str):
     try:
         r = requests.get(f"{_API_BASE}/getFile",
                          params={"file_id": file_id}, timeout=10)

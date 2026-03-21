@@ -66,7 +66,7 @@ def extract_urls(text: str) -> list:
 
 # ── LLM classifier ──────────────────────────────────────────────────────────
 
-def classify_intent_llm(text: str, history: list | None = None) -> dict:
+def classify_intent_llm(text: str, history=None) -> dict:
     """
     Send message + recent context to qwen2.5:7b for intent classification.
     Returns parsed dict with intent, project, action, target, etc.
@@ -204,7 +204,7 @@ def _classify_regex(text: str) -> dict:
 
 # ── Public API ───────────────────────────────────────────────────────────────
 
-def classify(text: str, history: list | None = None) -> dict:
+def classify(text: str, history=None) -> dict:
     """
     Classify intent using LLM, falling back to regex on failure.
     Returns dict with intent, project, action, target, attachments,
@@ -241,7 +241,7 @@ SAFE_COMMANDS: dict = {
 }
 
 
-def get_safe_command(text: str) -> str | None:
+def get_safe_command(text: str):
     """Return shell command string if text matches a safe command, else None."""
     lower = text.lower().strip()
     for trigger, cmd in SAFE_COMMANDS.items():
