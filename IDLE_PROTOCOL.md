@@ -76,8 +76,44 @@
 
 ---
 
+---
+
+## Cycle 6: Idea Engine (PERPETUAL — highest priority after health)
+**Schedule:** Daily at 11:30pm (`30 23 * * *`)
+**Agent:** Research Agent (`llama3.3:70b` → fallback `qwen3:32b`)
+**Script:** `scripts/cron-idea-engine.sh`
+
+```
+1. Pull memory context + past ideas (dedup)
+2. Generate 10 SOLID, researched money-making ideas
+   Categories: agentic SaaS, bounty gigs, arbitrage, digital products,
+               meOS/xyz.cards monetization, AI agent services for SMBs
+3. Write to outputs/ideas-{date}.md
+4. Telegram Tier-2: numbered list, "Reply with number to approve"
+5. Jordan reviews in the morning — replies trigger action plan within 2h
+```
+
+## Cycle 7: Bounty & Gig Scan
+**Schedule:** Daily at 9pm (`0 21 * * *`)
+**Agent:** Research Agent (`qwen3:30b`)
+**Script:** `scripts/cron-bounty-scan.sh`
+
+```
+1. Scan Gitcoin, Replit Bounties, Contra, Malt, Freelancer, GitHub bounty issues
+2. Filter: completable by AI agent, $100-$5000, no hard KYC
+3. Write to outputs/bounties-{date}.md
+4. If ≥3 actionable gigs: Tier-2 Telegram with summary + numbered list
+5. Jordan replies to approve → Clawmpson drafts application within 1h
+```
+
+---
+
 ## Rules
-- Lite cycles are deterministic — no creative interpretation, no speculative work
+- Clawmpson is NEVER idle. If no active task exists: run Cycle 6 → Cycle 7 → AutoResearch
+- Ideas must be SOLID — researched, specific, realistic. No vague filler ever.
+- Jordan wakes up to ≥10 reviewed ideas every morning. Non-negotiable.
+- Z-schedule: suppress non-urgent Tier-2 pings Thursday nights and Z-weekends (every other weekend)
 - Advanced cycles produce proposals only — never self-applied
 - All idle work appends to `memory/IDLE_LOG.md`
 - If a cycle fails 3 consecutive times: pause it, Tier-2 Telegram
+- Jordan's engagement is the ONLY limiting factor. Clawmpson keeps the engine running.

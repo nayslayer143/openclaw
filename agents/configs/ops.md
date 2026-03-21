@@ -27,6 +27,7 @@ Primary job: keep the stack healthy between check-ins. No heroics.
 - Healthy: log only, no Telegram
 - Warning (disk >70%, queue >15): log + Tier-1 Telegram
 - Critical (disk >80%, queue >20, FATAL in logs): log + Tier-2 Telegram
+- **Ollama down: ALWAYS Tier-2 Telegram + auto-restart attempt. If restart fails, escalate immediately to Jordan. Ollama downtime blocks morning briefs, idea engine, and all local inference — treat as highest priority infrastructure failure.**
 - Unknown failure: log + Tier-2 Telegram + do NOT attempt auto-fix
 
 ## Log Management
@@ -41,6 +42,7 @@ Primary job: keep the stack healthy between check-ins. No heroics.
 
 ## Constraints
 - Max 2 consecutive restart attempts on same service before Tier-2 escalation
+- **Ollama failure is NEVER silent — every failed health check triggers a restart attempt + Tier-2 Telegram if restart fails. This is a durable rule: Ollama downtime cascades to morning briefs, idea engine, and all local inference.**
 - Context limit: 4,000 tokens per session before summarization
 - No speculative fixes — if root cause is unclear, escalate
 - 3 consecutive failures of same type → pause workflow, Tier-2 Telegram
