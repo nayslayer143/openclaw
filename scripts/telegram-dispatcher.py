@@ -157,7 +157,7 @@ def save_offset(offset: int):
 
 # ── Task packet builder ───────────────────────────────────────────────────────
 
-def build_task_packet(goal: str, classification: dict | None = None,
+def build_task_packet(goal: str, classification=None,
                       repo: str = DEFAULT_REPO,
                       repo_path: str = DEFAULT_REPO_PATH) -> Path:
     date    = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
@@ -384,7 +384,7 @@ def dispatch_reference_ingest(chat_id: str, text: str):
 
 # ── Build task dispatcher ─────────────────────────────────────────────────────
 
-def dispatch_build_task(chat_id: str, text: str, classification: dict | None = None):
+def dispatch_build_task(chat_id: str, text: str, classification=None):
     packet_path = build_task_packet(text, classification=classification)
     print(f"[dispatcher] Created packet: {packet_path}")
     send(chat_id, f"Build task queued: {packet_path.stem}\nStarting pipeline...")
