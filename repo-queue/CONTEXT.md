@@ -76,3 +76,39 @@ repo-queue/
 
 - **Receives from:** `outputs/` (scout reports with repo recommendations)
 - **Hands off to:** `build-results/` (dispatched task packets), `memory/` (rejected/deferred decisions with reasons)
+
+---
+
+## Greenfield Detection — Ralph vs 4-Mode Dispatch
+
+When creating a task packet, determine build mode before dispatch:
+
+| Signal | Build Mode | Dispatch to |
+|--------|-----------|-------------|
+| Repo path does not exist | Greenfield | `ralph-plan-build.lobster` |
+| Repo exists but zero meaningful commits | Greenfield | `ralph-plan-build.lobster` |
+| Jordan says "build from scratch" / "new project" / "create" | Greenfield | `ralph-plan-build.lobster` |
+| Repo exists with code + Jordan says "fix/add/change" | Existing | `debug-and-fix.lobster` → `build-agent-bridge.sh` |
+| Repo is live / has users | Existing (always) | `debug-and-fix.lobster` → `build-agent-bridge.sh` |
+
+**When routing to Ralph — auto-scaffold before plan phase:**
+```bash
+# Run from target repo directory:
+cp ~/openclaw/scripts/ralph-templates/PROMPT_plan.md .
+cp ~/openclaw/scripts/ralph-templates/PROMPT_build.md .
+mkdir -p specs
+# AGENTS.md and IMPLEMENTATION_PLAN.md created by ralph-plan-build.lobster scaffold step
+```
+
+**Ralph task packet — additional fields:**
+```json
+{
+  "task_id": "ralph-[timestamp]",
+  "repo_path": "~/projects/[repo]",
+  "goal": "[one specific sentence — the end state]",
+  "slug": "[kebab-name]",
+  "max_iterations": 0,
+  "timeout_minutes": 360,
+  "build_mode": "ralph"
+}
+```
