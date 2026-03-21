@@ -57,6 +57,19 @@ if [[ "${QUEUE_DEPTH:-0}" -gt 20 ]]; then
   notify "OpenClaw alert: Queue depth ${QUEUE_DEPTH} items — needs triage"
 fi
 
+# --- Empty queue alert ---
+EMPTY_FLAG="${OPENCLAW_ROOT}/.queue-empty-notified"
+if [[ "${QUEUE_DEPTH:-0}" -eq 0 ]]; then
+  # Only ping once per empty stretch (not every 30min)
+  if [[ ! -f "$EMPTY_FLAG" ]]; then
+    touch "$EMPTY_FLAG"
+    notify "🫙 Clawmpson's task list is empty — feed me tasks or approve ideas from this morning's brief. I'm standing by."
+  fi
+else
+  # Queue has items — clear the flag so next empty stretch triggers again
+  rm -f "$EMPTY_FLAG"
+fi
+
 if [[ "${ERROR_COUNT:-0}" -gt 5 ]]; then
   notify "OpenClaw alert: ${ERROR_COUNT} FATAL/ERROR entries today — review logs"
 fi

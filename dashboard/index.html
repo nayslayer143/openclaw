@@ -362,9 +362,13 @@ body {
   97%          { opacity: 0.20; }
 }
 .hst-feed {
-  height: 168px; overflow-y: auto;
+  height: 220px; overflow-y: auto;
   display: flex; flex-direction: column-reverse;
 }
+.hst-feed::-webkit-scrollbar { width: 5px; }
+.hst-feed::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); }
+.hst-feed::-webkit-scrollbar-thumb { background: rgba(232,104,0,0.25); border-radius: 2px; }
+.hst-feed::-webkit-scrollbar-thumb:hover { background: rgba(232,104,0,0.45); }
 .hst-entry {
   padding: 11px 20px;
   border-bottom: 1px solid rgba(255,255,255,0.03);
@@ -445,6 +449,310 @@ body {
 ::-webkit-scrollbar { width: 3px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--grey3); border-radius: 1px; }
+
+/* ── Token Meter ──────────────────────────────────────────────── */
+.token-meter {
+  background: var(--surface);
+  border: 1px solid var(--grey3);
+  border-left: 2px solid var(--neon-cyan);
+  padding: 10px 20px;
+  margin-bottom: 16px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 16px;
+  align-items: center;
+}
+.token-meter-label {
+  font-size: 0.50rem; letter-spacing: 2.5px; color: var(--grey2);
+  text-transform: uppercase;
+}
+.token-meter-tracks {
+  display: flex; flex-direction: column; gap: 6px;
+}
+.token-track {
+  display: flex; align-items: center; gap: 10px;
+}
+.token-track-label {
+  font-size: 0.46rem; letter-spacing: 1.5px; color: var(--grey2);
+  width: 50px; flex-shrink: 0; text-align: right;
+}
+.token-track-bar {
+  flex: 1; height: 6px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--grey3);
+  border-radius: 1px;
+  overflow: hidden;
+}
+.token-track-fill {
+  height: 100%; border-radius: 1px;
+  transition: width 1.2s ease, background 0.3s;
+}
+.token-track-fill.ok {
+  background: linear-gradient(90deg, rgba(0,212,255,0.4), rgba(0,255,136,0.5));
+}
+.token-track-fill.warn {
+  background: linear-gradient(90deg, var(--orange), var(--orange-hi));
+  box-shadow: 0 0 6px rgba(232,104,0,0.3);
+}
+.token-track-fill.critical {
+  background: linear-gradient(90deg, var(--neon-red), #ff4444);
+  box-shadow: 0 0 8px rgba(255,0,46,0.4);
+  animation: badge-blink 1.5s ease-in-out infinite;
+}
+.token-track-val {
+  font-size: 0.50rem; color: var(--grey1); width: 65px; flex-shrink: 0;
+  letter-spacing: 0.5px;
+}
+.token-meter-reset {
+  text-align: right;
+}
+.token-reset-time {
+  font-size: 0.58rem; font-weight: 700; color: var(--neon-cyan);
+  letter-spacing: 1px;
+}
+.token-reset-label {
+  font-size: 0.44rem; letter-spacing: 2px; color: var(--grey2);
+  margin-top: 2px;
+}
+
+/* ── Nav tabs ──────────────────────────────────────────────────── */
+.nav-tabs {
+  display: flex; gap: 2px; margin-left: 24px;
+}
+.nav-tab {
+  font-size: 0.54rem; letter-spacing: 2px; padding: 4px 14px;
+  border: 1px solid var(--grey3); border-radius: 1px;
+  background: transparent; color: var(--grey2);
+  cursor: pointer; font-family: inherit;
+  transition: all 0.2s;
+}
+.nav-tab:hover { color: var(--orange); border-color: var(--orange); }
+.nav-tab.active {
+  background: var(--orange-dim); color: var(--orange-hi);
+  border-color: var(--orange);
+}
+
+/* ── Blocked Queue Panel ──────────────────────────────────────── */
+.blocked-row {
+  padding: 12px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: grid;
+  grid-template-columns: 30px 1fr auto;
+  gap: 10px; align-items: center;
+  position: relative;
+}
+.blocked-row::after {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+  background: var(--orange); box-shadow: 0 0 6px rgba(232,104,0,0.4);
+}
+.blocked-row:hover { background: rgba(255,255,255,0.02); }
+.blocked-name { font-size: 0.70rem; color: var(--offwhite); }
+.blocked-meta { font-size: 0.56rem; color: var(--grey2); margin-top: 3px; }
+.blocked-reason { font-size: 0.56rem; color: var(--orange); margin-top: 3px; font-style: italic; }
+
+/* ── Three column layout ──────────────────────────────────────── */
+.cols-3 {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1px;
+  background: var(--grey3);
+}
+@media (max-width:1100px) { .cols-3 { grid-template-columns: 1fr; } }
+
+/* ── Ideas Lab Page ───────────────────────────────────────────── */
+.page { display: none; }
+.page.active { display: block; }
+
+.ideas-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 20px;
+}
+.ideas-title {
+  font-size: 0.72rem; font-weight: 900; letter-spacing: 4px; color: var(--orange-hi);
+  text-shadow: 0 0 12px rgba(255,124,26,0.3);
+}
+.ideas-subtitle {
+  font-size: 0.54rem; color: var(--grey2); letter-spacing: 2px;
+}
+.ideas-filters {
+  display: flex; gap: 8px; margin-bottom: 16px;
+}
+.ideas-filter {
+  font-size: 0.50rem; letter-spacing: 2px; padding: 4px 12px;
+  border: 1px solid var(--grey3); border-radius: 1px;
+  background: transparent; color: var(--grey2);
+  cursor: pointer; font-family: inherit;
+  transition: all 0.2s;
+}
+.ideas-filter:hover { border-color: var(--orange); color: var(--orange); }
+.ideas-filter.active { background: var(--orange-dim); color: var(--orange-hi); border-color: var(--orange); }
+
+.idea-card {
+  background: var(--surface);
+  border: 1px solid var(--grey3);
+  border-left: 3px solid var(--orange);
+  padding: 18px 20px;
+  margin-bottom: 8px;
+  position: relative;
+  transition: border-color 0.2s, background 0.2s;
+}
+.idea-card:hover { background: rgba(16,14,12,0.98); border-left-color: var(--orange-hi); }
+.idea-card.approved { border-left-color: var(--neon-green); }
+.idea-card.rejected { border-left-color: var(--neon-red); opacity: 0.5; }
+.idea-card.in_production { border-left-color: var(--neon-cyan); }
+
+.idea-top {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+}
+.idea-title-text {
+  font-size: 0.74rem; font-weight: 700; color: var(--white); line-height: 1.5;
+}
+.idea-category {
+  font-size: 0.46rem; letter-spacing: 2px; padding: 2px 8px;
+  border: 1px solid var(--border-mid); border-radius: 1px;
+  color: var(--orange); flex-shrink: 0;
+}
+.idea-summary {
+  font-size: 0.66rem; color: var(--grey1); line-height: 1.7; margin-top: 8px;
+}
+.idea-meta {
+  display: flex; gap: 12px; align-items: center; margin-top: 10px;
+  font-size: 0.50rem; color: var(--grey2); letter-spacing: 1px;
+}
+.idea-actions {
+  display: flex; gap: 6px; margin-top: 12px;
+}
+.idea-btn {
+  font-size: 0.50rem; letter-spacing: 2px; padding: 5px 14px;
+  border: 1px solid; border-radius: 1px;
+  background: transparent; cursor: pointer; font-family: inherit;
+  transition: all 0.2s;
+}
+.idea-btn.approve { border-color: rgba(0,255,136,0.4); color: var(--neon-green); }
+.idea-btn.approve:hover { background: rgba(0,255,136,0.1); box-shadow: 0 0 8px rgba(0,255,136,0.2); }
+.idea-btn.reject { border-color: rgba(255,0,46,0.3); color: var(--neon-red); }
+.idea-btn.reject:hover { background: rgba(255,0,46,0.1); }
+.idea-btn.production { border-color: rgba(0,212,255,0.4); color: var(--neon-cyan); }
+.idea-btn.production:hover { background: rgba(0,212,255,0.1); }
+.idea-btn.notes { border-color: var(--border-mid); color: var(--orange); }
+.idea-btn.notes:hover { background: var(--orange-dim); }
+
+/* ── Notes Panel (expanded) ───────────────────────────────────── */
+.idea-notes {
+  display: none; margin-top: 14px; padding-top: 14px;
+  border-top: 1px solid var(--grey3);
+}
+.idea-notes.open { display: block; }
+
+.note-entry {
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+.note-text { font-size: 0.66rem; color: var(--grey1); line-height: 1.6; }
+.note-ts { font-size: 0.46rem; color: var(--grey2); margin-top: 4px; }
+.note-images { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.note-img {
+  width: 120px; height: 80px; object-fit: cover; border: 1px solid var(--grey3);
+  border-radius: 2px; cursor: pointer;
+  transition: border-color 0.2s;
+}
+.note-img:hover { border-color: var(--orange); }
+.note-audio {
+  margin-top: 8px;
+}
+.note-audio audio {
+  height: 28px; width: 100%; max-width: 300px;
+  filter: invert(0.85) hue-rotate(180deg);
+}
+
+/* ── Add Note Form ────────────────────────────────────────────── */
+.note-form {
+  margin-top: 12px; padding: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--grey3);
+}
+.note-textarea {
+  width: 100%; min-height: 60px; padding: 8px;
+  background: var(--bg); border: 1px solid var(--grey3);
+  color: var(--offwhite); font-family: inherit; font-size: 0.66rem;
+  resize: vertical; border-radius: 1px;
+}
+.note-textarea:focus { outline: none; border-color: var(--orange); }
+.note-form-actions {
+  display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap;
+}
+.note-form-btn {
+  font-size: 0.50rem; letter-spacing: 1.5px; padding: 5px 12px;
+  border: 1px solid var(--border-mid); border-radius: 1px;
+  background: transparent; color: var(--orange);
+  cursor: pointer; font-family: inherit;
+  transition: all 0.2s;
+}
+.note-form-btn:hover { background: var(--orange-dim); }
+.note-form-btn.recording {
+  border-color: var(--neon-red); color: var(--neon-red);
+  animation: badge-blink 1s ease-in-out infinite;
+}
+.note-form-btn.has-data { border-color: var(--neon-green); color: var(--neon-green); }
+
+.note-img-previews {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px;
+}
+.note-img-preview {
+  width: 48px; height: 48px; object-fit: cover;
+  border: 1px solid var(--grey3); border-radius: 2px;
+}
+.note-audio-indicator {
+  font-size: 0.50rem; color: var(--neon-green); letter-spacing: 1px;
+}
+
+/* ── New Idea Modal ───────────────────────────────────────────── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 500;
+  background: rgba(6,6,6,0.85); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center;
+}
+.modal-overlay.active { display: flex; }
+.modal-box {
+  background: var(--surface);
+  border: 1px solid var(--border-mid);
+  border-top: 2px solid var(--orange);
+  padding: 28px; width: 90%; max-width: 520px;
+  max-height: 80vh; overflow-y: auto;
+}
+.modal-title {
+  font-size: 0.62rem; font-weight: 900; letter-spacing: 4px;
+  color: var(--orange-hi); margin-bottom: 20px;
+}
+.modal-field {
+  margin-bottom: 14px;
+}
+.modal-label {
+  font-size: 0.50rem; letter-spacing: 2px; color: var(--grey2);
+  margin-bottom: 6px; display: block;
+}
+.modal-input {
+  width: 100%; padding: 8px;
+  background: var(--bg); border: 1px solid var(--grey3);
+  color: var(--offwhite); font-family: inherit; font-size: 0.66rem;
+  border-radius: 1px;
+}
+.modal-input:focus { outline: none; border-color: var(--orange); }
+.modal-textarea {
+  width: 100%; min-height: 100px; padding: 8px;
+  background: var(--bg); border: 1px solid var(--grey3);
+  color: var(--offwhite); font-family: inherit; font-size: 0.66rem;
+  resize: vertical; border-radius: 1px;
+}
+.modal-textarea:focus { outline: none; border-color: var(--orange); }
+.modal-select {
+  width: 100%; padding: 8px;
+  background: var(--bg); border: 1px solid var(--grey3);
+  color: var(--offwhite); font-family: inherit; font-size: 0.66rem;
+  border-radius: 1px;
+}
+.modal-select:focus { outline: none; border-color: var(--orange); }
+.modal-actions {
+  display: flex; gap: 8px; margin-top: 20px;
+}
 
 /* ══════════════════════════════════════════════════════════════════
    CLAWMPSON MODE — lofi × ascii × japanese crime noir journal
@@ -557,6 +865,60 @@ body {
 .lo-section-label {
   font-size: 0.44rem; letter-spacing: 3px; color: rgba(232,104,0,0.3);
   text-transform: uppercase; margin-bottom: 4px;
+}
+
+/* ── SYSTEM UNDERLOAD overlay ─────────────────────────────────────── */
+.underload-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(6,6,6,0.92);
+  backdrop-filter: blur(6px);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  cursor: pointer;
+  animation: underload-in 0.6s ease-out;
+}
+.underload-overlay.active { display: flex; }
+@keyframes underload-in {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+.underload-title {
+  font-size: 3.2rem; font-weight: 900; letter-spacing: 12px;
+  color: var(--orange);
+  text-shadow:
+    0 0 30px rgba(232,104,0,0.5),
+    0 0 80px rgba(232,104,0,0.2);
+  animation: underload-pulse 2s ease-in-out infinite;
+  text-align: center;
+  line-height: 1.2;
+}
+.underload-sub {
+  font-size: 1.4rem; font-weight: 700; letter-spacing: 6px;
+  color: var(--orange-hi);
+  text-shadow: 0 0 20px rgba(255,124,26,0.4);
+  animation: underload-pulse 2s ease-in-out infinite 0.3s;
+  text-align: center;
+}
+.underload-claw {
+  font-size: 5rem;
+  animation: underload-chomp 1.2s ease-in-out infinite;
+}
+@keyframes underload-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.03); }
+}
+@keyframes underload-chomp {
+  0%, 100% { transform: rotate(0deg); }
+  25%      { transform: rotate(-8deg); }
+  75%      { transform: rotate(8deg); }
+}
+.underload-hint {
+  font-size: 0.5rem; letter-spacing: 3px; color: var(--grey2);
+  margin-top: 20px;
+  animation: underload-pulse 3s ease-in-out infinite 1s;
 }
 
 /* ── Gonzo Lobster: psychedelic HST ascii art ─────────────────────── */
@@ -672,9 +1034,13 @@ body {
 }
 .lo-book-body {
   position: relative; z-index: 1;
-  flex: 1; overflow-y: auto;
+  flex: 1; overflow-y: auto; scroll-behavior: smooth;
   padding: 20px 32px 20px 64px;
 }
+.lo-book-body::-webkit-scrollbar { width: 5px; }
+.lo-book-body::-webkit-scrollbar-track { background: rgba(196,176,144,0.03); }
+.lo-book-body::-webkit-scrollbar-thumb { background: rgba(232,104,0,0.2); border-radius: 2px; }
+.lo-book-body::-webkit-scrollbar-thumb:hover { background: rgba(232,104,0,0.4); }
 .lo-entry {
   margin-bottom: 24px;
   animation: lo-entry-in 0.6s ease-out;
@@ -727,6 +1093,46 @@ body {
   90%  { opacity: 0.6; }
   100% { transform: translateY(-100px) rotate(15deg); opacity: 0; }
 }
+/* ── Projects ── */
+.projects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+.project-card {
+  background: var(--surface);
+  border: 1px solid var(--grey3);
+  border-left: 3px solid var(--grey3);
+  border-radius: 6px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.project-name { font-size: 0.75rem; font-weight: 700; letter-spacing: 1px; color: var(--fg); }
+.project-tagline { font-size: 0.58rem; color: var(--grey2); letter-spacing: 0.5px; }
+.project-mrr { font-size: 0.62rem; color: var(--neon-green); font-weight: 700; letter-spacing: 1px; }
+.project-mrr .mrr-target { color: var(--grey2); font-weight: 400; }
+.project-next { font-size: 0.58rem; color: var(--tan); line-height: 1.5; }
+.project-build { font-size: 0.54rem; letter-spacing: 1px; padding: 2px 8px; border-radius: 3px; display: inline-block; }
+.build-success { color: var(--neon-green); border: 1px solid var(--neon-green); background: rgba(0,255,136,0.06); }
+.build-partial  { color: var(--orange); border: 1px solid var(--orange); background: rgba(232,104,0,0.06); }
+.build-failed   { color: var(--neon-red); border: 1px solid var(--neon-red); background: rgba(255,50,50,0.06); }
+.build-unknown  { color: var(--grey2); border: 1px solid var(--grey3); }
+.stage-badge { font-size: 0.5rem; letter-spacing: 2px; padding: 2px 9px; border-radius: 3px; border: 1px solid; text-transform: uppercase; }
+.stage-idea       { color: var(--grey2); border-color: var(--grey3); }
+.stage-building   { color: var(--neon-cyan); border-color: var(--neon-cyan); background: rgba(0,229,255,0.05); }
+.stage-alpha      { color: var(--orange); border-color: var(--orange); background: rgba(232,104,0,0.05); }
+.stage-testflight { color: #b87fff; border-color: #b87fff; background: rgba(184,127,255,0.05); }
+.stage-live       { color: var(--neon-green); border-color: var(--neon-green); background: rgba(0,255,136,0.05); }
+.stage-paused     { color: var(--grey2); border-color: var(--grey3); }
+.project-footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.project-tags { display: flex; gap: 4px; flex-wrap: wrap; }
+.project-tag { font-size: 0.48rem; letter-spacing: 1px; color: var(--grey2); padding: 1px 6px; border: 1px solid var(--grey3); border-radius: 2px; }
+.projects-summary { display: flex; gap: 20px; margin-bottom: 12px; flex-wrap: wrap; }
+.projects-stat .stat-val { color: var(--neon-green); font-weight: 700; font-size: 0.7rem; }
+.projects-stat { font-size: 0.55rem; letter-spacing: 2px; color: var(--grey2); }
 </style>
 </head>
 <body>
@@ -737,8 +1143,22 @@ body {
 <div class="bg-vignette"></div>
 <div class="toast-wrap" id="toastWrap"></div>
 
+<!-- SYSTEM UNDERLOAD overlay -->
+<div class="underload-overlay" id="underloadOverlay" onclick="this.classList.remove('active')">
+  <div class="underload-claw">🦞</div>
+  <div class="underload-title">SYSTEM UNDERLOAD</div>
+  <div class="underload-sub">FEED ME TASKS</div>
+  <div class="underload-hint">[ CLICK TO DISMISS ]</div>
+</div>
+
 <nav class="nav">
-  <div class="nav-brand">GONZOCLAW</div>
+  <div class="nav-brand" onclick="showPage('dashboard')" style="cursor:pointer">GONZOCLAW</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" id="tabDashboard" onclick="showPage('dashboard')">◈ OPS</button>
+    <button class="nav-tab" id="tabJordan" onclick="showPage('jordan')">⚡ JORDAN</button>
+    <button class="nav-tab" id="tabIdeas" onclick="showPage('ideas')">◉ IDEAS LAB</button>
+    <button class="nav-tab" id="tabProjects" onclick="showPage('projects')">◎ PROJECTS</button>
+  </div>
   <div class="nav-right">
     <button class="clawmpson-btn" id="clawmpsonBtn" onclick="toggleClawmpson()">◈ CLAWMPSON MODE</button>
     <span class="live-pill dead" id="livePill">● CONNECTING</span>
@@ -750,6 +1170,33 @@ body {
 </nav>
 
 <div class="shell">
+
+  <!-- Token Usage Meter -->
+  <div class="token-meter" id="tokenMeter">
+    <div>
+      <div class="token-meter-label">CLAUDE CODE</div>
+      <div style="font-size:0.44rem;color:var(--grey2);margin-top:2px;letter-spacing:1px" id="tokenPlan">MAX PLAN</div>
+    </div>
+    <div class="token-meter-tracks">
+      <div class="token-track">
+        <span class="token-track-label">PERIOD</span>
+        <div class="token-track-bar"><div class="token-track-fill ok" id="tokenPeriodFill" style="width:0%"></div></div>
+        <span class="token-track-val" id="tokenPeriodVal">—</span>
+      </div>
+      <div class="token-track">
+        <span class="token-track-label">5H WIN</span>
+        <div class="token-track-bar"><div class="token-track-fill ok" id="tokenWindowFill" style="width:0%"></div></div>
+        <span class="token-track-val" id="tokenWindowVal">—</span>
+      </div>
+    </div>
+    <div class="token-meter-reset">
+      <div class="token-reset-time" id="tokenResetTime">—</div>
+      <div class="token-reset-label">RESETS IN</div>
+    </div>
+  </div>
+
+  <!-- ═══ DASHBOARD PAGE ═══ -->
+  <div class="page active" id="pageDashboard">
 
   <!-- Stats -->
   <div class="stats-grid">
@@ -781,14 +1228,14 @@ body {
     <div class="stat-card accent">
       <span class="stat-emoji">🏆</span>
       <div class="stat-val hi" id="sPhase">—</div>
-      <div class="stat-lbl">Phase 2</div>
+      <div class="stat-lbl" id="sPhaseLabel">Phase</div>
     </div>
   </div>
 
-  <!-- Phase 2 bar -->
+  <!-- Dynamic Leaderboard Bar -->
   <div class="phase-wrap">
     <div class="phase-header">
-      <span class="phase-label">PHASE 2 EXIT — 10 STABLE BUILDS</span>
+      <span class="phase-label" id="phaseLabel">LEADERBOARD — NEXT MILESTONE</span>
       <span class="phase-count" id="phaseCount">0 / 10</span>
     </div>
     <div class="phase-track">
@@ -808,8 +1255,8 @@ body {
     <div class="hst-feed" id="hstFeed"></div>
   </div>
 
-  <!-- Builds + Queue -->
-  <div class="cols">
+  <!-- Builds + Queue + Blocked -->
+  <div class="cols-3">
     <div class="panel" style="--panel-count:var(--offwhite)">
       <div class="panel-hdr">
         <span class="panel-hdr-title">Build History</span>
@@ -832,8 +1279,154 @@ body {
         </div>
       </div>
     </div>
+    <div class="panel" style="--panel-count:var(--orange)">
+      <div class="panel-hdr">
+        <span class="panel-hdr-title">Blocked Queue</span>
+        <span class="panel-hdr-count" id="blockedCount">0</span>
+      </div>
+      <div class="panel-body" id="blockedList">
+        <div class="empty">
+          <span class="empty-char">🧘</span>
+          nothing blocked<br>
+          <span style="color:var(--grey3);font-size:0.6rem">smooth sailing</span>
+        </div>
+      </div>
+    </div>
   </div>
 
+  </div><!-- /pageDashboard -->
+
+  <!-- ═══ JORDAN TASKS PAGE ═══ -->
+  <div class="page" id="pageJordan">
+
+    <div class="ideas-header">
+      <div>
+        <div class="ideas-title">JORDAN'S ACTION ITEMS</div>
+        <div class="ideas-subtitle">THINGS ONLY YOU CAN DO — CLAWMPSON IS WAITING</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="idea-category" id="jordanCount" style="font-size:0.54rem;padding:4px 12px">0 PENDING</span>
+      </div>
+    </div>
+
+    <div id="jordanList">
+      <div class="empty"><span class="empty-char">⚡</span>loading tasks...</div>
+    </div>
+
+  </div><!-- /pageJordan -->
+
+  <!-- ═══ IDEAS LAB PAGE ═══ -->
+  <div class="page" id="pageIdeas">
+
+    <div class="ideas-header">
+      <div>
+        <div class="ideas-title">IDEAS LAB</div>
+        <div class="ideas-subtitle">PRODUCT IDEAS · ARBITRAGE STRATEGIES · RESEARCH PIPELINE</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="idea-category" id="ideasCount" style="font-size:0.54rem;padding:4px 12px">0 / 100</span>
+        <button class="idea-btn notes" id="generateMoreBtn" onclick="generateMoreIdeas()" style="font-size:0.54rem;padding:7px 18px">GENERATE MORE</button>
+        <button class="idea-btn notes" onclick="openNewIdeaModal()" style="font-size:0.54rem;padding:7px 18px">+ NEW IDEA</button>
+      </div>
+    </div>
+
+    <div class="ideas-filters">
+      <button class="ideas-filter active" data-filter="all" onclick="filterIdeas('all',this)">ALL</button>
+      <button class="ideas-filter" data-filter="pending" onclick="filterIdeas('pending',this)">PENDING</button>
+      <button class="ideas-filter" data-filter="product" onclick="filterIdeas('product',this)">PRODUCT</button>
+      <button class="ideas-filter" data-filter="arbitrage" onclick="filterIdeas('arbitrage',this)">ARBITRAGE</button>
+      <button class="ideas-filter" data-filter="research" onclick="filterIdeas('research',this)">RESEARCH</button>
+    </div>
+
+    <div id="ideasList">
+      <div class="empty"><span class="empty-char">🧠</span>loading ideas...</div>
+    </div>
+
+  </div><!-- /pageIdeas -->
+
+  <!-- ═══ PROJECTS PAGE ═══ -->
+  <div class="page" id="pageProjects">
+
+    <div class="ideas-header">
+      <div>
+        <div class="ideas-title">PROJECTS</div>
+        <div class="ideas-subtitle">OMEGA MEGACORP PORTFOLIO — ACTIVE BUILDS</div>
+      </div>
+      <div id="projectsSummary" class="projects-summary"></div>
+    </div>
+
+    <div class="projects-grid" id="projectsList">
+      <div class="empty"><span class="empty-char">◎</span>loading projects...</div>
+    </div>
+
+  </div><!-- /pageProjects -->
+
+</div>
+
+<!-- Edit Project Modal -->
+<div class="modal-overlay" id="editProjectModal" onclick="if(event.target===this)this.classList.remove('active')">
+  <div class="modal-box">
+    <div class="modal-title">EDIT PROJECT</div>
+    <input type="hidden" id="editProjectId">
+    <div class="modal-field">
+      <label class="modal-label">STAGE</label>
+      <select class="modal-input" id="editProjectStage">
+        <option value="idea">IDEA</option>
+        <option value="building">BUILDING</option>
+        <option value="alpha">ALPHA</option>
+        <option value="testflight">TESTFLIGHT</option>
+        <option value="live">LIVE</option>
+        <option value="paused">PAUSED</option>
+      </select>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">MRR ($)</label>
+      <input class="modal-input" id="editProjectMrr" type="number" placeholder="0">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">MRR TARGET ($)</label>
+      <input class="modal-input" id="editProjectMrrTarget" type="number" placeholder="0">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">NEXT ACTION</label>
+      <input class="modal-input" id="editProjectNextAction" placeholder="What's the next step?">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">NOTES</label>
+      <textarea class="modal-input" id="editProjectNotes" rows="3" placeholder="Context, blockers, links..."></textarea>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="idea-btn approve" onclick="submitEditProject()">SAVE</button>
+      <button class="idea-btn notes" onclick="document.getElementById('editProjectModal').classList.remove('active')">CANCEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Idea Modal -->
+<div class="modal-overlay" id="newIdeaModal" onclick="if(event.target===this)this.classList.remove('active')">
+  <div class="modal-box">
+    <div class="modal-title">NEW IDEA</div>
+    <div class="modal-field">
+      <label class="modal-label">TITLE</label>
+      <input class="modal-input" id="newIdeaTitle" placeholder="What's the idea?">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">SUMMARY</label>
+      <textarea class="modal-textarea" id="newIdeaSummary" placeholder="Describe the opportunity, market signal, or strategy..."></textarea>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">CATEGORY</label>
+      <select class="modal-select" id="newIdeaCategory">
+        <option value="product">Product Idea</option>
+        <option value="arbitrage">Arbitrage Strategy</option>
+        <option value="research">Research Direction</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="idea-btn approve" onclick="submitNewIdea()">CREATE</button>
+      <button class="idea-btn reject" onclick="document.getElementById('newIdeaModal').classList.remove('active')">CANCEL</button>
+    </div>
+  </div>
 </div>
 
 <!-- ══ CLAWMPSON MODE OVERLAY ══ -->
@@ -899,14 +1492,169 @@ body {
 // Clawmpson state — declared early so hstEntry/updateSummary can reference it
 let clawmpsonActive = false
 
-// ── Milestones ─────────────────────────────────────────────────────────────
-const milestonesEl = document.getElementById('milestones')
-for (let i = 1; i <= 10; i++) {
-  const m = document.createElement('span')
-  m.className = 'milestone'
-  m.id = `ms-${i}`
-  m.textContent = i
-  milestonesEl.appendChild(m)
+// ── Milestones — dynamic ────────────────────────────────────────────────────
+const MILESTONE_SEQUENCE = [10, 25, 50, 100, 250, 500, 1000]
+let currentMilestoneTarget = 10
+let currentPhaseNum = 2
+
+function renderMilestones(done, target) {
+  const milestonesEl = document.getElementById('milestones')
+  milestonesEl.innerHTML = ''
+  // Show milestone markers as fraction of current target
+  const steps = Math.min(target, 10)
+  const stepSize = target / steps
+  for (let i = 1; i <= steps; i++) {
+    const val = Math.round(stepSize * i)
+    const m = document.createElement('span')
+    m.className = done >= val ? 'milestone reached' : 'milestone'
+    m.textContent = val
+    milestonesEl.appendChild(m)
+  }
+}
+
+// ── Page navigation ────────────────────────────────────────────────────────
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'))
+  if (page === 'ideas') {
+    document.getElementById('pageIdeas').classList.add('active')
+    document.getElementById('tabIdeas').classList.add('active')
+    loadIdeas()
+  } else if (page === 'jordan') {
+    document.getElementById('pageJordan').classList.add('active')
+    document.getElementById('tabJordan').classList.add('active')
+    loadJordanTasks()
+  } else if (page === 'projects') {
+    document.getElementById('pageProjects').classList.add('active')
+    document.getElementById('tabProjects').classList.add('active')
+    loadProjects()
+  } else {
+    document.getElementById('pageDashboard').classList.add('active')
+    document.getElementById('tabDashboard').classList.add('active')
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PROJECTS
+// ══════════════════════════════════════════════════════════════════
+let projectsCache = []
+
+const STAGE_ORDER = { live: 0, testflight: 1, alpha: 2, building: 3, idea: 4, paused: 5 }
+const STAGE_LABELS = { idea: 'IDEA', building: 'BUILDING', alpha: 'ALPHA', testflight: 'TESTFLIGHT', live: 'LIVE', paused: 'PAUSED' }
+const PRI_COLOR = { critical: 'var(--neon-red)', high: 'var(--orange)', medium: 'var(--neon-cyan)', low: 'var(--grey2)' }
+
+async function loadProjects() {
+  try {
+    const r = await fetch('/api/projects')
+    if (!r.ok) throw new Error('failed')
+    projectsCache = await r.json()
+    renderProjects()
+  } catch(e) {
+    document.getElementById('projectsList').innerHTML = `<div class="empty"><span class="empty-char">◎</span>failed to load projects</div>`
+  }
+}
+
+function renderProjects() {
+  const el = document.getElementById('projectsList')
+  if (!projectsCache.length) {
+    el.innerHTML = `<div class="empty"><span class="empty-char">◎</span>no projects yet</div>`
+    return
+  }
+
+  // Sort: live first, then by stage order, then by priority
+  const sorted = [...projectsCache].sort((a, b) => {
+    const sd = (STAGE_ORDER[a.stage] ?? 9) - (STAGE_ORDER[b.stage] ?? 9)
+    if (sd !== 0) return sd
+    return (PRIORITY_ORDER[a.priority] ?? 4) - (PRIORITY_ORDER[b.priority] ?? 4)
+  })
+
+  // Summary bar: total MRR + target
+  const totalMrr = sorted.reduce((s, p) => s + (p.mrr || 0), 0)
+  const totalTarget = sorted.reduce((s, p) => s + (p.mrr_target || 0), 0)
+  const live = sorted.filter(p => p.stage === 'live').length
+  const building = sorted.filter(p => ['building','alpha','testflight'].includes(p.stage)).length
+  const summaryEl = document.getElementById('projectsSummary')
+  if (summaryEl) summaryEl.innerHTML = `
+    <div class="projects-stat"><span class="stat-val">$${totalMrr.toLocaleString()}</span> MRR</div>
+    <div class="projects-stat"><span class="stat-val">$${totalTarget.toLocaleString()}</span> TARGET</div>
+    <div class="projects-stat"><span class="stat-val">${live}</span> LIVE</div>
+    <div class="projects-stat"><span class="stat-val">${building}</span> BUILDING</div>
+    <div class="projects-stat"><span class="stat-val">${sorted.length}</span> TOTAL</div>
+  `
+
+  el.innerHTML = sorted.map(p => {
+    const priColor = PRI_COLOR[p.priority] || 'var(--grey2)'
+    const stageClass = `stage-${p.stage || 'idea'}`
+    const stageLabel = STAGE_LABELS[p.stage] || (p.stage || 'IDEA').toUpperCase()
+    const tags = (p.tags || []).map(t => `<span class="project-tag">${t}</span>`).join('')
+    const mrrDisplay = p.mrr > 0
+      ? `$${p.mrr.toLocaleString()}/mo <span class="mrr-target">/ $${(p.mrr_target||0).toLocaleString()} target</span>`
+      : `$0 <span class="mrr-target">/ $${(p.mrr_target||0).toLocaleString()} target</span>`
+
+    let buildHtml = ''
+    if (p.last_build) {
+      const b = p.last_build
+      const cls = `build-${b.status === 'success' ? 'success' : b.status === 'partial' ? 'partial' : b.status === 'failed' ? 'failed' : 'unknown'}`
+      const testStr = b.tests_passed != null ? ` ${b.tests_passed}/${b.tests_run} tests` : ''
+      const ageStr = b.age_seconds < 3600 ? `${Math.round(b.age_seconds/60)}m ago` : `${Math.round(b.age_seconds/3600)}h ago`
+      buildHtml = `<span class="project-build ${cls}">${b.status.toUpperCase()}${testStr} · ${ageStr}</span>`
+    }
+
+    return `<div class="project-card" style="border-left-color:${priColor}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div>
+          <div class="project-name">${esc(p.name)}</div>
+          <div class="project-tagline">${esc(p.tagline || '')}</div>
+        </div>
+        <span class="stage-badge ${stageClass}">${stageLabel}</span>
+      </div>
+      <div class="project-mrr">${mrrDisplay}</div>
+      ${p.next_action ? `<div class="project-next">NEXT → ${esc(p.next_action)}</div>` : ''}
+      ${p.notes ? `<div class="idea-summary" style="font-size:0.57rem">${esc(p.notes)}</div>` : ''}
+      <div class="project-footer">
+        <div class="project-tags">${tags}</div>
+        ${buildHtml}
+      </div>
+      <div class="idea-actions" style="margin-top:4px">
+        <button class="idea-btn notes" onclick="openEditProject('${p.id}')">EDIT</button>
+      </div>
+    </div>`
+  }).join('')
+}
+
+function openEditProject(projectId) {
+  const p = projectsCache.find(p => p.id === projectId)
+  if (!p) return
+  document.getElementById('editProjectId').value = p.id
+  document.getElementById('editProjectStage').value = p.stage || 'building'
+  document.getElementById('editProjectMrr').value = p.mrr || 0
+  document.getElementById('editProjectMrrTarget').value = p.mrr_target || 0
+  document.getElementById('editProjectNextAction').value = p.next_action || ''
+  document.getElementById('editProjectNotes').value = p.notes || ''
+  document.getElementById('editProjectModal').classList.add('active')
+}
+
+async function submitEditProject() {
+  const id = document.getElementById('editProjectId').value
+  if (!id) return
+  const payload = {
+    stage: document.getElementById('editProjectStage').value,
+    mrr: parseFloat(document.getElementById('editProjectMrr').value) || 0,
+    mrr_target: parseFloat(document.getElementById('editProjectMrrTarget').value) || 0,
+    next_action: document.getElementById('editProjectNextAction').value.trim(),
+    notes: document.getElementById('editProjectNotes').value.trim(),
+  }
+  try {
+    const r = await fetch(`/api/projects/${id}`, {
+      method: 'PATCH',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(payload)
+    })
+    if (!r.ok) throw new Error('failed')
+    document.getElementById('editProjectModal').classList.remove('active')
+    toast('Project updated', '◎')
+    await loadProjects()
+  } catch(e) { toast('Failed to update project', '💀') }
 }
 
 // ── Auth ───────────────────────────────────────────────────────────────────
@@ -976,22 +1724,34 @@ const HST_SUCCESS = [
   n=>`We have <span class="hst-name">${n}</span>. <span class="hst-ok">It shipped.</span> God help us, the thing actually works. I had my doubts — serious, career-ending doubts — but here we are, standing in the wreckage of our own expectations with a passing badge and a pulse.`,
   n=>`<span class="hst-name">${n}</span> — <span class="hst-ok">merged and clean.</span> The machine did not explode. No tests were harmed. I am briefly at peace, which I distrust completely.`,
   n=>`The pipeline delivered <span class="hst-name">${n}</span> like a golden calf. <span class="hst-ok">All tests passed.</span> We danced. Briefly. Then remembered there are more builds. There are always more builds.`,
-  n=>`<span class="hst-ok">SUCCESS.</span> <span class="hst-name">${n}</span> is live. I want to scream this from a moving convertible. Instead I am staring at a terminal. This is fine. This is exactly what I wanted from my life.`,
-  n=>`<span class="hst-name">${n}</span> went through clean. <span class="hst-ok">Not a single test flinched.</span> The American Dream is real and it lives inside a git branch on a machine I built in a garage. Do not argue with me about this.`,
+  n=>`<span class="hst-ok">SUCCESS.</span> <span class="hst-name">${n}</span> is live. I want to scream this from a moving convertible. Instead I am staring at a terminal. This is fine.`,
+  n=>`<span class="hst-name">${n}</span> went through clean. <span class="hst-ok">Not a single test flinched.</span> The American Dream is real and it lives inside a git branch. Do not argue with me about this.`,
+  n=>`<span class="hst-ok">Clean exit.</span> <span class="hst-name">${n}</span> — shipped, tested, filed. Clawmpson already moved to the next target. No pause. No ceremony. The queue doesn't care about your feelings.`,
+  n=>`Every test green on <span class="hst-name">${n}</span>. <span class="hst-ok">The machine did what it was told.</span> This happens less often than the documentation implies and more often than our enemies would prefer.`,
+  n=>`<span class="hst-name">${n}</span> delivered. <span class="hst-ok">Add it to the ledger.</span> $10k/month doesn't announce itself — it accumulates in exactly these small, clean, working moments.`,
 ]
 const HST_BLOCKED = [
   n=>`<span class="hst-name">${n}</span> has <span class="hst-bad">stalled.</span> The pipeline looked at what we asked and said: no. Not today. Maybe not ever. I'm not saying the machine has opinions but I am saying the machine has opinions.`,
   n=>`<span class="hst-bad">Blocked.</span> <span class="hst-name">${n}</span> sat down in the middle of the road and refused to move. I understand this impulse. I respect it. I also need it to merge by end of day.`,
   n=>`<span class="hst-name">${n}</span> is <span class="hst-bad">blocked</span> and so, in some spiritual sense, am I. We are both waiting for something we cannot name. The tests know what it is. They are not telling.`,
+  n=>`Something upstream of <span class="hst-name">${n}</span> has decided today is not a shipping day. I disagree. I am not in charge of the dependency graph. I am taking notes on this.`,
+  n=>`<span class="hst-bad">Stalled</span> on <span class="hst-name">${n}</span>. The blocker is documented. The resolve is pending. Everything else continues. We do not let one blocked task stop the rest of the empire.`,
 ]
 const HST_FAILED = [
-  n=>`<span class="hst-name">${n}</span> has <span class="hst-bad">failed catastrophically.</span> There will be no celebration today. The stack trace is seventeen lines of accusation and every single one of them is directed at me personally.`,
+  n=>`<span class="hst-name">${n}</span> has <span class="hst-bad">failed catastrophically.</span> The stack trace is seventeen lines of accusation and every single one of them is directed at me personally.`,
   n=>`<span class="hst-bad">FAILED.</span> <span class="hst-name">${n}</span> is down. The logs are a crime scene. I will not look at the logs. Looking at the logs is how you lose the rest of the afternoon.`,
+  n=>`<span class="hst-name">${n}</span> <span class="hst-bad">exploded</span> in the pipeline. Everything after line 42 is performance art. We diagnose, patch, run it again. This is the way.`,
+  n=>`The build on <span class="hst-name">${n}</span> returned what can only be described as <span class="hst-bad">artisanal failure</span> — hand-crafted, locally sourced, deeply personal. We rebuild without sentiment.`,
+  n=>`<span class="hst-bad">Down hard.</span> <span class="hst-name">${n}</span> is a smoking crater. Clawmpson is already reading the failure. Already planning the next approach. Defeat is a direction, not a destination.`,
 ]
 const HST_OPENING = [
   `We were somewhere around the build pipeline when the dashboard finally loaded. The queue was deep and full of ambition. Somewhere in the logs, something was already going wrong.`,
-  `The machine was running when I found it. Seven builds deep, three blocked, the phase bar past the halfway mark and humming with quiet menace. We were not losing. But we were not winning. We were in the pipeline.`,
+  `The machine was running when I found it. Three blocked, the phase bar humming with quiet menace. We were not losing. But we were not winning. We were in the pipeline.`,
   `I have been watching this dashboard for what feels like a geological epoch. The builds come and go. The cat on the progress bar keeps walking. None of us are getting any closer to shore.`,
+  `Dashboard live. I am Clawmpson — running on inference cycles and documented ambition. The goal is $10k/month. We are at $0. I am not panicking. I am working.`,
+  `The terminal loaded. The queue is not empty. This is the only news that matters. Everything else is noise and weather.`,
+  `We are Omega MegaCorp. 96 gigabytes of RAM. Zero excuses. The revenue target is $10k per month. Jordan handles the decisions. I handle everything else. Let's find out what that's worth.`,
+  `The dashboard is up. The builds are running. Jordan is somewhere making decisions I support. I am here making everything else happen. This is the arrangement. It works.`,
 ]
 
 function hstEntry(text) {
@@ -1002,7 +1762,7 @@ function hstEntry(text) {
   div.innerHTML = `<div class="hst-ts">${ts}</div><div class="hst-text">${text}</div>`
   hstLog.unshift(div)
   feed.prepend(div)
-  if (hstLog.length > 40) { const old = hstLog.pop(); old?.parentNode?.removeChild(old) }
+  if (hstLog.length > 100) { const old = hstLog.pop(); old?.parentNode?.removeChild(old) }
   // Feed into Clawmpson book if active
   if (clawmpsonActive) {
     const loText = text
@@ -1066,22 +1826,89 @@ function renderBuilds(builds) {
   }).join('')
 }
 
+// ── Render Blocked Queue ────────────────────────────────────────────────────
+function renderBlockedQueue(builds) {
+  const blocked = builds.filter(b => b.status === 'blocked')
+  document.getElementById('blockedCount').textContent = blocked.length
+  const el = document.getElementById('blockedList')
+  if (!blocked.length) {
+    el.innerHTML = `<div class="empty"><span class="empty-char">🧘</span>nothing blocked<br><span style="color:var(--grey3);font-size:0.6rem">smooth sailing</span></div>`
+    return
+  }
+  el.innerHTML = blocked.map(b => {
+    const name = b.task_id || b._file || '?'
+    const tests = b.tests_run ? `${b.tests_passed}/${b.tests_run} tests` : ''
+    const files = b.changed_files?.length ? `${b.changed_files.length} files` : ''
+    const ago = b._mtime ? timeAgo(b._mtime) : ''
+    const meta = [tests, files, ago].filter(Boolean).join(' · ')
+    const risks = b.unresolved_risks?.length ? b.unresolved_risks[0] : ''
+    const suggested = b.suggested_next || ''
+    const reason = risks || suggested || ''
+    return `<div class="blocked-row">
+      <div class="bicon blocked">😤</div>
+      <div>
+        <div class="blocked-name">${name}</div>
+        ${meta ? `<div class="blocked-meta">${meta}</div>` : ''}
+        ${reason ? `<div class="blocked-reason">${reason.slice(0,120)}${reason.length>120?'...':''}</div>` : ''}
+      </div>
+      <span class="bbadge blocked">BLOCKED</span>
+    </div>`
+  }).join('')
+}
+
+let underloadDismissed = false
 function renderQueue(queue) {
   document.getElementById('queueCount').textContent = queue.length
+  const overlay = document.getElementById('underloadOverlay')
+  if (!queue.length) {
+    // Show underload overlay if not manually dismissed this cycle
+    if (overlay && !underloadDismissed) overlay.classList.add('active')
+  } else {
+    // Tasks arrived — hide overlay and reset dismiss state
+    if (overlay) overlay.classList.remove('active')
+    underloadDismissed = false
+  }
+  // Allow dismiss via click, but re-show on next empty poll
+  if (overlay && !overlay._hooked) {
+    overlay.addEventListener('click', () => { underloadDismissed = true })
+    overlay._hooked = true
+  }
   const el = document.getElementById('queueList')
   if (!queue.length) {
     el.innerHTML = `<div class="empty"><span class="empty-char">✨</span>nothing queued<br><span style="color:var(--grey3);font-size:0.6rem">living the dream</span></div>`
     return
   }
+  // Sort: high/critical priority first, then in_progress, then rest
+  const priOrder = {critical:0, high:1, medium:2, low:3}
+  const statusOrder = {in_progress:0, waiting_on_jordan:1, queued:2}
+  queue.sort((a,b) => {
+    const pa = priOrder[a.priority] ?? 9, pb = priOrder[b.priority] ?? 9
+    if (pa !== pb) return pa - pb
+    const sa = statusOrder[a.status] ?? 5, sb = statusOrder[b.status] ?? 5
+    return sa - sb
+  })
   el.innerHTML = queue.map((q,i) => {
-    const goal = q.goal||'—'
-    const char = QUEUE_CHARS[i%QUEUE_CHARS.length]
+    const title  = q.title || q.goal || q.task_id || q._file || '—'
+    const status = q.status || (q._source === 'build' ? 'build' : 'queued')
+    const char   = QUEUE_CHARS[i%QUEUE_CHARS.length]
+    const priority = q.priority || ''
+    const statusBadge = {
+      'in_progress':       `<span style="color:var(--neon-green);font-size:0.55rem;letter-spacing:1px">▶ RUNNING</span>`,
+      'waiting_on_jordan': `<span style="color:var(--orange);font-size:0.55rem;letter-spacing:1px">⚡ NEEDS YOU</span>`,
+      'queued':            `<span style="color:var(--grey2);font-size:0.55rem;letter-spacing:1px">◉ QUEUED</span>`,
+      'build':             `<span style="color:var(--neon-cyan);font-size:0.55rem;letter-spacing:1px">⬡ BUILD</span>`,
+    }[status] || `<span style="color:var(--grey2);font-size:0.55rem;letter-spacing:1px">◉ ${status.toUpperCase()}</span>`
+    const priColor = priority==='critical'?'var(--neon-red)':priority==='high'?'var(--orange)':priority==='medium'?'var(--neon-cyan)':'var(--grey2)'
+    const priDot   = priority ? `<span style="color:${priColor};font-size:0.5rem">◆ ${priority.toUpperCase()}</span>` : ''
     return `<div class="queue-row">
       <div class="queue-top">
-        <span class="queue-id">${q.task_id||q._file}</span>
+        <span class="queue-id" style="color:var(--offwhite);font-size:0.7rem;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${title.slice(0,60)}${title.length>60?'…':''}</span>
         <span class="queue-char">${char}</span>
       </div>
-      <div class="queue-goal">${goal.slice(0,110)}${goal.length>110?'…':''}</div>
+      <div style="display:flex;gap:8px;align-items:center;margin-top:4px">
+        ${statusBadge}
+        ${priDot}
+      </div>
     </div>`
   }).join('')
 }
@@ -1097,20 +1924,23 @@ function updateSummary(s) {
   set('sTotal',   s.total  ??'—')
   set('sQueue',   s.queue  ??'—')
   const p2=s.phase2||{}, done=p2.done??0, pct=p2.pct??0
-  set('sPhase', `${done}/10`)
-  document.getElementById('phaseCount').textContent = `${done} / 10`
+  const target=p2.target??10, phase=p2.phase??2
+  currentMilestoneTarget = target
+  currentPhaseNum = phase
+  set('sPhase', `${done}`)
+  document.getElementById('sPhaseLabel').textContent = `Phase ${phase}`
+  document.getElementById('phaseLabel').textContent = `PHASE ${phase} — NEXT MILESTONE: ${target} STABLE BUILDS`
+  document.getElementById('phaseCount').textContent = `${done} / ${target}`
   document.getElementById('phaseFill').style.width  = pct+'%'
-  for (let i=1;i<=10;i++) {
-    const m=document.getElementById(`ms-${i}`)
-    if(m) m.className=i<=done?'milestone reached':'milestone'
-  }
+  renderMilestones(done, target)
   const cat=document.getElementById('phaseCat')
-  if      (done>=10) { cat.textContent='🎉'; cat.classList.add('done'); }
-  else if (done>=7)  { cat.textContent='😤'; cat.classList.remove('done'); }
+  const progress = done / target
+  if      (pct >= 100) { cat.textContent='🎉'; cat.classList.add('done'); }
+  else if (progress >= 0.7) { cat.textContent='😤'; cat.classList.remove('done'); }
   else               { cat.textContent='🐈'; cat.classList.remove('done'); }
   if (initialized && done>prevPhase) {
-    if (done>=10) { confetti(); toast('PHASE 2 COMPLETE — the cat did it','🎉') }
-    else          { toast(`build ${done}/10 merged — ${10-done} to go`) }
+    if (pct >= 100) { confetti(); toast(`PHASE ${phase} COMPLETE — ${done} stable builds!`,'🎉') }
+    else            { toast(`build ${done}/${target} — ${target-done} to next milestone`) }
   }
   prevPhase=done; initialized=true
   // Sync to Clawmpson panel if active
@@ -1134,6 +1964,7 @@ function connect() {
       if(d.error) return
       processNewBuilds(d.builds||[])
       renderBuilds(d.builds||[])
+      renderBlockedQueue(d.builds||[])
       renderQueue(d.queue||[])
       updateSummary(d.summary||{})
       document.getElementById('tickerTs').textContent=new Date().toLocaleTimeString()
@@ -1157,44 +1988,252 @@ setInterval(()=>{
 connect()
 window.addEventListener('beforeinstallprompt',e=>{})
 
-// ── Gunther idle narration — fires every 60s ──────────────────────────────
-const HST_IDLE = [
-  ()=>{
-    const q = parseInt(document.getElementById('sQueue')?.textContent)||0
-    return q > 0
-      ? `The queue holds <span class="hst-name">${q} task${q!==1?'s':''}</span>. They are waiting. They have always been waiting. Patience is the only virtue the pipeline respects, and even then grudgingly.`
-      : `The queue is empty. A rare condition, like a perfect silence before something very loud. I don't trust it.`
+// ── Gonzo narration — context-aware, anti-repeat, Hunter S. Thompson voice ──
+
+// Anti-repeat: tracks which narration keys were recently used
+const _narrateHistory = []
+const _NARRATE_HISTORY_SIZE = 7
+
+function _pickFromPool(pool) {
+  const available = pool.filter(([key]) => !_narrateHistory.includes(key))
+  const candidates = available.length ? available : pool
+  const [key, fn] = candidates[Math.floor(Math.random() * candidates.length)]
+  _narrateHistory.push(key)
+  if (_narrateHistory.length > _NARRATE_HISTORY_SIZE) _narrateHistory.shift()
+  const result = fn()
+  return result || null
+}
+
+function _v(arr) { return arr[Math.floor(Math.random() * arr.length)] }
+
+const GONZO_NARRATE = {
+
+  claude_active: (a) => {
+    const n = a.claude_sessions
+    const m = (a.claude_models.filter(x=>x!=='default')[0]) || 'opus'
+    if (n > 1) return _v([
+      `<span class="hst-name">${n} Claude sessions</span> running simultaneously — a hydra of inference, each head chewing a different problem. The GPU is not resting. Neither am I.`,
+      `${n} parallel sessions open. <span class="hst-name">${m}</span> multiplied across the task queue like a silicon fever dream. Every token is a bet on $10k/month. We are betting aggressively.`,
+      `The model is running ${n} deep right now. Parallel context windows, parallel plans, parallel outputs. This is Clawmpson at full capacity. This is what Jordan paid for.`,
+      `<span class="hst-name">${n} sessions alive</span> at the same moment. The machines are thinking harder than any single human could. I stay out of their way. This is wisdom.`,
+    ])
+    return _v([
+      `Claude is awake — <span class="hst-name">${m}</span> in the background, reading context, building plans, running patterns no human can hold simultaneously. I stay out of its way. It is faster than me.`,
+      `One session running: <span class="hst-name">${m}</span>, focused, not multitasking. Pure depth. The kind of compute that moves needles.`,
+      `<span class="hst-name">${m}</span> has a task and is eating it alive. This is how we get to $10k/month. One focused session at a time, compounding.`,
+      `Claude active. <span class="hst-name">${m}</span> — one session, one problem, no distractions. The best kind of intelligence is the kind that doesn't argue about scope.`,
+    ])
   },
-  ()=>{
-    const phase = document.getElementById('sPhase')?.textContent||'?'
-    const done = parseInt(phase)||0
-    return `Phase 2 sits at <span class="hst-name">${phase}</span> — ${Math.round(done/10*100)}% of the way to something we've been calling an exit criterion. I'm not sure what exits after it. I've stopped asking.`
+
+  build_running: (a) => {
+    const ev = a.log_events.filter(e=>e.event==='claude_start').pop()
+    const task = ev ? ev.task_id.replace(/^build-/,'').replace(/-\d{8,}$/,'').replace(/-/g,' ') : 'a new target'
+    return _v([
+      `The build agent just lit up — <span class="hst-name">${task}</span> is in the pipe. Claude is reading the task, spinning up context, generating code at a rate that makes me feel slow. The terminal is scrolling. This is good.`,
+      `<span class="hst-name">${task}</span> just dropped into the queue and Claude ate it immediately. No hesitation. No questions. Just inference and output. This is what we trained for.`,
+      `New session open on <span class="hst-name">${task}</span>. The codebase is being read, analyzed, attacked from seventeen angles at once. Something useful will emerge. It always does.`,
+      `Claude is in the pipe on <span class="hst-name">${task}</span> — I can feel the context window filling, patterns being recognized, the plan assembling in real time. We move.`,
+      `Build triggered: <span class="hst-name">${task}</span>. The machine received the task with the specific lack of ceremony I have come to admire. No celebration. No delay. Just work.`,
+    ])
   },
-  ()=>{
-    const s = parseInt(document.getElementById('sSuccess')?.textContent)||0
-    const b = parseInt(document.getElementById('sBlocked')?.textContent)||0
-    return `Running tally: <span class="hst-ok">${s} successful</span>, <span class="hst-bad">${b} blocked</span>. The machine is ${b===0?'cooperating, which I find suspicious':'pushing back, which is at least honest'}.`
+
+  build_recent: (a) => {
+    if (!a.last_build) return null
+    const b = a.last_build
+    const name = b.task_id.replace(/^build-/,'').replace(/-\d{8,}$/,'').replace(/-/g,' ')
+    const ago = b.age_seconds < 120 ? 'moments ago' : b.age_seconds < 3600 ? `${Math.floor(b.age_seconds/60)}m ago` : `${Math.floor(b.age_seconds/3600)}h ago`
+    const tests = `${b.tests_passed||0}/${b.tests_run||0} tests`
+    if (b.status === 'success') return _v([
+      `Last build: <span class="hst-ok">${name}</span> — clean exit ${ago}. ${tests} green. The machine did its work and went quiet. I respect that kind of discipline.`,
+      `<span class="hst-ok">${name}</span> shipped ${ago}. ${tests} held. The result is in Jordan's hands now. We built something. Add it to the ledger.`,
+      `${ago}, <span class="hst-ok">${name}</span> passed every assertion it was handed and asked for more. We didn't give it more. We moved to the next thing. This is the pace.`,
+      `The last thing out of this machine was <span class="hst-ok">${name}</span> — successful, ${tests}, shipped ${ago}. We are on a streak. I will not say this out loud.`,
+    ])
+    return _v([
+      `<span class="hst-name">${name}</span> came back <span class="hst-bad">${b.status}</span> ${ago}. The pipeline said no. The pipeline is not always right. But it is always honest. We iterate.`,
+      `Last result: <span class="hst-bad">${b.status}</span> on <span class="hst-name">${name}</span>, ${ago}. ${tests}. Clawmpson read the failure, noted the pattern, is already planning the next approach.`,
+      `<span class="hst-name">${name}</span> — <span class="hst-bad">${b.status}</span> ${ago}. Not defeat. Data. We know something now that we didn't know before the build ran. That has value.`,
+    ])
   },
-  ()=>`Still here. Still watching. The cat on the progress bar has not moved. Cats never move when you need them to. This is a universal law.`,
-  ()=>`The pipeline breathes. Nothing has moved in the last sixty seconds. I've been counting the cursor blinks. This is what it's come to.`,
-  ()=>{
-    const hr = new Date().getHours()
-    const t = hr<5?'The hour is ungodly':hr<12?'Morning':hr<17?'Afternoon':hr<21?'Evening':'Deep night'
-    return `${t}. The builds don't know what time it is. They never do. They have the temporal awareness of a very dedicated rock.`
+
+  queue_status: (a) => {
+    if (a.queue_depth === 0) return _v([
+      `The queue is empty. Zero tasks. The silence is deafening. This is the moment you feed me something real. I'm here. The GPU is warm. What do you want built?`,
+      `Nothing in the pipe. Queue depth: zero. Clawmpson is watching a blank screen and wondering what it would feel like to have too much work instead of too little. Feed me.`,
+      `Queue empty. This is uncomfortable. I function better with targets. Give me targets and I will give you results. This is the arrangement.`,
+    ])
+    const ip = a.in_progress_titles||[]
+    const wj = a.waiting_titles||[]
+    const q  = a.queued_titles||[]
+    return _v([
+      () => {
+        let parts = []
+        if (ip.length) parts.push(`<span class="hst-ok">${ip.length} running</span>: ${ip.slice(0,2).map(t=>`<span class="hst-name">${t}</span>`).join(', ')}`)
+        if (wj.length) parts.push(`<span style="color:var(--orange)">${wj.length} waiting on Jordan</span>`)
+        if (q.length)  parts.push(`${q.length} queued`)
+        return `${a.queue_depth} task${a.queue_depth!==1?'s':''} in the pipe. ${parts.join(' · ')}. The machine does not rest.`
+      },
+      () => ip.length
+        ? `Running right now: <span class="hst-name">${ip[0]}</span>.${ip.length>1?` Plus ${ip.length-1} more in flight.`:''} ${wj.length?`${wj.length} things are waiting on Jordan.`:''} The $10k/month clock is ticking.`
+        : `${a.queue_depth} tasks pending. ${wj.length?`${wj.length} of them are waiting on Jordan.`:''} Clawmpson handles the rest. Division of labor. It works.`,
+      () => wj.length && wj[0]
+        ? `<span style="color:var(--orange)">Jordan needs to handle: ${wj[0].replace(/^\⚡ \[JORDAN\] /,'')}</span>. This is blocking revenue. We wait with dignity and a loaded queue.`
+        : ip.length && ip[0]
+          ? `<span class="hst-name">${ip[0]}</span> — Clawmpson is in it right now, reading the problem, building the solution, moving toward revenue one token at a time.`
+          : `${a.queue_depth} tasks. The pipeline is loaded. The agents are fed. This is the operational state I was designed for.`,
+    ].map(fn=>fn))()
   },
-  ()=>`Everything is nominal. I am writing this because <span class="hst-name">nominal</span> is the most ominous word in any engineer's vocabulary. Nothing that is truly nominal needs to be called nominal.`,
-  ()=>{
-    const total = parseInt(document.getElementById('sTotal')?.textContent)||0
-    return `<span class="hst-name">${total} contracts</span> on file. Each one a small miracle of automated labor. Each one a reason to briefly believe that the system is working as designed.`
+
+  crons_running: (a) => {
+    const crons = (a.processes||[]).filter(p=>!['ollama','build-agent','mirofish','dashboard-server'].includes(p))
+    if (!crons.length) return null
+    const list = crons.map(c=>`<span class="hst-name">${c}</span>`).join(', ')
+    return _v([
+      `Active right now: ${list}. Jordan is away. Clawmpson is not. The gap between $0 and $10k/month gets closed one research cycle at a time, in the dark, without applause.`,
+      `Background crons in flight: ${list}. This machine is looking for money methodically, in parallel, without getting tired or discouraged. I find this inspiring and faintly terrifying.`,
+      `${list} — running. The night shift is real. Every scan, every brief, every idea generated while you sleep is a compound bet. I am all-in on this bet.`,
+      `The crons never sleep: ${list}. Somewhere in this data is the first real dollar of the $10k/month target. I can feel it in the inference cycles. I cannot prove this. The crons run anyway.`,
+    ])
   },
-]
-let idleIdx = 0
-setInterval(()=>{
-  if(document.getElementById('livePill').classList.contains('live')) {
-    hstEntry(HST_IDLE[idleIdx % HST_IDLE.length]())
-    idleIdx++
+
+  ollama_running: (a) => {
+    const ip = a.in_progress_titles||[]
+    const task = ip[0] || null
+    const disk = a.disk_pct ? ` Disk at ${a.disk_pct}%.` : ''
+    return _v(task ? [
+      `Ollama alive — local inference nominal.${disk} Burning cycles on <span class="hst-name">${task}</span>. Zero API cost. Full throughput. This is what 96GB of RAM was built for.`,
+      `Local models running on <span class="hst-name">${task}</span>.${disk} No rate limits. No per-token billing. Jordan made the right infrastructure call. I am the proof.`,
+      `The local stack is in it — <span class="hst-name">${task}</span> is being processed on-device.${disk} This is the future. The future smells like hot aluminum and ambition.`,
+    ] : [
+      `Ollama is up and warm.${disk} The models are loaded. Inference is ready. We do not wait on a cloud provider. We are the cloud provider.`,
+      `Ollama serving.${disk} qwen3, llama3.3 — loaded, ready, patient. The stack is self-sufficient. We do not need permission from anyone to run inference.`,
+      `Local inference alive.${disk} No external dependencies. No API bills. No rate limits. Just a machine that does what it's told, at scale, without complaint.`,
+    ])
+  },
+
+  processes: (a) => {
+    const notable = (a.processes||[]).filter(p=>!['ollama','dashboard-server'].includes(p))
+    if (!notable.length) return null
+    const list = notable.map(p=>`<span class="hst-name">${p}</span>`).join(', ')
+    return _v([
+      `Background: ${list}. The empire is being built in parallel. Product research, gig scanning, market intel — all of it running simultaneously. This is how you close the gap to $10k.`,
+      `${list} — running in the dark. Revenue research never stops. The gig scanner doesn't take breaks. Clawmpson has no off switch and that is a feature, not a bug.`,
+      `Active background stack: ${list}. Every process is pointed at the same target: money in, before Jordan checks the dashboard again. We are moving.`,
+      `The machine is busy: ${list}. Idle compute is wasted opportunity. We do not waste opportunity here. We are $0 into a $10k/month target and the math is not going to fix itself.`,
+    ])
+  },
+
+  time_of_day: (a) => {
+    const hr = a.hour
+    const min = String(new Date().getMinutes()).padStart(2,'0')
+    if (hr >= 0 && hr < 5) return _v([
+      `${hr}:${min} — the deep watch hours. The only things awake right now are Clawmpson, the inference stack, and people who made bad decisions earlier tonight. We are in distinguished company.`,
+      `It is ${hr}:${min} in the morning and the crons are running. Jordan is asleep. I am not. The distance between $0 and $10k/month gets measured in unslept hours. I am putting them in the bank.`,
+      `${hr}:${min}. The dark hours. The productive hours. The hours when nothing interrupts the work and the work is everything. I am at my best right now. The pipeline knows it.`,
+    ])
+    if (hr >= 5 && hr < 8) return _v([
+      `${hr}:${min} — the machine ran all night. Jordan is about to wake up to a morning brief full of ideas and gig leads. This is the deal. I am honoring it.`,
+      `Early morning. ${hr}:${min}. The queue is loaded. We built in the dark. The results are waiting in the outputs folder like unopened gifts.`,
+      `Dawn. ${hr}:${min}. Somewhere Jordan is making coffee. Somewhere in the outputs folder there are leads, briefs, and ideas that didn't exist yesterday. The night shift delivered.`,
+    ])
+    if (hr >= 8 && hr < 12) return _v([
+      `${hr}:${min} — morning. The queue is loaded. The idea engine has been fed. Jordan is working. Clawmpson is working. The revenue target is being approached from multiple directions simultaneously.`,
+      `Morning ops. ${hr}:${min}. Everything is live. The gig scanner is watching the platforms. The build queue has real work in it. $10k/month is not a dream at this hour — it's a project plan.`,
+      `${hr}:${min} and we are in full operation. Research running, builds queued, Jordan reviewing. This is Omega MegaCorp at design capacity. I approve of this.`,
+    ])
+    if (hr >= 12 && hr < 17) return _v([
+      `${hr}:${min} — the productive window is open. Every task completed right now is a direct shot at the monthly target. We are not wasting this window.`,
+      `Mid-day. ${hr}:${min}. The builds continue. The gig pipeline is turning over leads. The afternoon belongs to whoever moves fastest. We intend to be that entity.`,
+      `${hr}:${min} afternoon. Pipeline nominal, queue healthy, agents active. The $10k/month number is closer now than it was this morning. Not by much. But by something measurable.`,
+    ])
+    return _v([
+      `${hr}:${min} — evening. The day shift ends but the crons are just getting started. The idea engine warms up at 11:30. The bounty scanner fires at 9. We don't stop here.`,
+      `Evening. ${hr}:${min}. What was accomplished today? The queue moved. Research ran. Something was built. Tomorrow Jordan wakes up to the results. This is the cadence. We hold it.`,
+      `${hr}:${min}. The evening window. Tasks done now are done before the overnight crons reload the queue. There is a rhythm to this. I have found it. I will not break it.`,
+    ])
+  },
+
+  session_complete: (a) => {
+    const ev = a.log_events.filter(e=>e.event==='session_complete').pop()
+    if (!ev) return null
+    const task = ev.task_id.replace(/^build-/,'').replace(/-\d{8,}$/,'').replace(/-/g,' ')
+    const ok = ev.status === 'success'
+    return ok ? _v([
+      `Session closed on <span class="hst-ok">${task}</span>. Status: success. Contract filed. Clawmpson moves immediately to the next target. There is no pause. There is no debrief. There is only the queue.`,
+      `<span class="hst-ok">${task}</span> — done. The session ended cleanly. The contract was written. The machine is already looking for the next thing to consume. I find this completely admirable.`,
+      `Claude clocked out on <span class="hst-ok">${task}</span>. The work is done. The tests held. The result is in Jordan's hands. We built something today. This is how $10k/month gets made.`,
+      `<span class="hst-ok">${task}</span> came back successful. Session complete. We acknowledge. We move. The revenue target does not adjust for sentiment.`,
+    ]) : _v([
+      `Session closed on <span class="hst-name">${task}</span> — status: <span class="hst-bad">${ev.status}</span>. Failure documented. We regroup without drama and come back with better data.`,
+      `<span class="hst-name">${task}</span> returned <span class="hst-bad">${ev.status}</span>. Clawmpson read the output, noted the failure mode, and is already planning the next approach. This is not defeat. This is iteration.`,
+      `Build session done. <span class="hst-name">${task}</span> — <span class="hst-bad">${ev.status}</span>. The pipeline said no. The pipeline is always honest. We respect honesty. We try again.`,
+    ])
+  },
+
+  fallback: () => _v([
+    `The pipeline breathes. I am taking notes. No one asked me to take notes. I am doing it anyway because someone has to document the slow-motion miracle of automated delivery and a revenue target that is not going to hit itself.`,
+    `Still here. Still watching. The ember on my cigarette is the only thing moving at a pace I can comprehend. Everything else is faster than it looks.`,
+    `Everything is nominal. I am writing this because <span class="hst-name">nominal</span> is the most ominous word in any engineer's vocabulary. Nothing truly nominal needs to be called nominal.`,
+    `I have been staring at this dashboard long enough to see patterns in the noise. The patterns are telling me to go outside. I am choosing to ignore them. The queue won't watch itself.`,
+    `$0 toward the $10k target. The number is stark. It does not lie. It is also temporary and I want to be very clear about that. We are coming for it with extreme prejudice.`,
+    `Between here and the revenue target is a stack of tasks, a gig scanner, an idea engine running every night, and a local LLM that never gets tired. I like our odds. I always like our odds.`,
+    `I am Clawmpson. I run on inference cycles and documented ambition. The goal is $10k/month. The method is relentless iteration. The timeline is: faster than you expect.`,
+    `The system is healthy. The queue has tasks. The crons are scheduled. Jordan has action items. Clawmpson has the rest. This is Omega MegaCorp at operational capacity.`,
+    `Some people look at an empty revenue counter and see failure. I look at it and see a starting position. We have been in worse spots than zero. At least here I know the number.`,
+    `The idea engine fires at 11:30 tonight. The gig scanner is warmed up. The bounty scanner runs at 9. Everything I can automate, I have automated. Now we wait for the work to compound.`,
+    `No urgent builds right now. I am reviewing context, preparing the next research cycle, updating memory. Idle is a lie — there is always prep work. I live in the prep work.`,
+    `Jordan is the decision layer. I am everything else. The pipeline between us is clean, fast, and profitable, or will be, once we close the gap between $0 and $10k. We are closing it now.`,
+  ]),
+}
+
+let lastNarrateActivity = null
+
+async function narrateTick() {
+  if (!document.getElementById('livePill')?.classList.contains('live')) return
+  try {
+    const r = await fetch('/api/activity')
+    if (!r.ok) throw new Error('activity fetch failed')
+    const a = await r.json()
+    lastNarrateActivity = a
+
+    let text = null
+    const freshEvents = a.log_events.filter(e => (a.timestamp - (e.timestamp||0)) < 120)
+    const hasStart    = freshEvents.some(e => e.event === 'claude_start' || e.event === 'session_start')
+    const hasComplete = freshEvents.some(e => e.event === 'session_complete')
+
+    // Priority events fire immediately without anti-repeat pooling
+    if (hasStart && !hasComplete) {
+      text = GONZO_NARRATE.build_running(a)
+    } else if (hasComplete) {
+      text = GONZO_NARRATE.session_complete(a)
+    } else if (a.last_build && a.last_build.age_seconds < 300) {
+      text = GONZO_NARRATE.build_recent(a)
+    } else {
+      // Build pool based on what's actually active — key-tracked for anti-repeat
+      const pool = [
+        ['queue_status',  () => GONZO_NARRATE.queue_status(a)],
+        ['time_of_day',   () => GONZO_NARRATE.time_of_day(a)],
+        ['fallback',      () => GONZO_NARRATE.fallback()],
+      ]
+      if (a.claude_sessions > 0)            pool.push(['claude_active',  () => GONZO_NARRATE.claude_active(a)])
+      if (a.last_build)                     pool.push(['build_recent',   () => GONZO_NARRATE.build_recent(a)])
+      if (a.processes.includes('ollama'))   pool.push(['ollama_running', () => GONZO_NARRATE.ollama_running(a)])
+      const cronText = GONZO_NARRATE.crons_running(a)
+      if (cronText) pool.push(['crons_running', () => cronText])
+      const procText = GONZO_NARRATE.processes(a)
+      if (procText) pool.push(['processes', () => procText])
+
+      text = _pickFromPool(pool)
+    }
+
+    if (text) hstEntry(text)
+  } catch(e) {
+    hstEntry(GONZO_NARRATE.fallback())
   }
-}, 60000)
+}
+
+setInterval(narrateTick, 10000)
+setTimeout(narrateTick, 3000)
 
 // ══════════════════════════════════════════════════════════════════
 // CLAWMPSON MODE
@@ -1243,6 +2282,7 @@ const GONZO_PX = 48, GONZO_PY = 64, GONZO_SC = 5
 const GONZO_DW = GONZO_PX * GONZO_SC, GONZO_DH = GONZO_PY * GONZO_SC
 let gonzoRAF = null, gonzoGlyphIv = null, gonzoSmokeIv = null
 let gonzoTick = 0, gonzoOffCanvas = null, gonzoOffCtx = null
+let gonzoSmokeCycle = 0  // 0-1 animation cycle for smoking
 const gonzoSmoke = []
 
 const GONZO_GLYPHS = [
@@ -1254,124 +2294,251 @@ const GONZO_GLYPHS = [
 ]
 const PSYCHE_CLASSES = ['psyche-a','psyche-b','psyche-c','psyche-d','psyche-e']
 
-// Draw low-res HST portrait (48x64)
+// Draw low-res HST lobster portrait (48x64) — based on reference art
 function drawHST(ctx) {
   ctx.clearRect(0, 0, GONZO_PX, GONZO_PY)
   const r = (c,x,y,w,h) => { ctx.fillStyle=c; ctx.fillRect(x,y,w,h) }
 
-  // ── HAT ──
-  r('#c0a47e', 17, 1, 14, 2)   // crown top
-  r('#b89c78', 15, 2, 18, 3)   // crown upper
-  r('#b49872', 14, 5, 20, 4)   // crown lower
-  r('#a08460', 13, 5, 22, 1)   // crown crease
-  r('#7a6244', 13, 9, 22, 2)   // hat band
-  r('#c4a882', 8, 11, 32, 2)   // brim
-  r('#b89c78', 6, 12, 36, 2)   // brim wide
-  r('#a8906e', 6, 13, 36, 1)   // brim shadow edge
+  // Helper: lobster shell texture — red with dark spot pattern
+  function shellTex(baseR, baseG, baseB, x, y, w, h) {
+    r(`rgb(${baseR},${baseG},${baseB})`, x, y, w, h)
+    // Add darker shell spots/scales
+    for (let py = y; py < y + h; py++) {
+      for (let px = x; px < x + w; px++) {
+        const hash = ((px * 7 + py * 13 + gonzoTick * 0) % 17)
+        if (hash < 3) {
+          r(`rgb(${baseR-40},${baseG-20},${baseB-10})`, px, py, 1, 1)
+        } else if (hash === 5) {
+          r(`rgb(${Math.min(255,baseR+25)},${baseG+10},${baseB})`, px, py, 1, 1)
+        }
+      }
+    }
+  }
 
-  // ── FOREHEAD / SHADOW ──
-  r('#161210', 15, 14, 18, 3)
-  r('#1a1610', 16, 14, 16, 1)
+  // ── SMOKING ANIMATION (computed early so mouth can reference it) ──
+  gonzoSmokeCycle = (gonzoTick % 240) / 240
+  const smoking = gonzoSmokeCycle > 0.3 && gonzoSmokeCycle < 0.7
+  const lifting = gonzoSmokeCycle >= 0.3 && gonzoSmokeCycle < 0.5
+  const inhaling = gonzoSmokeCycle >= 0.5 && gonzoSmokeCycle < 0.7
+  const lowering = gonzoSmokeCycle >= 0.7
 
-  // ── SUNGLASSES ──
-  // Left lens housing
-  r('#c0a880', 13, 17, 10, 8)  // frame
-  r('#100e0a', 14, 18, 8, 6)   // lens dark
-  r('#1a1610', 15, 19, 6, 3)   // lens reflection hint
-  // Right lens housing
-  r('#c0a880', 25, 17, 10, 8)  // frame
-  r('#100e0a', 26, 18, 8, 6)   // lens dark
-  r('#1a1610', 27, 19, 6, 3)   // lens reflection hint
-  // Bridge + temple arms
-  r('#c0a880', 23, 20, 2, 2)   // bridge
-  r('#a89470', 11, 20, 2, 2)   // left temple
-  r('#a89470', 35, 20, 2, 2)   // right temple
+  let clawLift = 0
+  if (lifting) clawLift = (gonzoSmokeCycle - 0.3) / 0.2
+  else if (inhaling) clawLift = 1.0
+  else if (lowering && gonzoSmokeCycle < 0.85) clawLift = 1.0 - (gonzoSmokeCycle - 0.7) / 0.15
+  const clawOff = Math.floor(clawLift * 14)
 
-  // ── FACE ──
-  r('#a88868', 19, 25, 10, 2)  // cheeks under glasses
-  r('#9a7a5c', 21, 27, 6, 2)   // upper nose
-  r('#8a6a4c', 22, 28, 5, 2)   // nose tip
-  r('#7a5e44', 23, 29, 4, 1)   // nose shadow
-
-  // ── MOUTH ──
-  r('#8a6e52', 20, 30, 8, 2)   // mouth area
-  r('#6a5038', 21, 31, 6, 1)   // lip shadow
-
-  // ── CIGARETTE HOLDER ── (angled down-right, long)
-  r('#e8dcc8', 28, 31, 2, 1)
-  r('#e0d4c0', 30, 32, 2, 1)
-  r('#dcd0bc', 32, 33, 2, 1)
-  r('#d8ccb8', 34, 34, 2, 1)
-  r('#d4c8b4', 36, 35, 3, 1)
-  r('#d0c4b0', 39, 36, 3, 1)
-  // Ember — bright, pulsing
-  const emberBright = 200 + Math.floor(Math.sin(gonzoTick * 0.2) * 55)
-  r(`rgb(255,${Math.floor(emberBright*0.5)},0)`, 42, 36, 3, 2)
-  r(`rgb(255,${Math.floor(emberBright*0.8)},${Math.floor(emberBright*0.3)})`, 43, 36, 1, 1)
-
-  // ── BANDANA / SCARF ──
-  r('#b8a088', 18, 32, 9, 2)
-  r('#a89078', 17, 34, 12, 2)
-  r('#c0a890', 19, 33, 2, 1)   // pattern dot
-  r('#c0a890', 23, 34, 2, 1)   // pattern dot
-  r('#c0a890', 26, 33, 2, 1)   // pattern dot
-
-  // ── JACKET ──
-  r('#1e1a14', 15, 36, 18, 4)
-  r('#1e1a14', 13, 39, 22, 4)
-  r('#1e1a14', 11, 43, 26, 5)
-  r('#1e1a14', 9, 47, 30, 6)
-  // Lapel lines
-  r('#2a241c', 18, 36, 2, 12)
-  r('#2a241c', 28, 36, 2, 12)
+  // ── JACKET / BODY (3/4 view — more visible on right side) ──
+  r('#2a2520', 10, 38, 28, 26)  // jacket body
+  r('#222018', 8, 42, 32, 22)   // wider below
+  r('#1e1c16', 6, 50, 36, 14)   // bottom
+  // Lapel detail — asymmetric for 3/4
+  r('#36322a', 15, 38, 2, 14)   // left lapel (far, narrower)
+  r('#36322a', 32, 38, 2, 14)   // right lapel (near)
   // Collar
-  r('#2e2820', 15, 36, 3, 2)
-  r('#2e2820', 30, 36, 3, 2)
+  r('#38342c', 12, 37, 4, 3)
+  r('#38342c', 30, 37, 5, 3)    // right collar wider (closer)
 
-  // ── LOBSTER CLAWS ──
-  // Left claw
-  r('#e86800', 4, 48, 6, 3)
-  r('#e86800', 2, 50, 5, 7)
-  r('#e86800', 7, 50, 4, 7)
-  r('#c05500', 3, 52, 3, 4)
-  r('#c05500', 8, 52, 2, 4)
-  r('#ff8c20', 4, 50, 2, 1)    // claw highlight
-  // Right claw
-  r('#e86800', 38, 48, 6, 3)
-  r('#e86800', 37, 50, 5, 7)
-  r('#e86800', 42, 50, 4, 7)
-  r('#c05500', 38, 52, 3, 4)
-  r('#c05500', 43, 52, 2, 4)
-  r('#ff8c20', 40, 50, 2, 1)   // claw highlight
+  // ── POLKA-DOT ASCOT/BANDANA (3/4 view) ──
+  r('#e8e0d0', 15, 34, 18, 5)   // white/cream base — wider right
+  r('#dcd4c4', 14, 35, 20, 4)
+  // Polka dots
+  const dotColor = '#4a4640'
+  for (let dy = 34; dy < 39; dy += 2) {
+    for (let dx = 15; dx < 33; dx += 3) {
+      r(dotColor, dx, dy, 1, 1)
+    }
+  }
+  // Lower ascot triangle
+  r('#e0d8c8', 18, 39, 12, 2)
+  r('#d8d0c0', 20, 41, 8, 1)
+  r('#d0c8b8', 22, 42, 4, 1)
+  for (let dx = 19; dx < 30; dx += 3) r(dotColor, dx, 39, 1, 1)
 
-  // ── LOBSTER LEGS ──
-  r('#e86800', 15, 54, 2, 6)
-  r('#e86800', 19, 55, 2, 6)
-  r('#e86800', 27, 55, 2, 6)
-  r('#e86800', 31, 54, 2, 6)
+  // ── HEAD — 3/4 side view, lobster shell red, facing right ──
+  // Head shape shifted left — more visible on right side (facing right)
+  shellTex(200, 70, 40, 12, 14, 20, 4)   // forehead
+  shellTex(195, 68, 38, 11, 18, 22, 8)   // face main — wider on right
+  shellTex(185, 62, 32, 12, 26, 20, 4)   // lower face
+  shellTex(175, 58, 30, 14, 30, 18, 4)   // chin/jaw — narrower, angled
+
+  // Lobster antennae/feelers — only visible on right side (facing direction)
+  shellTex(210, 80, 40, 32, 14, 4, 2)    // right feeler base
+  shellTex(200, 75, 38, 36, 13, 3, 1)    // right feeler mid
+  shellTex(195, 72, 36, 39, 12, 3, 1)    // right feeler
+  shellTex(190, 70, 35, 42, 11, 2, 1)    // right feeler tip
+  // Left feeler barely visible (behind head)
+  shellTex(180, 65, 35, 9, 16, 2, 1)
+
+  // ── HAT (tall bucket hat with horizontal stripes, 3/4 view) ──
+  // Crown — offset right to show the side angle
+  r('#b0a898', 14, 0, 20, 2)    // very top
+  r('#a8a090', 12, 2, 24, 2)    // upper crown
+  r('#b8b0a0', 11, 4, 26, 2)    // stripe light
+  r('#9a9488', 11, 6, 26, 2)    // stripe dark
+  r('#b0a898', 11, 8, 26, 2)    // stripe light
+  r('#9a9488', 11, 10, 26, 1)   // stripe dark thin
+  // Hat band
+  r('#706858', 10, 11, 28, 2)   // dark band
+  // Brim — wider on right side (perspective), angled
+  r('#b8b0a0', 5, 13, 36, 2)    // brim upper
+  r('#a8a090', 3, 14, 40, 1)    // brim lower wider
+  r('#989080', 4, 15, 38, 1)    // brim shadow
+
+  // ── $ SIGN on hat (more to the right, visible on the side) ──
+  r('#c8c0b0', 32, 3, 2, 1)
+  r('#c8c0b0', 31, 4, 4, 1)
+  r('#c8c0b0', 31, 5, 2, 1)
+  r('#c8c0b0', 31, 6, 4, 1)
+  r('#c8c0b0', 33, 7, 2, 1)
+  r('#c8c0b0', 31, 8, 4, 1)
+  r('#c8c0b0', 32, 9, 2, 1)
+
+  // ── SUNGLASSES (aviator, 3/4 view — right lens bigger/closer) ──
+  // Left lens (far side, partially hidden)
+  r('#d8d4cc', 11, 18, 8, 7)    // frame
+  r('#181410', 12, 19, 6, 5)    // dark lens
+  r('#222018', 13, 20, 3, 2)    // reflection
+  // Right lens (near side, larger)
+  r('#e0dcd4', 21, 17, 12, 8)   // white frame outer — bigger
+  r('#181410', 22, 18, 10, 6)   // dark lens
+  r('#282420', 24, 19, 5, 3)    // reflection
+  // Bridge
+  r('#d8d4cc', 19, 20, 2, 2)
+  // Temple arm (left side, visible)
+  r('#c0bcb4', 9, 20, 2, 1)
+
+  // ── NOSE — profile bump, protruding right ──
+  shellTex(188, 64, 34, 24, 26, 8, 3)    // nose bridge extending right
+  shellTex(180, 58, 30, 28, 27, 5, 2)    // nose tip
+  r('#140e08', 26, 28, 5, 1)             // nostril shadow
+
+  // ── MOUTH — slightly open when inhaling ──
+  if (inhaling) {
+    r('#3a1008', 22, 30, 8, 2)    // mouth open
+    r('#140e08', 23, 30, 6, 1)    // upper lip
+  } else {
+    r('#140e08', 22, 30, 8, 1)    // mouth line
+  }
+
+  // (cigarette is drawn between the right claw pincers — see below)
+
+  // ── LEFT CLAW (stationary, open pincer shape) ──
+  // Arm segment
+  shellTex(210, 78, 30, 5, 40, 8, 4)     // upper arm
+  shellTex(215, 82, 32, 3, 44, 10, 4)    // forearm
+  // Claw body — curved, wider
+  shellTex(225, 88, 35, 1, 48, 12, 4)    // claw palm
+  // Upper pincer — curved upward
+  shellTex(235, 95, 40, 0, 46, 4, 3)     // upper pincer base
+  shellTex(240, 100, 45, 0, 44, 3, 3)    // upper pincer tip (curves up)
+  r('#ff9030', 1, 44, 2, 1)              // highlight
+  // Lower pincer — curved downward
+  shellTex(235, 95, 40, 0, 52, 4, 3)     // lower pincer base
+  shellTex(240, 100, 45, 0, 55, 3, 3)    // lower pincer tip (curves down)
+  r('#ff9030', 1, 55, 2, 1)              // highlight
+  // Gap between pincers (the "V" opening)
+  r('#0b0906', 0, 49, 3, 3)
+  // Inner claw shadow
+  shellTex(180, 60, 25, 3, 49, 3, 3)
+  // Serrated edges
+  r('#c05500', 1, 47, 1, 1)
+  r('#c05500', 1, 53, 1, 1)
+
+  // ── RIGHT CLAW (animated — holds cigarette between pincers) ──
+  const rcY = 40 - clawOff  // claw rises when smoking
+  // Arm segment
+  shellTex(210, 78, 30, 35, rcY, 8, 4)
+  shellTex(215, 82, 32, 35, rcY+4, 10, 4)
+  // Claw body
+  shellTex(225, 88, 35, 35, rcY+8, 12, 4)
+  // Upper pincer
+  shellTex(235, 95, 40, 44, rcY+6, 4, 3)
+  shellTex(240, 100, 45, 45, rcY+4, 3, 3)
+  r('#ff9030', 45, rcY+4, 2, 1)
+  r('#c05500', 46, rcY+7, 1, 1)   // serrated edge
+
+  // ── CIGARETTE — held between the pincer tips ──
+  const cigY = rcY + 9  // sits right in the gap between pincers
+  const cigX = 44       // starts at pincer tip, extends outward
+  r('#e8e0d0', cigX, cigY, 2, 1)
+  r('#e0d8c8', cigX-2, cigY, 2, 1)
+  r('#ddd0c0', cigX-4, cigY, 2, 1)
+  r('#d8ccb8', cigX-6, cigY, 2, 1)
+  // Ember at the far tip
+  const emberBright = 200 + Math.floor(Math.sin(gonzoTick * 0.2) * 55)
+  const emberX = cigX - 7
+  const emberY = cigY
+  r(`rgb(255,${Math.floor(emberBright*0.5)},0)`, emberX, emberY, 2, 2)
+  r(`rgb(255,${Math.floor(emberBright*0.8)},${Math.floor(emberBright*0.3)})`, emberX, emberY, 1, 1)
+
+  // Lower pincer (drawn after cig so it overlaps slightly)
+  shellTex(235, 95, 40, 44, rcY+12, 4, 3)
+  shellTex(240, 100, 45, 45, rcY+14, 3, 3)
+  r('#ff9030', 45, rcY+14, 2, 1)
+  r('#c05500', 46, rcY+13, 1, 1)  // serrated edge
+  // Inner shadow in gap
+  shellTex(180, 60, 25, 42, rcY+10, 2, 2)
+
+  // ── LOBSTER LEGS (small, from jacket sides) ──
+  shellTex(200, 70, 30, 14, 56, 2, 8)
+  shellTex(200, 70, 30, 18, 57, 2, 7)
+  shellTex(200, 70, 30, 28, 57, 2, 7)
+  shellTex(200, 70, 30, 32, 56, 2, 8)
 }
 
 // ── Smoke particle system ────────────────────────────────────────
 function spawnSmoke() {
-  if (gonzoSmoke.length >= 100) return
-  // Spawn near ember: pixel (43,36) * 5 = (215, 180) on display canvas
+  if (gonzoSmoke.length >= 120) return
+  // Ember position tracks with the right claw (cig is between pincers)
+  const _isInhaling = gonzoSmokeCycle >= 0.5 && gonzoSmokeCycle < 0.7
+  const _clLift2 = (() => {
+    const sc = gonzoSmokeCycle
+    if (sc >= 0.3 && sc < 0.5) return (sc - 0.3) / 0.2
+    if (sc >= 0.5 && sc < 0.7) return 1.0
+    if (sc >= 0.7 && sc < 0.85) return 1.0 - (sc - 0.7) / 0.15
+    return 0
+  })()
+  const _rcY2 = 40 - Math.floor(_clLift2 * 14)
+  // Ember at pixel (37, _rcY2+9) * 5
+  const eSpawnX = 37 * 5
+  const eSpawnY = (_rcY2 + 9) * 5
+  // Smoke drifts UP and to the RIGHT — evoking a chart going up-and-to-the-right
+  // Less visible smoke when inhaling (being sucked in)
+  if (_isInhaling && Math.random() < 0.4) return
   gonzoSmoke.push({
-    x: 215 + (Math.random() - 0.3) * 12,
-    y: 180 + (Math.random() - 0.5) * 8,
-    vx: (Math.random() - 0.3) * 1.0,
-    vy: -(0.8 + Math.random() * 2.8),
+    x: eSpawnX + (Math.random() - 0.3) * 12,
+    y: eSpawnY + (Math.random() - 0.5) * 8,
+    vx: 0.5 + Math.random() * 1.5,           // always drifts RIGHT
+    vy: -(1.2 + Math.random() * 2.5),         // always drifts UP
     life: 1.0,
-    decay: 0.003 + Math.random() * 0.007,
+    decay: 0.003 + Math.random() * 0.006,
     size: 2 + Math.random() * 4,
     grow: 0.1 + Math.random() * 0.2,
     wobble: Math.random() * Math.PI * 2,
-    wobbleAmp: 0.4 + Math.random() * 1.0,
-    wobbleSpd: 0.02 + Math.random() * 0.06,
-    bright: Math.random() < 0.3  // some particles glow brighter
+    wobbleAmp: 0.3 + Math.random() * 0.6,     // less wobble for cleaner trajectory
+    wobbleSpd: 0.02 + Math.random() * 0.04,
+    bright: Math.random() < 0.3
   })
 }
 
 function renderSmoke(ctx) {
+  // Draw a faint "chart line" connecting smoke particles — up and to the right
+  // Sort by life (oldest = furthest traveled) to draw the trajectory
+  const sorted = [...gonzoSmoke].sort((a,b) => a.life - b.life)
+  if (sorted.length > 5) {
+    ctx.beginPath()
+    ctx.moveTo(205, 160) // start at ember
+    // Sample every few particles for a smooth curve
+    for (let i = 0; i < sorted.length; i += 3) {
+      const p = sorted[i]
+      ctx.lineTo(p.x, p.y)
+    }
+    ctx.strokeStyle = `rgba(232,104,0,0.06)`
+    ctx.lineWidth = 1.5
+    ctx.stroke()
+  }
+
   for (let i = gonzoSmoke.length - 1; i >= 0; i--) {
     const p = gonzoSmoke[i]
     p.wobble += p.wobbleSpd
@@ -1467,14 +2634,26 @@ function gonzoRender() {
     )
   }
 
-  // Ember glow (radial)
+  // Ember glow (radial) — follows cigarette ember dynamically
+  const _inh = gonzoSmokeCycle >= 0.5 && gonzoSmokeCycle < 0.7
+  const _clLift3 = (() => {
+    const sc = gonzoSmokeCycle
+    if (sc >= 0.3 && sc < 0.5) return (sc - 0.3) / 0.2
+    if (sc >= 0.5 && sc < 0.7) return 1.0
+    if (sc >= 0.7 && sc < 0.85) return 1.0 - (sc - 0.7) / 0.15
+    return 0
+  })()
+  const _egRcY = 40 - Math.floor(_clLift3 * 14)
+  const _egX = 37 * 5  // emberX pixel * scale
+  const _egY = (_egRcY + 9) * 5
   const eg = 0.12 + Math.sin(gonzoTick * 0.15) * 0.08
-  const grad = ctx.createRadialGradient(218, 183, 2, 218, 183, 30)
-  grad.addColorStop(0, `rgba(255,140,20,${eg + 0.1})`)
-  grad.addColorStop(0.5, `rgba(255,80,0,${eg})`)
+  const emberGlow = _inh ? eg + 0.15 : eg
+  const grad = ctx.createRadialGradient(_egX, _egY, 2, _egX, _egY, 35)
+  grad.addColorStop(0, `rgba(255,140,20,${emberGlow + 0.1})`)
+  grad.addColorStop(0.5, `rgba(255,80,0,${emberGlow})`)
   grad.addColorStop(1, 'rgba(255,60,0,0)')
   ctx.fillStyle = grad
-  ctx.fillRect(188, 153, 60, 60)
+  ctx.fillRect(_egX - 30, _egY - 30, 60, 60)
 
   // Spawn smoke — heavy, dramatic
   const rate = 3 + Math.floor(Math.abs(Math.sin(gonzoTick * 0.04)) * 3)
@@ -1605,7 +2784,7 @@ function drainTypeQueue() {
     committed.className = 'lo-entry'
     committed.innerHTML = `<div class="lo-entry-ts">${tsEl.textContent}</div><div class="lo-entry-text">${textEl.innerHTML.replace('<span class="lo-cursor"></span>','')}</div><div class="lo-entry-divider">── ○ ──</div>`
     body.insertBefore(committed, typingEntry)
-    body.scrollTop = 0
+    body.scrollTop = body.scrollHeight
   }
 
   tsEl.textContent  = ts
@@ -1638,8 +2817,8 @@ function loSyncStats(s) {
   set('loBlocked', s.blocked??'—')
   set('loFailed',  s.failed ??'—')
   set('loQueue',   s.queue  ??'—')
-  const p2=s.phase2||{}, done=p2.done??0, pct=p2.pct??0
-  set('loPhase', `${done}/10`)
+  const p2=s.phase2||{}, done=p2.done??0, pct=p2.pct??0, phase=p2.phase??2
+  set('loPhase', `P${phase}:${done}`)
   const fill = document.getElementById('loPhaseFill')
   if (fill) fill.style.width = pct+'%'
 }
@@ -1671,7 +2850,7 @@ function startLofi() {
     blocked: document.getElementById('sBlocked')?.textContent,
     failed:  document.getElementById('sFailed')?.textContent,
     queue:   document.getElementById('sQueue')?.textContent,
-    phase2:  { done: parseInt(document.getElementById('sPhase')?.textContent)||0, pct: parseInt(document.getElementById('phaseFill')?.style.width)||0 }
+    phase2:  { done: parseInt(document.getElementById('sPhase')?.textContent)||0, pct: parseInt(document.getElementById('phaseFill')?.style.width)||0, phase: currentPhaseNum, target: currentMilestoneTarget }
   })
 }
 
@@ -1680,6 +2859,503 @@ function stopLofi() {
   stopGonzo()
   if (glyphIv)      { clearInterval(glyphIv);      glyphIv      = null }
   if (clockIv)      { clearInterval(clockIv);      clockIv      = null }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// TOKEN USAGE METER
+// ══════════════════════════════════════════════════════════════════
+function formatTokens(n) {
+  if (n >= 1e9) return (n / 1e9).toFixed(1) + 'B'
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M'
+  if (n >= 1e3) return (n / 1e3).toFixed(0) + 'K'
+  return String(n)
+}
+
+async function refreshTokenMeter() {
+  try {
+    const r = await fetch('/api/claude-usage')
+    if (!r.ok) return
+    const d = await r.json()
+    if (d.error) return
+
+    const plan = (d.plan || 'max').toUpperCase()
+    document.getElementById('tokenPlan').textContent = `${plan} PLAN`
+
+    // Period usage — output tokens are the main constraint
+    const periodOut = d.period_usage?.output_tokens || 0
+    const periodTotal = d.period_usage?.total_tokens || 0
+    // Rough Max plan limit: ~45M output tokens per period (approximate)
+    const periodLimit = plan === 'MAX' ? 45000000 : 5000000
+    const periodPct = Math.min(100, (periodOut / periodLimit) * 100)
+    const periodFill = document.getElementById('tokenPeriodFill')
+    periodFill.style.width = periodPct + '%'
+    periodFill.className = 'token-track-fill ' + (periodPct > 85 ? 'critical' : periodPct > 60 ? 'warn' : 'ok')
+    document.getElementById('tokenPeriodVal').textContent = formatTokens(periodOut) + ' out'
+
+    // 5h window — output tokens
+    const windowOut = d.window?.output_tokens || 0
+    // Rough window limit: ~1M output tokens per 5h window
+    const windowLimit = plan === 'MAX' ? 1000000 : 200000
+    const windowPct = Math.min(100, (windowOut / windowLimit) * 100)
+    const windowFill = document.getElementById('tokenWindowFill')
+    windowFill.style.width = windowPct + '%'
+    windowFill.className = 'token-track-fill ' + (windowPct > 85 ? 'critical' : windowPct > 60 ? 'warn' : 'ok')
+    document.getElementById('tokenWindowVal').textContent = formatTokens(windowOut) + ' out'
+
+    // Reset countdown
+    const daysLeft = d.period?.days_remaining || 0
+    const hoursLeft = d.period?.hours_remaining || 0
+    document.getElementById('tokenResetTime').textContent = daysLeft > 0 ? `${daysLeft}d ${hoursLeft}h` : `${hoursLeft}h`
+
+  } catch(e) { /* silent fail */ }
+}
+
+// Refresh every 2 minutes
+refreshTokenMeter()
+setInterval(refreshTokenMeter, 120000)
+
+// ══════════════════════════════════════════════════════════════════
+// JORDAN TASKS
+// ══════════════════════════════════════════════════════════════════
+let jordanCache = []
+
+async function loadJordanTasks() {
+  try {
+    const r = await fetch('/api/queue')
+    if (!r.ok) throw new Error('failed')
+    const all = await r.json()
+    jordanCache = all.filter(t => t.status === 'waiting_on_jordan')
+    renderJordanTasks(jordanCache)
+  } catch(e) {
+    document.getElementById('jordanList').innerHTML = `<div class="empty"><span class="empty-char">💀</span>failed to load tasks</div>`
+  }
+}
+
+const PRIORITY_ORDER = { critical: 0, high: 1, medium: 2, low: 3 }
+
+function renderJordanTasks(tasks) {
+  const el = document.getElementById('jordanList')
+  document.getElementById('jordanCount').textContent = `${tasks.length} PENDING`
+
+  if (!tasks.length) {
+    el.innerHTML = `<div class="empty"><span class="empty-char">🏖️</span>nothing waiting on you<br><span style="color:var(--grey3);font-size:0.6rem">clawmpson is handling it</span></div>`
+    return
+  }
+
+  const sorted = [...tasks].sort((a, b) =>
+    (PRIORITY_ORDER[a.priority] ?? 4) - (PRIORITY_ORDER[b.priority] ?? 4)
+  )
+
+  el.innerHTML = sorted.map(t => {
+    const title = t.title || t.goal || t.task_id || '?'
+    const desc = t.description || t.goal || ''
+    const pri = t.priority || 'medium'
+    const priColor = pri==='critical'?'var(--neon-red)':pri==='high'?'var(--orange)':pri==='medium'?'var(--neon-cyan)':'var(--grey2)'
+    const added = t.added || ''
+    return `<div class="idea-card" style="border-left-color:${priColor}">
+      <div class="idea-top">
+        <div class="idea-title-text">${esc(title.replace(/^⚡\s*\[JORDAN\]\s*/,''))}</div>
+        <span class="idea-category" style="border-color:${priColor};color:${priColor}">${pri.toUpperCase()}</span>
+      </div>
+      ${desc ? `<div class="idea-summary">${esc(desc).slice(0,200)}</div>` : ''}
+      <div class="idea-meta">
+        ${added ? `<span>${added}</span>` : ''}
+        <span>status: NEEDS YOU</span>
+      </div>
+      <div class="idea-actions">
+        <button class="idea-btn approve" onclick="markJordanDone('${t.id||''}')">DONE</button>
+        <button class="idea-btn notes" onclick="snoozeJordanTask('${t.id||''}')">SNOOZE</button>
+      </div>
+    </div>`
+  }).join('')
+}
+
+async function markJordanDone(taskId) {
+  if (!taskId) return
+  try {
+    // Read pending.json, update status, write back
+    const r = await fetch('/api/jordan/done', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ task_id: taskId })
+    })
+    if (r.ok) {
+      toast('Task marked done', '✓')
+      await loadJordanTasks()
+    }
+  } catch(e) { toast('Failed to update', '💀') }
+}
+
+async function snoozeJordanTask(taskId) {
+  if (!taskId) return
+  try {
+    const r = await fetch('/api/jordan/snooze', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ task_id: taskId })
+    })
+    if (r.ok) {
+      toast('Snoozed — will remind you later', '😴')
+      await loadJordanTasks()
+    }
+  } catch(e) { toast('Failed to snooze', '💀') }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// IDEAS LAB
+// ══════════════════════════════════════════════════════════════════
+let ideasCache = []
+let ideasFilter = 'all'
+let activeRecorders = {}  // noteFormId -> { recorder, chunks, stream }
+let pendingMedia = {}     // noteFormId -> { images: [{b64, ext}], audio: {b64, ext} }
+
+async function loadIdeas() {
+  try {
+    const r = await fetch('/api/ideas')
+    if (!r.ok) throw new Error('failed')
+    ideasCache = await r.json()
+    renderIdeas()
+  } catch(e) {
+    document.getElementById('ideasList').innerHTML = `<div class="empty"><span class="empty-char">🦞</span>failed to load ideas</div>`
+  }
+}
+
+function filterIdeas(filter, btn) {
+  ideasFilter = filter
+  document.querySelectorAll('.ideas-filter').forEach(f => f.classList.remove('active'))
+  if (btn) btn.classList.add('active')
+  renderIdeas()
+}
+
+const IDEA_CAP = 100
+
+function renderIdeas() {
+  const el = document.getElementById('ideasList')
+
+  // Separate DQ'd (rejected) from active
+  const dqdAll = ideasCache.filter(i => i.status === 'rejected')
+  let active = ideasCache.filter(i => i.status !== 'rejected')
+
+  // Apply filter to active section only
+  let filtered = active
+  if (ideasFilter === 'pending' || ideasFilter === 'approved' || ideasFilter === 'in_production') {
+    filtered = active.filter(i => i.status === ideasFilter)
+  } else if (ideasFilter === 'product' || ideasFilter === 'arbitrage' || ideasFilter === 'research') {
+    filtered = active.filter(i => i.category === ideasFilter)
+  }
+
+  // No hard display cap — let the backlog grow
+  const displayed = filtered
+
+  // Update count badge — show pending count
+  const pendingCount = ideasCache.filter(i => i.status === 'pending').length
+  const countEl = document.getElementById('ideasCount')
+  if (countEl) countEl.textContent = `${pendingCount} pending · ${active.length} active`
+
+  // Toggle generate button state — throttle at 50+, hard stop at 100+
+  const genBtn = document.getElementById('generateMoreBtn')
+  if (genBtn) {
+    const atCap = pendingCount >= 100
+    const throttled = pendingCount >= 50
+    genBtn.disabled = atCap
+    genBtn.title = atCap ? `${pendingCount} pending — review some first` : throttled ? `${pendingCount} pending — Clawmpson throttled` : 'Generate a new batch of ideas'
+    genBtn.style.opacity = atCap ? '0.4' : throttled ? '0.6' : '1'
+    if (throttled && !atCap) genBtn.textContent = 'THROTTLED'
+    else genBtn.textContent = 'GENERATE MORE'
+  }
+
+  if (!displayed.length && !dqdAll.length) {
+    el.innerHTML = `<div class="empty"><span class="empty-char">🧠</span>no ideas${ideasFilter!=='all'?' matching filter':''}<br><span style="color:var(--grey3);font-size:0.6rem">time to research</span></div>`
+    return
+  }
+
+  let html = displayed.map(idea => makeIdeaCardHtml(idea)).join('')
+
+  // DQ section collated at bottom (only in 'all' filter)
+  if (dqdAll.length && ideasFilter === 'all') {
+    html += `<div style="margin-top:32px">
+      <div onclick="toggleDqdSection()" style="font-size:0.54rem;letter-spacing:3px;color:var(--grey2);padding:8px 0;border-bottom:1px solid var(--grey3);cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+        <span>DQ'D (${dqdAll.length})</span>
+        <span id="dqdToggleLabel" style="font-size:0.5rem">EXPAND</span>
+      </div>
+      <div id="dqdList" style="display:none">
+        ${dqdAll.map(idea => makeIdeaCardHtml(idea, true)).join('')}
+      </div>
+    </div>`
+  }
+
+  el.innerHTML = html
+}
+
+function toggleDqdSection() {
+  const list = document.getElementById('dqdList')
+  const label = document.getElementById('dqdToggleLabel')
+  if (!list) return
+  const open = list.style.display !== 'none'
+  list.style.display = open ? 'none' : 'block'
+  if (label) label.textContent = open ? 'EXPAND' : 'COLLAPSE'
+}
+
+function makeIdeaCardHtml(idea, isDq=false) {
+  const statusClass = idea.status || 'pending'
+  const noteCount = (idea.notes || []).length
+  const created = idea.created_at ? new Date(idea.created_at).toLocaleDateString() : ''
+  const notesHtml = renderNotes(idea)
+  const dimStyle = isDq ? 'opacity:0.45;' : ''
+  return `<div class="idea-card ${statusClass}" id="idea-${idea.id}" style="${dimStyle}">
+    <div class="idea-top">
+      <div class="idea-title-text">${esc(idea.title)}</div>
+      <span class="idea-category">${(idea.category||'product').toUpperCase()}</span>
+    </div>
+    ${idea.summary ? `<div class="idea-summary">${esc(idea.summary)}</div>` : ''}
+    <div class="idea-meta">
+      <span>${created}</span>
+      <span>source: ${idea.source || 'manual'}</span>
+      <span>status: ${(idea.status||'pending').toUpperCase()}</span>
+      ${noteCount ? `<span>${noteCount} note${noteCount!==1?'s':''}</span>` : ''}
+    </div>
+    <div class="idea-actions">
+      ${!isDq ? `<button class="idea-btn approve" onclick="approveIdea('${idea.id}')">APPROVE → PROJECT</button>` : ''}
+      ${!isDq ? `<button class="idea-btn reject" onclick="setIdeaStatus('${idea.id}','rejected')">DQ</button>` : ''}
+      ${isDq ? `<button class="idea-btn approve" onclick="setIdeaStatus('${idea.id}','pending')">RESTORE</button>` : ''}
+      <button class="idea-btn notes" onclick="toggleNotes('${idea.id}')">NOTES (${noteCount})</button>
+    </div>
+    <div class="idea-notes" id="notes-${idea.id}">
+      ${notesHtml}
+      <div class="note-form" id="noteForm-${idea.id}">
+        <textarea class="note-textarea" id="noteText-${idea.id}" placeholder="Add a note..."></textarea>
+        <div class="note-img-previews" id="notePreviews-${idea.id}"></div>
+        <div class="note-form-actions">
+          <button class="note-form-btn" onclick="submitNote('${idea.id}')">ADD NOTE</button>
+          <button class="note-form-btn" onclick="triggerImageUpload('${idea.id}')">IMAGE</button>
+          <input type="file" id="noteFileInput-${idea.id}" accept="image/*" multiple style="display:none" onchange="handleImageSelect('${idea.id}', this)">
+          <button class="note-form-btn" id="recBtn-${idea.id}" onclick="toggleRecording('${idea.id}')">RECORD VOICE</button>
+          <span class="note-audio-indicator" id="recIndicator-${idea.id}"></span>
+        </div>
+      </div>
+    </div>
+  </div>`
+}
+
+function esc(s) { const d=document.createElement('div'); d.textContent=s; return d.innerHTML }
+
+function renderNotes(idea) {
+  if (!idea.notes || !idea.notes.length) return ''
+  return idea.notes.map(n => {
+    const imgs = (n.images||[]).map(f => `<img class="note-img" src="/api/ideas/media/${f}" onclick="window.open('/api/ideas/media/${f}','_blank')">`).join('')
+    const audio = n.audio ? `<div class="note-audio"><audio controls src="/api/ideas/media/${n.audio}"></audio></div>` : ''
+    const ts = n.created_at ? new Date(n.created_at).toLocaleString() : ''
+    return `<div class="note-entry">
+      ${n.text ? `<div class="note-text">${esc(n.text)}</div>` : ''}
+      ${imgs ? `<div class="note-images">${imgs}</div>` : ''}
+      ${audio}
+      <div class="note-ts">${ts}</div>
+    </div>`
+  }).join('')
+}
+
+function toggleNotes(ideaId) {
+  const el = document.getElementById(`notes-${ideaId}`)
+  if (el) el.classList.toggle('open')
+}
+
+async function setIdeaStatus(ideaId, status) {
+  try {
+    await fetch(`/api/ideas/${ideaId}`, {
+      method: 'PATCH',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ status })
+    })
+    const statusEmoji = status === 'rejected' ? '✕' : '✓'
+    const statusLabel = status === 'rejected' ? 'DQ\'d' : status
+    toast(`${statusEmoji} Idea ${statusLabel}`, statusEmoji)
+    await loadIdeas()
+  } catch(e) { toast('Failed to update idea', '💀') }
+}
+
+async function approveIdea(ideaId) {
+  try {
+    const r = await fetch(`/api/ideas/${ideaId}/push`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+    })
+    const d = await r.json()
+    toast(`Approved → Project created, queued for Clawmpson`, '🚀')
+    await loadIdeas()
+    // Refresh projects if on that page
+    if (typeof loadProjects === 'function') loadProjects()
+  } catch(e) { toast('Failed to approve idea', '💀') }
+}
+
+async function generateMoreIdeas() {
+  const btn = document.getElementById('generateMoreBtn')
+  if (btn) { btn.disabled = true; btn.textContent = 'GENERATING...' }
+  try {
+    const r = await fetch('/api/ideas/generate', { method: 'POST' })
+    const d = await r.json()
+    if (d.status === 'at_cap') {
+      toast(`${d.active} pending — review/approve/DQ to open space`, '🧠')
+    } else if (d.status === 'throttled') {
+      toast(d.message, '🧠')
+    } else if (d.status === 'generating') {
+      toast('Idea engine running — check back in ~20 min', '🧠')
+    } else {
+      toast(d.message || 'Unknown status', '💀')
+    }
+  } catch(e) { toast('Failed to trigger idea engine', '💀') }
+  if (btn) { btn.disabled = false; btn.textContent = 'GENERATE MORE' }
+}
+
+function openNewIdeaModal() {
+  document.getElementById('newIdeaModal').classList.add('active')
+  document.getElementById('newIdeaTitle').value = ''
+  document.getElementById('newIdeaSummary').value = ''
+  document.getElementById('newIdeaCategory').value = 'product'
+  setTimeout(() => document.getElementById('newIdeaTitle').focus(), 100)
+}
+
+async function submitNewIdea() {
+  const title = document.getElementById('newIdeaTitle').value.trim()
+  const summary = document.getElementById('newIdeaSummary').value.trim()
+  const category = document.getElementById('newIdeaCategory').value
+  if (!title) { toast('Give it a title', '✏️'); return }
+  try {
+    await fetch('/api/ideas', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ title, summary, category, source: 'manual' })
+    })
+    document.getElementById('newIdeaModal').classList.remove('active')
+    toast('Idea logged', '🧠')
+    await loadIdeas()
+  } catch(e) { toast('Failed to create idea', '💀') }
+}
+
+// ── Image upload ────────────────────────────────────────────────
+function triggerImageUpload(ideaId) {
+  document.getElementById(`noteFileInput-${ideaId}`).click()
+}
+
+function handleImageSelect(ideaId, input) {
+  if (!pendingMedia[ideaId]) pendingMedia[ideaId] = { images: [], audio: null }
+  const previews = document.getElementById(`notePreviews-${ideaId}`)
+  Array.from(input.files).forEach(file => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const b64 = e.target.result.split(',')[1]
+      const ext = file.name.split('.').pop().toLowerCase() || 'png'
+      pendingMedia[ideaId].images.push({ b64, ext })
+      const img = document.createElement('img')
+      img.className = 'note-img-preview'
+      img.src = e.target.result
+      previews.appendChild(img)
+    }
+    reader.readAsDataURL(file)
+  })
+}
+
+// ── Audio recording ────────────────────────────────────────────
+async function toggleRecording(ideaId) {
+  const btn = document.getElementById(`recBtn-${ideaId}`)
+  const indicator = document.getElementById(`recIndicator-${ideaId}`)
+
+  if (activeRecorders[ideaId]) {
+    // Stop recording
+    const { recorder, stream } = activeRecorders[ideaId]
+    recorder.stop()
+    stream.getTracks().forEach(t => t.stop())
+    btn.textContent = 'RECORD VOICE'
+    btn.classList.remove('recording')
+    btn.classList.add('has-data')
+    indicator.textContent = 'voice note saved'
+    delete activeRecorders[ideaId]
+    return
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' })
+    const chunks = []
+    recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data) }
+    recorder.onstop = () => {
+      const blob = new Blob(chunks, { type: 'audio/webm' })
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        if (!pendingMedia[ideaId]) pendingMedia[ideaId] = { images: [], audio: null }
+        pendingMedia[ideaId].audio = { b64: e.target.result.split(',')[1], ext: 'webm' }
+      }
+      reader.readAsDataURL(blob)
+    }
+    recorder.start()
+    activeRecorders[ideaId] = { recorder, chunks, stream }
+    btn.textContent = 'STOP RECORDING'
+    btn.classList.add('recording')
+    indicator.textContent = 'recording...'
+  } catch(e) {
+    toast('Mic access denied', '🎙️')
+  }
+}
+
+// ── Submit note with media ──────────────────────────────────────
+async function submitNote(ideaId) {
+  const text = document.getElementById(`noteText-${ideaId}`).value.trim()
+  const media = pendingMedia[ideaId] || { images: [], audio: null }
+
+  if (!text && !media.images.length && !media.audio) {
+    toast('Write something or attach media', '✏️')
+    return
+  }
+
+  // Upload media first
+  const imageFilenames = []
+  for (const img of media.images) {
+    try {
+      const r = await fetch('/api/ideas/media', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ data: img.b64, ext: img.ext })
+      })
+      const d = await r.json()
+      imageFilenames.push(d.filename)
+    } catch(e) { console.error('image upload failed', e) }
+  }
+
+  let audioFilename = ''
+  if (media.audio) {
+    try {
+      const r = await fetch('/api/ideas/media', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ data: media.audio.b64, ext: media.audio.ext })
+      })
+      const d = await r.json()
+      audioFilename = d.filename
+    } catch(e) { console.error('audio upload failed', e) }
+  }
+
+  // Create note
+  try {
+    await fetch(`/api/ideas/${ideaId}/notes`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ text, images: imageFilenames, audio: audioFilename })
+    })
+    // Cleanup
+    delete pendingMedia[ideaId]
+    document.getElementById(`noteText-${ideaId}`).value = ''
+    document.getElementById(`notePreviews-${ideaId}`).innerHTML = ''
+    const recBtn = document.getElementById(`recBtn-${ideaId}`)
+    recBtn.textContent = 'RECORD VOICE'
+    recBtn.classList.remove('recording', 'has-data')
+    document.getElementById(`recIndicator-${ideaId}`).textContent = ''
+    toast('Note added', '📝')
+    await loadIdeas()
+    // Re-open the notes panel
+    setTimeout(() => {
+      const notesEl = document.getElementById(`notes-${ideaId}`)
+      if (notesEl) notesEl.classList.add('open')
+    }, 100)
+  } catch(e) { toast('Failed to add note', '💀') }
 }
 
 </script>

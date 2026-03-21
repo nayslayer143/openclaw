@@ -85,12 +85,39 @@ else
 fi
 
 # ---------------------------------------------------------------------------
+# Queue Runner — Clawmpson never sleeps
+# ---------------------------------------------------------------------------
+QUEUE_RUNNER="${OPENCLAW_ROOT:-$HOME/openclaw}/scripts/queue-runner.sh"
+if [[ -f "$QUEUE_RUNNER" ]]; then
+  if [[ -f "$HOME/openclaw/.queue-runner.pid" ]] && kill -0 "$(cat "$HOME/openclaw/.queue-runner.pid")" 2>/dev/null; then
+    echo "→ Queue runner: already running (PID $(cat "$HOME/openclaw/.queue-runner.pid"))"
+  else
+    nohup "$QUEUE_RUNNER" --max 3 > /dev/null 2>&1 &
+    echo "→ Queue runner: started (PID $!, max 3 concurrent)"
+  fi
+else
+  echo "→ Queue runner: not found at $QUEUE_RUNNER"
+fi
+
+# ---------------------------------------------------------------------------
+# Dashboard
+# ---------------------------------------------------------------------------
+if pgrep -f "openclaw/dashboard/server.py" >/dev/null 2>&1; then
+  echo "→ Dashboard: already running"
+else
+  cd "$HOME/openclaw/dashboard" && nohup python3 server.py > /dev/null 2>&1 &
+  echo "→ Dashboard: started on :7080 (PID $!)"
+fi
+
+# ---------------------------------------------------------------------------
 # Summary
 # ---------------------------------------------------------------------------
 echo ""
 echo "=== Stack Status ==="
-echo "  Ollama:   $(pgrep -x ollama >/dev/null && echo 'running' || echo 'NOT running')"
-echo "  Neo4j:    $(command -v neo4j &>/dev/null && echo 'installed' || echo 'not installed')"
-echo "  OpenClaw: $(command -v openclaw &>/dev/null && echo 'installed' || echo 'not installed')"
+echo "  Ollama:       $(pgrep -x ollama >/dev/null && echo 'running' || echo 'NOT running')"
+echo "  Neo4j:        $(command -v neo4j &>/dev/null && echo 'installed' || echo 'not installed')"
+echo "  OpenClaw:     $(command -v openclaw &>/dev/null && echo 'installed' || echo 'not installed')"
+echo "  Queue Runner: $(pgrep -f queue-runner.sh >/dev/null && echo 'running' || echo 'NOT running')"
+echo "  Dashboard:    $(pgrep -f 'dashboard/server.py' >/dev/null && echo 'running on :7080' || echo 'NOT running')"
 echo ""
-echo "Stack up. Morning brief at 8am."
+echo "Stack up. Clawmpson never sleeps."

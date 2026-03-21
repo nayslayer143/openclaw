@@ -5,8 +5,8 @@ Claude Code is the build plane. Local Ollama models handle all inference at zero
 Lobster runs deterministic workflows. Agents route tasks. Jordan approves via Telegram DM.
 
 **Strategy doc:** `~/openclaw/openclaw-v4.1-strategy.md`
-**Current phase:** Phase 0
-**Last updated:** 2026-03-19
+**Current phase:** Phase 4 (active 2026-03-20)
+**Last updated:** 2026-03-20
 
 ---
 
@@ -100,15 +100,24 @@ If you need upstream context, load only the specific artifact referenced in the 
 
 ## Model Assignment (confirmed by role-specialist bakeoff 2026-03-19)
 
-| Role | Model | Result |
-|------|-------|--------|
-| Orchestrator / Memory / Synthesis | `qwen3:32b` | 10/10 tool-calls, 2/2 memory tasks |
-| Research / Planning / Business | `qwen3:30b` | 3/3 research, 6/6 business — 2x faster than 32b |
-| Build / Code (primary) | `qwen3-coder-next` | 10/10 tool-calls, purpose-built agentic coder |
-| Build / Code (fallback) | `devstral-small-2` | 10/10 tool-calls, 16GB lightweight option |
-| Ops / Fast triage / Routing | `qwen2.5:7b` | 3/3 ops tasks, 18.6s avg — 4.5x faster than 32b |
-| Vision (Phase 3+) | `qwen3-vl:32b` | Activate in Phase 3 — not yet tested |
-| Embeddings | `nomic-embed-text` | Always loaded |
+| Role | Model | Size | Result |
+|------|-------|------|--------|
+| Orchestrator / Memory / Synthesis | `qwen3:32b` | 20 GB | 10/10 tool-calls, 2/2 memory tasks |
+| Research / Planning / Business | `qwen3:30b` | 18 GB | 3/3 research, 6/6 business — 2x faster than 32b |
+| Build / Code (primary) | `qwen3-coder-next` | 51 GB | 10/10 tool-calls, purpose-built agentic coder |
+| Build / Code (fallback) | `devstral-small-2` | 15 GB | 10/10 tool-calls, 16GB lightweight option |
+| Heavy code review / generation | `deepseek-coder:33b` | 18 GB | Available for code-heavy tasks |
+| Lightweight code tasks | `deepseek-coder:6.7b` | 3.8 GB | Fast code snippets and completions |
+| General fallback (heavyweight) | `llama3.1:70b` | 42 GB | Large general-purpose fallback |
+| High-quality writing / general | `llama3.3:70b` | 42 GB | Best quality, slowest throughput |
+| Mid-tier general | `qwen2.5:14b` | 9 GB | Balanced speed/quality general tasks |
+| General fallback | `qwen2.5:32b` | 19 GB | General-purpose fallback |
+| Ops / Fast triage / Routing | `qwen2.5:7b` | 4.7 GB | 3/3 ops tasks, 18.6s avg — 4.5x faster than 32b |
+| Ultra-fast triage / testing | `llama3.2:3b` | 2 GB | Fastest model — micro-tasks and smoke tests |
+| Vision (Phase 3+) | `qwen3-vl:32b` | 20 GB | Activate in Phase 3 — not yet tested |
+| Embeddings | `nomic-embed-text` | 274 MB | Always loaded |
+
+> **14 models total · ~264 GB local storage**
 
 ---
 
