@@ -30,6 +30,7 @@ lobster-workflows/
 ├── release-candidate.lobster   [Phase 2]
 ├── daily-market-intel.lobster  [Phase 3]
 ├── model-benchmark.lobster     [Phase 4]
+├── ralph-plan-build.lobster    [Phase 4] ← greenfield autonomous builds
 │
 │   # AutoResearch workflows (live in autoresearch/meta/, referenced here)
 └── autoresearch/meta/usecase-discovery.lobster  [cron: Mon 10pm]

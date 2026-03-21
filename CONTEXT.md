@@ -35,6 +35,7 @@ Do not load all workspaces at once.
 | Run a model bakeoff or evaluate the stack | `benchmark/CONTEXT.md` | Latest bakeoff doc, benchmark prompt set | Queue items, content outputs |
 | Draft or review a system improvement | `improvements/CONTEXT.md` | Proposal file, related memory summary | All active deliverables |
 | Run the build agent bridge (automated) | `lobster-workflows/build-agent-bridge.sh` | Task packet JSON from `repo-queue/` | Unrelated workspace docs |
+| Build a new project from scratch (greenfield) | `lobster-workflows/ralph-plan-build.lobster` | `specs/` for the project, `agents/configs/orchestrator.md` routing rules | Existing repo build logs |
 | Research: investing, Polymarket, financial signals | `autoresearch/domains/market-intel/config.md` | `autoresearch/core/pipeline.md`, `core/quality-standards.md` | Build artifacts, agent configs |
 | Research: blog, video, content ideation | `autoresearch/domains/content-research/config.md` | `autoresearch/core/pipeline.md`, writing-room voice (if drafting) | Financial data, academic sources |
 | Research: PhD-level paper or lit review | `autoresearch/domains/academic/config.md` | `autoresearch/core/pipeline.md`, `core/quality-standards.md` (strict) | Market intel, build logs |
@@ -96,9 +97,9 @@ routing ambiguity — that's a signal a new routing row is needed.
 |-------|--------|-------------------|
 | Phase 0 | [x] Complete | CLAUDE.md, CONTEXT.md |
 | Phase 1 | [x] Complete | + agents/, lobster-workflows/, repo-queue/, outputs/ |
-| Phase 2 | [ ] Active | + build-results/, memory/, benchmark/ |
-| Phase 3 | [ ] Locked | + mirofish/, revenue workflows |
-| Phase 4 | [ ] Locked | + improvements/, autoresearch/, Memory Librarian |
+| Phase 2 | [x] Complete | + build-results/, memory/, benchmark/ |
+| Phase 3 | [x] Active | + mirofish/, revenue workflows |
+| Phase 4 | [x] Active | + improvements/, autoresearch/, Memory Librarian, Ralph loop |
 
 Update the checkboxes as phases complete. The active phase row tells any session
 which workspace CONTEXT.md files exist and are safe to load.
