@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 """
 Clawmson reference / link ingestion.
 Fetches URLs, extracts readable text, summarizes via Ollama, stores in DB.
