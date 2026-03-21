@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 """
 Clawmson intent classifier.
 Primary: LLM-based classification via local Ollama (qwen2.5:7b).
 Fallback: regex/keyword matching if Ollama is unreachable.
 Media (images/audio/docs) is handled upstream before classify() is called.
 """
-from __future__ import annotations
 
 import os
 import re

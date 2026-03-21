@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 """
 Clawmson media handler.
 Downloads and processes photos, documents, voice, and audio from Telegram.
