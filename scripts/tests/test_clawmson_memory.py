@@ -123,5 +123,68 @@ class TestSensoryBuffer(unittest.TestCase):
         self.assertEqual(msgs[0]["content"], "hello there")
 
 
+# ── ShortTermMemory tests ────────────────────────────────────────────────────
+
+class TestShortTermMemory(unittest.TestCase):
+    def setUp(self):
+        """Fresh in-memory DB for each test."""
+        import importlib
+        import clawmson_db
+        importlib.reload(clawmson_db)
+        import clawmson_memory
+        importlib.reload(clawmson_memory)
+        from clawmson_memory import ShortTermMemory
+        self.stm = ShortTermMemory(max_rows=10, batch=5)
+
+    def _fill(self, chat_id, n):
+        import clawmson_db as db
+        for i in range(n):
+            db.save_message(chat_id, "user" if i % 2 == 0 else "assistant", f"msg {i}")
+
+    def test_stm_retrieve_empty(self):
+        """Returns empty string when no summaries exist."""
+        result = self.stm.retrieve("c1")
+        self.assertEqual(result, "")
+
+    def test_stm_summarize_triggers(self):
+        """Summarization fires and stores summary when active rows > max_rows."""
+        self._fill("c2", 12)  # > max_rows of 10
+        summary_text = "Test summary of conversation."
+        with patch("clawmson_memory._llm_text", return_value=summary_text):
+            self.stm.check_and_summarize("c2")
+        import clawmson_db as db
+        with db._get_conn() as conn:
+            rows = conn.execute(
+                "SELECT summary FROM stm_summaries WHERE chat_id='c2'"
+            ).fetchall()
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0][0], summary_text)
+
+    def test_stm_archives_correct_rows(self):
+        """Archives exactly batch-size oldest rows. Other chat_ids untouched. Archived rows preserved."""
+        import clawmson_db as db
+        self._fill("c3", 12)
+        self._fill("other", 3)  # different chat_id — must not be touched
+        with patch("clawmson_memory._llm_text", return_value="summary"):
+            self.stm.check_and_summarize("c3")
+        with db._get_conn() as conn:
+            archived_c3 = conn.execute(
+                "SELECT COUNT(*) FROM conversations WHERE chat_id='c3' AND archived=1"
+            ).fetchone()[0]
+            active_c3 = conn.execute(
+                "SELECT COUNT(*) FROM conversations WHERE chat_id='c3' AND archived=0"
+            ).fetchone()[0]
+            total_c3 = conn.execute(
+                "SELECT COUNT(*) FROM conversations WHERE chat_id='c3'"
+            ).fetchone()[0]
+            other_archived = conn.execute(
+                "SELECT COUNT(*) FROM conversations WHERE chat_id='other' AND archived=1"
+            ).fetchone()[0]
+        self.assertEqual(archived_c3, 5)     # batch size
+        self.assertEqual(active_c3, 7)       # 12 - 5
+        self.assertEqual(total_c3, 12)       # no hard deletes
+        self.assertEqual(other_archived, 0)  # other chat_id untouched
+
+
 if __name__ == "__main__":
     unittest.main()

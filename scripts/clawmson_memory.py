@@ -158,3 +158,75 @@ class SensoryBuffer:
             buf.append({"role": r["role"], "content": r["content"]})
         self._buffers[chat_id] = buf
         self._seeded.add(chat_id)
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# Layer 2 — ShortTermMemory
+# ════════════════════════════════════════════════════════════════════════════
+
+class ShortTermMemory:
+    """Rolling window of conversations in SQLite. Auto-summarizes when full."""
+
+    def __init__(self, max_rows: int = STM_MAX_ROWS, batch: int = STM_BATCH,
+                 retrieve_n: int = STM_RETRIEVE_N):
+        self._max_rows   = max_rows
+        self._batch      = batch
+        self._retrieve_n = retrieve_n
+
+    def check_and_summarize(self, chat_id: str):
+        """Called after each ingest. Archives oldest batch if active count > max_rows."""
+        with db._get_conn() as conn:
+            active = conn.execute(
+                "SELECT COUNT(*) FROM conversations WHERE chat_id=? AND archived=0",
+                (chat_id,)
+            ).fetchone()[0]
+            if active <= self._max_rows:
+                return
+            rows = conn.execute(
+                "SELECT id, content, role, timestamp FROM conversations"
+                " WHERE chat_id=? AND archived=0 ORDER BY id ASC LIMIT ?",
+                (chat_id, self._batch)
+            ).fetchall()
+
+        if not rows:
+            return
+
+        from_ts = rows[0]["timestamp"]
+        to_ts   = rows[-1]["timestamp"]
+        exchange_text = "\n".join(
+            f"{r['role'].capitalize()}: {r['content'][:200]}" for r in rows
+        )
+        prompt = (
+            f"Summarize these {len(rows)} conversation exchanges in 3-5 concise sentences. "
+            f"Focus on topics discussed, decisions made, and key information exchanged.\n\n"
+            f"{exchange_text}"
+        )
+        summary = _llm_text(prompt)
+        if not summary:
+            summary = f"(Summary unavailable for {len(rows)} messages from {from_ts[:10]})"
+
+        ids = [r["id"] for r in rows]
+        ts  = _now()
+        with db._get_conn() as conn:
+            conn.execute(
+                "INSERT INTO stm_summaries (chat_id, summary, from_ts, to_ts, timestamp)"
+                " VALUES (?, ?, ?, ?, ?)",
+                (chat_id, summary, from_ts, to_ts, ts)
+            )
+            conn.execute(
+                f"UPDATE conversations SET archived=1"
+                f" WHERE id IN ({','.join('?' * len(ids))})",
+                ids
+            )
+
+    def retrieve(self, chat_id: str) -> str:
+        """Return last N summaries as a single string, or '' if none."""
+        with db._get_conn() as conn:
+            rows = conn.execute(
+                "SELECT summary FROM stm_summaries WHERE chat_id=?"
+                " ORDER BY id DESC LIMIT ?",
+                (chat_id, self._retrieve_n)
+            ).fetchall()
+        if not rows:
+            return ""
+        return " ".join(r["summary"] for r in reversed(rows))
