@@ -195,8 +195,8 @@ def _classify_prompt(prompt: str) -> str:
 
 def route(
     prompt: str,
-    task_type: str = None,
-    intent: str = None,
+    task_type: str | None = None,
+    intent: str | None = None,
     has_image: bool = False,
 ) -> str:
     """
