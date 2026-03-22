@@ -64,8 +64,11 @@ def _parse_response(raw: str, task: str) -> dict:
             })
         if subtasks:
             return {"pattern": pattern, "subtasks": subtasks}
-    except (json.JSONDecodeError, KeyError, TypeError):
-        pass
+    except (json.JSONDecodeError, KeyError, TypeError) as e:
+        print(f"[decomposer] JSON parse failed: {e!r} — using fallback")
+
+    else:
+        print("[decomposer] LLM returned empty subtask list — using fallback")
 
     # Fallback: single SCOUT subtask
     agent = get_agent("SCOUT")
@@ -82,9 +85,10 @@ def decompose(task: str) -> dict:
     Returns {"pattern": str, "subtasks": list[dict]}.
     """
     prompt = _DECOMPOSE_PROMPT + task
-
     raw = run_agent("DECOMPOSER", _PRIMARY_MODEL, prompt)
     if raw.startswith("[ERROR]"):
+        print(f"[decomposer] Primary model failed: {raw} — retrying with fallback")
         raw = run_agent("DECOMPOSER", _FALLBACK_MODEL, prompt)
-
+    if raw.startswith("[ERROR]"):
+        print(f"[decomposer] Both models failed: {raw} — returning single-subtask fallback")
     return _parse_response(raw, task)
