@@ -3,6 +3,7 @@
 Polymarket feed — fetches market data from gamma-api.polymarket.com and caches to SQLite.
 """
 from __future__ import annotations
+import json
 import os
 import sqlite3
 import datetime
@@ -64,15 +65,47 @@ def fetch_markets(categories: list[str] | None = None) -> list[dict]:
             if volume < MIN_VOLUME:
                 continue
 
-            # Extract prices from tokens list
-            tokens = m.get("tokens", []) or []
+            # NEW: try outcomePrices/outcomes first (gamma API format), fall back to tokens
             yes_price = no_price = None
-            for tok in tokens:
-                outcome = (tok.get("outcome") or "").upper()
-                if outcome == "YES":
-                    yes_price = float(tok.get("price", 0) or 0)
-                elif outcome == "NO":
-                    no_price = float(tok.get("price", 0) or 0)
+
+            def _parse_json_field(val):
+                """Parse field that may be a JSON string or already a list."""
+                if isinstance(val, list):
+                    return val
+                if isinstance(val, str):
+                    try:
+                        return json.loads(val)
+                    except (ValueError, TypeError):
+                        pass
+                return []
+
+            outcome_prices = _parse_json_field(m.get("outcomePrices"))
+            outcomes = _parse_json_field(m.get("outcomes"))
+            if outcome_prices and outcomes:
+                for outcome_label, price_str in zip(outcomes, outcome_prices):
+                    label = (outcome_label or "").lower()
+                    try:
+                        price = float(price_str)
+                    except (ValueError, TypeError):
+                        continue
+                    if label == "yes":
+                        yes_price = price
+                    elif label == "no":
+                        no_price = price
+
+            # Fallback: tokens array (CLOB API format)
+            if yes_price is None or no_price is None:
+                tokens = m.get("tokens", []) or []
+                for tok in tokens:
+                    outcome = (tok.get("outcome") or "").upper()
+                    try:
+                        price = float(tok.get("price", 0) or 0)
+                    except (ValueError, TypeError):
+                        continue
+                    if outcome == "YES":
+                        yes_price = price
+                    elif outcome == "NO":
+                        no_price = price
 
             if yes_price is None or no_price is None:
                 continue
@@ -97,8 +130,9 @@ def fetch_markets(categories: list[str] | None = None) -> list[dict]:
                 "volume": volume, "end_date": end_date,
             })
 
-    # Filter by category (post-insert so cache is always populated)
-    filtered = [m for m in markets if not categories or m["category"] in categories]
+    # Filter by category (post-insert so cache is always populated).
+    # Markets with no category field pass through so an uncategorised API never returns empty.
+    filtered = [m for m in markets if not categories or not m["category"] or m["category"] in categories]
     print(f"[mirofish/feed] Fetched {len(markets)} markets, {len(filtered)} after category filter")
     return filtered
 
