@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-from __future__ import annotations
 """
 OpenClaw model router.
 Routes requests to the optimal Ollama model based on task type,
 current VRAM usage, and historical performance data.
 """
+from __future__ import annotations
 
 import os
 import json
