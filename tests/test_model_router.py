@@ -66,3 +66,45 @@ def test_init_db_creates_tables():
         assert "model_stats" in tables
     finally:
         os.unlink(tmp)
+
+
+def _mock_ps(loaded: list[str], vram_gb: float = 0.0):
+    """Helper: patch _get_ps to return given loaded models at given VRAM usage."""
+    size_vram = int(vram_gb * 1e9 / max(len(loaded), 1)) if loaded else 0
+    return {
+        "models": [
+            {"name": n, "size": size_vram, "size_vram": size_vram}
+            for n in loaded
+        ]
+    }
+
+def test_select_prefers_loaded_model():
+    with patch('model_router._get_ps', return_value=_mock_ps(["devstral-small-2"], 15.0)):
+        model = router._select_from_chain(
+            ["qwen3-coder-next", "devstral-small-2", "deepseek-coder:6.7b"],
+            vram_used_gb=15.0
+        )
+    assert model == "devstral-small-2"
+
+def test_select_falls_back_to_fits_in_vram():
+    # Nothing loaded, but 10GB free — deepseek-coder:6.7b (3.8GB) fits
+    with patch('model_router._get_ps', return_value=_mock_ps([], 80.0)):
+        model = router._select_from_chain(
+            ["qwen3-coder-next", "devstral-small-2", "deepseek-coder:6.7b"],
+            vram_used_gb=80.0
+        )
+    assert model == "deepseek-coder:6.7b"
+
+def test_select_unconditional_last_when_nothing_fits():
+    # 89.5 GB used, nothing loaded, nothing fits
+    with patch('model_router._get_ps', return_value=_mock_ps([], 89.5)):
+        model = router._select_from_chain(
+            ["qwen3-coder-next", "devstral-small-2", "deepseek-coder:6.7b"],
+            vram_used_gb=89.5
+        )
+    assert model == "deepseek-coder:6.7b"  # last in chain
+
+def test_select_single_model_chain():
+    with patch('model_router._get_ps', return_value=_mock_ps([], 50.0)):
+        model = router._select_from_chain(["qwen3-vl:32b"], vram_used_gb=50.0)
+    assert model == "qwen3-vl:32b"

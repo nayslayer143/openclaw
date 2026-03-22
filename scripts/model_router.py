@@ -112,6 +112,33 @@ def _get_vram_used_gb() -> float:
     return total / 1e9
 
 
+# ── Chain selection ───────────────────────────────────────────────────────────
+
+def _select_from_chain(chain: list[str], vram_used_gb: float) -> str:
+    """
+    Pick the best model from a fallback chain:
+    1. First model in chain that is currently loaded in Ollama
+    2. First model in chain that fits in remaining VRAM
+    3. Last model in chain unconditionally (Ollama handles load/evict)
+    """
+    loaded = set(get_loaded_models())
+    remaining = VRAM_CEILING_GB - vram_used_gb
+
+    # Pass 1: prefer already-loaded (no cold-load penalty)
+    for model in chain:
+        if model in loaded:
+            return model
+
+    # Pass 2: fits in remaining VRAM
+    for model in chain:
+        size = MODEL_SIZES_GB.get(model, 0.0)
+        if size <= remaining:
+            return model
+
+    # Pass 3: unconditional last resort
+    return chain[-1]
+
+
 # ── SQLite init ───────────────────────────────────────────────────────────────
 
 def _get_conn() -> sqlite3.Connection:
