@@ -53,7 +53,14 @@ _BUILD_HINTS    = ("code", "build", "write", "implement", "function", "script", 
 
 
 def get_agent(codename: str, task_hint: str = "") -> AgentDef:
-    """Return AgentDef for codename (case-insensitive). Falls back by task_hint keywords."""
+    """
+    Return AgentDef for codename (case-insensitive).
+    Unknown codename: fallback by task_hint keywords in priority order:
+      1. research/intel/market keywords → SCOUT
+      2. code/build/implement keywords → FORGE
+      3. everything else (including no hint) → AXIS
+    Overlapping hints always resolve to the first matching priority.
+    """
     upper = codename.upper()
     if upper in AGENTS:
         return AGENTS[upper]
