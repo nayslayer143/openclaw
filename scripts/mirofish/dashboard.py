@@ -62,8 +62,8 @@ def check_graduation() -> dict[str, Any]:
         peak = balances[0]
         for b in balances:
             peak = max(peak, b)
-            if peak > 0:
-                max_dd = max(max_dd, (peak - b) / peak)
+            dd = (peak - b) / peak if peak > 0 else 0.0
+            max_dd = max(max_dd, dd)
 
     criteria = {
         "min_history": has_min_history,
@@ -89,28 +89,26 @@ def check_graduation() -> dict[str, Any]:
 def maybe_snapshot(chat_id_for_notify: str | None = None) -> bool:
     """Write daily_pnl row if not written today. Returns True if snapshot written."""
     today = datetime.date.today().isoformat()
-    with _get_conn() as conn:
-        existing = conn.execute(
-            "SELECT id FROM daily_pnl WHERE date=?", (today,)
-        ).fetchone()
-
-    if existing:
-        return False
 
     import scripts.mirofish.paper_wallet as pw
     import scripts.mirofish.polymarket_feed as feed
 
-    prices = feed.get_latest_prices()
     state = pw.get_state()
+    prices = feed.get_latest_prices()
 
     with _get_conn() as conn:
+        existing = conn.execute(
+            "SELECT id FROM daily_pnl WHERE date=?", (today,)
+        ).fetchone()
+        if existing:
+            return False
+
         prev_row = conn.execute(
             "SELECT balance FROM daily_pnl ORDER BY date DESC LIMIT 1"
         ).fetchone()
-    prev_balance = prev_row["balance"] if prev_row else state["starting_balance"]
-    roi_pct = (state["balance"] - prev_balance) / prev_balance if prev_balance > 0 else 0.0
+        prev_balance = prev_row["balance"] if prev_row else state["starting_balance"]
+        roi_pct = (state["balance"] - prev_balance) / prev_balance if prev_balance > 0 else 0.0
 
-    with _get_conn() as conn:
         open_count = conn.execute(
             "SELECT COUNT(*) as cnt FROM paper_trades WHERE status='open'"
         ).fetchone()["cnt"]
@@ -121,7 +119,8 @@ def maybe_snapshot(chat_id_for_notify: str | None = None) -> bool:
             "SELECT COALESCE(SUM(pnl), 0) as s FROM paper_trades WHERE status != 'open'"
         ).fetchone()["s"]
         unrealized_pnl = state["balance"] - state["starting_balance"] - realized_pnl
-        conn.execute("""
+
+        cur = conn.execute("""
             INSERT OR IGNORE INTO daily_pnl
             (date, balance, open_positions, realized_pnl, unrealized_pnl,
              total_trades, win_rate, roi_pct)
@@ -129,27 +128,31 @@ def maybe_snapshot(chat_id_for_notify: str | None = None) -> bool:
         """, (today, state["balance"], open_count, realized_pnl,
               unrealized_pnl, total_trades, state["win_rate"], roi_pct))
 
+        if cur.rowcount == 0:
+            return False  # Lost the race — another process inserted first
+
     generate_report("daily")
 
     grad = check_graduation()
     if grad["ready"]:
+        should_notify = False
         with _get_conn() as conn:
             already_notified = conn.execute(
                 "SELECT value FROM context WHERE chat_id='mirofish' AND key='graduation_notified'"
             ).fetchone()
-        if not already_notified:
-            with _get_conn() as conn:
+            if not already_notified:
                 conn.execute("""
                     INSERT OR REPLACE INTO context (chat_id, key, value)
                     VALUES ('mirofish', 'graduation_notified', '1')
                 """)
-            if chat_id_for_notify:
-                _send_telegram(chat_id_for_notify,
-                    "MIROFISH: READY FOR LIVE TRADING\n"
-                    f"7d ROI: {grad['roi_7d']*100:.1f}% | "
-                    f"Win: {grad['win_rate']*100:.0f}% | "
-                    f"Sharpe: {grad['sharpe_all_time']:.2f} | "
-                    f"MaxDD: {grad['max_drawdown']*100:.1f}%")
+                should_notify = True
+        if should_notify and chat_id_for_notify:
+            _send_telegram(chat_id_for_notify,
+                "MIROFISH: READY FOR LIVE TRADING\n"
+                f"7d ROI: {grad['roi_7d']*100:.1f}% | "
+                f"Win: {grad['win_rate']*100:.0f}% | "
+                f"Sharpe: {grad['sharpe_all_time']:.2f} | "
+                f"MaxDD: {grad['max_drawdown']*100:.1f}%")
 
     if chat_id_for_notify:
         pnl_today = state["balance"] - prev_balance
@@ -175,6 +178,8 @@ def _send_telegram(chat_id: str, message: str) -> None:
     script = Path.home() / "openclaw" / "scripts" / "notify-telegram.sh"
     if script.exists():
         subprocess.run([str(script), message], timeout=30, capture_output=True)
+    else:
+        print(f"[dashboard] notify-telegram.sh not found at {script} — alert not sent")
 
 
 def generate_report(period: str = "daily") -> Path:
@@ -271,7 +276,7 @@ def format_pnl_message() -> str:
         f"Win rate: {state['win_rate']*100:.0f}% ({state['total_trades']} closed trades)",
         f"Balance: ${state['balance']:.2f}",
     ]
-    if state["sharpe_ratio"]:
+    if state["sharpe_ratio"] is not None:
         lines.append(f"Sharpe: {state['sharpe_ratio']:.2f}  |  Drawdown: {state['max_drawdown']*100:.1f}%")
     if grad["ready"]:
         lines.insert(0, "READY FOR LIVE TRADING")
