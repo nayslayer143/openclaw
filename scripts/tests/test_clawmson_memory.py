@@ -425,7 +425,7 @@ class TestMemoryManager(unittest.TestCase):
         slow_called = []
 
         def slow_llm(prompt):
-            time.sleep(0.2)
+            time.sleep(0.3)
             slow_called.append(True)
             return ""
 
@@ -437,8 +437,8 @@ class TestMemoryManager(unittest.TestCase):
             t0 = time.time()
             self.mm.ingest_async("c3", "assistant", "it broke prod login")
             elapsed = time.time() - t0
-        # Should return in well under 0.1s even though LLM sleeps 0.2s
-        self.assertLess(elapsed, 0.15)
+        # Should return in well under 0.2s even though LLM sleeps 0.3s
+        self.assertLess(elapsed, 0.2)
 
     def test_ingest_async_concurrent_no_duplicate_summaries(self):
         """Serial executor (max_workers=1) prevents duplicate STM summaries."""
@@ -473,7 +473,7 @@ class TestMemoryManager(unittest.TestCase):
                 "SELECT COUNT(*) FROM stm_summaries WHERE chat_id='c4'"
             ).fetchone()[0]
         # Serial executor means at most 1 summary per trigger
-        self.assertLessEqual(summaries, 2)
+        self.assertLessEqual(summaries, 1)
 
     def test_clear_layer(self):
         """clear() removes data from the specified layer only."""
