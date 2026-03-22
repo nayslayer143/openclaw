@@ -33,7 +33,7 @@ def _deps_satisfied(subtask: dict, bus) -> object:
     for dep_id in dep_ids:
         dep = bus.get_subtask(dep_id)
         if dep is None:
-            continue  # not yet inserted (hierarchy mid-run) — treat as pending
+            return False  # not yet inserted — treat as pending
         if dep["status"] == "complete":
             continue
         if dep["status"] == "failed":
@@ -79,7 +79,7 @@ def run_sequential(subtasks: List[dict], bus, runner: Callable = run_agent) -> L
     for subtask in subtasks:
         prompt = subtask["prompt"]
         if prior_result:
-            prompt = f"Prior step result:\n{prior_result}\n\n{prompt}"
+            prompt = f"Prior step result: {prior_result}\n\n{prompt}"
         enriched = {**subtask, "prompt": prompt}
         result = _run_subtask(enriched, bus, runner)
         prior_result = result
