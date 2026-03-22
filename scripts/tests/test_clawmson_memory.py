@@ -278,5 +278,88 @@ class TestSemanticMemory(unittest.TestCase):
         self.assertLessEqual(len(results), 5)
 
 
+class TestProceduralMemory(unittest.TestCase):
+    def setUp(self):
+        import importlib
+        import clawmson_db
+        importlib.reload(clawmson_db)
+        import clawmson_memory
+        importlib.reload(clawmson_memory)
+        from clawmson_memory import ProceduralMemory
+        self.proc = ProceduralMemory(threshold=3)
+        self._notifications = []
+
+    def _notify(self, chat_id, msg):
+        self._notifications.append((chat_id, msg))
+
+    def test_procedural_explicit(self):
+        """add_procedure() creates an active procedure immediately."""
+        import clawmson_db as db
+        pid = self.proc.add_procedure("c1", "scout X", "run research pipeline on X")
+        with db._get_conn() as conn:
+            row = conn.execute(
+                "SELECT status, created_by FROM procedures WHERE id=?", (pid,)
+            ).fetchone()
+        self.assertEqual(row["status"], "active")
+        self.assertEqual(row["created_by"], "explicit")
+
+    def test_procedural_candidate_tracking(self):
+        """3 occurrences of same pattern creates pending_approval procedure."""
+        for _ in range(3):
+            self.proc.track_candidate("c2", "BUILD_TASK", "build",
+                                      "build the contact form",
+                                      notify_fn=self._notify)
+        import clawmson_db as db
+        with db._get_conn() as conn:
+            pending = conn.execute(
+                "SELECT id FROM procedures WHERE chat_id='c2' AND status='pending_approval'"
+            ).fetchall()
+            candidates = conn.execute(
+                "SELECT count FROM procedure_candidates WHERE chat_id='c2'"
+            ).fetchall()
+        self.assertEqual(len(pending), 1)
+        self.assertEqual(len(candidates), 0)  # moved to procedures, removed from candidates
+        self.assertEqual(len(self._notifications), 1)
+
+    def test_procedural_approve_reject(self):
+        """Approve → active. Reject → tombstone (status=rejected, row kept)."""
+        import clawmson_db as db
+        pid = self.proc.add_procedure("c3", "trigger", "action")
+        with db._get_conn() as conn:
+            conn.execute("UPDATE procedures SET status='pending_approval' WHERE id=?", (pid,))
+        self.proc.approve_procedure("c3", pid)
+        with db._get_conn() as conn:
+            row = conn.execute("SELECT status FROM procedures WHERE id=?", (pid,)).fetchone()
+        self.assertEqual(row["status"], "active")
+
+        pid2 = self.proc.add_procedure("c3", "trigger2", "action2")
+        with db._get_conn() as conn:
+            conn.execute("UPDATE procedures SET status='pending_approval' WHERE id=?", (pid2,))
+        self.proc.reject_procedure("c3", pid2)
+        with db._get_conn() as conn:
+            row2 = conn.execute("SELECT status FROM procedures WHERE id=?", (pid2,)).fetchone()
+        self.assertIsNotNone(row2)  # row kept (tombstone)
+        self.assertEqual(row2["status"], "rejected")
+
+    def test_procedural_no_reproposal_after_reject(self):
+        """Rejected (intent, action) pair is not proposed again."""
+        import clawmson_db as db
+        # Insert a rejected tombstone procedure for "build" action
+        ts = _now()
+        with db._get_conn() as conn:
+            conn.execute(
+                "INSERT INTO procedures"
+                " (chat_id, trigger_pattern, action_description, created_by, status,"
+                "  occurrence_count, timestamp)"
+                " VALUES ('c4','build','build thing','proposed','rejected',3,?)",
+                (ts,)
+            )
+        # Now fire 3 candidate occurrences for the same (intent, action)
+        for _ in range(3):
+            self.proc.track_candidate("c4", "BUILD_TASK", "build",
+                                      "build it", notify_fn=self._notify)
+        self.assertEqual(len(self._notifications), 0)  # no re-proposal
+
+
 if __name__ == "__main__":
     unittest.main()
