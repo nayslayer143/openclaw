@@ -2,7 +2,6 @@
 from __future__ import annotations
 import os
 import sqlite3
-import tempfile
 from pathlib import Path
 from statistics import mean, stdev
 import pytest
@@ -12,23 +11,17 @@ import pytest
 def temp_db(tmp_path, monkeypatch):
     db = str(tmp_path / "test.db")
     monkeypatch.setenv("CLAWMSON_DB_PATH", db)
-    # Force re-import with new env var
+    # simulator.py has a module-level DB_PATH; flush it so migrate() picks up the new env var
     import sys
     for mod in list(sys.modules.keys()):
-        if "mirofish" in mod or "clawmson" in mod:
+        if "mirofish" in mod:
             del sys.modules[mod]
     import scripts.mirofish.simulator as sim
-    sim.DB_PATH = Path(db)
     sim.migrate()
     yield db
 
 
 def _get_wallet():
-    # Re-import after env var is set
-    import sys
-    for mod in list(sys.modules.keys()):
-        if "paper_wallet" in mod:
-            del sys.modules[mod]
     import scripts.mirofish.paper_wallet as pw
     return pw
 
@@ -190,3 +183,34 @@ def test_max_drawdown_calculation(temp_db):
     conn.commit(); conn.close()
     state = pw.get_state()
     assert state["max_drawdown"] == pytest.approx(0.2, rel=1e-3)
+
+
+def test_stop_loss_does_not_fire_above_threshold(temp_db):
+    pw = _get_wallet()
+    conn = sqlite3.connect(temp_db)
+    # YES 100 shares at 0.50, current 0.41 → pnl_pct = -18% — should NOT close
+    conn.execute("""
+        INSERT INTO paper_trades (id, market_id, question, direction, shares,
+         entry_price, amount_usd, status, opened_at)
+        VALUES (10, 'mkt10', 'no stop', 'YES', 100, 0.50, 50.0, 'open', '2026-01-01T00:00:00')
+    """)
+    conn.commit(); conn.close()
+    current_prices = {"mkt10": {"yes_price": 0.41, "no_price": 0.59}}
+    closed = pw.check_stops(current_prices)
+    assert len(closed) == 0
+
+
+def test_stop_loss_fires_well_inside_threshold(temp_db):
+    pw = _get_wallet()
+    conn = sqlite3.connect(temp_db)
+    # YES 100 shares at 0.50, current 0.30 → pnl_pct = -40% — should close
+    conn.execute("""
+        INSERT INTO paper_trades (id, market_id, question, direction, shares,
+         entry_price, amount_usd, status, opened_at)
+        VALUES (11, 'mkt11', 'deep loss', 'YES', 100, 0.50, 50.0, 'open', '2026-01-01T00:00:00')
+    """)
+    conn.commit(); conn.close()
+    current_prices = {"mkt11": {"yes_price": 0.30, "no_price": 0.70}}
+    closed = pw.check_stops(current_prices)
+    assert len(closed) == 1
+    assert closed[0]["status"] == "closed_loss"

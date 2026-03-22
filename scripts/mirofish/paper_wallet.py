@@ -11,8 +11,6 @@ from pathlib import Path
 from statistics import mean, stdev
 from typing import Any
 
-DB_PATH = Path(os.environ.get("CLAWMSON_DB_PATH", Path.home() / ".openclaw" / "clawmson.db"))
-
 STOP_LOSS_PCT    = float(os.environ.get("MIROFISH_STOP_LOSS_PCT",    "0.20"))
 TAKE_PROFIT_PCT  = float(os.environ.get("MIROFISH_TAKE_PROFIT_PCT",  "0.50"))
 MAX_POSITION_PCT = float(os.environ.get("MIROFISH_MAX_POSITION_PCT", "0.10"))
@@ -20,8 +18,9 @@ MIN_HISTORY_DAYS = int(os.environ.get("MIROFISH_MIN_HISTORY_DAYS", "14"))
 
 
 def _get_conn() -> sqlite3.Connection:
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(str(DB_PATH))
+    db_path = Path(os.environ.get("CLAWMSON_DB_PATH", Path.home() / ".openclaw" / "clawmson.db"))
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(str(db_path))
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")
     return conn
@@ -52,6 +51,7 @@ def _get_latest_prices() -> dict[str, dict]:
 def _compute_balance(starting: float, prices: dict[str, dict]) -> float:
     """Derive current balance from trade history + mark-to-market open positions."""
     with _get_conn() as conn:
+        # Includes closed_win, closed_loss, and expired — all have their final pnl stored at close time
         closed = conn.execute(
             "SELECT COALESCE(SUM(pnl), 0) as total FROM paper_trades WHERE status != 'open'"
         ).fetchone()["total"]
@@ -162,6 +162,7 @@ def check_stops(current_prices: dict[str, dict]) -> list[dict]:
     """
     now = datetime.datetime.utcnow()
     closed = []
+    closed_updates = []
 
     with _get_conn() as conn:
         open_trades = conn.execute("""
@@ -203,16 +204,17 @@ def check_stops(current_prices: dict[str, dict]) -> list[dict]:
         if should_close:
             status = "expired" if expired else ("closed_win" if unrealized_pnl >= 0 else "closed_loss")
             ts = now.isoformat()
-            with _get_conn() as conn:
-                conn.execute("""
-                    UPDATE paper_trades
-                    SET exit_price=?, pnl=?, status=?, closed_at=?
-                    WHERE id=?
-                """, (current_price, unrealized_pnl, status, ts, t["id"]))
+            closed_updates.append((current_price, unrealized_pnl, status, ts, t["id"]))
             closed.append({
                 "id": t["id"], "market_id": t["market_id"],
                 "status": status, "exit_price": current_price, "pnl": unrealized_pnl,
             })
+
+    if closed_updates:
+        with _get_conn() as conn:
+            conn.executemany("""
+                UPDATE paper_trades SET exit_price=?, pnl=?, status=?, closed_at=? WHERE id=?
+            """, closed_updates)
 
     return closed
 
