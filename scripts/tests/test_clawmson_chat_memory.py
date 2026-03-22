@@ -29,7 +29,8 @@ class TestChatMemoryContext(unittest.TestCase):
             captured.append(json)
             return self._mock_response("reply")
 
-        with patch("clawmson_chat.requests.post", side_effect=fake_post):
+        with patch("clawmson_chat.requests.post", side_effect=fake_post), \
+             patch("model_router.route", return_value="qwen2.5:7b"):
             import clawmson_chat
             clawmson_chat.chat([], "hello", memory_context="### Memory Context\nJordan prefers X")
 
@@ -47,7 +48,8 @@ class TestChatMemoryContext(unittest.TestCase):
             captured.append(json)
             return self._mock_response("reply")
 
-        with patch("clawmson_chat.requests.post", side_effect=fake_post):
+        with patch("clawmson_chat.requests.post", side_effect=fake_post), \
+             patch("model_router.route", return_value="qwen2.5:7b"):
             import clawmson_chat
             clawmson_chat.chat([], "hello")
 

@@ -56,6 +56,9 @@ _OLLAMA_ERROR_PREFIXES = (
     "Chat error",
 )
 
+import clawmson_memory as mem_module
+_memory = mem_module.memory  # module-level singleton
+
 # ── Config ────────────────────────────────────────────────────────────────────
 
 OPENCLAW_ROOT  = Path.home() / "openclaw"
@@ -324,6 +327,69 @@ def handle_references(chat_id: str):
     send(chat_id, refs.format_references(ref_list))
 
 
+
+def handle_memory(chat_id: str, query: str = ""):
+    """Show current memory context for this chat."""
+    ctx = _memory.retrieve(chat_id, query)
+    send(chat_id, ctx if ctx else "Memory is empty.")
+
+
+def handle_memory_stats(chat_id: str):
+    """Show counts per memory layer."""
+    stats = _memory.stats(chat_id)
+    lines = ["Memory stats:"]
+    for layer, count in stats.items():
+        lines.append(f"  {layer}: {count}")
+    send(chat_id, "\n".join(lines))
+
+
+def handle_forget_memory(chat_id: str, layer: str = "all"):
+    """Clear one or all memory layers."""
+    valid_layers = {"all", "stm", "episodic", "semantic", "procedural"}
+    if layer not in valid_layers:
+        send(chat_id, f"Unknown layer '{layer}'. Valid: {', '.join(sorted(valid_layers))}")
+        return
+    _memory.clear(chat_id, layer=layer)
+    send(chat_id, f"Memory layer '{layer}' cleared.")
+
+
+def handle_remember(chat_id: str, args: str):
+    """Store an explicit semantic fact. Usage: /remember key: value"""
+    if ":" not in args:
+        send(chat_id, "Usage: /remember <key>: <value>")
+        return
+    key, _, value = args.partition(":")
+    key   = key.strip()
+    value = value.strip()
+    if not key or not value:
+        send(chat_id, "Usage: /remember <key>: <value>")
+        return
+    _memory._semantic.ingest_explicit(chat_id, key, value)
+    send(chat_id, f"Remembered: {key} = {value}")
+
+
+def handle_approve_proc(chat_id: str, proc_id_str: str):
+    """Approve a proposed procedure. Usage: /approve-proc <id>"""
+    try:
+        proc_id = int(proc_id_str.strip())
+    except ValueError:
+        send(chat_id, "Usage: /approve-proc <id>")
+        return
+    _memory.approve_procedure(chat_id, proc_id)
+    send(chat_id, f"Procedure {proc_id} approved.")
+
+
+def handle_reject_proc(chat_id: str, proc_id_str: str):
+    """Reject a proposed procedure. Usage: /reject-proc <id>"""
+    try:
+        proc_id = int(proc_id_str.strip())
+    except ValueError:
+        send(chat_id, "Usage: /reject-proc <id>")
+        return
+    _memory.reject_procedure(chat_id, proc_id)
+    send(chat_id, f"Procedure {proc_id} rejected.")
+
+
 # ── Direct command execution ──────────────────────────────────────────────────
 
 def handle_direct_command(chat_id: str, text: str):
@@ -351,10 +417,12 @@ def _conversation_thread(chat_id: str, effective_text: str,
                          has_image: bool, intent: str = None):
     """Called in a background thread. Fetches Ollama reply and sends it."""
     send_typing(chat_id)
-    history    = db.get_history(chat_id, limit=50)
-    model_name = router.route(effective_text, intent=intent, has_image=has_image)
+    history        = _memory.sensory(chat_id)
+    memory_context = _memory.retrieve(chat_id, effective_text)
+    model_name     = router.route(effective_text, intent=intent, has_image=has_image)
     t0    = time.monotonic()
-    reply = llm.chat(history, effective_text, has_image=has_image, model=model_name)
+    reply = llm.chat(history, effective_text, has_image=has_image,
+                     model=model_name, memory_context=memory_context)
     elapsed_ms = (time.monotonic() - t0) * 1000
 
     success = not any(reply.startswith(e) for e in _OLLAMA_ERROR_PREFIXES)
@@ -363,8 +431,8 @@ def _conversation_thread(chat_id: str, effective_text: str,
     )
     router.record_result(model_name, task_type, elapsed_ms, success=success)
 
-    db.save_message(chat_id, "assistant", reply)
     send(chat_id, reply)
+    _memory.ingest_async(chat_id, "assistant", reply)
 
 
 def dispatch_conversation(chat_id: str, effective_text: str,
@@ -456,6 +524,29 @@ def handle_message(msg: dict):
         if lower == "/references":
             handle_references(chat_id)
             return
+        if lower == "/memory-stats":
+            handle_memory_stats(chat_id)
+            return
+        if lower.startswith("/memory"):
+            query = text[len("/memory"):].strip()
+            handle_memory(chat_id, query)
+            return
+        if lower.startswith("/forget-memory"):
+            layer = text[len("/forget-memory"):].strip() or "all"
+            handle_forget_memory(chat_id, layer)
+            return
+        if lower.startswith("/remember "):
+            args = text[len("/remember "):].strip()
+            handle_remember(chat_id, args)
+            return
+        if lower.startswith("/approve-proc"):
+            proc_id_str = text[len("/approve-proc"):].strip()
+            handle_approve_proc(chat_id, proc_id_str)
+            return
+        if lower.startswith("/reject-proc"):
+            proc_id_str = text[len("/reject-proc"):].strip()
+            handle_reject_proc(chat_id, proc_id_str)
+            return
         if lower.startswith("/approve"):
             raw = text.strip()
             if raw.lower().startswith("/approve-"):
@@ -500,6 +591,7 @@ def handle_message(msg: dict):
 
     db.save_message(chat_id, "user", effective_text,
                     message_id=msg_id, media_type=media_type)
+    _memory._sensory.push(chat_id, "user", effective_text)
 
     # ── 5. Classify and route (LLM-powered, regex fallback) ─────────────────
     # Media messages (image/audio/doc content) always go to conversation,
@@ -527,6 +619,13 @@ def handle_message(msg: dict):
     intent = result["intent"]
     print(f"[dispatcher] intent={intent} confidence={result.get('confidence', '?')} "
           f"source={result.get('_source', '?')}")
+
+    # Track procedure candidates for auto-learning
+    action = result.get("action")
+    if intent == intents.BUILD_TASK and action:
+        _memory.track_procedure_candidate(
+            chat_id, intent, action, effective_text[:100]
+        )
 
     # ── UNCLEAR: ask one clarifying question, then wait ───────────────────
     if intent == intents.UNCLEAR and result.get("needs_clarification"):
