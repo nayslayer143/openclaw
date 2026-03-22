@@ -65,6 +65,10 @@ def cmd_dry_run(task: str, pattern):
 
 def cmd_resume(args):
     swarm_id = args.resume
+    # Whitelist: only allow swarm ID characters (lowercase alnum and hyphens)
+    if not re.match(r'^[a-z0-9\-]+$', swarm_id):
+        print(f"[ERROR] Invalid swarm ID format: {swarm_id!r}", file=sys.stderr)
+        sys.exit(1)
     print(f"Resuming swarm: {swarm_id}")
     resume_swarm(swarm_id, notify=args.notify)
     swarm = bus.get_swarm(swarm_id)

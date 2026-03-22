@@ -421,6 +421,7 @@ def handle_message(msg: dict):
                 send(chat_id, "Usage: !swarm <task description>")
                 return
             log_path = OPENCLAW_ROOT / "logs" / f"clawteam-{datetime.date.today()}.log"
+            log_path.parent.mkdir(parents=True, exist_ok=True)
             with open(log_path, "a") as log_file:
                 subprocess.Popen(
                     [sys.executable, str(CLAWTEAM), "--task", task, "--notify"],
