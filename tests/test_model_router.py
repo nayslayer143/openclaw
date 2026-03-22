@@ -142,3 +142,40 @@ def test_route_unknown_intent_defaults_to_chat():
         with patch('model_router._log_routing'):
             model = router.route("yo", intent="UNKNOWN_THING")
     assert model == "qwen2.5:7b"
+
+def test_record_result_updates_stats():
+    with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
+        tmp = f.name
+    try:
+        with patch.object(router, 'DB_PATH', Path(tmp)):
+            router._init_db()
+            router.record_result("qwen2.5:7b", "chat", 1000.0, success=True)
+            router.record_result("qwen2.5:7b", "chat",  500.0, success=True)
+            stats = router.get_stats()
+        row = next(r for r in stats if r["model"] == "qwen2.5:7b" and r["task_type"] == "chat")
+        assert row["call_count"] == 2
+        assert row["success_count"] == 2
+        # CMA: first call stores 1000.0; second: (1000.0 * 1 + 500.0) / 2 = 750.0
+        assert abs(row["avg_latency_ms"] - 750.0) < 0.01
+    finally:
+        os.unlink(tmp)
+
+def test_record_result_tracks_failures():
+    with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
+        tmp = f.name
+    try:
+        with patch.object(router, 'DB_PATH', Path(tmp)):
+            router._init_db()
+            router.record_result("qwen2.5:7b", "chat", 100.0, success=False)
+            router.record_result("qwen2.5:7b", "chat", 200.0, success=True)
+            stats = router.get_stats()
+        row = next(r for r in stats if r["model"] == "qwen2.5:7b")
+        assert row["call_count"] == 2
+        assert row["success_count"] == 1
+    finally:
+        os.unlink(tmp)
+
+def test_record_result_silently_survives_db_error():
+    # Should not raise even if DB is broken
+    with patch('model_router._get_conn', side_effect=Exception("db gone")):
+        router.record_result("qwen2.5:7b", "chat", 100.0)  # must not raise
