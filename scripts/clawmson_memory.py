@@ -159,6 +159,12 @@ class SensoryBuffer:
         self._buffers[chat_id] = buf
         self._seeded.add(chat_id)
 
+    def clear(self, chat_id: str):
+        """Remove chat_id from RAM buffer and seed set."""
+        with self._lock:
+            self._buffers.pop(chat_id, None)
+            self._seeded.discard(chat_id)
+
 
 # ════════════════════════════════════════════════════════════════════════════
 # Layer 2 — ShortTermMemory
@@ -615,14 +621,16 @@ class MemoryManager:
         to the background serial executor. Call AFTER send().
         """
         self._sensory.push(chat_id, role, content)
-        self._executor.submit(self._full_ingest_wrapper, chat_id, role, content)
+        fut = self._executor.submit(self._full_ingest_wrapper, chat_id, role, content)
+        fut.add_done_callback(
+            lambda f: f.exception() and print(f"[memory/ingest] background error: {f.exception()}")
+        )
 
     def _full_ingest_wrapper(self, chat_id: str, role: str, content: str):
         """
         Background task: save to DB, run STM check, trigger episodic+semantic ingest.
         Only runs full ingest when we have a user+assistant pair (role==assistant).
         """
-        import clawmson_db as db
         db.save_message(chat_id, role, content)
 
         if role != "assistant":
@@ -662,7 +670,6 @@ class MemoryManager:
 
     def stats(self, chat_id: str) -> dict:
         """Return dict of counts per layer for the given chat_id."""
-        import clawmson_db as db
         with db._get_conn() as conn:
             stm_count = conn.execute(
                 "SELECT COUNT(*) FROM stm_summaries WHERE chat_id=?", (chat_id,)
@@ -687,7 +694,11 @@ class MemoryManager:
 
     def clear(self, chat_id: str, layer: str = "all"):
         """Clear one or all layers for chat_id. layer: 'stm'|'episodic'|'semantic'|'procedural'|'all'"""
-        import clawmson_db as db
+        # Drain the executor queue to prevent in-flight tasks from re-writing after clear
+        try:
+            self._executor.submit(lambda: None).result(timeout=5)
+        except Exception:
+            pass
         tables = {
             "stm":        "stm_summaries",
             "episodic":   "episodic_memories",
@@ -700,9 +711,7 @@ class MemoryManager:
                 conn.execute(f"DELETE FROM {tbl} WHERE chat_id=?", (chat_id,))
         # Also clear sensory buffer in RAM
         if layer == "all":
-            with self._sensory._lock:
-                self._sensory._buffers.pop(chat_id, None)
-                self._sensory._seeded.discard(chat_id)
+            self._sensory.clear(chat_id)
 
 
 # ── Module-level singleton ─────────────────────────────────────────────────
