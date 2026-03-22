@@ -102,6 +102,6 @@ def test_output_contract_schema(bus, output_dir):
          patch("clawteam.orchestrator.BUILD_RESULTS_DIR", output_dir):
         swarm_id = run_swarm("schema test", pattern="sequential", bus=bus)
     contract = json.loads((output_dir / swarm_id / "output-contract.json").read_text())
-    for key in ("swarm_id", "task", "pattern", "status", "created_at", "subtask_ids",
-                "subtask_statuses", "result_file"):
+    for key in ("swarm_id", "task", "pattern", "status", "created_at", "completed_at",
+                "subtask_ids", "subtask_statuses", "result_file"):
         assert key in contract, f"Missing key: {key}"
