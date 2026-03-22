@@ -192,6 +192,10 @@ def resume_swarm(swarm_id: str, bus=None, notify: bool = False) -> str:
                                   synthesizer=lambda c: _synthesize(c))
             synthesis = result["synthesis"]
 
+    else:
+        # No pending subtasks — restore synthesis from prior completed run
+        synthesis = swarm.get("result") or ""
+
     all_subtasks = bus.list_subtasks(swarm_id)
     completed = [s for s in all_subtasks if s["status"] == "complete"]
     status = "complete" if completed and not synthesis.startswith("[ERROR]") else "partial"
