@@ -7,6 +7,7 @@ WAL mode enabled for safe concurrent reads/writes from ThreadPoolExecutor.
 import os
 import sqlite3
 import datetime
+import threading
 from pathlib import Path
 from typing import Optional, List
 
@@ -14,6 +15,7 @@ DB_PATH = Path(os.environ.get("CLAWMSON_DB_PATH",
                Path.home() / ".openclaw" / "clawmson.db"))
 
 _conn: Optional[sqlite3.Connection] = None
+_lock = threading.Lock()
 
 
 def _get_conn() -> sqlite3.Connection:  # type: ignore[return]
@@ -75,11 +77,12 @@ def _now() -> str:
 
 def create_swarm(swarm_id: str, task: str, pattern: str) -> None:
     conn = _get_conn()
-    conn.execute(
-        "INSERT INTO ct_swarms (id, task, pattern, status, created_at) VALUES (?,?,?,'pending',?)",
-        (swarm_id, task, pattern, _now())
-    )
-    conn.commit()
+    with _lock:
+        conn.execute(
+            "INSERT INTO ct_swarms (id, task, pattern, status, created_at) VALUES (?,?,?,'pending',?)",
+            (swarm_id, task, pattern, _now())
+        )
+        conn.commit()
 
 
 def get_swarm(swarm_id: str) -> Optional[dict]:
@@ -92,11 +95,14 @@ def get_swarm(swarm_id: str) -> Optional[dict]:
 def update_swarm_status(swarm_id: str, status: str, result: Optional[str] = None) -> None:
     conn = _get_conn()
     completed_at = _now() if status in ("complete", "partial", "failed") else None
-    conn.execute(
-        "UPDATE ct_swarms SET status=?, result=?, completed_at=? WHERE id=?",
-        (status, result, completed_at, swarm_id)
-    )
-    conn.commit()
+    with _lock:
+        cur = conn.execute(
+            "UPDATE ct_swarms SET status=?, result=?, completed_at=? WHERE id=?",
+            (status, result, completed_at, swarm_id)
+        )
+        if cur.rowcount == 0:
+            raise ValueError(f"update_swarm_status: no swarm with id={swarm_id!r}")
+        conn.commit()
 
 
 def list_swarms(limit: int = 10) -> List[dict]:
@@ -112,12 +118,13 @@ def list_swarms(limit: int = 10) -> List[dict]:
 def insert_subtask(subtask_id: str, swarm_id: str, agent: str, model: str,
                    prompt: str, depends_on: Optional[str]) -> None:
     conn = _get_conn()
-    conn.execute(
-        "INSERT INTO ct_subtasks (id, swarm_id, agent, model, prompt, depends_on, status)"
-        " VALUES (?,?,?,?,?,?,'pending')",
-        (subtask_id, swarm_id, agent, model, prompt, depends_on)
-    )
-    conn.commit()
+    with _lock:
+        conn.execute(
+            "INSERT INTO ct_subtasks (id, swarm_id, agent, model, prompt, depends_on, status)"
+            " VALUES (?,?,?,?,?,?,'pending')",
+            (subtask_id, swarm_id, agent, model, prompt, depends_on)
+        )
+        conn.commit()
 
 
 def get_subtask(subtask_id: str) -> Optional[dict]:
@@ -137,40 +144,50 @@ def list_subtasks(swarm_id: str) -> List[dict]:
 def update_subtask_status(subtask_id: str, status: str) -> None:
     conn = _get_conn()
     started_at = _now() if status == "running" else None
-    conn.execute(
-        "UPDATE ct_subtasks SET status=?, started_at=COALESCE(started_at, ?) WHERE id=?",
-        (status, started_at, subtask_id)
-    )
-    conn.commit()
+    with _lock:
+        cur = conn.execute(
+            "UPDATE ct_subtasks SET status=?, started_at=COALESCE(started_at, ?) WHERE id=?",
+            (status, started_at, subtask_id)
+        )
+        if cur.rowcount == 0:
+            raise ValueError(f"update_subtask_status: no subtask with id={subtask_id!r}")
+        conn.commit()
 
 
 def complete_subtask(subtask_id: str, result: str) -> None:
     conn = _get_conn()
-    conn.execute(
-        "UPDATE ct_subtasks SET status='complete', result=?, completed_at=? WHERE id=?",
-        (result, _now(), subtask_id)
-    )
-    conn.commit()
+    with _lock:
+        cur = conn.execute(
+            "UPDATE ct_subtasks SET status='complete', result=?, completed_at=? WHERE id=?",
+            (result, _now(), subtask_id)
+        )
+        if cur.rowcount == 0:
+            raise ValueError(f"complete_subtask: no subtask with id={subtask_id!r}")
+        conn.commit()
 
 
 def fail_subtask(subtask_id: str) -> None:
     conn = _get_conn()
-    conn.execute(
-        "UPDATE ct_subtasks SET status='failed', completed_at=? WHERE id=?",
-        (_now(), subtask_id)
-    )
-    conn.commit()
+    with _lock:
+        cur = conn.execute(
+            "UPDATE ct_subtasks SET status='failed', completed_at=? WHERE id=?",
+            (_now(), subtask_id)
+        )
+        if cur.rowcount == 0:
+            raise ValueError(f"fail_subtask: no subtask with id={subtask_id!r}")
+        conn.commit()
 
 
 def reset_running_subtasks(swarm_id: str) -> None:
     """Resume logic: reset any interrupted (running) subtasks back to pending."""
     conn = _get_conn()
-    conn.execute(
-        "UPDATE ct_subtasks SET status='pending', result=NULL, started_at=NULL"
-        " WHERE swarm_id=? AND status='running'",
-        (swarm_id,)
-    )
-    conn.commit()
+    with _lock:
+        conn.execute(
+            "UPDATE ct_subtasks SET status='pending', result=NULL, started_at=NULL"
+            " WHERE swarm_id=? AND status='running'",
+            (swarm_id,)
+        )
+        conn.commit()
 
 
 # ── Messages ──────────────────────────────────────────────────────────────────
@@ -178,12 +195,13 @@ def reset_running_subtasks(swarm_id: str) -> None:
 def post_message(swarm_id: str, from_agent: str, to_agent: Optional[str],
                  msg_type: str, content: str) -> None:
     conn = _get_conn()
-    conn.execute(
-        "INSERT INTO ct_messages (swarm_id, from_agent, to_agent, msg_type, content, timestamp)"
-        " VALUES (?,?,?,?,?,?)",
-        (swarm_id, from_agent, to_agent, msg_type, content, _now())
-    )
-    conn.commit()
+    with _lock:
+        conn.execute(
+            "INSERT INTO ct_messages (swarm_id, from_agent, to_agent, msg_type, content, timestamp)"
+            " VALUES (?,?,?,?,?,?)",
+            (swarm_id, from_agent, to_agent, msg_type, content, _now())
+        )
+        conn.commit()
 
 
 def get_messages(swarm_id: str) -> List[dict]:
