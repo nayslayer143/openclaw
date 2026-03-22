@@ -421,3 +421,121 @@ class SemanticMemory:
 
         scored.sort(key=lambda x: x[0], reverse=True)
         return [text for _, text in scored[:SEMANTIC_TOP_K]]
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# Layer 5 — ProceduralMemory
+# ════════════════════════════════════════════════════════════════════════════
+
+class ProceduralMemory:
+    """Trigger→action mappings. Explicit creation + auto-proposed from patterns."""
+
+    def __init__(self, threshold: int = PROC_THRESHOLD):
+        self._threshold = threshold
+
+    def add_procedure(self, chat_id: str, trigger: str, action: str) -> int:
+        """Explicit /remember command. Inserts active procedure. Returns id."""
+        ts = _now()
+        with db._get_conn() as conn:
+            cur = conn.execute(
+                "INSERT INTO procedures"
+                " (chat_id, trigger_pattern, action_description, created_by, status,"
+                " occurrence_count, timestamp)"
+                " VALUES (?, ?, ?, 'explicit', 'active', 1, ?)",
+                (chat_id, trigger, action, ts)
+            )
+            return cur.lastrowid
+
+    def track_candidate(self, chat_id: str, intent: str, action: str,
+                        trigger_phrase: str, notify_fn=None):
+        """
+        Increment occurrence count for (intent, action) pair.
+        When threshold reached and no rejected tombstone exists: propose to user.
+        notify_fn(chat_id, message) is called to send the proposal notification.
+        """
+        # Check for existing rejected tombstone — suppress re-proposal
+        with db._get_conn() as conn:
+            tombstone = conn.execute(
+                "SELECT id FROM procedures"
+                " WHERE chat_id=? AND status='rejected' AND created_by='proposed'"
+                " AND trigger_pattern LIKE ?",
+                (chat_id, f"%{action}%")
+            ).fetchone()
+        if tombstone:
+            return
+
+        ts = _now()
+        with db._get_conn() as conn:
+            conn.execute(
+                "INSERT INTO procedure_candidates"
+                " (chat_id, intent, action, trigger_phrase, count, last_seen)"
+                " VALUES (?, ?, ?, ?, 1, ?)"
+                " ON CONFLICT(chat_id, intent, action) DO UPDATE SET"
+                " count=count+1, last_seen=excluded.last_seen",
+                (chat_id, intent, action, trigger_phrase, ts)
+            )
+            row = conn.execute(
+                "SELECT id, count, trigger_phrase FROM procedure_candidates"
+                " WHERE chat_id=? AND intent=? AND action=?",
+                (chat_id, intent, action)
+            ).fetchone()
+
+        if not row or row["count"] < self._threshold:
+            return
+
+        # Threshold reached — promote to pending_approval
+        with db._get_conn() as conn:
+            cur = conn.execute(
+                "INSERT INTO procedures"
+                " (chat_id, trigger_pattern, action_description, created_by, status,"
+                " occurrence_count, timestamp)"
+                " VALUES (?, ?, ?, 'proposed', 'pending_approval', ?, ?)",
+                (chat_id, row["trigger_phrase"], action, row["count"], ts)
+            )
+            proc_id = cur.lastrowid
+            conn.execute(
+                "DELETE FROM procedure_candidates"
+                " WHERE chat_id=? AND intent=? AND action=?",
+                (chat_id, intent, action)
+            )
+
+        if notify_fn:
+            msg = (
+                f"I've noticed you keep asking me to '{action}' when you mention "
+                f"'{row['trigger_phrase']}'. Want me to remember that?\n"
+                f"/approve-proc {proc_id} or /reject-proc {proc_id}"
+            )
+            notify_fn(chat_id, msg)
+
+    def approve_procedure(self, chat_id: str, proc_id: int):
+        with db._get_conn() as conn:
+            conn.execute(
+                "UPDATE procedures SET status='active' WHERE id=? AND chat_id=?",
+                (proc_id, chat_id)
+            )
+
+    def reject_procedure(self, chat_id: str, proc_id: int):
+        """Tombstone — sets status=rejected, keeps row to suppress re-proposal."""
+        with db._get_conn() as conn:
+            conn.execute(
+                "UPDATE procedures SET status='rejected' WHERE id=? AND chat_id=?",
+                (proc_id, chat_id)
+            )
+
+    def retrieve(self, chat_id: str, query: str) -> list:
+        """Keyword match against active trigger_patterns. Returns formatted strings."""
+        lower = query.lower()
+        with db._get_conn() as conn:
+            rows = conn.execute(
+                "SELECT trigger_pattern, action_description FROM procedures"
+                " WHERE chat_id=? AND status='active'",
+                (chat_id,)
+            ).fetchall()
+        results = []
+        for r in rows:
+            if r["trigger_pattern"].lower() in lower:
+                results.append(
+                    f"[Procedural] When Jordan says \"{r['trigger_pattern']}\""
+                    f" \u2192 {r['action_description']}"
+                )
+        return results
