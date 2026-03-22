@@ -136,10 +136,10 @@ def run_swarm(task: str, pattern=None, bus=None, notify: bool = False) -> str:
 
     # Determine final status
     completed = [r for r in subtask_results if r.get("status") == "complete"]
-    if synthesis.startswith("[ERROR]") or not synthesis:
-        status = "partial"
-    elif not subtask_results or not completed:
+    if not completed:
         status = "failed"
+    elif synthesis.startswith("[ERROR]") or not synthesis:
+        status = "partial"
     else:
         status = "complete"
 
