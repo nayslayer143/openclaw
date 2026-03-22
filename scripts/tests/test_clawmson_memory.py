@@ -361,5 +361,151 @@ class TestProceduralMemory(unittest.TestCase):
         self.assertEqual(len(self._notifications), 0)  # no re-proposal
 
 
+class TestMemoryManager(unittest.TestCase):
+    def setUp(self):
+        import importlib
+        import clawmson_db
+        importlib.reload(clawmson_db)
+        import clawmson_memory
+        importlib.reload(clawmson_memory)
+        from clawmson_memory import MemoryManager
+        self.mm = MemoryManager()
+
+    def _fake_embed(self, text: str) -> bytes:
+        import numpy as np
+        return np.zeros(768, dtype=np.float32).tobytes()
+
+    def _nonzero_embed(self) -> bytes:
+        """Return a non-zero embedding so cosine similarity is 1.0 between identical vectors."""
+        import numpy as np
+        v = np.ones(768, dtype=np.float32)
+        return v.tobytes()
+
+    def test_retrieve_assembles_context(self):
+        """retrieve() returns a ### Memory Context block when data exists."""
+        import clawmson_db as db
+        from unittest.mock import patch
+        # Use non-zero embedding so cosine similarity passes MIN_SIM threshold
+        nonzero_emb = self._nonzero_embed()
+        with db._get_conn() as conn:
+            conn.execute(
+                "INSERT INTO semantic_facts"
+                " (chat_id, key, value, confidence, source, timestamp, embedding)"
+                " VALUES (?,?,?,?,?,?,?)",
+                ("c1", "model_pref", "Jordan prefers qwen3:32b", 0.9, "explicit", _now(), nonzero_emb)
+            )
+        # Patch _embed to return the same non-zero vector so cosine similarity == 1.0
+        with patch("clawmson_memory._embed", return_value=nonzero_emb):
+            result = self.mm.retrieve("c1", "model preference")
+        self.assertIn("### Memory Context", result)
+        self.assertIn("Jordan prefers qwen3:32b", result)
+
+    def test_retrieve_empty_query_uses_probe(self):
+        """retrieve() with empty query falls back to default probe and still returns string."""
+        import clawmson_db as db
+        from unittest.mock import patch
+        nonzero_emb = self._nonzero_embed()
+        with db._get_conn() as conn:
+            conn.execute(
+                "INSERT INTO semantic_facts"
+                " (chat_id, key, value, confidence, source, timestamp, embedding)"
+                " VALUES (?,?,?,?,?,?,?)",
+                ("c2", "info", "Jordan runs openclaw", 0.9, "explicit", _now(), nonzero_emb)
+            )
+        with patch("clawmson_memory._embed", return_value=nonzero_emb):
+            result = self.mm.retrieve("c2", "")  # empty query
+        self.assertIsInstance(result, str)
+        self.assertIn("Jordan runs openclaw", result)
+
+    def test_ingest_async_nonblocking(self):
+        """ingest_async() returns quickly (doesn't block the caller)."""
+        import clawmson_db as db
+        from unittest.mock import patch
+        import time
+        slow_called = []
+
+        def slow_llm(prompt):
+            time.sleep(0.2)
+            slow_called.append(True)
+            return ""
+
+        with patch("clawmson_memory._llm_text", side_effect=slow_llm), \
+             patch("clawmson_memory._embed", return_value=self._fake_embed("")), \
+             patch("clawmson_memory._llm_json", return_value={}):
+            # Seed a user message in sensory so assistant ingest has something to work with
+            self.mm._sensory.push("c3", "user", "we deployed the fix")
+            t0 = time.time()
+            self.mm.ingest_async("c3", "assistant", "it broke prod login")
+            elapsed = time.time() - t0
+        # Should return in well under 0.1s even though LLM sleeps 0.2s
+        self.assertLess(elapsed, 0.15)
+
+    def test_ingest_async_concurrent_no_duplicate_summaries(self):
+        """Serial executor (max_workers=1) prevents duplicate STM summaries."""
+        import clawmson_db as db
+        from unittest.mock import patch
+        import time
+
+        # Pre-fill 12 messages to trigger STM summarization
+        for i in range(12):
+            db.save_message("c4", "user" if i % 2 == 0 else "assistant", f"msg {i}")
+
+        calls = []
+
+        def counting_llm(prompt):
+            calls.append(1)
+            time.sleep(0.05)
+            return "test summary"
+
+        with patch("clawmson_memory._llm_text", side_effect=counting_llm), \
+             patch("clawmson_memory._llm_json", return_value={}), \
+             patch("clawmson_memory._embed", return_value=self._fake_embed("")):
+            # Seed user message in sensory buffer so _full_ingest_wrapper finds it
+            self.mm._sensory.push("c4", "user", "we deployed the fix")
+            # Fire two concurrent ingests
+            self.mm.ingest_async("c4", "assistant", "msg A")
+            self.mm.ingest_async("c4", "assistant", "msg B")
+            # Wait for executor to finish
+            self.mm._executor.shutdown(wait=True)
+
+        with db._get_conn() as conn:
+            summaries = conn.execute(
+                "SELECT COUNT(*) FROM stm_summaries WHERE chat_id='c4'"
+            ).fetchone()[0]
+        # Serial executor means at most 1 summary per trigger
+        self.assertLessEqual(summaries, 2)
+
+    def test_clear_layer(self):
+        """clear() removes data from the specified layer only."""
+        import clawmson_db as db
+        from unittest.mock import patch
+        fake_emb = self._fake_embed("")
+        # Insert one semantic fact and one episodic memory
+        with db._get_conn() as conn:
+            conn.execute(
+                "INSERT INTO semantic_facts"
+                " (chat_id, key, value, confidence, source, timestamp, embedding)"
+                " VALUES (?,?,?,?,?,?,?)",
+                ("c5", "k1", "some fact", 0.9, "explicit", _now(), fake_emb)
+            )
+            conn.execute(
+                "INSERT INTO episodic_memories"
+                " (chat_id, content, summary, timestamp, valence, embedding)"
+                " VALUES (?,?,?,?,?,?)",
+                ("c5", "content", "episode", _now(), "neutral", fake_emb)
+            )
+        # Clear only semantic
+        self.mm.clear("c5", layer="semantic")
+        with db._get_conn() as conn:
+            sem_count = conn.execute(
+                "SELECT COUNT(*) FROM semantic_facts WHERE chat_id='c5'"
+            ).fetchone()[0]
+            ep_count = conn.execute(
+                "SELECT COUNT(*) FROM episodic_memories WHERE chat_id='c5'"
+            ).fetchone()[0]
+        self.assertEqual(sem_count, 0)   # cleared
+        self.assertEqual(ep_count, 1)    # untouched
+
+
 if __name__ == "__main__":
     unittest.main()

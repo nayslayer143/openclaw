@@ -539,3 +539,172 @@ class ProceduralMemory:
                     f" \u2192 {r['action_description']}"
                 )
         return results
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# MemoryManager — coordinator
+# ════════════════════════════════════════════════════════════════════════════
+
+class MemoryManager:
+    """
+    Coordinator for all 5 memory layers.
+    Single ThreadPoolExecutor(max_workers=1) serializes background ingest.
+    """
+
+    def __init__(self):
+        self._sensory   = SensoryBuffer()
+        self._stm       = ShortTermMemory()
+        self._episodic  = EpisodicMemory()
+        self._semantic  = SemanticMemory()
+        self._procedural = ProceduralMemory()
+        self._executor  = ThreadPoolExecutor(max_workers=1)
+        self._notify_fn = None  # set externally if desired
+
+    # ── Public layer accessors ─────────────────────────────────────────────
+
+    def sensory(self, chat_id: str) -> list:
+        """Return last N messages as list of {role, content} dicts."""
+        return self._sensory.get(chat_id)
+
+    def retrieve(self, chat_id: str, query: str = "") -> str:
+        """
+        Assemble a ### Memory Context block from all layers.
+        If query is empty, use the default probe string.
+        Cap total output at ~2000 chars.
+        Returns "" if all layers empty.
+        """
+        probe = query.strip() or _DEFAULT_PROBE
+
+        parts = []
+
+        # Layer 2: STM summaries
+        stm = self._stm.retrieve(chat_id)
+        if stm:
+            parts.append(f"**Recent summary:** {stm}")
+
+        # Layer 3: Episodic
+        episodes = self._episodic.retrieve(chat_id, probe)
+        if episodes:
+            parts.append("**Past events:**")
+            parts.extend(episodes)
+
+        # Layer 4: Semantic
+        facts = self._semantic.retrieve(chat_id, probe)
+        if facts:
+            parts.append("**Known facts:**")
+            parts.extend(facts)
+
+        # Layer 5: Procedural
+        procs = self._procedural.retrieve(chat_id, probe)
+        if procs:
+            parts.append("**Procedures:**")
+            parts.extend(procs)
+
+        if not parts:
+            return ""
+
+        body = "\n".join(parts)
+        # Cap at ~2000 chars
+        if len(body) > 2000:
+            body = body[:1997] + "..."
+        return f"### Memory Context\n{body}"
+
+    def ingest_async(self, chat_id: str, role: str, content: str):
+        """
+        Push message to sensory buffer synchronously, then submit full ingest
+        to the background serial executor. Call AFTER send().
+        """
+        self._sensory.push(chat_id, role, content)
+        self._executor.submit(self._full_ingest_wrapper, chat_id, role, content)
+
+    def _full_ingest_wrapper(self, chat_id: str, role: str, content: str):
+        """
+        Background task: save to DB, run STM check, trigger episodic+semantic ingest.
+        Only runs full ingest when we have a user+assistant pair (role==assistant).
+        """
+        import clawmson_db as db
+        db.save_message(chat_id, role, content)
+
+        if role != "assistant":
+            return
+
+        # Get last user message from sensory buffer
+        msgs = self._sensory.get(chat_id)
+        user_msg = ""
+        for m in reversed(msgs):
+            if m["role"] == "user":
+                user_msg = m["content"]
+                break
+
+        self._stm.check_and_summarize(chat_id)
+        self._episodic.ingest(chat_id, user_msg, content)
+        self._semantic.ingest(chat_id, user_msg, content)
+
+    # ── Procedural memory passthrough ──────────────────────────────────────
+
+    def track_procedure_candidate(self, chat_id: str, intent: str, action: str,
+                                   trigger_phrase: str):
+        self._procedural.track_candidate(
+            chat_id, intent, action, trigger_phrase,
+            notify_fn=self._notify_fn
+        )
+
+    def add_procedure(self, chat_id: str, trigger: str, action: str) -> int:
+        return self._procedural.add_procedure(chat_id, trigger, action)
+
+    def approve_procedure(self, chat_id: str, proc_id: int):
+        self._procedural.approve_procedure(chat_id, proc_id)
+
+    def reject_procedure(self, chat_id: str, proc_id: int):
+        self._procedural.reject_procedure(chat_id, proc_id)
+
+    # ── Stats and management ───────────────────────────────────────────────
+
+    def stats(self, chat_id: str) -> dict:
+        """Return dict of counts per layer for the given chat_id."""
+        import clawmson_db as db
+        with db._get_conn() as conn:
+            stm_count = conn.execute(
+                "SELECT COUNT(*) FROM stm_summaries WHERE chat_id=?", (chat_id,)
+            ).fetchone()[0]
+            ep_count = conn.execute(
+                "SELECT COUNT(*) FROM episodic_memories WHERE chat_id=?", (chat_id,)
+            ).fetchone()[0]
+            sem_count = conn.execute(
+                "SELECT COUNT(*) FROM semantic_facts WHERE chat_id=?", (chat_id,)
+            ).fetchone()[0]
+            proc_count = conn.execute(
+                "SELECT COUNT(*) FROM procedures WHERE chat_id=? AND status='active'",
+                (chat_id,)
+            ).fetchone()[0]
+        return {
+            "sensory":   len(self._sensory.get(chat_id)),
+            "stm":       stm_count,
+            "episodic":  ep_count,
+            "semantic":  sem_count,
+            "procedural": proc_count,
+        }
+
+    def clear(self, chat_id: str, layer: str = "all"):
+        """Clear one or all layers for chat_id. layer: 'stm'|'episodic'|'semantic'|'procedural'|'all'"""
+        import clawmson_db as db
+        tables = {
+            "stm":        "stm_summaries",
+            "episodic":   "episodic_memories",
+            "semantic":   "semantic_facts",
+            "procedural": "procedures",
+        }
+        to_clear = list(tables.items()) if layer == "all" else [(layer, tables[layer])]
+        with db._get_conn() as conn:
+            for _, tbl in to_clear:
+                conn.execute(f"DELETE FROM {tbl} WHERE chat_id=?", (chat_id,))
+        # Also clear sensory buffer in RAM
+        if layer == "all":
+            with self._sensory._lock:
+                self._sensory._buffers.pop(chat_id, None)
+                self._sensory._seeded.discard(chat_id)
+
+
+# ── Module-level singleton ─────────────────────────────────────────────────
+
+memory = MemoryManager()
