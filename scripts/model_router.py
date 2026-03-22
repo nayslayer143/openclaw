@@ -315,7 +315,7 @@ def record_result(
         print(f"[model_router] record_result failed: {e}")
 
 
-def get_stats() -> list:
+def get_stats() -> list[dict]:
     """
     Return all rows from model_stats as list of dicts.
     Keys: model, task_type, call_count, success_count, avg_latency_ms, last_updated.
