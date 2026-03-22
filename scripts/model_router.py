@@ -112,7 +112,42 @@ def _get_vram_used_gb() -> float:
     return total / 1e9
 
 
+# ── SQLite init ───────────────────────────────────────────────────────────────
+
+def _get_conn() -> sqlite3.Connection:
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(str(DB_PATH))
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def _init_db():
+    with _get_conn() as conn:
+        conn.executescript("""
+            CREATE TABLE IF NOT EXISTS routing_log (
+                id           INTEGER PRIMARY KEY AUTOINCREMENT,
+                task_type    TEXT    NOT NULL,
+                model_chosen TEXT    NOT NULL,
+                intent       TEXT,
+                vram_used_gb REAL,
+                timestamp    TEXT    NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_routing_ts
+                ON routing_log(timestamp);
+
+            CREATE TABLE IF NOT EXISTS model_stats (
+                model          TEXT    NOT NULL,
+                task_type      TEXT    NOT NULL,
+                call_count     INTEGER DEFAULT 0,
+                success_count  INTEGER DEFAULT 0,
+                avg_latency_ms REAL    DEFAULT 0.0,
+                last_updated   TEXT,
+                PRIMARY KEY (model, task_type)
+            );
+        """)
+
+
 # Init on import (matches clawmson_db.py pattern)
 # Guard allows tests to skip DB creation by setting MODEL_ROUTER_SKIP_INIT=1
 if not os.environ.get("MODEL_ROUTER_SKIP_INIT"):
-    pass  # _init_db() will be added in Task 2
+    _init_db()

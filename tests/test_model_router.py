@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, sqlite3, tempfile
 # Prevent model_router from creating ~/.openclaw/clawmson.db at import time
 os.environ.setdefault("MODEL_ROUTER_SKIP_INIT", "1")
 
@@ -50,3 +50,19 @@ def test_intent_to_task_covers_all_known_intents():
         assert result is not None, f"{intent} has no entry in INTENT_TO_TASK"
         assert result in router.FALLBACK_CHAINS, \
             f"INTENT_TO_TASK[{intent}]={result!r} not in FALLBACK_CHAINS"
+
+def test_init_db_creates_tables():
+    with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
+        tmp = f.name
+    try:
+        with patch.object(router, 'DB_PATH', Path(tmp)):
+            router._init_db()
+        conn = sqlite3.connect(tmp)
+        tables = {r[0] for r in conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='table'"
+        ).fetchall()}
+        conn.close()
+        assert "routing_log" in tables
+        assert "model_stats" in tables
+    finally:
+        os.unlink(tmp)
