@@ -272,6 +272,67 @@ def _init_db():
         """)
 
 
+def record_result(
+    model: str,
+    task_type: str,
+    latency_ms: float,
+    success: bool = True,
+) -> None:
+    """
+    Record inference outcome. Updates model_stats with cumulative moving average.
+    Never raises — stats must not block inference.
+
+    CMA formula: new_avg = (old_avg * old_count + latency_ms) / (old_count + 1)
+    where old_count is the count before incrementing.
+    """
+    ts = datetime.datetime.utcnow().isoformat()
+    try:
+        with _get_conn() as conn:
+            row = conn.execute(
+                "SELECT call_count, avg_latency_ms FROM model_stats"
+                " WHERE model = ? AND task_type = ?",
+                (model, task_type)
+            ).fetchone()
+            if row:
+                old_count = row["call_count"]
+                old_avg   = row["avg_latency_ms"]
+                new_count = old_count + 1
+                new_avg   = (old_avg * old_count + latency_ms) / new_count
+                conn.execute(
+                    "UPDATE model_stats"
+                    " SET call_count = ?, success_count = success_count + ?, avg_latency_ms = ?, last_updated = ?"
+                    " WHERE model = ? AND task_type = ?",
+                    (new_count, 1 if success else 0, new_avg, ts, model, task_type)
+                )
+            else:
+                conn.execute(
+                    "INSERT INTO model_stats"
+                    " (model, task_type, call_count, success_count, avg_latency_ms, last_updated)"
+                    " VALUES (?, ?, 1, ?, ?, ?)",
+                    (model, task_type, 1 if success else 0, latency_ms, ts)
+                )
+    except Exception as e:
+        print(f"[model_router] record_result failed: {e}")
+
+
+def get_stats() -> list:
+    """
+    Return all rows from model_stats as list of dicts.
+    Keys: model, task_type, call_count, success_count, avg_latency_ms, last_updated.
+    """
+    try:
+        with _get_conn() as conn:
+            rows = conn.execute(
+                "SELECT model, task_type, call_count, success_count,"
+                "       avg_latency_ms, last_updated FROM model_stats"
+                " ORDER BY model, task_type"
+            ).fetchall()
+        return [dict(r) for r in rows]
+    except Exception as e:
+        print(f"[model_router] get_stats failed: {e}")
+        return []
+
+
 # Init on import (matches clawmson_db.py pattern)
 # Guard allows tests to skip DB creation by setting MODEL_ROUTER_SKIP_INIT=1
 if not os.environ.get("MODEL_ROUTER_SKIP_INIT"):
