@@ -83,7 +83,7 @@ def run_sequential(subtasks: List[dict], bus, runner: Callable = run_agent) -> L
         enriched = {**subtask, "prompt": prompt}
         result = _run_subtask(enriched, bus, runner)
         prior_result = result
-        results.append({"id": subtask["id"], "result": result,
+        results.append({"id": subtask["id"], "agent": subtask["agent"], "result": result,
                          "status": "complete" if not result.startswith("[ERROR]") else "failed"})
     return results
 
@@ -252,7 +252,7 @@ def run_hierarchy(swarm_id: str, task: str, bus, runner: Callable = run_agent) -
                 if dep_status == "failed":
                     bus.fail_subtask(w["id"])
                     remaining.remove(w)
-                    worker_results.append({"id": w["id"], "result": "[SKIPPED: dependency failed]",
+                    worker_results.append({"id": w["id"], "agent": w["agent"], "result": "[SKIPPED: dependency failed]",
                                            "status": "failed"})
                 elif dep_status is True and w["id"] not in dispatched:
                     futures[pool.submit(_run_subtask, w, bus, runner)] = w
@@ -263,7 +263,7 @@ def run_hierarchy(swarm_id: str, task: str, bus, runner: Callable = run_agent) -
             for f in done:
                 w = futures.pop(f)
                 result = f.result()
-                worker_results.append({"id": w["id"], "result": result,
+                worker_results.append({"id": w["id"], "agent": w["agent"], "result": result,
                                         "status": "complete" if not result.startswith("[ERROR]") else "failed"})
             if remaining or futures:
                 time.sleep(_DEP_POLL_INTERVAL)
