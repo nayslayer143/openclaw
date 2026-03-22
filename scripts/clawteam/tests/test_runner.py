@@ -39,9 +39,7 @@ def test_run_timeout_is_300():
     mock_resp = _mock_streaming_response("ok")
     with patch("clawteam.runner.requests.post", return_value=mock_resp) as mock_post:
         run_agent("AXIS", "qwen3:32b", "do something")
-    call_kwargs = mock_post.call_args
-    timeout = (call_kwargs[1].get("timeout") or call_kwargs[0][2]) if len(call_kwargs[0]) > 2 else call_kwargs[1].get("timeout")
-    assert timeout == 300
+    assert mock_post.call_args.kwargs["timeout"] == 300
 
 
 def test_run_returns_error_string_on_connection_error():
