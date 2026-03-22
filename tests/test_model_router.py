@@ -1,7 +1,6 @@
 import sys, os
 # Prevent model_router from creating ~/.openclaw/clawmson.db at import time
 os.environ.setdefault("MODEL_ROUTER_SKIP_INIT", "1")
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'scripts'))
 
 from unittest.mock import patch, MagicMock
 from pathlib import Path

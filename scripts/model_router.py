@@ -20,7 +20,7 @@ from pathlib import Path
 OLLAMA_BASE_URL  = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
 VRAM_CEILING_GB  = float(os.environ.get("OPENCLAW_VRAM_TOTAL_GB", "90.0"))
 DB_PATH          = Path(os.environ.get("CLAWMSON_DB_PATH",
-                        Path.home() / ".openclaw" / "clawmson.db"))
+                        str(Path.home() / ".openclaw" / "clawmson.db")))
 _PS_CACHE_TTL    = 10.0   # seconds
 
 # ── Model sizes (GB, from bakeoff 2026-03-19) ────────────────────────────────
