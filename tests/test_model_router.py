@@ -108,3 +108,37 @@ def test_select_single_model_chain():
     with patch('model_router._get_ps', return_value=_mock_ps([], 50.0)):
         model = router._select_from_chain(["qwen3-vl:32b"], vram_used_gb=50.0)
     assert model == "qwen3-vl:32b"
+
+def test_route_with_task_type_bypasses_classification():
+    with patch('model_router._get_ps', return_value=_mock_ps(["qwen2.5:7b"], 4.7)):
+        with patch('model_router._log_routing'):
+            model = router.route("hello", task_type="chat")
+    assert model == "qwen2.5:7b"
+
+def test_route_intent_maps_to_task_type():
+    with patch('model_router._get_ps', return_value=_mock_ps(["qwen3-coder-next"], 51.0)):
+        with patch('model_router._log_routing'):
+            model = router.route("build a login form", intent="BUILD_TASK")
+    assert model == "qwen3-coder-next"
+
+def test_route_has_image_forces_vision():
+    with patch('model_router._get_ps', return_value=_mock_ps(["qwen3-vl:32b"], 20.0)):
+        with patch('model_router._log_routing'):
+            model = router.route("what's in this image?", has_image=True)
+    assert model == "qwen3-vl:32b"
+
+def test_route_env_override_bypasses_all_logic():
+    with patch.dict(os.environ, {"OLLAMA_CHAT_MODEL": "my-custom-model"}):
+        model = router.route("hello", task_type="chat")
+    assert model == "my-custom-model"
+
+def test_route_vision_env_override():
+    with patch.dict(os.environ, {"OLLAMA_VISION_MODEL": "my-vision-model"}):
+        model = router.route("what's in this?", has_image=True)
+    assert model == "my-vision-model"
+
+def test_route_unknown_intent_defaults_to_chat():
+    with patch('model_router._get_ps', return_value=_mock_ps(["qwen2.5:7b"], 4.7)):
+        with patch('model_router._log_routing'):
+            model = router.route("yo", intent="UNKNOWN_THING")
+    assert model == "qwen2.5:7b"

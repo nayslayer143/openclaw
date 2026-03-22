@@ -139,6 +139,104 @@ def _select_from_chain(chain: list[str], vram_used_gb: float) -> str:
     return chain[-1]
 
 
+# ── Logging helper ────────────────────────────────────────────────────────────
+
+def _log_routing(task_type: str, model: str, intent: str | None, vram_used_gb: float):
+    ts = datetime.datetime.utcnow().isoformat()
+    try:
+        with _get_conn() as conn:
+            conn.execute(
+                "INSERT INTO routing_log (task_type, model_chosen, intent, vram_used_gb, timestamp)"
+                " VALUES (?, ?, ?, ?, ?)",
+                (task_type, model, intent, round(vram_used_gb, 3), ts)
+            )
+    except Exception as e:
+        print(f"[model_router] routing_log write failed: {e}")
+
+
+# ── Classification helper (non-Telegram callers only) ─────────────────────────
+
+_CLASSIFY_PROMPT = """\
+Classify this request into one word: chat, code, research, routing, vision, or embedding.
+- code: writing/fixing/reviewing code or software
+- research: reading, summarizing, studying URLs or documents
+- routing: system status, queue checks, shell commands
+- vision: analyzing an image
+- embedding: generating embeddings
+- chat: everything else (default)
+Return ONLY the single word."""
+
+
+def _classify_prompt(prompt: str) -> str:
+    """Use qwen2.5:7b to classify prompt → task_type. Never calls route()."""
+    try:
+        resp = requests.post(
+            f"{OLLAMA_BASE_URL}/api/chat",
+            json={
+                "model": "qwen2.5:7b",  # hardcoded — must not recurse via route()
+                "messages": [
+                    {"role": "system", "content": _CLASSIFY_PROMPT},
+                    {"role": "user", "content": prompt[:500]},
+                ],
+                "stream": False,
+            },
+            timeout=15,
+        )
+        resp.raise_for_status()
+        result = resp.json().get("message", {}).get("content", "").strip().lower()
+        if result in FALLBACK_CHAINS:
+            return result
+    except Exception as e:
+        print(f"[model_router] classification failed: {e}")
+    return "chat"
+
+
+# ── Public API ────────────────────────────────────────────────────────────────
+
+def route(
+    prompt: str,
+    task_type: str = None,
+    intent: str = None,
+    has_image: bool = False,
+) -> str:
+    """
+    Return the model name to use for this request.
+
+    Priority:
+    1. has_image=True → forces "vision" task_type
+    2. task_type provided → use directly
+    3. intent provided → map via INTENT_TO_TASK lookup
+    4. neither → classify via qwen2.5:7b (non-Telegram path)
+
+    Env var overrides (OLLAMA_CHAT_MODEL, OLLAMA_VISION_MODEL) bypass all logic.
+    """
+    # has_image overrides everything
+    if has_image:
+        task_type = "vision"
+
+    # Resolve task_type
+    if not task_type:
+        if intent:
+            task_type = INTENT_TO_TASK.get(intent.upper(), "chat")
+        else:
+            task_type = _classify_prompt(prompt)
+
+    # Env var override (backwards compat)
+    env_key = _ENV_OVERRIDES.get(task_type)
+    if env_key:
+        override = os.environ.get(env_key)
+        if override:
+            return override
+
+    # Get VRAM state and pick from chain
+    vram_used = _get_vram_used_gb()
+    chain = FALLBACK_CHAINS.get(task_type, FALLBACK_CHAINS["chat"])
+    model = _select_from_chain(chain, vram_used)
+
+    _log_routing(task_type, model, intent, vram_used)
+    return model
+
+
 # ── SQLite init ───────────────────────────────────────────────────────────────
 
 def _get_conn() -> sqlite3.Connection:
