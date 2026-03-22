@@ -41,13 +41,14 @@ def _wallet():
 # ── Arbitrage detection ────────────────────────────────────────────────────
 def test_arbitrage_detected_when_gap_exceeds_threshold():
     tb = _brain()
-    # yes=0.60 + no=0.45 → gap = 0.05 > 0.03 → flagged
-    market = {"market_id": "m1", "question": "test", "yes_price": 0.60, "no_price": 0.45,
+    # yes=0.60 + no=0.35 → gap = 0.05 > 0.03 → flagged
+    # fair_no = 1 - 0.60 = 0.40; no_p (0.35) < fair_no (0.40) → NO is underpriced → buy NO
+    market = {"market_id": "m1", "question": "test", "yes_price": 0.60, "no_price": 0.35,
               "volume": 50000, "end_date": None, "category": "crypto"}
     result = tb._check_arbitrage(market)
     assert result is not None
     assert result.strategy == "arbitrage"
-    # Should buy the underpriced side (NO at 0.45 < 0.50)
+    # Should buy NO: it is below its fair value (0.35 < 1 - 0.60 = 0.40)
     assert result.direction == "NO"
 
 
@@ -103,6 +104,9 @@ def test_kelly_cap_never_exceeded():
 
 # ── Manual /bet position cap ────────────────────────────────────────────────
 def test_manual_bet_enforces_position_cap(temp_db):
+    # Starting balance is $1000 (from migration INSERT OR IGNORE into context).
+    # MIROFISH_MAX_POSITION_PCT defaults to 0.10, so cap = $100.
+    # amount_usd=150.0 is 15% of balance — over cap → rejected.
     pw = _wallet()
     from types import SimpleNamespace
     decision = SimpleNamespace(

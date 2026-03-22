@@ -11,8 +11,9 @@ import requests
 from dataclasses import dataclass
 from typing import Any
 
-OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
-MIROFISH_MODEL  = os.environ.get("MIROFISH_MODEL", "qwen3:30b")
+OLLAMA_BASE_URL   = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
+MIROFISH_MODEL    = os.environ.get("MIROFISH_MODEL", "qwen3:30b")
+OLLAMA_TIMEOUT    = int(os.environ.get("MIROFISH_OLLAMA_TIMEOUT", "180"))
 MAX_POSITION_PCT = float(os.environ.get("MIROFISH_MAX_POSITION_PCT", "0.10"))
 ARB_THRESHOLD = 0.03
 ARB_POSITION_PCT = 0.05  # Fixed 5% of portfolio for arb trades
@@ -60,19 +61,25 @@ def _check_arbitrage(market: dict) -> TradeDecision | None:
     if gap <= ARB_THRESHOLD:
         return None
 
-    # Buy the underpriced side
-    if yes_p < 0.50:
-        direction, entry_price = "YES", yes_p
-    else:
+    # Buy the side furthest below its theoretical fair value
+    # In a binary market: fair_no = 1 - yes_p, fair_yes = 1 - no_p
+    if no_p < 1 - yes_p:
         direction, entry_price = "NO", no_p
+    else:
+        direction, entry_price = "YES", yes_p
 
     confidence = min(gap / 0.10, 1.0)
     reasoning = (f"Arbitrage: YES={yes_p:.3f} + NO={no_p:.3f} = {yes_p+no_p:.3f} "
                  f"(gap={gap:.3f} > {ARB_THRESHOLD})")
 
+    market_id = market.get("market_id", "")
+    question = market.get("question", "")
+    if not market_id:
+        return None
+
     return TradeDecision(
-        market_id=market["market_id"],
-        question=market["question"],
+        market_id=market_id,
+        question=question,
         direction=direction,
         confidence=confidence,
         reasoning=reasoning,
@@ -93,7 +100,7 @@ def _call_ollama(prompt: str) -> str:
                 "messages": [{"role": "user", "content": prompt}],
                 "stream": False,
             },
-            timeout=180,
+            timeout=OLLAMA_TIMEOUT,
         )
         resp.raise_for_status()
         return resp.json().get("message", {}).get("content", "")
@@ -108,7 +115,7 @@ def _extract_json(text: str) -> list[dict]:
         return json.loads(text)
     except json.JSONDecodeError:
         pass
-    m = re.search(r'\[.*?\]', text, re.DOTALL)
+    m = re.search(r'\[.*\]', text, re.DOTALL)
     if m:
         try:
             return json.loads(m.group())
@@ -183,23 +190,25 @@ If no clear opportunities, return [].
     raw = _call_ollama(prompt)
     parsed = _extract_json(raw)
 
+    # Build lookup once so each iteration is O(1)
+    market_by_id = {m["market_id"]: m for m in non_arb}
+
     for item in parsed:
         market_id  = item.get("market_id", "")
         direction  = item.get("direction", "").upper()
         confidence = float(item.get("confidence", 0))
         strategy   = item.get("strategy", "news_catalyst")
         reasoning  = item.get("reasoning", "")
-        entry_price = float(item.get("entry_price", 0))
 
         if not market_id or direction not in ("YES", "NO") or confidence <= 0:
             continue
 
-        # Look up entry price from market if not provided by LLM
-        if entry_price <= 0:
-            for m in non_arb:
-                if m["market_id"] == market_id:
-                    entry_price = m["yes_price"] if direction == "YES" else m["no_price"]
-                    break
+        # Always use actual market price — ignore any LLM-provided entry_price
+        mkt = market_by_id.get(market_id)
+        if not mkt:
+            continue
+        entry_price = mkt["yes_price"] if direction == "YES" else mkt["no_price"]
+        question = mkt["question"]
 
         if entry_price <= 0 or entry_price >= 1:
             continue
@@ -208,7 +217,6 @@ If no clear opportunities, return [].
         if amount is None:
             continue  # negative edge — skip
 
-        question = next((m["question"] for m in non_arb if m["market_id"] == market_id), "")
         decisions.append(TradeDecision(
             market_id=market_id, question=question, direction=direction,
             confidence=confidence, reasoning=reasoning, strategy=strategy,
