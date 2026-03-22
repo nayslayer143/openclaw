@@ -7,14 +7,16 @@ from __future__ import annotations
 import argparse
 import os
 import sqlite3
+import datetime
 from pathlib import Path
 
-DB_PATH = Path(os.environ.get("CLAWMSON_DB_PATH", Path.home() / ".openclaw" / "clawmson.db"))
+JORDAN_CHAT_ID = os.environ.get("JORDAN_TELEGRAM_CHAT_ID", "")
 
 
 def _get_conn() -> sqlite3.Connection:
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(str(DB_PATH))
+    db_path = Path(os.environ.get("CLAWMSON_DB_PATH", Path.home() / ".openclaw" / "clawmson.db"))
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(str(db_path))
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL")
     return conn
@@ -72,7 +74,6 @@ CREATE TABLE IF NOT EXISTS context (
     PRIMARY KEY (chat_id, key)
 );
 
--- Seed starting balance in context table if not already set
 INSERT OR IGNORE INTO context (chat_id, key, value)
 VALUES ('mirofish', 'starting_balance', '1000.00');
 """
@@ -82,22 +83,82 @@ def migrate():
     """Create mirofish tables. Idempotent."""
     with _get_conn() as conn:
         conn.executescript(MIGRATION_SQL)
-    print(f"[mirofish] Migration complete. DB: {DB_PATH}")
+    db_path = Path(os.environ.get("CLAWMSON_DB_PATH", Path.home() / ".openclaw" / "clawmson.db"))
+    print(f"[mirofish] Migration complete. DB: {db_path}")
+
+
+def run_loop():
+    """Full simulation loop: fetch → analyze → trade → stops → snapshot."""
+    import scripts.mirofish.polymarket_feed as feed
+    import scripts.mirofish.paper_wallet as wallet
+    import scripts.mirofish.trading_brain as brain
+    import scripts.mirofish.dashboard as dash
+
+    print(f"[mirofish] Run loop starting — {datetime.datetime.utcnow().isoformat()}")
+
+    # 1. Fetch market data
+    markets = feed.fetch_markets()
+    if not markets:
+        print("[mirofish] No markets available (API down + cache stale). Skipping trades.")
+    else:
+        # 2. Get wallet state
+        state = wallet.get_state()
+        print(f"[mirofish] Wallet: ${state['balance']:.2f} | "
+              f"Positions: {state['open_positions']} | "
+              f"Win rate: {state['win_rate']*100:.0f}%")
+
+        # 3. Analyze markets
+        decisions = brain.analyze(markets, state)
+        print(f"[mirofish] Brain returned {len(decisions)} trade decisions")
+
+        # 4. Execute trades
+        for d in decisions:
+            result = wallet.execute_trade(d)
+            if result:
+                print(f"[mirofish] Executed: {d.direction} ${d.amount_usd:.0f} "
+                      f"on '{d.question[:50]}' [{d.strategy}]")
+            else:
+                print(f"[mirofish] Rejected: {d.market_id} (cap or kelly)")
+
+    # 5. Check stops (always runs, even if API is down)
+    current_prices = feed.get_latest_prices()
+    closed = wallet.check_stops(current_prices)
+    for c in closed:
+        sign = "+" if (c["pnl"] or 0) >= 0 else ""
+        print(f"[mirofish] Stop closed: {c['market_id']} → {c['status']} "
+              f"{sign}${c['pnl']:.2f}")
+
+    # 6. Daily snapshot (first run of the day only)
+    snapshotted = dash.maybe_snapshot(chat_id_for_notify=JORDAN_CHAT_ID or None)
+    if snapshotted:
+        print("[mirofish] Daily snapshot written and digest sent")
+
+    print(f"[mirofish] Run complete — {datetime.datetime.utcnow().isoformat()}")
 
 
 def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--migrate", action="store_true")
-    parser.add_argument("--run", action="store_true")
-    parser.add_argument("--report", action="store_true")
+    # Load .env
+    env_file = Path.home() / "openclaw" / ".env"
+    if env_file.exists():
+        for line in env_file.read_text().splitlines():
+            if "=" in line and not line.startswith("#"):
+                k, _, v = line.partition("=")
+                os.environ.setdefault(k.strip(), v.strip())
+
+    parser = argparse.ArgumentParser(description="Mirofish paper trading simulator")
+    parser.add_argument("--migrate", action="store_true", help="Create DB tables")
+    parser.add_argument("--run", action="store_true", help="Run simulation loop")
+    parser.add_argument("--report", action="store_true", help="Generate report only")
     args = parser.parse_args()
 
     if args.migrate:
         migrate()
     elif args.run:
-        print("[mirofish] --run not yet implemented")
+        run_loop()
     elif args.report:
-        print("[mirofish] --report not yet implemented")
+        import scripts.mirofish.dashboard as dash
+        path = dash.generate_report("daily")
+        print(f"[mirofish] Report: {path}")
     else:
         parser.print_help()
 
