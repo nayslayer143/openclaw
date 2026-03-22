@@ -10,8 +10,6 @@ import sqlite3
 import datetime
 from pathlib import Path
 
-JORDAN_CHAT_ID = os.environ.get("JORDAN_TELEGRAM_CHAT_ID", "")
-
 
 def _get_conn() -> sqlite3.Connection:
     db_path = Path(os.environ.get("CLAWMSON_DB_PATH", Path.home() / ".openclaw" / "clawmson.db"))
@@ -121,15 +119,18 @@ def run_loop():
                 print(f"[mirofish] Rejected: {d.market_id} (cap or kelly)")
 
     # 5. Check stops (always runs, even if API is down)
-    current_prices = feed.get_latest_prices()
-    closed = wallet.check_stops(current_prices)
-    for c in closed:
-        sign = "+" if (c["pnl"] or 0) >= 0 else ""
-        print(f"[mirofish] Stop closed: {c['market_id']} → {c['status']} "
-              f"{sign}${c['pnl']:.2f}")
+    try:
+        current_prices = feed.get_latest_prices()
+        closed = wallet.check_stops(current_prices)
+        for c in closed:
+            sign = "+" if (c["pnl"] or 0) >= 0 else ""
+            print(f"[mirofish] Stop closed: {c['market_id']} → {c['status']} "
+                  f"{sign}${c['pnl']:.2f}")
+    except Exception as exc:
+        print(f"[mirofish] Stop check failed: {exc}")
 
     # 6. Daily snapshot (first run of the day only)
-    snapshotted = dash.maybe_snapshot(chat_id_for_notify=JORDAN_CHAT_ID or None)
+    snapshotted = dash.maybe_snapshot(chat_id_for_notify=os.environ.get("JORDAN_TELEGRAM_CHAT_ID") or None)
     if snapshotted:
         print("[mirofish] Daily snapshot written and digest sent")
 
