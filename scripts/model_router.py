@@ -112,6 +112,41 @@ def _get_vram_used_gb() -> float:
     return total / 1e9
 
 
+# ── SQLite helpers ────────────────────────────────────────────────────────────
+
+def _get_conn() -> sqlite3.Connection:
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(str(DB_PATH))
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def _init_db():
+    with _get_conn() as conn:
+        conn.executescript("""
+            CREATE TABLE IF NOT EXISTS routing_log (
+                id           INTEGER PRIMARY KEY AUTOINCREMENT,
+                task_type    TEXT    NOT NULL,
+                model_chosen TEXT    NOT NULL,
+                intent       TEXT,
+                vram_used_gb REAL,
+                timestamp    TEXT    NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_routing_ts
+                ON routing_log(timestamp);
+
+            CREATE TABLE IF NOT EXISTS model_stats (
+                model          TEXT    NOT NULL,
+                task_type      TEXT    NOT NULL,
+                call_count     INTEGER DEFAULT 0,
+                success_count  INTEGER DEFAULT 0,
+                avg_latency_ms REAL    DEFAULT 0.0,
+                last_updated   TEXT,
+                PRIMARY KEY (model, task_type)
+            );
+        """)
+
+
 # ── Chain selection ───────────────────────────────────────────────────────────
 
 def _select_from_chain(chain: list[str], vram_used_gb: float) -> str:
@@ -235,41 +270,6 @@ def route(
 
     _log_routing(task_type, model, intent, vram_used)
     return model
-
-
-# ── SQLite init ───────────────────────────────────────────────────────────────
-
-def _get_conn() -> sqlite3.Connection:
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(str(DB_PATH))
-    conn.row_factory = sqlite3.Row
-    return conn
-
-
-def _init_db():
-    with _get_conn() as conn:
-        conn.executescript("""
-            CREATE TABLE IF NOT EXISTS routing_log (
-                id           INTEGER PRIMARY KEY AUTOINCREMENT,
-                task_type    TEXT    NOT NULL,
-                model_chosen TEXT    NOT NULL,
-                intent       TEXT,
-                vram_used_gb REAL,
-                timestamp    TEXT    NOT NULL
-            );
-            CREATE INDEX IF NOT EXISTS idx_routing_ts
-                ON routing_log(timestamp);
-
-            CREATE TABLE IF NOT EXISTS model_stats (
-                model          TEXT    NOT NULL,
-                task_type      TEXT    NOT NULL,
-                call_count     INTEGER DEFAULT 0,
-                success_count  INTEGER DEFAULT 0,
-                avg_latency_ms REAL    DEFAULT 0.0,
-                last_updated   TEXT,
-                PRIMARY KEY (model, task_type)
-            );
-        """)
 
 
 def record_result(
