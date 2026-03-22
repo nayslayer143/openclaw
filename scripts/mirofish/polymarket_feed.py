@@ -15,6 +15,18 @@ MIN_VOLUME = float(os.environ.get("MIROFISH_MIN_MARKET_VOLUME", "10000"))
 CACHE_MAX_AGE_HOURS = 6
 
 
+def _parse_json_field(val):
+    """Parse field that may be a JSON string or already a list."""
+    if isinstance(val, list):
+        return val
+    if isinstance(val, str):
+        try:
+            return json.loads(val)
+        except (ValueError, TypeError):
+            pass
+    return []
+
+
 def _get_conn() -> sqlite3.Connection:
     db_path = Path(os.environ.get("CLAWMSON_DB_PATH", Path.home() / ".openclaw" / "clawmson.db"))
     db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -43,6 +55,11 @@ def fetch_markets(categories: list[str] | None = None) -> list[dict]:
     if categories is None:
         categories = ["crypto", "politics", "sports", "weather", "tech"]
 
+    # If cache is fresh, return cached data instead of hitting the API
+    if _is_cache_fresh():
+        print("[mirofish/feed] Cache fresh — skipping live fetch")
+        return _load_cached_markets(categories)
+
     now = datetime.datetime.utcnow().isoformat()
 
     try:
@@ -67,17 +84,6 @@ def fetch_markets(categories: list[str] | None = None) -> list[dict]:
 
             # NEW: try outcomePrices/outcomes first (gamma API format), fall back to tokens
             yes_price = no_price = None
-
-            def _parse_json_field(val):
-                """Parse field that may be a JSON string or already a list."""
-                if isinstance(val, list):
-                    return val
-                if isinstance(val, str):
-                    try:
-                        return json.loads(val)
-                    except (ValueError, TypeError):
-                        pass
-                return []
 
             outcome_prices = _parse_json_field(m.get("outcomePrices"))
             outcomes = _parse_json_field(m.get("outcomes"))
@@ -154,7 +160,7 @@ def _load_cached_markets(categories: list[str]) -> list[dict]:
     markets = [dict(r) for r in rows]
     if not markets:
         print("[mirofish/feed] Cache empty or stale. No markets available.")
-    return [m for m in markets if not categories or m.get("category") in categories]
+    return [m for m in markets if not categories or not m.get("category") or m.get("category") in categories]
 
 
 def get_recent_snapshots(market_id: str, limit: int = 3) -> list[dict]:
