@@ -352,15 +352,16 @@ def _conversation_thread(chat_id: str, effective_text: str,
     """Called in a background thread. Fetches Ollama reply and sends it."""
     send_typing(chat_id)
     history    = db.get_history(chat_id, limit=50)
-    task_type  = "vision" if has_image else None
-    model_name = router.route(effective_text, task_type=task_type, intent=intent,
-                               has_image=has_image)
+    model_name = router.route(effective_text, intent=intent, has_image=has_image)
     t0    = time.monotonic()
     reply = llm.chat(history, effective_text, has_image=has_image, model=model_name)
     elapsed_ms = (time.monotonic() - t0) * 1000
 
     success = not any(reply.startswith(e) for e in _OLLAMA_ERROR_PREFIXES)
-    router.record_result(model_name, task_type or "chat", elapsed_ms, success=success)
+    task_type = "vision" if has_image else (
+        router.INTENT_TO_TASK.get(intent, "chat") if intent else "chat"
+    )
+    router.record_result(model_name, task_type, elapsed_ms, success=success)
 
     db.save_message(chat_id, "assistant", reply)
     send(chat_id, reply)
