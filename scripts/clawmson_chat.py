@@ -34,10 +34,11 @@ def reload_system_prompt():
 
 
 def chat(history: list, user_message: str, has_image: bool = False,
-         model: str = None) -> str:
+         model: str = None, memory_context: str = "") -> str:
     """
     Send conversation history + new user message to Ollama.
     history: list of {"role": "user"|"assistant", "content": str}
+    memory_context: optional memory context to inject into system prompt
     Returns the assistant's reply as a string.
     Streams the response and assembles it before returning.
     """
@@ -46,6 +47,8 @@ def chat(history: list, user_message: str, has_image: bool = False,
         # Pass has_image so router applies the vision override internally
         model = router.route(user_message, has_image=has_image)
     system_prompt = _load_system_prompt()
+    if memory_context:
+        system_prompt = f"{system_prompt}\n\n{memory_context}"
 
     messages = [{"role": "system", "content": system_prompt}]
     for entry in history:
