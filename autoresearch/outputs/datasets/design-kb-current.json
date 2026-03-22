@@ -1,0 +1,25 @@
+{
+  "_meta": {
+    "description": "Omega MegaCorp Design Intelligence Knowledge Base",
+    "schema_version": "1.0",
+    "max_entries": 200,
+    "max_age_days": 90,
+    "last_trimmed": "2026-03-22",
+    "inject_script": "agents/tools/design-inject.py"
+  },
+  "entries": [
+    {
+      "url": "https://shiny.new",
+      "name": "SHINY.NEW — Omega MegaCorp",
+      "discovered": "2026-03-22",
+      "source": "internal",
+      "what_makes_it_special": "Pure state machine replaces scroll — 8 scenes fire on timer, forcing forward-only pacing the user cannot skip. Conic-gradient rotated via @property CSS custom property because GSAP cannot tween gradient strings directly.",
+      "techniques": ["gsap", "state-machine", "conic-gradient", "css-custom-property", "canvas-2d", "mix-blend-mode", "rgb-split", "css-keyframes-orbit"],
+      "aesthetic_tags": ["corporate-surreal", "void", "brutalist", "typographic", "glitch", "neon"],
+      "intensity": 8,
+      "applicable_to": ["experience", "landing", "product"],
+      "the_unexpected": "The artifact reveal is decided silently on §3 submit — all of §4 through §6 is pure theater for a decision already made.",
+      "brief_injection": "Make the system's decision feel like fate — compute the outcome first, then stage the theater of it arriving."
+    }
+  ]
+}
