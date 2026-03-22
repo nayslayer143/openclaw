@@ -65,6 +65,13 @@ CREATE TABLE IF NOT EXISTS daily_pnl (
     roi_pct         REAL
 );
 
+CREATE TABLE IF NOT EXISTS context (
+    chat_id  TEXT NOT NULL,
+    key      TEXT NOT NULL,
+    value    TEXT NOT NULL,
+    PRIMARY KEY (chat_id, key)
+);
+
 -- Seed starting balance in context table if not already set
 INSERT OR IGNORE INTO context (chat_id, key, value)
 VALUES ('mirofish', 'starting_balance', '1000.00');
