@@ -12,8 +12,6 @@ import requests
 from pathlib import Path
 
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
-CHAT_MODEL      = os.environ.get("OLLAMA_CHAT_MODEL",   "qwen2.5:7b")
-VISION_MODEL    = os.environ.get("OLLAMA_VISION_MODEL", "qwen3-vl:32b")
 
 _SYSTEM_PROMPT_PATH = Path.home() / "openclaw" / "agents" / "configs" / "clawmson-chat.md"
 _SYSTEM_PROMPT_CACHE = None
@@ -35,14 +33,18 @@ def reload_system_prompt():
     _SYSTEM_PROMPT_CACHE = None
 
 
-def chat(history: list, user_message: str, has_image: bool = False) -> str:
+def chat(history: list, user_message: str, has_image: bool = False,
+         model: str = None) -> str:
     """
     Send conversation history + new user message to Ollama.
     history: list of {"role": "user"|"assistant", "content": str}
     Returns the assistant's reply as a string.
     Streams the response and assembles it before returning.
     """
-    model = VISION_MODEL if has_image else CHAT_MODEL
+    if model is None:
+        import model_router as router
+        # Pass has_image so router applies the vision override internally
+        model = router.route(user_message, has_image=has_image)
     system_prompt = _load_system_prompt()
 
     messages = [{"role": "system", "content": system_prompt}]
