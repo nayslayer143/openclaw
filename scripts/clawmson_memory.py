@@ -464,7 +464,7 @@ class ProceduralMemory:
             tombstone = conn.execute(
                 "SELECT id FROM procedures"
                 " WHERE chat_id=? AND status='rejected' AND created_by='proposed'"
-                " AND trigger_pattern LIKE ?",
+                " AND action_description LIKE ?",
                 (chat_id, f"%{action}%")
             ).fetchone()
         if tombstone:
