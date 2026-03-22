@@ -230,3 +230,89 @@ class ShortTermMemory:
         if not rows:
             return ""
         return " ".join(r["summary"] for r in reversed(rows))
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# Layer 3 — EpisodicMemory
+# ════════════════════════════════════════════════════════════════════════════
+
+class EpisodicMemory:
+    """Significant events stored with valence tags and nomic embeddings."""
+
+    _RULE_KEYWORDS = {
+        "deploy", "deployed", "broke", "broken", "failed", "failure",
+        "fixed", "shipped", "decided", "decision", "remember", "never again",
+        "that worked", "rollback", "rolled back", "merged", "approved",
+        "launched", "crashed", "error", "reverted"
+    }
+
+    def _rule_pass(self, text: str) -> bool:
+        lower = text.lower()
+        return any(kw in lower for kw in self._RULE_KEYWORDS)
+
+    def ingest(self, chat_id: str, user_msg: str, assistant_msg: str):
+        """Check significance and store if episodic. Called from background thread."""
+        combined = f"{user_msg}\n{assistant_msg}"
+        if not self._rule_pass(combined):
+            return
+
+        prompt = (
+            f"User said: {user_msg[:500]}\n"
+            f"Assistant replied: {assistant_msg[:500]}\n\n"
+            f"Is this exchange episodically significant — a notable event, decision, "
+            f"outcome, or failure worth remembering? "
+            f"Return JSON: {{\"significant\": bool, \"summary\": \"1-sentence description\", "
+            f"\"valence\": \"positive|negative|neutral|critical\"}}"
+        )
+        result = _llm_json(prompt)
+        if not result.get("significant"):
+            return
+
+        summary = result.get("summary", combined[:200])
+        valence = result.get("valence", "neutral")
+        if valence not in ("positive", "negative", "neutral", "critical"):
+            valence = "neutral"
+
+        try:
+            embedding = _embed(summary)
+        except Exception as e:
+            print(f"[memory/episodic] embed failed: {e}")
+            embedding = None
+
+        ts = _now()
+        with db._get_conn() as conn:
+            conn.execute(
+                "INSERT INTO episodic_memories"
+                " (chat_id, content, summary, timestamp, valence, embedding)"
+                " VALUES (?, ?, ?, ?, ?, ?)",
+                (chat_id, combined[:1000], summary, ts, valence, embedding)
+            )
+
+    def retrieve(self, chat_id: str, query: str,
+                 embed_fn=None, min_sim: float = EPISODIC_MIN_SIM) -> list:
+        """Return top-K formatted episode strings by cosine similarity."""
+        embed_fn = embed_fn or _embed
+        try:
+            q_emb = embed_fn(query)
+        except Exception:
+            return []
+
+        with db._get_conn() as conn:
+            rows = conn.execute(
+                "SELECT summary, timestamp, valence, embedding"
+                " FROM episodic_memories WHERE chat_id=? AND embedding IS NOT NULL",
+                (chat_id,)
+            ).fetchall()
+
+        if not rows:
+            return []
+
+        scored = []
+        for r in rows:
+            sim = _cosine(q_emb, r["embedding"])
+            if sim >= min_sim:
+                date = r["timestamp"][:10]
+                scored.append((sim, f"[Episodic] [{date}, {r['valence']}] {r['summary']}"))
+
+        scored.sort(key=lambda x: x[0], reverse=True)
+        return [text for _, text in scored[:EPISODIC_TOP_K]]

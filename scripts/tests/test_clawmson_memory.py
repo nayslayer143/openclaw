@@ -186,5 +186,51 @@ class TestShortTermMemory(unittest.TestCase):
         self.assertEqual(other_archived, 0)  # other chat_id untouched
 
 
+# ── EpisodicMemory tests ─────────────────────────────────────────────────────
+
+class TestEpisodicMemory(unittest.TestCase):
+    def setUp(self):
+        import importlib
+        import clawmson_db
+        importlib.reload(clawmson_db)
+        import clawmson_memory
+        importlib.reload(clawmson_memory)
+        from clawmson_memory import EpisodicMemory
+        self.ep = EpisodicMemory()
+
+    def test_episodic_rule_pass(self):
+        """Trigger keyword in message pair passes rule check."""
+        self.assertTrue(self.ep._rule_pass("we deployed the fix"))
+        self.assertTrue(self.ep._rule_pass("it broke prod"))
+
+    def test_episodic_rule_no_match(self):
+        """Neutral message skips LLM call and stores nothing."""
+        with patch("clawmson_memory._llm_json") as mock_llm, \
+             patch("clawmson_memory._embed", return_value=_fake_embed("")):
+            self.ep.ingest("c1", "hey how are you", "doing well thanks")
+            mock_llm.assert_not_called()
+        import clawmson_db as db
+        with db._get_conn() as conn:
+            count = conn.execute(
+                "SELECT COUNT(*) FROM episodic_memories WHERE chat_id='c1'"
+            ).fetchone()[0]
+        self.assertEqual(count, 0)
+
+    def test_episodic_store_retrieve(self):
+        """Stores a significant episode; cosine search returns it."""
+        fake_emb = _fake_embed("")
+        llm_resp = {"significant": True, "summary": "Deployed fix, prod broke.",
+                    "valence": "critical"}
+        with patch("clawmson_memory._llm_json", return_value=llm_resp), \
+             patch("clawmson_memory._embed", return_value=fake_emb):
+            self.ep.ingest("c2", "we deployed the fix", "it broke prod login")
+        results = self.ep.retrieve("c2", "deployment",
+                                   embed_fn=lambda t: fake_emb,
+                                   min_sim=0.0)
+        self.assertEqual(len(results), 1)
+        self.assertIn("critical", results[0])
+        self.assertIn("Deployed fix", results[0])
+
+
 if __name__ == "__main__":
     unittest.main()
