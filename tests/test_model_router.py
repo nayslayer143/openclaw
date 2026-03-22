@@ -179,3 +179,18 @@ def test_record_result_silently_survives_db_error():
     # Should not raise even if DB is broken
     with patch('model_router._get_conn', side_effect=Exception("db gone")):
         router.record_result("qwen2.5:7b", "chat", 100.0)  # must not raise
+
+import clawmson_chat as chat_mod
+
+def test_chat_accepts_model_parameter():
+    """chat() must accept a model= kwarg and use it."""
+    import inspect
+    sig = inspect.signature(chat_mod.chat)
+    assert "model" in sig.parameters, "chat() must have a model= parameter"
+
+def test_chat_module_has_no_hardcoded_model_constants():
+    """CHAT_MODEL and VISION_MODEL constants must be removed."""
+    assert not hasattr(chat_mod, "CHAT_MODEL"), \
+        "CHAT_MODEL constant must be removed (shadows router)"
+    assert not hasattr(chat_mod, "VISION_MODEL"), \
+        "VISION_MODEL constant must be removed (shadows router)"
