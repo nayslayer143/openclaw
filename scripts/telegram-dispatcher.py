@@ -46,6 +46,15 @@ import clawmson_chat as llm
 import clawmson_intents as intents
 import clawmson_media as media
 import clawmson_references as refs
+import model_router as router
+
+# Prefixes that indicate Ollama inference failed (from clawmson_chat.py error returns)
+_OLLAMA_ERROR_PREFIXES = (
+    "Ollama is not reachable",
+    "Ollama timed out",
+    "Ollama HTTP error",
+    "Chat error",
+)
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
@@ -338,19 +347,30 @@ def handle_direct_command(chat_id: str, text: str):
 
 # ── Conversation handler (runs in thread) ─────────────────────────────────────
 
-def _conversation_thread(chat_id: str, effective_text: str, has_image: bool):
+def _conversation_thread(chat_id: str, effective_text: str,
+                         has_image: bool, intent: str = None):
     """Called in a background thread. Fetches Ollama reply and sends it."""
     send_typing(chat_id)
-    history = db.get_history(chat_id, limit=50)
-    reply   = llm.chat(history, effective_text, has_image=has_image)
+    history    = db.get_history(chat_id, limit=50)
+    task_type  = "vision" if has_image else None
+    model_name = router.route(effective_text, task_type=task_type, intent=intent,
+                               has_image=has_image)
+    t0    = time.monotonic()
+    reply = llm.chat(history, effective_text, has_image=has_image, model=model_name)
+    elapsed_ms = (time.monotonic() - t0) * 1000
+
+    success = not any(reply.startswith(e) for e in _OLLAMA_ERROR_PREFIXES)
+    router.record_result(model_name, task_type or "chat", elapsed_ms, success=success)
+
     db.save_message(chat_id, "assistant", reply)
     send(chat_id, reply)
 
 
-def dispatch_conversation(chat_id: str, effective_text: str, has_image: bool = False):
+def dispatch_conversation(chat_id: str, effective_text: str,
+                          has_image: bool = False, intent: str = None):
     t = threading.Thread(
         target=_conversation_thread,
-        args=(chat_id, effective_text, has_image),
+        args=(chat_id, effective_text, has_image, intent),
         daemon=True
     )
     t.start()
@@ -540,7 +560,7 @@ def handle_message(msg: dict):
         return
 
     # Default: CONVERSATION
-    dispatch_conversation(chat_id, effective_text, has_image=has_image)
+    dispatch_conversation(chat_id, effective_text, has_image=has_image, intent=intent)
 
 
 # ── Main loop ─────────────────────────────────────────────────────────────────
@@ -549,7 +569,7 @@ def main():
     print(f"[dispatcher] Starting Clawmson. Allowed users: {ALLOWED_USERS}")
     print(f"[dispatcher] Default repo: {DEFAULT_REPO} @ {DEFAULT_REPO_PATH}")
     print(f"[dispatcher] Ollama: {os.environ.get('OLLAMA_BASE_URL', 'http://localhost:11434')}"
-          f" / {os.environ.get('OLLAMA_CHAT_MODEL', 'qwen2.5:7b')}")
+          f" / model routing active")
     offset = load_offset()
 
     while True:

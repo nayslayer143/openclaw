@@ -180,6 +180,30 @@ def test_record_result_silently_survives_db_error():
     with patch('model_router._get_conn', side_effect=Exception("db gone")):
         router.record_result("qwen2.5:7b", "chat", 100.0)  # must not raise
 
+def test_conversation_thread_calls_record_result():
+    """_conversation_thread must call router.record_result after inference."""
+    import importlib.util
+    _dispatcher_path = os.path.join(os.path.dirname(__file__), '..', 'scripts',
+                                    'telegram-dispatcher.py')
+    spec = importlib.util.spec_from_file_location("telegram_dispatcher", _dispatcher_path)
+    dispatcher = importlib.util.module_from_spec(spec)
+
+    with patch('clawmson_db.get_history', return_value=[]), \
+         patch('clawmson_chat.chat', return_value="hi"), \
+         patch('model_router.route', return_value="qwen2.5:7b"), \
+         patch('model_router.record_result') as mock_record, \
+         patch('requests.post'), \
+         patch('clawmson_db.save_message'):
+        spec.loader.exec_module(dispatcher)
+        dispatcher._conversation_thread("123", "hello", False, "CONVERSATION")
+
+    mock_record.assert_called_once()
+    args = mock_record.call_args[0]
+    assert args[0] == "qwen2.5:7b"   # model
+    assert args[1] == "chat"          # task_type (None → "chat")
+    assert isinstance(args[2], float) # latency_ms
+
+
 import clawmson_chat as chat_mod
 
 def test_chat_accepts_model_parameter():
