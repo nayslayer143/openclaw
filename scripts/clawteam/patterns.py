@@ -78,7 +78,7 @@ def run_sequential(subtasks: List[dict], bus, runner: Callable = run_agent) -> L
     prior_result = ""
     for subtask in subtasks:
         prompt = subtask["prompt"]
-        if prior_result:
+        if prior_result and not prior_result.startswith("[ERROR]"):
             prompt = f"Prior step result: {prior_result}\n\n{prompt}"
         enriched = {**subtask, "prompt": prompt}
         result = _run_subtask(enriched, bus, runner)
@@ -159,6 +159,10 @@ def run_debate(swarm_id: str, task: str, bus, runner: Callable = run_agent) -> s
 
     a_result = results_map.get(pos_a["id"], "(position A unavailable)")
     b_result = results_map.get(pos_b["id"], "(position B unavailable)")
+    if a_result.startswith("[ERROR]"):
+        a_result = "(position A unavailable — model error)"
+    if b_result.startswith("[ERROR]"):
+        b_result = "(position B unavailable — model error)"
 
     judge_prompt = (
         f"You have two positions on this topic:\n\n"
@@ -206,6 +210,17 @@ def run_hierarchy(swarm_id: str, task: str, bus, runner: Callable = run_agent) -
     if not worker_defs:
         # MANAGER failed — single fallback worker
         worker_defs = [{"agent": "SCOUT", "prompt": task, "depends_on": []}]
+
+    # Validate: depends_on indices must be strictly earlier than current index
+    # (prevents cycles; if any back-reference exists, clear that dep and log a warning)
+    validated_defs = []
+    for idx, wdef in enumerate(worker_defs):
+        dep_indices = wdef.get("depends_on", []) or []
+        valid_deps = [i for i in dep_indices if isinstance(i, int) and 0 <= i < idx]
+        if len(valid_deps) != len(dep_indices):
+            print(f"[patterns] hierarchy: worker {idx} has invalid/cyclic deps {dep_indices} — keeping only valid: {valid_deps}")
+        validated_defs.append({**wdef, "depends_on": valid_deps})
+    worker_defs = validated_defs
 
     # Insert worker subtasks with index→ID translation
     workers = []
