@@ -232,5 +232,51 @@ class TestEpisodicMemory(unittest.TestCase):
         self.assertIn("Deployed fix", results[0])
 
 
+class TestSemanticMemory(unittest.TestCase):
+    def setUp(self):
+        import importlib
+        import clawmson_db
+        importlib.reload(clawmson_db)
+        import clawmson_memory
+        importlib.reload(clawmson_memory)
+        from clawmson_memory import SemanticMemory
+        self.sem = SemanticMemory()
+
+    def test_semantic_upsert(self):
+        """Same key updates value — no duplicate row created."""
+        import clawmson_db as db
+        fake_emb = _fake_embed("")
+        facts_v1 = {"facts": [{"key": "preferred model", "value": "qwen3:32b", "confidence": 0.8}]}
+        facts_v2 = {"facts": [{"key": "preferred model", "value": "qwen3-coder", "confidence": 0.9}]}
+        with patch("clawmson_memory._llm_json", return_value=facts_v1), \
+             patch("clawmson_memory._embed", return_value=fake_emb):
+            self.sem.ingest("c1", "I prefer qwen3:32b", "got it")
+        with patch("clawmson_memory._llm_json", return_value=facts_v2), \
+             patch("clawmson_memory._embed", return_value=fake_emb):
+            self.sem.ingest("c1", "actually I prefer qwen3-coder", "updated")
+        with db._get_conn() as conn:
+            rows = conn.execute(
+                "SELECT value FROM semantic_facts WHERE chat_id='c1' AND key='preferred model'"
+            ).fetchall()
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0][0], "qwen3-coder")
+
+    def test_semantic_retrieve_topk(self):
+        """Returns at most SEMANTIC_TOP_K facts."""
+        import clawmson_db as db
+        fake_emb = _fake_embed("")
+        for i in range(8):
+            with db._get_conn() as conn:
+                conn.execute(
+                    "INSERT INTO semantic_facts"
+                    " (chat_id, key, value, confidence, source, timestamp, embedding)"
+                    " VALUES (?,?,?,?,?,?,?)",
+                    ("c2", f"key{i}", f"fact {i}", 0.9, "explicit", _now(), fake_emb)
+                )
+        results = self.sem.retrieve("c2", "anything",
+                                    embed_fn=lambda t: fake_emb, min_sim=0.0)
+        self.assertLessEqual(len(results), 5)
+
+
 if __name__ == "__main__":
     unittest.main()

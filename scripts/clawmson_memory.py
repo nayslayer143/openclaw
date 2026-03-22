@@ -316,3 +316,108 @@ class EpisodicMemory:
 
         scored.sort(key=lambda x: x[0], reverse=True)
         return [text for _, text in scored[:EPISODIC_TOP_K]]
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# Layer 4 — SemanticMemory
+# ════════════════════════════════════════════════════════════════════════════
+
+class SemanticMemory:
+    """Extracted facts and preferences stored with nomic embeddings."""
+
+    _RULE_PATTERNS = (
+        "i prefer", "i always", "i hate", "i love", "i never", "i use",
+        "we use", "we always", "we never", "the model is", "jordan likes",
+        "jordan prefers", "jordan hates", "never use", "always use",
+    )
+
+    def _rule_pass(self, text: str) -> bool:
+        lower = text.lower()
+        return any(p in lower for p in self._RULE_PATTERNS)
+
+    def ingest(self, chat_id: str, user_msg: str, assistant_msg: str,
+               source: str = "inferred"):
+        """Extract facts/preferences and upsert into semantic_facts."""
+        combined = f"{user_msg}\n{assistant_msg}"
+        if not self._rule_pass(combined):
+            return
+
+        prompt = (
+            f"Message: {combined[:800]}\n\n"
+            f"Extract any stated facts, preferences, or habits as a JSON list. "
+            f"Each item: {{\"key\": \"short label\", \"value\": \"full fact sentence\", "
+            f"\"confidence\": 0.0-1.0}}. Return {{\"facts\": []}} if nothing notable."
+        )
+        result = _llm_json(prompt)
+        facts  = result.get("facts", [])
+        if not facts:
+            return
+
+        ts = _now()
+        for fact in facts:
+            key   = str(fact.get("key", ""))[:100]
+            value = str(fact.get("value", ""))[:500]
+            conf  = float(fact.get("confidence", 0.7))
+            if not key or not value:
+                continue
+            try:
+                embedding = _embed(value)
+            except Exception:
+                embedding = None
+            with db._get_conn() as conn:
+                conn.execute(
+                    "INSERT INTO semantic_facts"
+                    " (chat_id, key, value, confidence, source, timestamp, embedding)"
+                    " VALUES (?, ?, ?, ?, ?, ?, ?)"
+                    " ON CONFLICT(chat_id, key) DO UPDATE SET"
+                    " value=excluded.value, confidence=excluded.confidence,"
+                    " timestamp=excluded.timestamp, embedding=excluded.embedding",
+                    (chat_id, key, value, conf, source, ts, embedding)
+                )
+
+    def ingest_explicit(self, chat_id: str, key: str, value: str):
+        """Store a fact explicitly (/remember fact: key = value)."""
+        try:
+            embedding = _embed(value)
+        except Exception:
+            embedding = None
+        ts = _now()
+        with db._get_conn() as conn:
+            conn.execute(
+                "INSERT INTO semantic_facts"
+                " (chat_id, key, value, confidence, source, timestamp, embedding)"
+                " VALUES (?, ?, ?, ?, ?, ?, ?)"
+                " ON CONFLICT(chat_id, key) DO UPDATE SET"
+                " value=excluded.value, confidence=1.0,"
+                " timestamp=excluded.timestamp, embedding=excluded.embedding",
+                (chat_id, key[:100], value[:500], 1.0, "explicit", ts, embedding)
+            )
+
+    def retrieve(self, chat_id: str, query: str,
+                 embed_fn=None, min_sim: float = SEMANTIC_MIN_SIM) -> list:
+        """Return top-K formatted fact strings by cosine similarity."""
+        embed_fn = embed_fn or _embed
+        try:
+            q_emb = embed_fn(query)
+        except Exception:
+            return []
+
+        with db._get_conn() as conn:
+            rows = conn.execute(
+                "SELECT key, value, confidence, embedding FROM semantic_facts"
+                " WHERE chat_id=? AND embedding IS NOT NULL AND confidence >= ?",
+                (chat_id, SEMANTIC_MIN_CONF)
+            ).fetchall()
+
+        if not rows:
+            return []
+
+        scored = []
+        for r in rows:
+            sim = _cosine(q_emb, r["embedding"])
+            if sim >= min_sim:
+                scored.append((sim,
+                    f"[Semantic] {r['value']} (confidence: {r['confidence']:.1f})"))
+
+        scored.sort(key=lambda x: x[0], reverse=True)
+        return [text for _, text in scored[:SEMANTIC_TOP_K]]
