@@ -24,6 +24,7 @@ The core pipeline is shared. Outputs flow to the domain's output folder, then up
 | **Content Research** | `domains/content-research/` | Blog ideation, video scripts, image concepts, marketing material research |
 | **Academic** | `domains/academic/` | PhD-level papers, literature reviews, citation-heavy research, technical deep dives |
 | **Competitive** | `domains/competitive/` | Competitor analysis, landscape mapping, feature comparisons, market positioning |
+| **Design Intel** | `domains/design-intel/` | World-class web design scouting — feeds `design-kb-current.json` for brief injection |
 | **Ad-hoc** | `domains/_template/` | Anything that doesn't fit above — clone template, name the new domain, go |
 
 ---
@@ -72,6 +73,7 @@ Findings land in `meta/discovery-log.md`. Jordan reviews weekly.
 | Blog / video / content ideation | `domains/content-research/config.md` | `core/pipeline.md`, writing-room voice if drafting |
 | PhD-level paper or lit review | `domains/academic/config.md` | `core/pipeline.md`, `core/quality-standards.md` (strict mode) |
 | Competitor or market analysis | `domains/competitive/config.md` | `core/pipeline.md` |
+| Web design scouting / brief injection | `domains/design-intel/config.md` | `agents/tools/design-inject.py` for brief injection |
 | Something new / undefined | Clone `domains/_template/` | Name it, configure it, add to this table |
 | Discover new use cases for autoresearch | `meta/usecase-discovery.lobster` | Runs on cron — check `meta/discovery-log.md` |
 
