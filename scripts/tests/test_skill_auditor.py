@@ -380,6 +380,7 @@ class TestReporter(unittest.TestCase):
         self.assertIn("BLOCKED", report)
         self.assertIn("CRITICAL", report)
         self.assertIn("eval", report)
+        self.assertIn("Snippet", report)
 
 
 if __name__ == "__main__":

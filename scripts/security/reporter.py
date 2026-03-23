@@ -10,6 +10,11 @@ from pathlib import Path
 AUDIT_DIR = Path.home() / "openclaw" / "security" / "audits"
 
 
+def _md(s: str) -> str:
+    """Escape pipe characters for markdown table cells."""
+    return str(s).replace("|", "\\|")
+
+
 def build_report(
     skill_name: str,
     score: int,
@@ -25,7 +30,7 @@ def build_report(
     approved_str = approved_by or "pending"
 
     lines = [
-        f"# Security Audit: {skill_name}",
+        f"# Security Audit: {_md(skill_name)}",
         f"",
         f"**Date:** {date_str}  **Score:** {score}/100  "
         f"**Category:** {category}  **Approved by:** {approved_str}",
@@ -103,8 +108,8 @@ def write_summary(registry_rows: list[dict]) -> Path:
     ]
     for row in registry_rows:
         lines.append(
-            f"| {row['skill_name']} | {row['trust_score']} | {row['category']} "
-            f"| {row.get('approved_by') or '—'} | {row.get('last_verified') or '—'} |"
+            f"| {_md(row['skill_name'])} | {row['trust_score']} | {_md(row['category'])} "
+            f"| {_md(row.get('approved_by') or '—')} | {_md(row.get('last_verified') or '—')} |"
         )
 
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
