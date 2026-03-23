@@ -485,6 +485,74 @@ def digest_batch(paper_ids: list[str], delay: float = 5) -> list[dict]:
     return results
 
 
+# ── Auto mode ─────────────────────────────────────────────────────────────────
+
+def auto_mode(domains: list[str] | None = None) -> dict:
+    """
+    Overnight cron entry point.
+    Discovers papers across configured domains, digests qualifying papers,
+    writes daily digest report, returns summary dict.
+    """
+    if domains is None:
+        domains = DEFAULT_DOMAINS
+
+    today = datetime.datetime.utcnow().strftime("%Y-%m-%d")
+    all_candidates: list[dict] = []
+
+    for keyword in domains:
+        try:
+            candidates = discover(query=keyword, limit=20)
+            all_candidates.extend(candidates)
+        except Exception as e:
+            print(f"[scholar] discover failed for '{keyword}': {e}")
+
+    # Deduplicate across domains
+    seen: set[str] = set()
+    unique = []
+    for p in all_candidates:
+        if p["paper_id"] not in seen:
+            seen.add(p["paper_id"])
+            unique.append(p)
+
+    # Filter by relevance threshold
+    to_digest = [p for p in unique if (p.get("relevance_score") or 0) >= RELEVANCE_THRESHOLD]
+
+    # Digest qualifying papers
+    digest_results = digest_batch([p["paper_id"] for p in to_digest], delay=5)
+
+    # Collect actions taken
+    actions_taken: list[str] = []
+    for r in digest_results:
+        for a in r.get("actions", []):
+            if a not in actions_taken:
+                actions_taken.append(a)
+
+    # Write daily digest report
+    summary = get_recent_papers(days=1)
+    report_path = (OPENCLAW_ROOT / "autoresearch" / "outputs" / "papers" /
+                   f"academic-scholar-digest-{today}.md")
+    digested_count = len([r for r in digest_results if "error" not in r])
+    top_titles = summary.get("top_titles", [])
+
+    report_lines = [
+        f"# AutoScholar Daily Digest — {today}\n",
+        f"**Discovered:** {len(unique)} papers\n",
+        f"**Digested:** {digested_count} papers\n",
+        f"**Actions:** {', '.join(actions_taken) or 'none'}\n\n",
+        "## Top Papers\n",
+    ]
+    for title in top_titles:
+        report_lines.append(f"- {title}\n")
+    report_path.write_text("".join(report_lines))
+
+    return {
+        "discovered": len(unique),
+        "digested": digested_count,
+        "actions_taken": actions_taken,
+        "top_titles": top_titles,
+    }
+
+
 # ── ClawTeam shim ─────────────────────────────────────────────────────────────
 
 def get_paper_for_debate(paper_id: str, full: bool = False) -> dict:
