@@ -190,21 +190,15 @@ def handle_block(skill_name: str, notify_fn=None) -> str:
     if not row:
         return f"Unknown skill: {skill_name}"
 
-    registry.set_approved(skill_name, "blocked")
-    # Update category in DB
-    with registry._get_conn() as conn:
-        conn.execute(
-            "UPDATE skill_registry SET category = 'BLOCKED' WHERE skill_name = ?",
-            (skill_name,),
-        )
+    registry.set_blocked(skill_name)
 
     src = Path(row["source_path"])
     if src.exists():
         SKILLS_REJECTED.mkdir(parents=True, exist_ok=True)
         try:
             src.rename(SKILLS_REJECTED / src.name)
-        except Exception:
-            pass
+        except Exception as exc:
+            _log("block_move_error", {"skill_name": skill_name, "error": str(exc)})
 
     msg = f"🔴 {skill_name} blocked by Jordan."
     if notify_fn:
@@ -217,7 +211,7 @@ def scan_incoming(notify_fn=None) -> list[AuditResult]:
     SKILLS_INCOMING.mkdir(parents=True, exist_ok=True)
     results = []
     for path in sorted(SKILLS_INCOMING.iterdir()):
-        if path.suffix not in (".py", ".md") and not path.is_dir():
+        if path.suffix not in (".py",) and not path.is_dir():
             continue
         skill_name = path.stem
         if registry.get(skill_name):
