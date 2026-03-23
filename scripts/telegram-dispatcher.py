@@ -75,6 +75,7 @@ ENV_FILE       = OPENCLAW_ROOT / ".env"
 QUEUE_DIR      = OPENCLAW_ROOT / "repo-queue"
 BUILD_RESULTS  = OPENCLAW_ROOT / "build-results"
 RUN_TASK       = OPENCLAW_ROOT / "scripts" / "run-task.sh"
+CLAWTEAM       = OPENCLAW_ROOT / "scripts" / "clawteam.py"
 POLL_INTERVAL  = 5   # seconds
 _TWITTER_RE = scout.TWITTER_RE  # shared with clawmson_scout — single source of truth
 OFFSET_FILE    = Path("/tmp/openclaw-tg-offset.txt")
@@ -765,6 +766,22 @@ def handle_message(msg: dict):
     # ── 1. Existing ! shortcut commands (fast path, no DB save) ──────────────
     if text:
         lower = text.lower()
+        if text.startswith("!swarm "):
+            raw = text[7:].strip()
+            task = re.sub(r'[\x00-\x1f\x7f]', '', raw)[:500]
+            if not task:
+                send(chat_id, "Usage: !swarm <task description>")
+                return
+            log_path = OPENCLAW_ROOT / "logs" / f"clawteam-{datetime.date.today()}.log"
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(log_path, "a") as log_file:
+                subprocess.Popen(
+                    [sys.executable, str(CLAWTEAM), "--task", task, "--notify"],
+                    stdout=log_file, stderr=log_file,
+                    close_fds=True
+                )
+            send(chat_id, f"Swarm started. I'll ping you when it's done.\nTask: {task[:80]}...")
+            return
         if lower in ("!status", "/status"):
             handle_status(chat_id)
             return
