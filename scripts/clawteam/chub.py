@@ -14,6 +14,15 @@ _BLOCKLIST = {
     "api", "json", "http", "re", "os", "io", "sys", "time", "math", "csv",
     "abc", "ast", "uuid", "enum", "copy", "ssl", "xml", "url", "app", "sql",
     "log", "cli", "db",
+    # English stop-words / programming filler (picked up by call/use/using patterns)
+    "this", "that", "your", "case", "each", "then", "what", "some",
+    "have", "will", "them", "they", "best", "just", "when", "make",
+    "into", "more", "here", "next", "most", "such", "only", "very",
+    "even", "back", "take", "want", "both", "give", "know", "like",
+    "call", "with", "test", "type", "name", "path", "mode", "args",
+    "size", "text", "port", "user", "send", "read", "load", "save",
+    "open", "line", "docs", "func", "main", "base", "core", "util",
+    "from", "also", "show", "work", "tell", "move", "live",
 }
 
 _PATTERNS = [
@@ -45,6 +54,8 @@ def _extract_candidates(prompt: str) -> list[str]:
     filtered = []
     for c in seen:
         if not re.match(r'^[\w][\w.\-]*$', c):   # shape: no spaces, valid chars
+            continue
+        if c.startswith('__'):                     # dunder names (__future__, __init__)
             continue
         if len(c) < 4:                             # min length: block os, re, io
             continue

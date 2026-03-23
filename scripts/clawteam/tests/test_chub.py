@@ -36,3 +36,10 @@ def test_candidate_with_spaces_filtered():
     result = _extract_candidates("use `some library` to process data")
     # "some library" contains a space — shape filter `re.match(r'^[\w][\w.\-]*$', c)` drops it
     assert "some library" not in result
+
+
+def test_cap_at_three():
+    """Prompts with more than 3 candidates return at most 3."""
+    from clawteam.chub import _extract_candidates
+    result = _extract_candidates("`numpy` `pandas` `scipy` `sklearn` `matplotlib`")
+    assert len(result) == 3
