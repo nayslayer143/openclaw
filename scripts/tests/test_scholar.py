@@ -144,6 +144,10 @@ class TestDBHelpers(unittest.TestCase):
 
 
 class TestEmbedAndRank(unittest.TestCase):
+    def setUp(self):
+        from autoresearch import scholar
+        scholar._GOAL_VECTOR = None  # reset cache before each test
+
     def _make_embed_response(self, vec: list) -> MagicMock:
         mock = MagicMock()
         mock.raise_for_status = MagicMock()
