@@ -106,10 +106,7 @@ def test_cache_returns_when_fresh(temp_db, monkeypatch):
 
 # ── Test 5: signals injected into Ollama prompt ────────────────────────────
 def test_signals_injected_into_ollama_prompt(temp_db):
-    import sys, datetime as dt
-    for mod in list(sys.modules.keys()):
-        if "trading_brain" in mod:
-            del sys.modules[mod]
+    import datetime as dt
     import scripts.mirofish.trading_brain as tb
 
     captured: list[str] = []
