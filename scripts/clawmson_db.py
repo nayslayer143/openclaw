@@ -214,6 +214,9 @@ def fts_index(chat_id: str, source: str, source_id: int,
     except ImportError:
         return
 
+    if not content or not content.strip():
+        return
+
     sql = ("INSERT INTO memory_fts (content, source, chat_id, source_id, ts)"
            " VALUES (?, ?, ?, ?, ?)")
     params = (content, source, chat_id, source_id, ts)
