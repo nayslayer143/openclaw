@@ -383,5 +383,78 @@ class TestReporter(unittest.TestCase):
         self.assertIn("Snippet", report)
 
 
+class TestAuditor(unittest.TestCase):
+    """Tests for auditor.py orchestration logic."""
+
+    def setUp(self):
+        import security.registry as reg
+        self._orig_db = reg._DB_PATH
+        reg._DB_PATH = ":memory:"
+        reg._CONN = None
+        reg._init_db()
+
+    def tearDown(self):
+        import security.registry as reg
+        reg._DB_PATH = self._orig_db
+        if reg._CONN:
+            reg._CONN.close()
+        reg._CONN = None
+
+    def test_handle_approval_rejects_changed_file(self):
+        """handle_approval() returns error and does NOT call set_approved when hash changed."""
+        import security.registry as reg
+        from security.auditor import handle_approval
+
+        with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode="w") as f:
+            f.write("x = 1\n")
+            path = f.name
+
+        try:
+            # Register with a stale hash (wrong hash to simulate post-audit modification)
+            reg.register("my_skill", path, score=65, category="REVIEW",
+                         findings=[], source_url=None)
+            # Corrupt the stored hash to simulate file change since audit
+            with reg._get_conn() as conn:
+                conn.execute(
+                    "UPDATE skill_registry SET hash_sha256 = 'deadbeef' WHERE skill_name = ?",
+                    ("my_skill",)
+                )
+
+            notifications = []
+            result = handle_approval("my_skill", notify_fn=notifications.append)
+
+            # Must reject — hash mismatch
+            self.assertIn("changed since audit", result)
+            # set_approved must NOT have been called — approved_by stays None
+            row = reg.get("my_skill")
+            self.assertIsNone(row["approved_by"])
+        finally:
+            os.unlink(path)
+
+    def test_handle_approval_succeeds_on_matching_hash(self):
+        """handle_approval() calls set_approved when hash matches."""
+        import security.registry as reg
+        from security.auditor import handle_approval
+
+        with tempfile.NamedTemporaryFile(suffix=".py", delete=False, mode="w") as f:
+            f.write("x = 1\n")
+            path = f.name
+
+        try:
+            # Register with the real hash
+            reg.register("clean_skill", path, score=65, category="REVIEW",
+                         findings=[], source_url=None)
+
+            result = handle_approval("clean_skill")
+
+            # Must succeed — hashes match
+            self.assertIn("approved by Jordan", result)
+            row = reg.get("clean_skill")
+            self.assertEqual(row["approved_by"], "jordan")
+        finally:
+            # File may have been moved — use Path.unlink(missing_ok=True)
+            Path(path).unlink(missing_ok=True)
+
+
 if __name__ == "__main__":
     unittest.main()
