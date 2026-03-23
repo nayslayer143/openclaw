@@ -73,3 +73,72 @@ DEFAULT_DOMAINS = [
     "tool use LLM",
     "agentic systems",
 ]
+
+# ── DB helpers ────────────────────────────────────────────────────────────────
+
+def save_paper(paper_id: str, title: str, authors, abstract, url,
+               relevance_score) -> None:
+    """INSERT OR IGNORE a paper row. discovered_at set to UTC now."""
+    ts = datetime.datetime.utcnow().isoformat()
+    with db._get_conn() as conn:
+        conn.execute(
+            "INSERT OR IGNORE INTO papers "
+            "(paper_id, title, authors, abstract, url, relevance_score, discovered_at)"
+            " VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (paper_id, title, authors, abstract, url, relevance_score, ts)
+        )
+
+
+def mark_digested(paper_id: str) -> None:
+    with db._get_conn() as conn:
+        conn.execute("UPDATE papers SET digested=1 WHERE paper_id=?", (paper_id,))
+
+
+def save_digest(paper_id: str, findings: str, techniques: str, models: str,
+                relevance: str, priority: str, action: str) -> None:
+    """Insert a paper_digests row. digested_at set to UTC now."""
+    ts = datetime.datetime.utcnow().isoformat()
+    with db._get_conn() as conn:
+        conn.execute(
+            "INSERT INTO paper_digests "
+            "(paper_id, key_findings, implementable_techniques, linked_models, "
+            " relevance_to_builds, priority, action_taken, digested_at)"
+            " VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            (paper_id, findings, techniques, models, relevance, priority, action, ts)
+        )
+
+
+def get_undigested(limit: int = 20) -> list[dict]:
+    """Return papers not yet digested, ordered by relevance_score DESC."""
+    with db._get_conn() as conn:
+        rows = conn.execute(
+            "SELECT * FROM papers WHERE digested=0 ORDER BY relevance_score DESC LIMIT ?",
+            (limit,)
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_recent_papers(days: int = 7) -> dict:
+    """
+    Return summary of papers discovered in the last N days.
+    Returns {"total": int, "digested": int, "top_titles": list[str]}
+    """
+    cutoff = (datetime.datetime.utcnow() - datetime.timedelta(days=days)).isoformat()
+    with db._get_conn() as conn:
+        total = conn.execute(
+            "SELECT COUNT(*) FROM papers WHERE discovered_at >= ?", (cutoff,)
+        ).fetchone()[0]
+        digested = conn.execute(
+            "SELECT COUNT(*) FROM papers WHERE discovered_at >= ? AND digested=1",
+            (cutoff,)
+        ).fetchone()[0]
+        top_rows = conn.execute(
+            "SELECT title FROM papers WHERE discovered_at >= ? AND digested=1"
+            " ORDER BY relevance_score DESC LIMIT 5",
+            (cutoff,)
+        ).fetchall()
+    return {
+        "total": total,
+        "digested": digested,
+        "top_titles": [r["title"] for r in top_rows],
+    }

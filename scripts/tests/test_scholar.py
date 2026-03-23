@@ -64,5 +64,83 @@ class TestModuleConstants(unittest.TestCase):
         self.assertLessEqual(scholar.RELEVANCE_THRESHOLD, 1.0)
 
 
+class TestDBHelpers(unittest.TestCase):
+    def setUp(self):
+        # Wipe papers tables between tests
+        conn = db._get_conn()
+        conn.execute("DELETE FROM paper_digests")
+        conn.execute("DELETE FROM papers")
+        conn.commit()
+        from autoresearch import scholar
+        self.s = scholar
+
+    def test_save_paper_inserts(self):
+        self.s.save_paper("2401.00001", "Test Paper", '["Alice"]',
+                          "An abstract.", "https://hf.co/papers/2401.00001", 0.82)
+        conn = db._get_conn()
+        row = conn.execute("SELECT * FROM papers WHERE paper_id=?",
+                           ("2401.00001",)).fetchone()
+        self.assertIsNotNone(row)
+        self.assertEqual(row["title"], "Test Paper")
+        self.assertEqual(row["digested"], 0)
+        self.assertIsNotNone(row["discovered_at"])
+
+    def test_save_paper_insert_or_ignore(self):
+        self.s.save_paper("2401.00002", "Paper A", None, None, None, 0.9)
+        self.s.save_paper("2401.00002", "Paper B", None, None, None, 0.5)
+        conn = db._get_conn()
+        rows = conn.execute("SELECT title FROM papers WHERE paper_id=?",
+                            ("2401.00002",)).fetchall()
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0]["title"], "Paper A")  # first write wins
+
+    def test_mark_digested(self):
+        self.s.save_paper("2401.00003", "Paper C", None, None, None, 0.7)
+        self.s.mark_digested("2401.00003")
+        conn = db._get_conn()
+        row = conn.execute("SELECT digested FROM papers WHERE paper_id=?",
+                           ("2401.00003",)).fetchone()
+        self.assertEqual(row["digested"], 1)
+
+    def test_save_digest_inserts(self):
+        import json
+        self.s.save_paper("2401.00004", "Paper D", None, None, None, 0.8)
+        self.s.save_digest(
+            paper_id="2401.00004",
+            findings=json.dumps(["finding 1", "finding 2"]),
+            techniques=json.dumps(["technique A"]),
+            models=json.dumps(["bert-base"]),
+            relevance="Relevant to RAG",
+            priority="P1",
+            action="improvement,bakeoff",
+        )
+        conn = db._get_conn()
+        row = conn.execute("SELECT * FROM paper_digests WHERE paper_id=?",
+                           ("2401.00004",)).fetchone()
+        self.assertIsNotNone(row)
+        self.assertEqual(row["priority"], "P1")
+        self.assertEqual(row["action_taken"], "improvement,bakeoff")
+        self.assertIsNotNone(row["digested_at"])
+
+    def test_get_undigested(self):
+        self.s.save_paper("2401.00005", "Undigested", None, None, None, 0.9)
+        self.s.save_paper("2401.00006", "Digested", None, None, None, 0.8)
+        self.s.mark_digested("2401.00006")
+        results = self.s.get_undigested(limit=10)
+        ids = [r["paper_id"] for r in results]
+        self.assertIn("2401.00005", ids)
+        self.assertNotIn("2401.00006", ids)
+
+    def test_get_recent_papers_structure(self):
+        self.s.save_paper("2401.00007", "Recent Paper", None, None, None, 0.85)
+        self.s.mark_digested("2401.00007")
+        result = self.s.get_recent_papers(days=7)
+        self.assertIn("total", result)
+        self.assertIn("digested", result)
+        self.assertIn("top_titles", result)
+        self.assertIsInstance(result["top_titles"], list)
+        self.assertGreaterEqual(result["total"], 1)
+
+
 if __name__ == "__main__":
     unittest.main()
