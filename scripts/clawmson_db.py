@@ -150,11 +150,13 @@ def save_message(chat_id: str, role: str, content: str,
                  message_id: int = None, media_type: str = None):
     ts = datetime.datetime.utcnow().isoformat()
     with _get_conn() as conn:
-        conn.execute(
+        cur = conn.execute(
             "INSERT INTO conversations (chat_id, message_id, role, content, timestamp, media_type)"
             " VALUES (?, ?, ?, ?, ?, ?)",
             (chat_id, message_id, role, content, ts, media_type)
         )
+        source_id = cur.lastrowid
+        fts_index(chat_id, "conversation", source_id, content, ts, conn=conn)
 
 
 def get_history(chat_id: str, limit: int = 50) -> list:
@@ -192,11 +194,14 @@ def set_context(chat_id: str, key: str, value: str):
 def save_reference(chat_id: str, url: str, title: str, summary: str, content: str):
     ts = datetime.datetime.utcnow().isoformat()
     with _get_conn() as conn:
-        conn.execute(
+        cur = conn.execute(
             "INSERT INTO refs (chat_id, url, title, summary, content, timestamp)"
             " VALUES (?, ?, ?, ?, ?, ?)",
             (chat_id, url, title or url, summary, content, ts)
         )
+        source_id = cur.lastrowid
+        fts_content = f"{title or url} {summary or ''}".strip()
+        fts_index(chat_id, "reference", source_id, fts_content, ts, conn=conn)
 
 
 def fts_index(chat_id: str, source: str, source_id: int,
