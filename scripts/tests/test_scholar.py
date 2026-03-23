@@ -532,5 +532,57 @@ class TestDigestBatchAndDebate(unittest.TestCase):
         self.assertEqual(result.get("error"), "not_found")
 
 
+class TestAutoMode(unittest.TestCase):
+    def setUp(self):
+        conn = db._get_conn()
+        conn.execute("DELETE FROM paper_digests")
+        conn.execute("DELETE FROM papers")
+        conn.commit()
+
+    def test_auto_mode_threshold_filters(self):
+        from autoresearch import scholar
+
+        # discover() returns two papers: one above threshold, one below
+        above = {"paper_id": "2401.60001", "title": "High Score",
+                 "abstract": "abc", "relevance_score": 0.9, "authors": None, "url": None}
+        below = {"paper_id": "2401.60002", "title": "Low Score",
+                 "abstract": "xyz", "relevance_score": 0.5, "authors": None, "url": None}
+
+        digested_ids = []
+
+        def fake_discover(query=None, limit=10):
+            return [above, below]
+
+        def fake_digest_batch(ids, delay=0):
+            digested_ids.extend(ids)
+            return [{"paper_id": pid} for pid in ids]
+
+        with patch.object(scholar, "discover", side_effect=fake_discover), \
+             patch.object(scholar, "digest_batch", side_effect=fake_digest_batch), \
+             patch.object(scholar, "RELEVANCE_THRESHOLD", 0.75):
+            # Save papers so get_recent_papers works
+            scholar.save_paper("2401.60001", "High Score", None, None, None, 0.9)
+            scholar.mark_digested("2401.60001")
+            result = scholar.auto_mode(domains=["test domain"])
+
+        self.assertIn("2401.60001", digested_ids)
+        self.assertNotIn("2401.60002", digested_ids)
+        self.assertIn("discovered", result)
+        self.assertIn("digested", result)
+        self.assertIn("top_titles", result)
+
+    def test_auto_mode_returns_correct_structure(self):
+        from autoresearch import scholar
+        with patch.object(scholar, "discover", return_value=[]), \
+             patch.object(scholar, "digest_batch", return_value=[]):
+            result = scholar.auto_mode(domains=["agents"])
+
+        self.assertIn("discovered", result)
+        self.assertIn("digested", result)
+        self.assertIn("actions_taken", result)
+        self.assertIn("top_titles", result)
+        self.assertIsInstance(result["actions_taken"], list)
+
+
 if __name__ == "__main__":
     unittest.main()
