@@ -59,6 +59,16 @@ _OLLAMA_ERROR_PREFIXES = (
 import clawmson_memory as mem_module
 _memory = mem_module.memory  # module-level singleton
 
+import clawmson_fts as fts
+import clawmson_sessions as sessions
+import signal
+
+CLAWMSON_SEARCH_LIMIT = int(os.environ.get("CLAWMSON_SEARCH_LIMIT", "10"))
+
+_SESSION_KEY: str = ""                     # set on boot by start_session()
+_resumed: set[str] = set()                # chat_ids already resumed this process run
+_resumed_lock = threading.Lock()           # guards check-then-add on _resumed
+
 # ── Config ────────────────────────────────────────────────────────────────────
 
 OPENCLAW_ROOT  = Path.home() / "openclaw"
@@ -390,6 +400,12 @@ def handle_reject_proc(chat_id: str, proc_id_str: str):
     send(chat_id, f"Procedure {proc_id} rejected.")
 
 
+def handle_search(chat_id: str, query: str):
+    """FTS5 keyword search across all memory layers. Usage: /search <query>"""
+    results = fts.search(chat_id, query, limit=CLAWMSON_SEARCH_LIMIT)
+    send(chat_id, fts.format_results(results))
+
+
 # ── Direct command execution ──────────────────────────────────────────────────
 
 def handle_direct_command(chat_id: str, text: str):
@@ -417,9 +433,26 @@ def _conversation_thread(chat_id: str, effective_text: str,
                          has_image: bool, intent: str = None):
     """Called in a background thread. Fetches Ollama reply and sends it."""
     send_typing(chat_id)
+
+    # Session tracking
+    if _SESSION_KEY:
+        sessions.ensure_session(_SESSION_KEY, chat_id)
+
     history        = _memory.sensory(chat_id)
     memory_context = _memory.retrieve(chat_id, effective_text)
-    model_name     = router.route(effective_text, intent=intent, has_image=has_image)
+
+    # Resume injection: first post-restart message per chat_id gets previous session context
+    if _SESSION_KEY:
+        with _resumed_lock:
+            already_resumed = chat_id in _resumed
+            if not already_resumed:
+                _resumed.add(chat_id)
+        if not already_resumed:
+            resume = sessions.get_resume_context(chat_id, _SESSION_KEY)
+            if resume:
+                memory_context = resume + "\n\n" + memory_context
+
+    model_name = router.route(effective_text, intent=intent, has_image=has_image)
     t0    = time.monotonic()
     reply = llm.chat(history, effective_text, has_image=has_image,
                      model=model_name, memory_context=memory_context)
@@ -523,6 +556,13 @@ def handle_message(msg: dict):
             return
         if lower == "/references":
             handle_references(chat_id)
+            return
+        if lower.startswith("/search"):
+            query = text[len("/search"):].strip()
+            if not query:
+                send(chat_id, "Usage: /search <query>")
+            else:
+                handle_search(chat_id, query)
             return
         if lower == "/memory-stats":
             handle_memory_stats(chat_id)
@@ -665,7 +705,21 @@ def handle_message(msg: dict):
 
 # ── Main loop ─────────────────────────────────────────────────────────────────
 
+def _shutdown():
+    """Clean shutdown: end all sessions, then exit."""
+    if _SESSION_KEY:
+        sessions.end_all_sessions(_SESSION_KEY)
+    sys.exit(0)
+
+
 def main():
+    global _SESSION_KEY
+    _SESSION_KEY = sessions.start_session()
+    print(f"[dispatcher] Session key: {_SESSION_KEY}")
+
+    signal.signal(signal.SIGTERM, lambda sig, frame: _shutdown())
+    signal.signal(signal.SIGINT,  lambda sig, frame: _shutdown())
+
     print(f"[dispatcher] Starting Clawmson. Allowed users: {ALLOWED_USERS}")
     print(f"[dispatcher] Default repo: {DEFAULT_REPO} @ {DEFAULT_REPO_PATH}")
     print(f"[dispatcher] Ollama: {os.environ.get('OLLAMA_BASE_URL', 'http://localhost:11434')}"
