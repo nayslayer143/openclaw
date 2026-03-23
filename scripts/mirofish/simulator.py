@@ -150,6 +150,34 @@ def migrate():
     print(f"[mirofish] Migration complete. DB: {db_path}")
 
 
+def _log_price_lag_trade(decision) -> None:
+    """Write price-lag arb tracking row from decision.metadata."""
+    m = decision.metadata
+    if not m:
+        return
+    try:
+        with _get_conn() as conn:
+            conn.execute("""
+                INSERT INTO price_lag_trades
+                (market_id, question, asset, contract_type, spot_price,
+                 threshold, bracket_low, bracket_high, polymarket_price,
+                 raw_dislocation, decayed_edge, days_to_expiry,
+                 direction, confidence, amount_usd, entry_price, detected_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                decision.market_id, decision.question,
+                m.get("asset"), m.get("contract_type"), m.get("spot_price"),
+                m.get("threshold"), m.get("bracket_low"), m.get("bracket_high"),
+                m.get("polymarket_price"), m.get("raw_dislocation"),
+                m.get("decayed_edge"), m.get("days_to_expiry"),
+                decision.direction, decision.confidence,
+                decision.amount_usd, decision.entry_price,
+                datetime.datetime.utcnow().isoformat(),
+            ))
+    except Exception as e:
+        print(f"[mirofish] Price-lag tracking error: {e}")
+
+
 def run_loop():
     """Full simulation loop: fetch → analyze → trade → stops → snapshot."""
     import scripts.mirofish.polymarket_feed as feed
@@ -173,6 +201,7 @@ def run_loop():
         # 3. Fetch UW signals ([] if key not set or API down)
         import scripts.mirofish.unusual_whales_feed as uw_feed
         import scripts.mirofish.crucix_feed as crucix_feed
+        import scripts.mirofish.spot_feed as spot_feed
         uw_signals = uw_feed.fetch()
         if uw_signals:
             print(f"[mirofish] UW signals: {len(uw_signals)} "
@@ -184,8 +213,14 @@ def run_loop():
 
         all_signals = uw_signals + crucix_signals
 
+        spot_signals = spot_feed.fetch()
+        spot_dict = spot_feed.get_spot_dict()
+        if spot_dict:
+            print(f"[mirofish] Spot prices: " +
+                  ", ".join(f"{k}=${v:,.0f}" for k, v in spot_dict.items()))
+
         # 4. Analyze markets
-        decisions = brain.analyze(markets, state, signals=all_signals or None)
+        decisions = brain.analyze(markets, state, signals=all_signals or None, spot_prices=spot_dict or None)
         # Note: empty list collapses to None intentionally.
         # analyze() branches on `if signals:` so both None and [] skip injection.
         print(f"[mirofish] Brain returned {len(decisions)} trade decisions")
@@ -196,6 +231,8 @@ def run_loop():
             if result:
                 print(f"[mirofish] Executed: {d.direction} ${d.amount_usd:.0f} "
                       f"on '{d.question[:50]}' [{d.strategy}]")
+                if d.strategy == "price_lag_arb" and d.metadata:
+                    _log_price_lag_trade(d)
             else:
                 print(f"[mirofish] Rejected: {d.market_id} (cap or kelly)")
 

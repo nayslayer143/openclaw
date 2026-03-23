@@ -7,6 +7,7 @@ from __future__ import annotations
 import os
 import json
 import re
+import math
 import requests
 from dataclasses import dataclass
 from typing import Any
@@ -18,6 +19,9 @@ MAX_POSITION_PCT = float(os.environ.get("MIROFISH_MAX_POSITION_PCT", "0.10"))
 MERGED_SIGNAL_LIMIT = int(os.environ.get("MERGED_SIGNAL_LIMIT", "30"))
 ARB_THRESHOLD = 0.03
 ARB_POSITION_PCT = 0.05  # Fixed 5% of portfolio for arb trades
+PRICE_LAG_MIN_EDGE = float(os.environ.get("PRICE_LAG_MIN_EDGE", "0.05"))
+PRICE_LAG_LATENCY_PENALTY = float(os.environ.get("PRICE_LAG_LATENCY_PENALTY", "0.005"))
+PRICE_LAG_MAX_HORIZON = int(os.environ.get("PRICE_LAG_MAX_HORIZON", "180"))
 
 
 @dataclass
@@ -31,6 +35,7 @@ class TradeDecision:
     amount_usd:  float
     entry_price: float
     shares:      float
+    metadata:    dict | None = None
 
 
 def _kelly_size(confidence: float, entry_price: float, balance: float) -> float | None:
@@ -91,6 +96,230 @@ def _check_arbitrage(market: dict) -> TradeDecision | None:
     )
 
 
+# ── Price-lag arb helpers ──────────────────────────────────────────────────
+
+_CRYPTO_ASSETS = {
+    "BTC": re.compile(r"\b(?:BTC|Bitcoin)\b", re.IGNORECASE),
+    "ETH": re.compile(r"\b(?:ETH|Ethereum)\b", re.IGNORECASE),
+}
+
+_BINARY_ABOVE_RE = re.compile(
+    r"(?:above|over|exceed|reach|hit)\s*\$?([\d,]+\.?\d*[kK]?)", re.IGNORECASE
+)
+_BINARY_BELOW_RE = re.compile(
+    r"(?:below|under|drop)\s*\$?([\d,]+\.?\d*[kK]?)", re.IGNORECASE
+)
+_BRACKET_RE = re.compile(
+    r"\$?([\d,]+\.?\d*[kK]?)\s*[-\u2013]\s*\$?([\d,]+\.?\d*[kK]?)"
+)
+
+
+def _parse_price_string(s: str) -> float | None:
+    """Normalize price strings: '$50,000' / '50k' / '1,234.56' → float."""
+    if not s or not s.strip():
+        return None
+    s = s.strip().replace(",", "").replace("$", "")
+    multiplier = 1.0
+    if s.lower().endswith("k"):
+        multiplier = 1000.0
+        s = s[:-1]
+    try:
+        return float(s) * multiplier
+    except ValueError:
+        return None
+
+
+def _detect_crypto_contract(market: dict) -> tuple | None:
+    """Detect if a market is a crypto price contract.
+
+    Returns: (asset, contract_type, params_dict) or None.
+    - binary_threshold: params = {"threshold": float}
+    - continuous_bracket: params = {"bracket_low": float, "bracket_high": float}
+    """
+    question = market.get("question", "")
+    asset = None
+    for a, pattern in _CRYPTO_ASSETS.items():
+        if pattern.search(question):
+            asset = a
+            break
+    if not asset:
+        return None
+
+    # Try bracket first (more specific pattern)
+    m = _BRACKET_RE.search(question)
+    if m:
+        low = _parse_price_string(m.group(1))
+        high = _parse_price_string(m.group(2))
+        if low is not None and high is not None and low < high:
+            return (asset, "continuous_bracket", {"bracket_low": low, "bracket_high": high})
+
+    # Try binary above
+    m = _BINARY_ABOVE_RE.search(question)
+    if m:
+        threshold = _parse_price_string(m.group(1))
+        if threshold is not None:
+            return (asset, "binary_threshold", {"threshold": threshold})
+
+    # Try binary below
+    m = _BINARY_BELOW_RE.search(question)
+    if m:
+        threshold = _parse_price_string(m.group(1))
+        if threshold is not None:
+            return (asset, "binary_threshold", {"threshold": threshold})
+
+    return None
+
+
+def _compute_binary_dislocation(
+    spot: float, threshold: float, market_yes: float,
+    market_no: float, days_to_expiry: int,
+) -> tuple[float, str, float] | None:
+    """Compute dislocation for binary threshold contract.
+
+    Returns: (raw_dislocation, direction, implied_prob) or None.
+    """
+    distance_pct = abs(threshold - spot) / spot if spot > 0 else 999
+    vol_factor = 0.5 * math.sqrt(max(days_to_expiry, 1) / 30)
+
+    # Implied probability that price reaches/stays above threshold
+    implied_prob = max(0.01, min(0.99, 1.0 - distance_pct / vol_factor))
+
+    # Dislocation against market prices
+    if implied_prob > market_yes:
+        raw_dislocation = implied_prob - market_yes
+        direction = "YES"
+    else:
+        implied_no = 1.0 - implied_prob
+        raw_dislocation = implied_no - market_no
+        direction = "NO"
+
+    raw_dislocation = max(raw_dislocation, 0.0)
+    return (raw_dislocation, direction, implied_prob)
+
+
+def _compute_bracket_dislocation(
+    spot: float, bracket_low: float, bracket_high: float,
+    market_yes: float, days_to_expiry: int,
+) -> tuple[float, str, float] | None:
+    """Compute dislocation for continuous bracket contract."""
+    bracket_width = bracket_high - bracket_low
+    center = (bracket_low + bracket_high) / 2
+
+    if bracket_low <= spot <= bracket_high:
+        dist_from_center = abs(spot - center) / (bracket_width / 2) if bracket_width > 0 else 1
+        implied_prob = max(0.05, 0.7 * (1.0 - dist_from_center))
+    else:
+        if spot < bracket_low:
+            dist = (bracket_low - spot) / spot if spot > 0 else 999
+        else:
+            dist = (spot - bracket_high) / spot if spot > 0 else 999
+        vol_factor = 0.5 * math.sqrt(max(days_to_expiry, 1) / 30)
+        implied_prob = max(0.01, min(0.40, 0.3 * (1.0 - dist / vol_factor)))
+
+    raw_dislocation = abs(implied_prob - market_yes)
+    direction = "YES" if implied_prob > market_yes else "NO"
+    return (raw_dislocation, direction, implied_prob)
+
+
+def _decay_multiplier(days_to_expiry: int) -> float:
+    """Inverted linear decay: near expiry = strong signal, far = weak."""
+    return max(0.1, 1.0 - days_to_expiry / PRICE_LAG_MAX_HORIZON)
+
+
+def _check_price_lag_arb(
+    market: dict, spot_prices: dict[str, float], balance: float,
+) -> "TradeDecision | None":
+    """Check if a Polymarket crypto contract has a price-lag dislocation."""
+    detection = _detect_crypto_contract(market)
+    if not detection:
+        return None
+
+    asset, contract_type, params = detection
+    spot = spot_prices.get(asset)
+    if not spot or spot <= 0:
+        return None
+
+    # Parse end_date
+    end_date_str = market.get("end_date")
+    if not end_date_str:
+        return None
+    try:
+        import datetime as dt
+        end_date = dt.datetime.fromisoformat(end_date_str.replace("Z", "+00:00"))
+        days_to_expiry = (end_date.replace(tzinfo=None) - dt.datetime.utcnow()).days
+    except (ValueError, TypeError):
+        return None
+    if days_to_expiry <= 0:
+        return None
+
+    market_yes = market.get("yes_price", 0) or 0
+    market_no = market.get("no_price", 1.0 - market_yes)
+
+    # Compute dislocation based on contract type
+    if contract_type == "binary_threshold":
+        result = _compute_binary_dislocation(
+            spot, params["threshold"], market_yes, market_no, days_to_expiry
+        )
+    elif contract_type == "continuous_bracket":
+        result = _compute_bracket_dislocation(
+            spot, params["bracket_low"], params["bracket_high"],
+            market_yes, days_to_expiry
+        )
+    else:
+        return None
+
+    if not result:
+        return None
+    raw_dislocation, direction, implied_prob = result
+
+    # Apply edge decay and latency penalty
+    decay = _decay_multiplier(days_to_expiry)
+    decayed_edge = raw_dislocation * decay - PRICE_LAG_LATENCY_PENALTY
+    if decayed_edge < PRICE_LAG_MIN_EDGE:
+        return None
+
+    # Size with Kelly
+    entry_price = market_yes if direction == "YES" else market_no
+    amount = _kelly_size(decayed_edge, entry_price, balance)
+    if amount is None:
+        return None
+
+    # Build threshold/bracket for metadata
+    threshold = params.get("threshold")
+    bracket_low = params.get("bracket_low")
+    bracket_high = params.get("bracket_high")
+
+    reasoning = (
+        f"Price-lag arb: {asset} spot=${spot:,.0f}, "
+        f"implied={implied_prob:.2f} vs market={market_yes:.2f}, "
+        f"raw={raw_dislocation:.3f}, decayed={decayed_edge:.3f}"
+    )
+
+    return TradeDecision(
+        market_id=market.get("market_id", ""),
+        question=market.get("question", ""),
+        direction=direction,
+        confidence=decayed_edge,
+        reasoning=reasoning,
+        strategy="price_lag_arb",
+        amount_usd=amount,
+        entry_price=entry_price,
+        shares=amount / entry_price if entry_price > 0 else 0,
+        metadata={
+            "asset": asset,
+            "contract_type": contract_type,
+            "spot_price": spot,
+            "threshold": threshold,
+            "bracket_low": bracket_low,
+            "bracket_high": bracket_high,
+            "polymarket_price": market_yes,
+            "raw_dislocation": raw_dislocation,
+            "decayed_edge": decayed_edge,
+            "days_to_expiry": float(days_to_expiry),
+        },
+    )
+
+
 def _call_ollama(prompt: str) -> str:
     """Call Ollama and return the response text."""
     try:
@@ -129,6 +358,7 @@ def analyze(
     markets: list[dict],
     wallet: dict[str, Any],
     signals: list[dict] | None = None,
+    spot_prices: dict[str, float] | None = None,
 ) -> list[TradeDecision]:
     """
     Main entry point. Returns list of TradeDecisions sorted by confidence desc.
@@ -148,6 +378,14 @@ def analyze(
             arb.shares = arb.amount_usd / arb.entry_price if arb.entry_price > 0 else 0
             decisions.append(arb)
             arb_market_ids.add(market["market_id"])
+
+    # Step 1.5: Price-lag arb (spot vs Polymarket dislocation)
+    if spot_prices:
+        for market in [m for m in markets if m["market_id"] not in arb_market_ids]:
+            pla = _check_price_lag_arb(market, spot_prices, balance)
+            if pla:
+                decisions.append(pla)
+                arb_market_ids.add(market["market_id"])
 
     # Step 2: Ollama analysis for non-arb markets
     non_arb = [m for m in markets if m["market_id"] not in arb_market_ids]
