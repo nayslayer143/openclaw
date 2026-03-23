@@ -472,5 +472,65 @@ class TestActionRouting(unittest.TestCase):
         self.assertIn("build_note", actions)
 
 
+class TestDigestBatchAndDebate(unittest.TestCase):
+    def setUp(self):
+        conn = db._get_conn()
+        conn.execute("DELETE FROM paper_digests")
+        conn.execute("DELETE FROM papers")
+        conn.commit()
+        from autoresearch import scholar
+        self.s = scholar
+
+    def test_digest_batch_calls_digest_paper(self):
+        results_log = []
+        def fake_digest(pid, **_):
+            results_log.append(pid)
+            return {"paper_id": pid, "key_findings": [], "priority": "P2"}
+
+        with patch.object(self.s, "digest_paper", side_effect=fake_digest):
+            results = self.s.digest_batch(["p1", "p2", "p3"], delay=0)
+
+        self.assertEqual(results_log, ["p1", "p2", "p3"])
+        self.assertEqual(len(results), 3)
+
+    def test_get_paper_for_debate_full_data(self):
+        self.s.save_paper("2401.50001", "Debate Paper", '["Author A"]',
+                          "The abstract.", "http://hf.co/papers/2401.50001", 0.9)
+        self.s.save_digest(
+            "2401.50001",
+            json.dumps(["finding 1"]),
+            json.dumps(["technique A"]),
+            json.dumps([]),
+            "Relevant to agents",
+            "P1",
+            "improvement",
+        )
+        self.s.mark_digested("2401.50001")
+
+        result = self.s.get_paper_for_debate("2401.50001")
+        self.assertEqual(result["title"], "Debate Paper")
+        self.assertEqual(result["abstract"], "The abstract.")
+        self.assertEqual(result["key_findings"], ["finding 1"])
+        self.assertIsNone(result.get("full_markdown"))
+
+    def test_get_paper_for_debate_with_full_markdown(self):
+        self.s.save_paper("2401.50002", "Full Paper", None, "abs", None, 0.8)
+        md = "# Full Paper\n\nContent."
+        with patch.object(self.s, "fetch_paper_markdown", return_value=md):
+            result = self.s.get_paper_for_debate("2401.50002", full=True)
+        self.assertEqual(result["full_markdown"], md)
+
+    def test_get_paper_for_debate_undigested(self):
+        self.s.save_paper("2401.50003", "Undigested", None, "abstract", None, 0.7)
+        result = self.s.get_paper_for_debate("2401.50003")
+        self.assertEqual(result["title"], "Undigested")
+        self.assertIsNone(result["key_findings"])
+
+    def test_get_paper_for_debate_not_found(self):
+        from autoresearch import scholar
+        result = scholar.get_paper_for_debate("9999.99999")
+        self.assertEqual(result.get("error"), "not_found")
+
+
 if __name__ == "__main__":
     unittest.main()

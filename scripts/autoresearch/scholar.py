@@ -467,3 +467,54 @@ def _route_paper_actions(paper_id: str, priority: str, techniques: list,
         actions.append("build_note")
 
     return actions
+
+
+# ── Batch digestion ───────────────────────────────────────────────────────────
+
+def digest_batch(paper_ids: list[str], delay: int = 5) -> list[dict]:
+    """
+    Digest multiple papers with a delay between calls.
+    Use delay=0 in tests to avoid real sleep.
+    """
+    results = []
+    for i, pid in enumerate(paper_ids):
+        result = digest_paper(pid)
+        results.append(result)
+        if delay > 0 and i < len(paper_ids) - 1:
+            time.sleep(delay)
+    return results
+
+
+# ── ClawTeam shim ─────────────────────────────────────────────────────────────
+
+def get_paper_for_debate(paper_id: str, full: bool = False) -> dict:
+    """
+    Return structured paper data for ClawTeam debate pattern.
+
+    - Full data returned when paper has been digested.
+    - Partial data (title/abstract/url, digest fields None) if not yet digested.
+    - {"error": "not_found"} if paper_id is unknown.
+    - full=True triggers a live fetch of paper markdown (slow, may fail).
+    """
+    with db._get_conn() as conn:
+        paper = conn.execute(
+            "SELECT * FROM papers WHERE paper_id=?", (paper_id,)
+        ).fetchone()
+        if not paper:
+            return {"error": "not_found"}
+        digest = conn.execute(
+            "SELECT * FROM paper_digests WHERE paper_id=?", (paper_id,)
+        ).fetchone()
+
+    result = {
+        "title":                  paper["title"],
+        "abstract":               paper["abstract"],
+        "url":                    paper["url"],
+        "key_findings":           json.loads(digest["key_findings"]) if digest and digest["key_findings"] else None,
+        "implementable_techniques": json.loads(digest["implementable_techniques"]) if digest and digest["implementable_techniques"] else None,
+        "relevance_to_builds":    digest["relevance_to_builds"] if digest else None,
+        "full_markdown":          None,
+    }
+    if full:
+        result["full_markdown"] = fetch_paper_markdown(paper_id) or None
+    return result
