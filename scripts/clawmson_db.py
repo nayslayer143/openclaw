@@ -109,6 +109,16 @@ def _init_db():
                 last_seen      TEXT    NOT NULL,
                 UNIQUE(chat_id, intent, action)
             );
+            CREATE TABLE IF NOT EXISTS sessions (
+                id            INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_key   TEXT NOT NULL,
+                chat_id       TEXT NOT NULL,
+                started_at    TEXT NOT NULL,
+                ended_at      TEXT,
+                message_count INTEGER NOT NULL DEFAULT 0,
+                summary       TEXT,
+                UNIQUE(session_key, chat_id)
+            );
             CREATE INDEX IF NOT EXISTS idx_conv_chat      ON conversations(chat_id);
             CREATE INDEX IF NOT EXISTS idx_conv_archived  ON conversations(chat_id, archived);
             CREATE INDEX IF NOT EXISTS idx_ref_chat       ON refs(chat_id);
@@ -117,7 +127,23 @@ def _init_db():
             CREATE INDEX IF NOT EXISTS idx_semantic_chat  ON semantic_facts(chat_id);
             CREATE INDEX IF NOT EXISTS idx_procedures_chat ON procedures(chat_id, status);
             CREATE INDEX IF NOT EXISTS idx_candidates_chat ON procedure_candidates(chat_id);
+            CREATE INDEX IF NOT EXISTS idx_sessions_chat  ON sessions(chat_id, started_at DESC);
         """)
+    # FTS5 creation is separate — not all SQLite builds support it
+    try:
+        with _get_conn() as conn:
+            conn.execute("""
+                CREATE VIRTUAL TABLE IF NOT EXISTS memory_fts USING fts5(
+                    content,
+                    source    UNINDEXED,
+                    chat_id   UNINDEXED,
+                    source_id UNINDEXED,
+                    ts        UNINDEXED,
+                    tokenize = 'porter unicode61'
+                )
+            """)
+    except Exception as e:
+        print(f"[db] FTS5 not available: {e}")
 
 
 def save_message(chat_id: str, role: str, content: str,
@@ -171,6 +197,31 @@ def save_reference(chat_id: str, url: str, title: str, summary: str, content: st
             " VALUES (?, ?, ?, ?, ?, ?)",
             (chat_id, url, title or url, summary, content, ts)
         )
+
+
+def fts_index(chat_id: str, source: str, source_id: int,
+              content: str, ts: str, conn=None):
+    """Insert one item into memory_fts. No-op if FTS5 unavailable.
+
+    When conn is provided, INSERT runs inside the caller's existing transaction.
+    When conn=None, a new connection is opened.
+    """
+    # Lazy import avoids circular dependency — clawmson_fts imports clawmson_db
+    try:
+        import clawmson_fts as _fts
+        if not _fts.FTS5_AVAILABLE:
+            return
+    except ImportError:
+        return
+
+    sql = ("INSERT INTO memory_fts (content, source, chat_id, source_id, ts)"
+           " VALUES (?, ?, ?, ?, ?)")
+    params = (content, source, chat_id, source_id, ts)
+    if conn is not None:
+        conn.execute(sql, params)
+    else:
+        with _get_conn() as c:
+            c.execute(sql, params)
 
 
 def search_references(chat_id: str, keyword: str) -> list:
