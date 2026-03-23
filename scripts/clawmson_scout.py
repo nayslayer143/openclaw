@@ -10,7 +10,9 @@ import re
 import clawmson_db as db
 import clawmson_twitter as tw
 
-_TWITTER_RE = re.compile(r'https?://(x\.com|twitter\.com)/\w+/status/\d+')
+# Single source of truth — also imported by telegram-dispatcher as scout.TWITTER_RE
+TWITTER_RE = re.compile(r'https?://(x\.com|twitter\.com)/\w+/status/\d+')
+_TWITTER_RE = TWITTER_RE  # module-local alias for internal use
 
 _EMOJI = {
     "tool":                 "🔧",

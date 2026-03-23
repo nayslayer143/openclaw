@@ -68,7 +68,7 @@ QUEUE_DIR      = OPENCLAW_ROOT / "repo-queue"
 BUILD_RESULTS  = OPENCLAW_ROOT / "build-results"
 RUN_TASK       = OPENCLAW_ROOT / "scripts" / "run-task.sh"
 POLL_INTERVAL  = 5   # seconds
-_TWITTER_RE = re.compile(r'https?://(x\.com|twitter\.com)/\w+/status/\d+')
+_TWITTER_RE = scout.TWITTER_RE  # shared with clawmson_scout — single source of truth
 OFFSET_FILE    = Path("/tmp/openclaw-tg-offset.txt")
 
 DEFAULT_REPO      = "EmergentWebActions"
