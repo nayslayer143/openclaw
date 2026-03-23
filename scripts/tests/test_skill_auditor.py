@@ -187,5 +187,116 @@ class TestScorer(unittest.TestCase):
         self.assertEqual(result["category"], "BLOCKED")
 
 
+class TestRegistry(unittest.TestCase):
+    def setUp(self):
+        """Use an in-memory SQLite DB for isolation."""
+        import security.registry as reg
+        self._orig_db = reg._DB_PATH
+        reg._DB_PATH = ":memory:"
+        reg._CONN = None
+        reg._init_db()
+
+    def tearDown(self):
+        import security.registry as reg
+        reg._DB_PATH = self._orig_db
+        if reg._CONN:
+            reg._CONN.close()
+        reg._CONN = None
+
+    def _make_temp_skill(self, content: str = "def hello(): pass\n") -> str:
+        f = tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False)
+        f.write(content)
+        f.close()
+        return f.name
+
+    def test_hash_roundtrip(self):
+        import security.registry as reg
+        path = self._make_temp_skill("def safe(): pass\n")
+        try:
+            h1 = reg.compute_hash(path)
+            h2 = reg.compute_hash(path)
+            self.assertEqual(h1, h2)
+            self.assertEqual(len(h1), 64)  # SHA256 hex
+        finally:
+            os.unlink(path)
+
+    def test_hash_changes_on_modification(self):
+        import security.registry as reg
+        path = self._make_temp_skill("def original(): pass\n")
+        try:
+            h1 = reg.compute_hash(path)
+            Path(path).write_text("def modified(): pass\n")
+            h2 = reg.compute_hash(path)
+            self.assertNotEqual(h1, h2)
+        finally:
+            os.unlink(path)
+
+    def test_register_and_get(self):
+        import security.registry as reg
+        path = self._make_temp_skill()
+        try:
+            reg.register("my-skill", path, score=85, category="TRUSTED",
+                         findings=[], source_url=None)
+            row = reg.get("my-skill")
+            self.assertIsNotNone(row)
+            self.assertEqual(row["skill_name"], "my-skill")
+            self.assertEqual(row["trust_score"], 85)
+            self.assertEqual(row["category"], "TRUSTED")
+        finally:
+            os.unlink(path)
+
+    def test_register_upserts(self):
+        import security.registry as reg
+        path = self._make_temp_skill()
+        try:
+            reg.register("my-skill", path, score=70, category="REVIEW",
+                         findings=[], source_url=None)
+            reg.register("my-skill", path, score=90, category="TRUSTED",
+                         findings=[], source_url=None)
+            row = reg.get("my-skill")
+            self.assertEqual(row["trust_score"], 90)
+        finally:
+            os.unlink(path)
+
+    def test_set_approved(self):
+        import security.registry as reg
+        path = self._make_temp_skill()
+        try:
+            reg.register("my-skill", path, score=70, category="REVIEW",
+                         findings=[], source_url=None)
+            reg.set_approved("my-skill", "jordan")
+            row = reg.get("my-skill")
+            self.assertEqual(row["approved_by"], "jordan")
+        finally:
+            os.unlink(path)
+
+    def test_verify_all_detects_change(self):
+        import security.registry as reg
+        path = self._make_temp_skill("def original(): pass\n")
+        try:
+            reg.register("my-skill", path, score=85, category="TRUSTED",
+                         findings=[], source_url=None)
+            # Modify the file after registration
+            Path(path).write_text("def tampered(): import os; os.system('evil')\n")
+            results = reg.verify_all()
+            changed = [r for r in results if r[1] == "changed"]
+            self.assertEqual(len(changed), 1)
+            self.assertEqual(changed[0][0], "my-skill")
+        finally:
+            os.unlink(path)
+
+    def test_verify_all_ok_unchanged(self):
+        import security.registry as reg
+        path = self._make_temp_skill()
+        try:
+            reg.register("my-skill", path, score=85, category="TRUSTED",
+                         findings=[], source_url=None)
+            results = reg.verify_all()
+            ok = [r for r in results if r[1] == "ok"]
+            self.assertEqual(len(ok), 1)
+        finally:
+            os.unlink(path)
+
+
 if __name__ == "__main__":
     unittest.main()
