@@ -27,7 +27,8 @@ class TestFinding(unittest.TestCase):
         self.assertEqual(f.category, "obfuscation")
         self.assertEqual(f.severity, "CRITICAL")
         self.assertEqual(f.line_no, 42)
-        self.assertIn("eval", f.snippet)
+        self.assertEqual(f.snippet, "eval(user_input)")
+        self.assertEqual(f.context, "line 41\neval(user_input)\nline 43")
 
 
 if __name__ == "__main__":
