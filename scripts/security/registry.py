@@ -136,6 +136,18 @@ def set_approved(skill_name: str, approved_by: str) -> None:
             raise KeyError(f"skill not found in registry: {skill_name}")
 
 
+def set_blocked(skill_name: str) -> None:
+    """Set skill category=BLOCKED and approved_by='blocked' atomically."""
+    with _get_conn() as conn:
+        cur = conn.execute(
+            "UPDATE skill_registry SET category = 'BLOCKED', approved_by = 'blocked'"
+            " WHERE skill_name = ?",
+            (skill_name,),
+        )
+        if cur.rowcount == 0:
+            raise KeyError(f"Skill not found: {skill_name}")
+
+
 def verify_all() -> list[tuple[str, str]]:
     """
     Recompute SHA256 for every registered skill.
