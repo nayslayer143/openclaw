@@ -5,6 +5,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch, MagicMock
 
 _SCRIPTS = Path(__file__).parent.parent
 if str(_SCRIPTS) not in sys.path:
@@ -313,6 +314,48 @@ class TestRegistry(unittest.TestCase):
         import security.registry as reg
         with self.assertRaises(KeyError):
             reg.set_approved("nonexistent-skill", "jordan")
+
+
+class TestDebate(unittest.TestCase):
+    def _mock_ollama(self, responses: list[str]):
+        """Return a side_effect that yields responses in order."""
+        call_count = {"n": 0}
+        def fake_post(url, json=None, timeout=None, **kwargs):
+            idx = call_count["n"]
+            call_count["n"] += 1
+            content = responses[idx] if idx < len(responses) else ""
+            mock_r = MagicMock()
+            mock_r.raise_for_status = MagicMock()
+            mock_r.json.return_value = {"message": {"content": content}}
+            return mock_r
+        return fake_post
+
+    def test_successful_debate_returns_score(self):
+        from security.debate import run_debate
+        judge_json = '{"verdict": "APPROVE", "adjusted_score": 78, "reasoning": "safe"}'
+        with patch("security.debate.requests.post",
+                   side_effect=self._mock_ollama(["safe skill", "no real threats", judge_json])):
+            result = run_debate("def hello(): pass", findings=[], original_score=65)
+        self.assertEqual(result["adjusted_score"], 78)
+        self.assertEqual(result["verdict"], "APPROVE")
+        self.assertIsNotNone(result["transcript"])
+
+    def test_parse_failure_returns_original_score(self):
+        from security.debate import run_debate
+        with patch("security.debate.requests.post",
+                   side_effect=self._mock_ollama(["good", "bad", "not valid json at all"])):
+            result = run_debate("def hello(): pass", findings=[], original_score=65)
+        self.assertEqual(result["adjusted_score"], 65)
+        self.assertTrue(result["parse_failed"])
+
+    def test_timeout_treated_as_parse_failure(self):
+        import requests as req_module
+        from security.debate import run_debate
+        with patch("security.debate.requests.post",
+                   side_effect=req_module.exceptions.Timeout("timed out")):
+            result = run_debate("def hello(): pass", findings=[], original_score=65)
+        self.assertEqual(result["adjusted_score"], 65)
+        self.assertTrue(result["parse_failed"])
 
 
 if __name__ == "__main__":
