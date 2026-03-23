@@ -68,6 +68,7 @@ CLAWMSON_SEARCH_LIMIT = int(os.environ.get("CLAWMSON_SEARCH_LIMIT", "10"))
 _SESSION_KEY: str = ""                     # set on boot by start_session()
 _resumed: set[str] = set()                # chat_ids already resumed this process run
 _resumed_lock = threading.Lock()           # guards check-then-add on _resumed
+_SHUTDOWN_REQUESTED = False                # set by signal handler, checked in main loop
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
@@ -705,8 +706,14 @@ def handle_message(msg: dict):
 
 # ── Main loop ─────────────────────────────────────────────────────────────────
 
+def _signal_handler(sig, frame):
+    """Set shutdown flag — called from signal handler context (async-signal-safe)."""
+    global _SHUTDOWN_REQUESTED
+    _SHUTDOWN_REQUESTED = True
+
+
 def _shutdown():
-    """Clean shutdown: end all sessions, then exit."""
+    """Clean shutdown: end all sessions, then exit. Called from main thread only."""
     if _SESSION_KEY:
         sessions.end_all_sessions(_SESSION_KEY)
     sys.exit(0)
@@ -717,8 +724,8 @@ def main():
     _SESSION_KEY = sessions.start_session()
     print(f"[dispatcher] Session key: {_SESSION_KEY}")
 
-    signal.signal(signal.SIGTERM, lambda sig, frame: _shutdown())
-    signal.signal(signal.SIGINT,  lambda sig, frame: _shutdown())
+    signal.signal(signal.SIGTERM, _signal_handler)
+    signal.signal(signal.SIGINT,  _signal_handler)
 
     print(f"[dispatcher] Starting Clawmson. Allowed users: {ALLOWED_USERS}")
     print(f"[dispatcher] Default repo: {DEFAULT_REPO} @ {DEFAULT_REPO_PATH}")
@@ -727,6 +734,8 @@ def main():
     offset = load_offset()
 
     while True:
+        if _SHUTDOWN_REQUESTED:
+            _shutdown()
         updates = get_updates(offset)
         for update in updates:
             offset = update["update_id"] + 1
