@@ -471,7 +471,7 @@ def _route_paper_actions(paper_id: str, priority: str, techniques: list,
 
 # ── Batch digestion ───────────────────────────────────────────────────────────
 
-def digest_batch(paper_ids: list[str], delay: int = 5) -> list[dict]:
+def digest_batch(paper_ids: list[str], delay: float = 5) -> list[dict]:
     """
     Digest multiple papers with a delay between calls.
     Use delay=0 in tests to avoid real sleep.
