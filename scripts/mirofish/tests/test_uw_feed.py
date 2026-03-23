@@ -102,3 +102,44 @@ def test_cache_returns_when_fresh(temp_db, monkeypatch):
 
     assert len(result) >= 1
     assert any(s["ticker"] == "AAPL" for s in result)
+
+
+# ── Test 5: signals injected into Ollama prompt ────────────────────────────
+def test_signals_injected_into_ollama_prompt(temp_db):
+    import sys, datetime as dt
+    for mod in list(sys.modules.keys()):
+        if "trading_brain" in mod:
+            del sys.modules[mod]
+    import scripts.mirofish.trading_brain as tb
+
+    captured: list[str] = []
+
+    def fake_ollama(prompt: str) -> str:
+        captured.append(prompt)
+        return "[]"
+
+    sample_signal = {
+        "source": "options_flow",
+        "ticker": "NVDA",
+        "signal_type": "call_sweep",
+        "direction": "bullish",
+        "amount_usd": 2_500_000,
+        "description": "NVDA call_sweep 1000 exp 2026-04 — $2.5M premium",
+        "fetched_at": dt.datetime.utcnow().isoformat(),
+    }
+    markets = [{
+        "market_id": "m1",
+        "question": "Will NVDA hit ATH in 2026?",
+        "yes_price": 0.50,
+        "no_price": 0.50,
+        "volume": 50_000,
+    }]
+    wallet = {"balance": 1000.0, "open_positions": 0}
+
+    with patch.object(tb, "_call_ollama", side_effect=fake_ollama):
+        tb.analyze(markets, wallet, signals=[sample_signal])
+
+    assert len(captured) == 1
+    assert "Active market signals" in captured[0]
+    assert "NVDA" in captured[0]
+    assert "Unusual Whales" in captured[0]
