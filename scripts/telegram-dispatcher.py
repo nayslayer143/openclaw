@@ -353,7 +353,11 @@ def handle_digest(chat_id: str, paper_id: str):
         send(chat_id, "Usage: /digest <paper_id>")
         return
     send_typing(chat_id)
-    result = scholar.digest_paper(paper_id)
+    try:
+        result = scholar.digest_paper(paper_id)
+    except Exception as e:
+        send(chat_id, f"Digest failed: {e}")
+        return
     if "error" in result:
         if result["error"] == "unknown_paper":
             send(chat_id, f"Paper {paper_id} not found. Try /papers [topic] to discover it first.")
@@ -385,13 +389,17 @@ def handle_scholar(chat_id: str, subcommand: str):
     """Handle /scholar [subcommand]."""
     sub = subcommand.strip().lower()
     if sub == "status" or sub == "":
-        summary = scholar.get_recent_papers(days=7)
+        try:
+            summary = scholar.get_recent_papers(days=7)
+        except Exception as e:
+            send(chat_id, f"Scholar status failed: {e}")
+            return
         lines = [
             f"AutoScholar — last 7 days\n",
-            f"Discovered: {summary['total']} papers\n",
-            f"Digested: {summary['digested']} papers\n",
+            f"Discovered: {summary.get('total', 0)} papers\n",
+            f"Digested: {summary.get('digested', 0)} papers\n",
         ]
-        if summary["top_titles"]:
+        if summary.get("top_titles"):
             lines.append("\nTop digested:\n")
             for t in summary["top_titles"]:
                 lines.append(f"• {t}\n")
