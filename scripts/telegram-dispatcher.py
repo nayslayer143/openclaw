@@ -47,6 +47,7 @@ import clawmson_intents as intents
 import clawmson_media as media
 import clawmson_references as refs
 import model_router as router
+import clawmson_scout as scout
 
 # Prefixes that indicate Ollama inference failed (from clawmson_chat.py error returns)
 _OLLAMA_ERROR_PREFIXES = (
@@ -67,6 +68,7 @@ QUEUE_DIR      = OPENCLAW_ROOT / "repo-queue"
 BUILD_RESULTS  = OPENCLAW_ROOT / "build-results"
 RUN_TASK       = OPENCLAW_ROOT / "scripts" / "run-task.sh"
 POLL_INTERVAL  = 5   # seconds
+_TWITTER_RE = scout.TWITTER_RE  # shared with clawmson_scout — single source of truth
 OFFSET_FILE    = Path("/tmp/openclaw-tg-offset.txt")
 
 DEFAULT_REPO      = "EmergentWebActions"
@@ -256,7 +258,8 @@ def handle_help(chat_id: str):
         "/approve <id>    — merge a passing build into main\n"
         "/forget          — clear conversation history\n"
         "/context         — show persistent notes\n"
-        "/references      — list saved links\n\n"
+        "/references      — list saved links\n"
+        "/scout              — digest of recently scouted Twitter links\n\n"
         "Anything else: just talk to me.\n"
         "Send a URL and I'll read and summarize it.\n"
         "Send a photo, file, or voice note and I'll process it.\n"
@@ -471,6 +474,11 @@ def dispatch_reference_ingest(chat_id: str, text: str):
     t.start()
 
 
+def _scout_thread(chat_id: str, text: str):
+    """Background thread for Twitter scout pipeline."""
+    scout.handle_scout_links(chat_id, text, send)
+
+
 # ── Build task dispatcher ─────────────────────────────────────────────────────
 
 def dispatch_build_task(chat_id: str, text: str, classification=None):
@@ -499,6 +507,13 @@ def handle_message(msg: dict):
         print(f"[dispatcher] Ignored from non-allowed user {user_id}")
         return
 
+    # ── 0. Twitter/X scout pre-route (runs before all other routing) ─────────
+    if text and _TWITTER_RE.search(text):
+        db.save_message(chat_id, "user", text, message_id=msg_id)
+        t = threading.Thread(target=_scout_thread, args=(chat_id, text), daemon=True)
+        t.start()
+        return
+
     # ── 1. Existing ! shortcut commands (fast path, no DB save) ──────────────
     if text:
         lower = text.lower()
@@ -523,6 +538,12 @@ def handle_message(msg: dict):
             return
         if lower == "/references":
             handle_references(chat_id)
+            return
+        if lower == "/scout":
+            send(chat_id, scout.generate_digest(chat_id))
+            return
+        if lower == "/scout clear":
+            send(chat_id, "Scout queue clear is not yet implemented.")
             return
         if lower == "/memory-stats":
             handle_memory_stats(chat_id)

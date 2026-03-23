@@ -3,6 +3,9 @@
 # Core (already in use)
 requests
 
+# HTML parsing for nitter tweet extraction
+beautifulsoup4
+
 # Link ingestion — extracts clean readable text from web pages
 trafilatura
 

@@ -7,12 +7,15 @@ DB at ~/.openclaw/clawmson.db
 """
 
 import os
+import re
+import json
 import sqlite3
 import datetime
 from pathlib import Path
 
 DB_PATH = Path(os.environ.get("CLAWMSON_DB_PATH", Path.home() / ".openclaw" / "clawmson.db"))
 _SHARED_MEM_CONN = None  # For in-memory DB testing
+_SCOUT_GITHUB_RE = re.compile(r'https?://github\.com/[\w.-]+/[\w.-]+')
 
 
 def _get_conn() -> sqlite3.Connection:
@@ -109,6 +112,21 @@ def _init_db():
                 last_seen      TEXT    NOT NULL,
                 UNIQUE(chat_id, intent, action)
             );
+            CREATE TABLE IF NOT EXISTS scout_links (
+                id              INTEGER PRIMARY KEY AUTOINCREMENT,
+                chat_id         TEXT NOT NULL,
+                url             TEXT NOT NULL,
+                author          TEXT,
+                tweet_text      TEXT,
+                category        TEXT,
+                relevance_score INTEGER,
+                summary         TEXT,
+                action_items    TEXT,
+                github_repos    TEXT,
+                linked_urls     TEXT,
+                processed_at    TEXT NOT NULL,
+                raw_data        TEXT
+            );
             CREATE INDEX IF NOT EXISTS idx_conv_chat      ON conversations(chat_id);
             CREATE INDEX IF NOT EXISTS idx_conv_archived  ON conversations(chat_id, archived);
             CREATE INDEX IF NOT EXISTS idx_ref_chat       ON refs(chat_id);
@@ -117,6 +135,8 @@ def _init_db():
             CREATE INDEX IF NOT EXISTS idx_semantic_chat  ON semantic_facts(chat_id);
             CREATE INDEX IF NOT EXISTS idx_procedures_chat ON procedures(chat_id, status);
             CREATE INDEX IF NOT EXISTS idx_candidates_chat ON procedure_candidates(chat_id);
+            CREATE INDEX IF NOT EXISTS idx_scout_chat ON scout_links(chat_id);
+            CREATE INDEX IF NOT EXISTS idx_scout_cat  ON scout_links(category);
         """)
 
 
@@ -193,6 +213,83 @@ def list_references(chat_id: str, limit: int = 20) -> list:
             (chat_id, limit)
         ).fetchall()
     return [dict(r) for r in rows]
+
+
+def save_scout_link(chat_id: str, url: str, extraction: dict, categorization: dict):
+    """Store one scouted tweet. Works for both success and extraction-failed dicts."""
+    ts = datetime.datetime.utcnow().isoformat()
+
+    # For extraction-failed dicts, most fields will be None
+    author      = extraction.get("author")
+    tweet_text  = extraction.get("text")
+    linked_urls = extraction.get("linked_urls", [])
+
+    from clawmson_twitter import extract_github_repos
+    all_text = (tweet_text or "") + " ".join(linked_urls)
+    github_repos = extract_github_repos(all_text)
+
+    category        = categorization.get("category")
+    relevance_score = categorization.get("relevance_score")
+    summary         = categorization.get("summary")
+    action_items    = categorization.get("action_items", [])
+
+    # raw_data: full extraction dict (includes methods_tried for failures)
+    raw_data = json.dumps(extraction)
+
+    with _get_conn() as conn:
+        conn.execute(
+            "INSERT INTO scout_links "
+            "(chat_id, url, author, tweet_text, category, relevance_score, summary, "
+            " action_items, github_repos, linked_urls, processed_at, raw_data) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                chat_id, url, author, tweet_text, category, relevance_score, summary,
+                json.dumps(action_items),
+                json.dumps(github_repos),
+                json.dumps(linked_urls),
+                ts, raw_data,
+            )
+        )
+
+
+def get_scout_links(chat_id: str, since_hours: int = 24, category: str = None) -> list:
+    """Return scout_links rows for chat_id within since_hours, newest first."""
+    cutoff = (datetime.datetime.utcnow() - datetime.timedelta(hours=since_hours)).isoformat()
+    with _get_conn() as conn:
+        if category:
+            rows = conn.execute(
+                "SELECT * FROM scout_links WHERE chat_id = ? AND processed_at >= ? "
+                "AND category = ? ORDER BY processed_at DESC",
+                (chat_id, cutoff, category)
+            ).fetchall()
+        else:
+            rows = conn.execute(
+                "SELECT * FROM scout_links WHERE chat_id = ? AND processed_at >= ? "
+                "ORDER BY processed_at DESC",
+                (chat_id, cutoff)
+            ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def get_scout_digest(chat_id: str, since_hours: int = 24) -> dict:
+    """Return category counts + top 5 items by relevance for the last N hours."""
+    cutoff = (datetime.datetime.utcnow() - datetime.timedelta(hours=since_hours)).isoformat()
+    with _get_conn() as conn:
+        count_rows = conn.execute(
+            "SELECT category, COUNT(*) as n FROM scout_links "
+            "WHERE chat_id = ? AND processed_at >= ? GROUP BY category",
+            (chat_id, cutoff)
+        ).fetchall()
+        top_rows = conn.execute(
+            "SELECT url, author, summary, category, relevance_score FROM scout_links "
+            "WHERE chat_id = ? AND processed_at >= ? "
+            "ORDER BY relevance_score DESC LIMIT 5",
+            (chat_id, cutoff)
+        ).fetchall()
+    return {
+        "counts": {r["category"]: r["n"] for r in count_rows},
+        "top_items": [dict(r) for r in top_rows],
+    }
 
 
 # Init on import
