@@ -32,6 +32,8 @@ def index(chat_id: str, source: str, source_id: int,
     """Insert one item into memory_fts. No-op if FTS5 unavailable."""
     if not FTS5_AVAILABLE:
         return
+    if not content or not content.strip():
+        return
     sql = ("INSERT INTO memory_fts (content, source, chat_id, source_id, ts)"
            " VALUES (?, ?, ?, ?, ?)")
     params = (content, source, chat_id, source_id, ts)
@@ -42,15 +44,17 @@ def index(chat_id: str, source: str, source_id: int,
             c.execute(sql, params)
 
 
-def remove(source: str, source_id: int):
+def remove(source: str, source_id: int, conn=None):
     """Delete item from memory_fts by source + source_id. No-op if FTS5 unavailable."""
     if not FTS5_AVAILABLE:
         return
-    with db._get_conn() as conn:
-        conn.execute(
-            "DELETE FROM memory_fts WHERE source=? AND source_id=?",
-            (source, source_id)
-        )
+    sql = "DELETE FROM memory_fts WHERE source=? AND source_id=?"
+    params = (source, source_id)
+    if conn is not None:
+        conn.execute(sql, params)
+    else:
+        with db._get_conn() as c:
+            c.execute(sql, params)
 
 
 def search(chat_id: str, query: str, limit: int = 10) -> list[dict]:

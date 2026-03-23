@@ -206,25 +206,11 @@ def fts_index(chat_id: str, source: str, source_id: int,
     When conn is provided, INSERT runs inside the caller's existing transaction.
     When conn=None, a new connection is opened.
     """
-    # Lazy import avoids circular dependency — clawmson_fts imports clawmson_db
     try:
         import clawmson_fts as _fts
-        if not _fts.FTS5_AVAILABLE:
-            return
+        _fts.index(chat_id, source, source_id, content, ts, conn=conn)
     except ImportError:
-        return
-
-    if not content or not content.strip():
-        return
-
-    sql = ("INSERT INTO memory_fts (content, source, chat_id, source_id, ts)"
-           " VALUES (?, ?, ?, ?, ?)")
-    params = (content, source, chat_id, source_id, ts)
-    if conn is not None:
-        conn.execute(sql, params)
-    else:
-        with _get_conn() as c:
-            c.execute(sql, params)
+        pass
 
 
 def search_references(chat_id: str, keyword: str) -> list:
