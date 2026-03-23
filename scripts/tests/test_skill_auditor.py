@@ -122,5 +122,64 @@ class TestScanSkillMdCapabilities(unittest.TestCase):
             os.unlink(path)
 
 
+class TestScorer(unittest.TestCase):
+    def _make_finding(self, severity: str, category: str = "obfuscation"):
+        from security.scanner import Finding
+        return Finding(category=category, severity=severity,
+                       line_no=1, snippet="x", context="x")
+
+    def test_no_findings_is_100(self):
+        from security.scorer import score
+        result = score([], skill_md_caps=None, source_url=None)
+        self.assertEqual(result["score"], 100)
+        self.assertEqual(result["category"], "TRUSTED")
+
+    def test_critical_deducts_35(self):
+        from security.scorer import score
+        findings = [self._make_finding("CRITICAL")]
+        result = score(findings, skill_md_caps=None, source_url=None)
+        self.assertEqual(result["score"], 65)
+        self.assertEqual(result["category"], "REVIEW")
+
+    def test_two_criticals_blocked(self):
+        from security.scorer import score
+        findings = [self._make_finding("CRITICAL"), self._make_finding("CRITICAL")]
+        result = score(findings, skill_md_caps=None, source_url=None)
+        self.assertLess(result["score"], 50)
+        self.assertEqual(result["category"], "BLOCKED")
+
+    def test_trust_bonus_source_url(self):
+        from security.scorer import score
+        result = score(
+            [],
+            skill_md_caps=None,
+            source_url="https://github.com/anthropics/some-skill",
+        )
+        self.assertEqual(result["score"], 100)  # 100 + 10 = 110, capped at 100
+
+    def test_trust_bonus_no_path_spoofing(self):
+        from security.scorer import score
+        # source_url=None → no bonus, even if we pretend path contains "anthropics"
+        result = score([], skill_md_caps=None, source_url=None)
+        self.assertEqual(result["score"], 100)  # No bonus without source_url
+
+    def test_skill_md_mismatch_penalty(self):
+        from security.scorer import score
+        from security.scanner import Finding
+        findings = [Finding("network", "HIGH", 1, "import requests", "")]
+        caps = {"network": False}
+        result = score(findings, skill_md_caps=caps, source_url=None)
+        # 100 - 15 (HIGH) - 20 (mismatch) = 65
+        self.assertEqual(result["score"], 65)
+        self.assertTrue(result["mismatch"])
+
+    def test_floor_is_zero(self):
+        from security.scorer import score
+        findings = [self._make_finding("CRITICAL")] * 10
+        result = score(findings, skill_md_caps=None, source_url=None)
+        self.assertEqual(result["score"], 0)
+        self.assertEqual(result["category"], "BLOCKED")
+
+
 if __name__ == "__main__":
     unittest.main()
