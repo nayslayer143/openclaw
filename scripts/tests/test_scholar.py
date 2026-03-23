@@ -4,6 +4,7 @@ from __future__ import annotations
 import os
 import sys
 import unittest
+import requests
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 
@@ -252,6 +253,43 @@ class TestDiscovery(unittest.TestCase):
         conn = db._get_conn()
         row = conn.execute("SELECT * FROM papers WHERE paper_id='2401.00020'").fetchone()
         self.assertIsNotNone(row)
+
+
+class TestFetchMarkdown(unittest.TestCase):
+    def setUp(self):
+        conn = db._get_conn()
+        conn.execute("DELETE FROM paper_digests")
+        conn.execute("DELETE FROM papers")
+        conn.commit()
+
+    def test_fetch_returns_markdown(self):
+        from autoresearch import scholar
+        mock_resp = MagicMock()
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.text = "# My Paper\n\nThis is the content."
+        with patch("requests.get", return_value=mock_resp):
+            result = scholar.fetch_paper_markdown("2401.99001")
+        self.assertEqual(result, "# My Paper\n\nThis is the content.")
+
+    def test_fetch_fallback_to_abstract(self):
+        from autoresearch import scholar
+        # Paper exists in DB with an abstract
+        scholar.save_paper("2401.99002", "Fallback Paper", None,
+                           "This is the abstract.", None, 0.7)
+        mock_resp = MagicMock()
+        mock_resp.raise_for_status.side_effect = requests.exceptions.HTTPError("404")
+        with patch("requests.get", return_value=mock_resp):
+            result = scholar.fetch_paper_markdown("2401.99002")
+        self.assertEqual(result, "This is the abstract.")
+
+    def test_fetch_returns_empty_string_if_no_fallback(self):
+        from autoresearch import scholar
+        # Paper not in DB at all
+        mock_resp = MagicMock()
+        mock_resp.raise_for_status.side_effect = requests.exceptions.HTTPError("404")
+        with patch("requests.get", return_value=mock_resp):
+            result = scholar.fetch_paper_markdown("2401.99003")
+        self.assertEqual(result, "")
 
 
 if __name__ == "__main__":
