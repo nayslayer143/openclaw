@@ -144,3 +144,52 @@ def get_recent_papers(days: int = 7) -> dict:
         "digested": digested,
         "top_titles": [r["title"] for r in top_rows],
     }
+
+
+# ── Embedding + relevance ranking ─────────────────────────────────────────────
+
+def _cosine(a: list[float], b: list[float]) -> float:
+    """Cosine similarity between two vectors."""
+    dot = sum(x * y for x, y in zip(a, b))
+    norm_a = math.sqrt(sum(x * x for x in a))
+    norm_b = math.sqrt(sum(x * x for x in b))
+    if norm_a == 0 or norm_b == 0:
+        return 0.0
+    return dot / (norm_a * norm_b)
+
+
+def embed_text(text: str) -> list[float]:
+    """Embed text using nomic-embed-text via Ollama."""
+    resp = requests.post(
+        f"{OLLAMA_BASE_URL}/api/embeddings",
+        json={"model": EMBED_MODEL, "prompt": text},
+        timeout=30,
+    )
+    resp.raise_for_status()
+    return resp.json()["embedding"]
+
+
+def _get_goal_vector() -> list[float]:
+    """Return cached goal vector, embedding once on first call."""
+    global _GOAL_VECTOR
+    if _GOAL_VECTOR is None:
+        _GOAL_VECTOR = embed_text(_GOAL_TEXT)
+    return _GOAL_VECTOR
+
+
+def rank_by_relevance(candidates: list[dict]) -> list[dict]:
+    """
+    Embed each candidate's abstract and rank by cosine similarity
+    against the project goal vector. Attaches relevance_score to each dict.
+    Returns sorted list (highest score first).
+    """
+    goal = _get_goal_vector()
+    for candidate in candidates:
+        abstract = candidate.get("abstract") or candidate.get("title") or ""
+        try:
+            vec = embed_text(abstract)
+            candidate["relevance_score"] = round(_cosine(goal, vec), 4)
+        except Exception as e:
+            print(f"[scholar] embed failed for {candidate.get('paper_id')}: {e}")
+            candidate["relevance_score"] = 0.0
+    return sorted(candidates, key=lambda c: c["relevance_score"], reverse=True)

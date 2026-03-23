@@ -5,6 +5,7 @@ import os
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch, MagicMock
 
 # Point DB to in-memory SQLite before any imports touch clawmson_db
 os.environ["CLAWMSON_DB_PATH"] = ":memory:"
@@ -140,6 +141,59 @@ class TestDBHelpers(unittest.TestCase):
         self.assertIn("top_titles", result)
         self.assertIsInstance(result["top_titles"], list)
         self.assertGreaterEqual(result["total"], 1)
+
+
+class TestEmbedAndRank(unittest.TestCase):
+    def _make_embed_response(self, vec: list) -> MagicMock:
+        mock = MagicMock()
+        mock.raise_for_status = MagicMock()
+        mock.json.return_value = {"embedding": vec}
+        return mock
+
+    def test_embed_text_returns_list(self):
+        from autoresearch import scholar
+        with patch("requests.post", return_value=self._make_embed_response([0.1, 0.2, 0.3])):
+            result = scholar.embed_text("hello world")
+        self.assertIsInstance(result, list)
+        self.assertEqual(result, [0.1, 0.2, 0.3])
+
+    def test_rank_by_relevance_sorts_descending(self):
+        from autoresearch import scholar
+        goal_vec = [1.0, 0.0]
+        paper_vecs = {
+            "p1": [1.0, 0.0],   # cosine=1.0 (identical)
+            "p2": [0.0, 1.0],   # cosine=0.0 (orthogonal)
+            "p3": [0.7, 0.7],   # cosine~0.7
+        }
+        papers_list = ["p1", "p2", "p3"]
+        call_order = [0]
+
+        def ordered_embed(text):
+            if call_order[0] == 0:
+                call_order[0] += 1
+                return goal_vec  # first call is for goal vector
+            pid = papers_list[call_order[0] - 1]
+            call_order[0] += 1
+            return paper_vecs[pid]
+
+        candidates = [
+            {"paper_id": "p1", "abstract": "p1 abstract"},
+            {"paper_id": "p2", "abstract": "p2 abstract"},
+            {"paper_id": "p3", "abstract": "p3 abstract"},
+        ]
+
+        with patch.object(scholar, "embed_text", side_effect=ordered_embed), \
+             patch.object(scholar, "_GOAL_VECTOR", None):
+            ranked = scholar.rank_by_relevance(candidates)
+
+        scores = [r["relevance_score"] for r in ranked]
+        self.assertEqual(scores, sorted(scores, reverse=True))
+        self.assertEqual(ranked[0]["paper_id"], "p1")
+
+    def test_cosine_similarity(self):
+        from autoresearch import scholar
+        self.assertAlmostEqual(scholar._cosine([1, 0], [1, 0]), 1.0, places=5)
+        self.assertAlmostEqual(scholar._cosine([1, 0], [0, 1]), 0.0, places=5)
 
 
 if __name__ == "__main__":
