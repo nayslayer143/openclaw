@@ -145,7 +145,7 @@ class TestScorer(unittest.TestCase):
         from security.scorer import score
         findings = [self._make_finding("CRITICAL"), self._make_finding("CRITICAL")]
         result = score(findings, skill_md_caps=None, source_url=None)
-        self.assertLess(result["score"], 50)
+        self.assertEqual(result["score"], 30)  # 100 - 35 - 35 = 30
         self.assertEqual(result["category"], "BLOCKED")
 
     def test_trust_bonus_source_url(self):
@@ -159,9 +159,15 @@ class TestScorer(unittest.TestCase):
 
     def test_trust_bonus_no_path_spoofing(self):
         from security.scorer import score
-        # source_url=None → no bonus, even if we pretend path contains "anthropics"
-        result = score([], skill_md_caps=None, source_url=None)
-        self.assertEqual(result["score"], 100)  # No bonus without source_url
+        # A URL containing "anthropics" in the path but NOT matching the prefix
+        # must NOT earn a bonus — only exact prefix match counts
+        result = score(
+            [],
+            skill_md_caps=None,
+            source_url="https://evil.com/anthropics/some-skill",
+        )
+        self.assertEqual(result["score"], 100)
+        self.assertEqual(result["breakdown"]["bonus"], 0)
 
     def test_skill_md_mismatch_penalty(self):
         from security.scorer import score
