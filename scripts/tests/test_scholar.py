@@ -389,6 +389,20 @@ class TestDigestPaper(unittest.TestCase):
             result = self.s.digest_paper("2401.30004")
         self.assertEqual(result.get("error"), "unknown_paper")
 
+    def test_digest_handles_ollama_failure(self):
+        self.s.save_paper("2401.30005", "Ollama Fail Paper", None, "abs", None, 0.7)
+        with patch("requests.get") as mock_get, \
+             patch("requests.post") as mock_post:
+            mock_get.return_value = MagicMock(raise_for_status=MagicMock(), text="# Ollama Fail Paper\n")
+            mock_post.side_effect = Exception("connection refused")
+            result = self.s.digest_paper("2401.30005")
+
+        self.assertEqual(result.get("error"), "ollama_failed")
+        # No digest row written
+        conn = db._get_conn()
+        row = conn.execute("SELECT * FROM paper_digests WHERE paper_id='2401.30005'").fetchone()
+        self.assertIsNone(row)
+
 
 if __name__ == "__main__":
     unittest.main()
