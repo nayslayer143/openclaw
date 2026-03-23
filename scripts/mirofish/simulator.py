@@ -119,11 +119,20 @@ def run_loop():
               f"Positions: {state['open_positions']} | "
               f"Win rate: {state['win_rate']*100:.0f}%")
 
-        # 3. Analyze markets
-        decisions = brain.analyze(markets, state)
+        # 3. Fetch UW signals ([] if key not set or API down)
+        import scripts.mirofish.unusual_whales_feed as uw_feed
+        uw_signals = uw_feed.fetch()
+        if uw_signals:
+            print(f"[mirofish] UW signals: {len(uw_signals)} "
+                  f"({len(set(s['ticker'] for s in uw_signals))} tickers)")
+
+        # 4. Analyze markets
+        decisions = brain.analyze(markets, state, signals=uw_signals or None)
+        # Note: uw_signals=[] collapses to None intentionally.
+        # analyze() branches on `if signals:` so both None and [] skip injection.
         print(f"[mirofish] Brain returned {len(decisions)} trade decisions")
 
-        # 4. Execute trades
+        # 5. Execute trades
         for d in decisions:
             result = wallet.execute_trade(d)
             if result:
@@ -132,7 +141,7 @@ def run_loop():
             else:
                 print(f"[mirofish] Rejected: {d.market_id} (cap or kelly)")
 
-    # 5. Check stops (always runs, even if API is down)
+    # 6. Check stops (always runs, even if API is down)
     try:
         current_prices = feed.get_latest_prices()
         closed = wallet.check_stops(current_prices)
@@ -143,7 +152,7 @@ def run_loop():
     except Exception as exc:
         print(f"[mirofish] Stop check failed: {exc}")
 
-    # 6. Daily snapshot (first run of the day only)
+    # 7. Daily snapshot (first run of the day only)
     snapshotted = dash.maybe_snapshot(chat_id_for_notify=os.environ.get("JORDAN_TELEGRAM_CHAT_ID") or None)
     if snapshotted:
         print("[mirofish] Daily snapshot written and digest sent")
