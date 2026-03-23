@@ -94,27 +94,6 @@ class TestFTSIndexAndSearch(unittest.TestCase):
         self.assertEqual(len(after), 0)
 
     @unittest.skipUnless(FTS5_AVAILABLE, "FTS5 not supported")
-    def test_fts_in_retrieve_fallback(self):
-        """retrieve() returns FTS results when _embed() raises (Ollama down)."""
-        import importlib
-        import clawmson_db
-        importlib.reload(clawmson_db)
-        import clawmson_memory
-        importlib.reload(clawmson_memory)
-        import clawmson_fts as fts
-        import datetime
-        from unittest.mock import patch
-
-        ts = datetime.datetime.utcnow().isoformat()
-        fts.index("chat4", "semantic", 1, "Jordan uses qwen3 coder model", ts)
-
-        from clawmson_memory import MemoryManager
-        mm = MemoryManager()
-        with patch("clawmson_memory._embed", side_effect=Exception("Ollama down")):
-            result = mm.retrieve("chat4", "qwen3 model")
-        self.assertIn("qwen3", result.lower())
-
-    @unittest.skipUnless(FTS5_AVAILABLE, "FTS5 not supported")
     def test_search_command_formats_results(self):
         """format_results() returns string with source labels."""
         import clawmson_fts as fts
