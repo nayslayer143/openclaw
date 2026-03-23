@@ -140,3 +140,15 @@ def test_graceful_nonzero_exit_search():
     with patch("clawteam.chub.subprocess.run", return_value=search_proc):
         result = fetch_chub_context("use `requests` to fetch data")
     assert result == ""
+
+
+def test_graceful_nonzero_exit_get():
+    """Non-zero returncode from chub get → returns empty string."""
+    import json as _json
+    from clawteam.chub import fetch_chub_context
+    search_out = _json.dumps([{"id": "requests", "name": "requests"}]).encode()
+    search_proc = _make_proc(stdout=search_out, returncode=0)
+    get_proc = _make_proc(stdout=b"", returncode=1)
+    with patch("clawteam.chub.subprocess.run", side_effect=[search_proc, get_proc]):
+        result = fetch_chub_context("use `requests` to fetch data")
+    assert result == ""
