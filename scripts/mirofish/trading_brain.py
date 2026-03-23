@@ -164,8 +164,9 @@ def analyze(
     if signals:
         recent = sorted(signals, key=lambda s: s.get("fetched_at", ""), reverse=True)[:20]
         signal_lines = "\n".join(
-            f'- [{s["source"].upper()}] {s["ticker"]} {s["direction"]} '
-            f'{s["signal_type"]} — {s["description"]}'
+            f'- [{s.get("source", "").upper()}] {s.get("ticker", "?")} '
+            f'{s.get("direction", "")} {s.get("signal_type", "")} '
+            f'— {s.get("description", "")}'
             for s in recent
         )
         signals_block = (
