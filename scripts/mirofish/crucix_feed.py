@@ -512,6 +512,132 @@ def _normalize_maritime(data: dict) -> list[dict]:
     return signals
 
 
+_PRIORITY_MAP = {
+    ("crucix_delta", "critical_change"): 100,
+    ("crucix_delta", "regime_signal"): 100,
+    ("crucix_ideas", "crucix_idea"): 90,
+    ("tSignals", "military_strike"): 80,
+    ("telegram", "urgent_intel"): 70,
+    ("acled",): 60,  # any acled signal type
+    ("fred", "indicator_spike"): 50,
+    ("fred", "indicator_level"): 50,
+    ("energy",): 45,
+    ("noaa", "severe_weather"): 40,
+    ("nukeSignals", "radiation_anomaly"): 35,
+}
+
+
+def _priority_score(signal: dict) -> int:
+    """Map (source, signal_type) to priority score. Default 10."""
+    source = signal.get("source", "")
+    sig_type = signal.get("signal_type", "")
+    # Try exact match first
+    score = _PRIORITY_MAP.get((source, sig_type))
+    if score is not None:
+        return score
+    # Try source-only match
+    score = _PRIORITY_MAP.get((source,))
+    if score is not None:
+        return score
+    return 10
+
+
+def _sort_by_priority(signals: list[dict]) -> list[dict]:
+    """Sort signals by priority score descending."""
+    return sorted(signals, key=_priority_score, reverse=True)
+
+
+def _strip_unhealthy(data: dict, source_keys: list[str], hmap: dict) -> dict:
+    """Return a copy of data with unhealthy source keys replaced by empty values.
+
+    This ensures normalizers never process data from sources marked err/stale.
+    """
+    filtered = dict(data)
+    for key in source_keys:
+        if not _is_source_healthy(hmap, key):
+            print(f"[crucix_feed] Stripping unhealthy source: {key}")
+            original = data.get(key)
+            # Replace with empty version of the same type
+            if isinstance(original, list):
+                filtered[key] = []
+            elif isinstance(original, dict):
+                filtered[key] = {}
+            else:
+                filtered[key] = None
+    return filtered
+
+
+def _normalize_all(data: dict) -> list[dict]:
+    """Run all normalizers, filter by health per-source, sort by priority, cap."""
+    hmap = _build_health_map(data.get("health") or [])
+
+    all_signals: list[dict] = []
+    normalizers = [
+        (["gdelt", "acled", "tg"], _normalize_geopolitical),
+        (["fred", "energy", "treasury", "bls", "gscpi", "markets"], _normalize_economic),
+        (["thermal", "tSignals", "air", "space", "sdr"], _normalize_military),
+        (["noaa", "nuke", "nukeSignals", "epa", "who"], _normalize_environmental),
+        (["chokepoints"], _normalize_maritime),
+        (["delta", "ideas"], _normalize_meta),
+    ]
+
+    for source_keys, normalizer in normalizers:
+        # Strip unhealthy sources from data before passing to normalizer
+        filtered_data = _strip_unhealthy(data, source_keys, hmap)
+
+        try:
+            domain_signals = normalizer(filtered_data)
+            all_signals.extend(domain_signals)
+        except Exception as e:
+            print(f"[crucix_feed] Normalizer error ({source_keys}): {e}")
+
+    # Sort by priority and cap
+    all_signals = _sort_by_priority(all_signals)
+    return all_signals[:CRUCIX_SIGNAL_LIMIT]
+
+
+def _is_cache_fresh() -> bool:
+    """True if any crucix_signals row was fetched within CRUCIX_CACHE_TTL_HOURS."""
+    cutoff = (datetime.datetime.utcnow() -
+              datetime.timedelta(hours=CRUCIX_CACHE_TTL_HOURS)).isoformat()
+    try:
+        with _get_conn() as conn:
+            row = conn.execute(
+                "SELECT COUNT(*) as cnt FROM crucix_signals WHERE fetched_at > ?",
+                (cutoff,)
+            ).fetchone()
+        return row["cnt"] > 0
+    except Exception:
+        return False
+
+
+def _store_signals(signals: list[dict]) -> None:
+    """Batch INSERT OR IGNORE into crucix_signals."""
+    if not signals:
+        return
+    try:
+        with _get_conn() as conn:
+            conn.executemany("""
+                INSERT OR IGNORE INTO crucix_signals
+                (source, ticker, signal_type, direction, amount_usd, description, fetched_at)
+                VALUES (:source, :ticker, :signal_type, :direction,
+                        :amount_usd, :description, :fetched_at)
+            """, signals)
+    except Exception as e:
+        print(f"[crucix_feed] DB write error: {e}")
+
+
+def _purge_old_signals() -> None:
+    """Delete crucix_signals rows older than 24 hours."""
+    cutoff = (datetime.datetime.utcnow() -
+              datetime.timedelta(hours=24)).isoformat()
+    try:
+        with _get_conn() as conn:
+            conn.execute("DELETE FROM crucix_signals WHERE fetched_at < ?", (cutoff,))
+    except Exception as e:
+        print(f"[crucix_feed] Purge error: {e}")
+
+
 def get_cached() -> list[dict]:
     """Return signals from crucix_signals fetched within CRUCIX_CACHE_TTL_HOURS."""
     cutoff = (datetime.datetime.utcnow() -
@@ -531,6 +657,42 @@ def get_cached() -> list[dict]:
 
 
 def fetch() -> list[dict]:
-    """Fetch from Crucix /api/data, normalize all sources, cache, return signals."""
-    # Stub — will be implemented in Task 12
-    return []
+    """
+    Fetch from Crucix /api/data, normalize all 29 sources, cache, return signals.
+    On failure, returns cached signals or []. Never raises.
+    """
+    if _is_cache_fresh():
+        print("[crucix_feed] Cache fresh — skipping live fetch")
+        return get_cached()
+
+    try:
+        resp = requests.get(
+            f"{CRUCIX_BASE_URL}/api/data",
+            timeout=CRUCIX_TIMEOUT,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+    except requests.exceptions.ConnectionError:
+        print("[crucix_feed] Crucix unreachable — falling back to cache")
+        return get_cached()
+    except requests.exceptions.Timeout:
+        print("[crucix_feed] Crucix timeout — falling back to cache")
+        return get_cached()
+    except Exception as e:
+        print(f"[crucix_feed] Fetch error: {e}")
+        return get_cached()
+
+    if not isinstance(data, dict):
+        print("[crucix_feed] Malformed response (not a dict) — falling back to cache")
+        return get_cached()
+
+    signals = _normalize_all(data)
+
+    if not signals:
+        print("[crucix_feed] No signals from normalization — falling back to cache")
+        return get_cached()
+
+    _purge_old_signals()
+    _store_signals(signals)
+    print(f"[crucix_feed] Fetched and normalized {len(signals)} signals")
+    return signals

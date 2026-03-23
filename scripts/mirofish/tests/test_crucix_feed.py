@@ -300,3 +300,160 @@ def test_normalize_maritime(temp_db):
     assert len(signals) == 1
     assert signals[0]["ticker"] == "SEA:STRAIT_OF_HORMUZ"
     assert signals[0]["direction"] == "neutral"
+
+
+# ---------------------------------------------------------------------------
+# Task 10: Priority scoring + _normalize_all
+# ---------------------------------------------------------------------------
+
+def test_priority_scoring_and_cap(temp_db):
+    cf = _cf()
+    # Create signals with known priorities
+    signals = [
+        {"source": "crucix_delta", "signal_type": "critical_change", "ticker": "META:VIX"},
+        {"source": "crucix_ideas", "signal_type": "crucix_idea", "ticker": "IDEA:1"},
+        {"source": "tSignals", "signal_type": "military_strike", "ticker": "MIL:STRIKE"},
+        {"source": "telegram", "signal_type": "urgent_intel", "ticker": "GEO:TG"},
+        {"source": "gdelt", "signal_type": "conflict_event", "ticker": "GEO:GLOBAL"},
+    ]
+    scored = cf._sort_by_priority(signals)
+    # Delta critical (100) > ideas (90) > tSignals (80) > telegram (70) > gdelt (10)
+    assert scored[0]["source"] == "crucix_delta"
+    assert scored[1]["source"] == "crucix_ideas"
+    assert scored[2]["source"] == "tSignals"
+    assert scored[3]["source"] == "telegram"
+    assert scored[4]["source"] == "gdelt"
+
+
+def test_normalize_all_combines_domains(temp_db):
+    cf = _cf()
+    data = {
+        "gdelt": {"conflicts": 42, "crisis": 5, "totalArticles": 100,
+                   "geoPoints": [{"name": "Kyiv", "count": 12}]},
+        "acled": {"deadliestEvents": []},
+        "tg": {"urgent": []},
+        "fred": [], "energy": {}, "treasury": {}, "bls": [],
+        "gscpi": {}, "markets": {},
+        "thermal": [], "tSignals": [], "air": [], "space": {}, "sdr": {},
+        "noaa": {}, "nuke": [], "nukeSignals": [], "epa": {}, "who": [],
+        "chokepoints": [],
+        "delta": {"summary": {"direction": "risk-off", "criticalChanges": 1},
+                  "signals": []},
+        "ideas": [],
+        "health": [{"n": "GDELT", "err": False, "stale": False}],
+    }
+    signals = cf._normalize_all(data)
+    assert isinstance(signals, list)
+    assert len(signals) >= 2  # At minimum: GDELT conflict + regime signal
+    # All signals have required keys
+    required = {"source", "ticker", "signal_type", "direction", "description", "fetched_at"}
+    for s in signals:
+        assert required.issubset(s.keys()), f"Missing keys in {s}"
+
+
+# ---------------------------------------------------------------------------
+# Task 11: Caching layer
+# ---------------------------------------------------------------------------
+
+def test_store_and_retrieve_cached(temp_db):
+    cf = _cf()
+    signals = [{
+        "source": "gdelt", "ticker": "GEO:KYIV", "signal_type": "conflict_event",
+        "direction": "bearish", "amount_usd": None,
+        "description": "test signal", "fetched_at": datetime.datetime.utcnow().isoformat(),
+    }]
+    cf._store_signals(signals)
+    cached = cf.get_cached()
+    assert len(cached) >= 1
+    assert cached[0]["ticker"] == "GEO:KYIV"
+
+
+def test_old_signals_purged(temp_db):
+    import sqlite3 as sql
+    cf = _cf()
+    # Insert a signal from 25 hours ago
+    old_time = (datetime.datetime.utcnow() - datetime.timedelta(hours=25)).isoformat()
+    conn = sql.connect(temp_db)
+    conn.execute("""
+        INSERT INTO crucix_signals
+        (source, ticker, signal_type, direction, amount_usd, description, fetched_at)
+        VALUES ('gdelt', 'GEO:OLD', 'conflict_event', 'bearish', NULL, 'old signal', ?)
+    """, (old_time,))
+    conn.commit()
+    conn.close()
+
+    # Purge should remove it
+    cf._purge_old_signals()
+    cached = cf.get_cached()
+    old = [s for s in cached if s["ticker"] == "GEO:OLD"]
+    assert len(old) == 0
+
+
+def test_cache_freshness(temp_db):
+    cf = _cf()
+    # Empty DB → not fresh
+    assert cf._is_cache_fresh() is False
+    # Insert recent signal → fresh
+    cf._store_signals([{
+        "source": "test", "ticker": "TEST:1", "signal_type": "test",
+        "direction": "neutral", "amount_usd": None,
+        "description": "test", "fetched_at": datetime.datetime.utcnow().isoformat(),
+    }])
+    assert cf._is_cache_fresh() is True
+
+
+# ---------------------------------------------------------------------------
+# Task 12: fetch() — full implementation
+# ---------------------------------------------------------------------------
+
+def test_fetch_integration_with_mock(temp_db, monkeypatch):
+    cf = _cf()
+    sample_response = {
+        "gdelt": {"conflicts": 5, "crisis": 1, "totalArticles": 50,
+                   "geoPoints": [{"name": "Kyiv", "count": 3}]},
+        "acled": {"deadliestEvents": []},
+        "tg": {"urgent": []},
+        "fred": [], "energy": {}, "treasury": {}, "bls": [],
+        "gscpi": {}, "markets": {},
+        "thermal": [], "tSignals": [], "air": [], "space": {}, "sdr": {},
+        "noaa": {}, "nuke": [], "nukeSignals": [], "epa": {}, "who": [],
+        "chokepoints": [],
+        "delta": {"summary": {"direction": "mixed", "criticalChanges": 0}, "signals": []},
+        "ideas": [],
+        "health": [],
+        "meta": {"sourcesQueried": 29, "sourcesOk": 29},
+    }
+    mock_resp = MagicMock()
+    mock_resp.raise_for_status.return_value = None
+    mock_resp.json.return_value = sample_response
+
+    with patch("requests.get", return_value=mock_resp):
+        signals = cf.fetch()
+
+    assert isinstance(signals, list)
+    assert len(signals) >= 1
+    # Verify signals were cached
+    cached = cf.get_cached()
+    assert len(cached) >= 1
+
+
+def test_fetch_crucix_down_returns_empty(temp_db):
+    cf = _cf()
+    with patch("requests.get", side_effect=requests.exceptions.ConnectionError("refused")):
+        signals = cf.fetch()
+    assert signals == []
+
+
+def test_fetch_uses_cache_when_fresh(temp_db):
+    cf = _cf()
+    # Seed cache
+    cf._store_signals([{
+        "source": "gdelt", "ticker": "GEO:TEST", "signal_type": "conflict_event",
+        "direction": "bearish", "amount_usd": None,
+        "description": "cached", "fetched_at": datetime.datetime.utcnow().isoformat(),
+    }])
+    # Should not hit API
+    with patch("requests.get", side_effect=AssertionError("should not hit API")):
+        signals = cf.fetch()
+    assert len(signals) >= 1
+    assert signals[0]["ticker"] == "GEO:TEST"
