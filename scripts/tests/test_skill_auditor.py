@@ -78,10 +78,48 @@ class TestScanner(unittest.TestCase):
         self.assertTrue(len(crits) >= 1)
 
     def test_snippet_capped_at_120(self):
-        long_line = "x = " + "a" * 200 + "\n"
-        findings = self._scan(long_line)
+        long_eval = 'eval("' + "a" * 200 + '")\n'  # 208+ chars, triggers obfuscation
+        findings = self._scan(long_eval)
+        self.assertTrue(len(findings) >= 1, "Expected at least one finding on long eval line")
         for f in findings:
             self.assertLessEqual(len(f.snippet), 120)
+
+
+class TestScanSkillMdCapabilities(unittest.TestCase):
+    def _write_skill_md(self, content: str) -> str:
+        f = tempfile.NamedTemporaryFile(mode="w", suffix=".md", delete=False)
+        f.write(content)
+        f.close()
+        return f.name
+
+    def test_parses_capabilities_block(self):
+        from security.scanner import scan_skill_md_capabilities
+        path = self._write_skill_md(
+            "# capabilities:\n"
+            "#   network: false\n"
+            "#   filesystem_write: false\n"
+        )
+        try:
+            caps = scan_skill_md_capabilities(path)
+            self.assertIsNotNone(caps)
+            self.assertFalse(caps["network"])
+            self.assertFalse(caps["filesystem_write"])
+        finally:
+            os.unlink(path)
+
+    def test_missing_file_returns_none(self):
+        from security.scanner import scan_skill_md_capabilities
+        caps = scan_skill_md_capabilities("/nonexistent/SKILL.md")
+        self.assertIsNone(caps)
+
+    def test_no_capabilities_block_returns_none(self):
+        from security.scanner import scan_skill_md_capabilities
+        path = self._write_skill_md("# This skill does X\nNo capabilities block here.\n")
+        try:
+            caps = scan_skill_md_capabilities(path)
+            self.assertIsNone(caps)
+        finally:
+            os.unlink(path)
 
 
 if __name__ == "__main__":
