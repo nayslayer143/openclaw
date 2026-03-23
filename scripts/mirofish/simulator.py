@@ -86,6 +86,20 @@ CREATE TABLE IF NOT EXISTS uw_signals (
 CREATE INDEX IF NOT EXISTS idx_uw_signals_ticker_time
     ON uw_signals(ticker, fetched_at);
 
+CREATE TABLE IF NOT EXISTS crucix_signals (
+    id          INTEGER PRIMARY KEY,
+    source      TEXT NOT NULL,
+    ticker      TEXT NOT NULL,
+    signal_type TEXT NOT NULL,
+    direction   TEXT NOT NULL,
+    amount_usd  REAL,
+    description TEXT NOT NULL,
+    fetched_at  TEXT NOT NULL,
+    UNIQUE (source, ticker, signal_type, fetched_at)
+);
+CREATE INDEX IF NOT EXISTS idx_crucix_signals_ticker_time
+    ON crucix_signals(ticker, fetched_at);
+
 INSERT OR IGNORE INTO context (chat_id, key, value)
 VALUES ('mirofish', 'starting_balance', '1000.00');
 """
