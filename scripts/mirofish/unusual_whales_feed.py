@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
 """
 Unusual Whales feed — fetches options flow, dark pool, congressional trades,
-and institutional holdings. Caches to uw_signals SQLite table. Satisfies the
+and institutional holdings. Caches to uw_signals SQLite table. Duck-type compatible with the
 DataFeed protocol (base_feed.py) via module-level fetch() and get_cached().
+Note: isinstance(this_module, DataFeed) will return False — callers must
+duck-type against the module, not use isinstance().
 
 Graceful degradation: returns [] immediately if UNUSUAL_WHALES_API_KEY not set.
 """
 from __future__ import annotations
 import os
+import re
 import sqlite3
 import datetime
 import requests
@@ -58,11 +61,14 @@ def _is_cache_fresh() -> bool:
     ttl = float(os.environ.get("UW_CACHE_TTL_HOURS", "1.0"))
     cutoff = (datetime.datetime.utcnow() -
               datetime.timedelta(hours=ttl)).isoformat()
-    with _get_conn() as conn:
-        row = conn.execute(
-            "SELECT COUNT(*) as cnt FROM uw_signals WHERE fetched_at > ?", (cutoff,)
-        ).fetchone()
-    return row["cnt"] > 0
+    try:
+        with _get_conn() as conn:
+            row = conn.execute(
+                "SELECT COUNT(*) as cnt FROM uw_signals WHERE fetched_at > ?", (cutoff,)
+            ).fetchone()
+        return row["cnt"] > 0
+    except Exception:
+        return False
 
 
 def _normalize_options_flow(item: dict) -> dict | None:
@@ -153,14 +159,13 @@ def _normalize_congressional(item: dict) -> dict | None:
     elif "sale" in txn_type or txn_type == "sell":
         direction, signal_type = "bearish", "sell"
     else:
-        direction, signal_type = "neutral", "buy"
+        return None  # unknown transaction type — skip rather than mislabel
 
     member_type = item.get("member_type", "")
     amounts = item.get("amounts", "")
     filed_at = item.get("filed_at_date", "")
 
     # Extract midpoint of amounts range for amount_usd
-    import re
     amount_usd = 0.0
     if amounts:
         nums = re.findall(r'[\d,]+', amounts)
@@ -246,13 +251,17 @@ def get_cached() -> list[dict]:
     ttl = float(os.environ.get("UW_CACHE_TTL_HOURS", "1.0"))
     cutoff = (datetime.datetime.utcnow() -
               datetime.timedelta(hours=ttl)).isoformat()
-    with _get_conn() as conn:
-        rows = conn.execute("""
-            SELECT source, ticker, signal_type, direction, amount_usd, description, fetched_at
-            FROM uw_signals WHERE fetched_at > ?
-            ORDER BY fetched_at DESC
-        """, (cutoff,)).fetchall()
-    return [dict(r) for r in rows]
+    try:
+        with _get_conn() as conn:
+            rows = conn.execute("""
+                SELECT source, ticker, signal_type, direction, amount_usd, description, fetched_at
+                FROM uw_signals WHERE fetched_at > ?
+                ORDER BY fetched_at DESC
+            """, (cutoff,)).fetchall()
+        return [dict(r) for r in rows]
+    except Exception as e:
+        print(f"[uw_feed] Cache read error: {e}")
+        return []
 
 
 def fetch() -> list[dict]:
