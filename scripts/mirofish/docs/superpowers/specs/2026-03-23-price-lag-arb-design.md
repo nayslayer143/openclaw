@@ -14,7 +14,7 @@ Add a price-lag arbitrage strategy to Mirofish that detects dislocations between
 
 1. Fetch real-time BTC/ETH spot prices from Binance and Coinbase (free, no auth).
 2. Detect price dislocations between spot prices and Polymarket crypto contracts.
-3. Model edge decay over time (linear: further from expiry = higher edge).
+3. Model edge decay over time (linear inverted: near-expiry = higher edge for price-lag).
 4. Simulate execution latency as a cost penalty.
 5. Integrate as a new strategy step inside `trading_brain.analyze()`.
 6. Track price-lag trades in a separate DB table for independent performance analysis.
@@ -154,10 +154,19 @@ From the question text:
 
 **Binary threshold contracts:**
 
+**Prerequisite — end_date handling:**
+- Parse `end_date` from ISO string: `datetime.fromisoformat(market["end_date"])`
+- If `end_date` is None or `days_to_expiry <= 0`, return None (skip this market)
+
 ```python
 spot = spot_prices[asset]          # e.g., 42350.0
 threshold = extracted_threshold     # e.g., 50000.0
-days_to_expiry = (end_date - now).days
+end_date_str = market.get("end_date")
+if not end_date_str:
+    return None  # no expiry → can't compute edge decay
+days_to_expiry = (datetime.fromisoformat(end_date_str) - datetime.utcnow()).days
+if days_to_expiry <= 0:
+    return None  # expired or same-day → skip
 
 # Distance as fraction of spot price
 distance_pct = abs(threshold - spot) / spot
@@ -166,16 +175,29 @@ distance_pct = abs(threshold - spot) / spot
 # P(reaching threshold) decreases with distance, increases with time
 # Uses a crude volatility-adjusted estimate
 vol_factor = 0.5 * math.sqrt(max(days_to_expiry, 1) / 30)  # ~monthly vol scaling
-if spot < threshold:  # need price to go UP to hit threshold
+if spot < threshold:  # need price to go UP to hit "above X" threshold
+    # Farther below = lower probability of reaching threshold
     implied_prob = max(0.01, min(0.99, 1.0 - distance_pct / vol_factor))
-else:  # already above threshold
+else:  # spot is already above threshold
+    # Already above = high probability of "above X" being true
+    # Farther above = higher probability (more buffer before dropping)
     implied_prob = max(0.01, min(0.99, 1.0 - distance_pct / vol_factor))
-    implied_prob = 1.0 - implied_prob  # flip for "above" when already above
+    # IMPORTANT: Don't flip. If spot is $55k and threshold is $50k,
+    # distance_pct is small (0.09), so implied_prob is high (~0.91).
+    # That correctly says "high chance BTC stays above $50k".
 
-# Dislocation
+# Dislocation — compare our implied probability vs market price
+# Use NO price when market sum deviates from 1.0 for more accurate comparison
 market_yes = market["yes_price"]
-raw_dislocation = abs(implied_prob - market_yes)
-direction = "YES" if implied_prob > market_yes else "NO"
+market_no = market.get("no_price", 1.0 - market_yes)
+if implied_prob > market_yes:
+    raw_dislocation = implied_prob - market_yes
+    direction = "YES"
+else:
+    implied_no = 1.0 - implied_prob
+    raw_dislocation = implied_no - market_no
+    direction = "NO"
+raw_dislocation = max(raw_dislocation, 0.0)
 ```
 
 **Continuous bracket contracts:**
@@ -187,9 +209,9 @@ bracket_width = bracket_high - bracket_low
 center = (bracket_low + bracket_high) / 2
 
 if bracket_low <= spot <= bracket_high:
-    # Spot inside bracket — higher probability
+    # Spot inside bracket — higher probability (up to 0.7 when centered)
     dist_from_center = abs(spot - center) / (bracket_width / 2)
-    implied_prob = max(0.05, 0.5 * (1.0 - dist_from_center))
+    implied_prob = max(0.05, 0.7 * (1.0 - dist_from_center))
 else:
     # Spot outside bracket — probability drops with distance
     if spot < bracket_low:
@@ -203,11 +225,15 @@ raw_dislocation = abs(implied_prob - market_yes)
 direction = "YES" if implied_prob > market_yes else "NO"
 ```
 
-### Edge Decay (Linear)
+### Edge Decay (Linear, Inverted for Price-Lag)
+
+For price-lag arb, near-expiry dislocations are STRONGER signals (less time for reversion — the current spot price is close to the answer). This is the opposite of standard prediction market decay where distant expiry = more optionality.
 
 ```python
 MAX_HORIZON_DAYS = 180
-decay_multiplier = min(days_to_expiry / MAX_HORIZON_DAYS, 1.0)
+# Near expiry = high multiplier (strong signal), far expiry = low multiplier (noisy signal)
+decay_multiplier = max(0.1, 1.0 - days_to_expiry / MAX_HORIZON_DAYS)
+# 1 day out → 0.994, 30 days → 0.833, 90 days → 0.5, 180+ days → 0.1
 ```
 
 ### Latency Simulation
@@ -350,7 +376,10 @@ For price-lag arb decisions, `metadata` contains:
    import scripts.mirofish.spot_feed as spot_feed
    spot_signals = spot_feed.fetch()
    spot_dict = spot_feed.get_spot_dict()
-   all_signals = uw_signals + crucix_signals + spot_signals
+   # Spot signals are NOT merged into all_signals for the Ollama prompt —
+   # they serve a different purpose (structured price data for the arb strategy).
+   # Adding "BTC spot: $42,350" as a signal line wastes tokens and adds noise.
+   all_signals = uw_signals + crucix_signals
    decisions = brain.analyze(markets, state, signals=all_signals or None, spot_prices=spot_dict)
    ```
 4. After executing a price-lag trade, write the tracking row:
@@ -359,6 +388,36 @@ For price-lag arb decisions, `metadata` contains:
        result = wallet.execute_trade(d)
        if result and d.strategy == "price_lag_arb" and d.metadata:
            _log_price_lag_trade(d)
+   ```
+
+5. Define `_log_price_lag_trade(d)` in `simulator.py`:
+   ```python
+   def _log_price_lag_trade(decision: "TradeDecision") -> None:
+       """Write price-lag arb tracking row from decision.metadata."""
+       m = decision.metadata
+       if not m:
+           return
+       try:
+           with _get_conn() as conn:
+               conn.execute("""
+                   INSERT INTO price_lag_trades
+                   (market_id, question, asset, contract_type, spot_price,
+                    threshold, bracket_low, bracket_high, polymarket_price,
+                    raw_dislocation, decayed_edge, days_to_expiry,
+                    direction, confidence, amount_usd, entry_price, detected_at)
+                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+               """, (
+                   decision.market_id, decision.question,
+                   m.get("asset"), m.get("contract_type"), m.get("spot_price"),
+                   m.get("threshold"), m.get("bracket_low"), m.get("bracket_high"),
+                   m.get("polymarket_price"), m.get("raw_dislocation"),
+                   m.get("decayed_edge"), m.get("days_to_expiry"),
+                   decision.direction, decision.confidence,
+                   decision.amount_usd, decision.entry_price,
+                   datetime.datetime.utcnow().isoformat(),
+               ))
+       except Exception as e:
+           print(f"[mirofish] Price-lag tracking error: {e}")
    ```
 
 ### trading_brain.py changes
