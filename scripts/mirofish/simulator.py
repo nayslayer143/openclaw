@@ -135,14 +135,21 @@ def run_loop():
 
         # 3. Fetch UW signals ([] if key not set or API down)
         import scripts.mirofish.unusual_whales_feed as uw_feed
+        import scripts.mirofish.crucix_feed as crucix_feed
         uw_signals = uw_feed.fetch()
         if uw_signals:
             print(f"[mirofish] UW signals: {len(uw_signals)} "
                   f"({len(set(s['ticker'] for s in uw_signals))} tickers)")
 
+        crucix_signals = crucix_feed.fetch()
+        if crucix_signals:
+            print(f"[mirofish] Crucix signals: {len(crucix_signals)}")
+
+        all_signals = uw_signals + crucix_signals
+
         # 4. Analyze markets
-        decisions = brain.analyze(markets, state, signals=uw_signals or None)
-        # Note: uw_signals=[] collapses to None intentionally.
+        decisions = brain.analyze(markets, state, signals=all_signals or None)
+        # Note: empty list collapses to None intentionally.
         # analyze() branches on `if signals:` so both None and [] skip injection.
         print(f"[mirofish] Brain returned {len(decisions)} trade decisions")
 

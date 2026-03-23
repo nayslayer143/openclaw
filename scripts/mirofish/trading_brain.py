@@ -15,6 +15,7 @@ OLLAMA_BASE_URL   = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
 MIROFISH_MODEL    = os.environ.get("MIROFISH_MODEL", "qwen3:30b")
 OLLAMA_TIMEOUT    = int(os.environ.get("MIROFISH_OLLAMA_TIMEOUT", "180"))
 MAX_POSITION_PCT = float(os.environ.get("MIROFISH_MAX_POSITION_PCT", "0.10"))
+MERGED_SIGNAL_LIMIT = int(os.environ.get("MERGED_SIGNAL_LIMIT", "30"))
 ARB_THRESHOLD = 0.03
 ARB_POSITION_PCT = 0.05  # Fixed 5% of portfolio for arb trades
 
@@ -159,24 +160,50 @@ def analyze(
         for m in non_arb[:30]
     )
 
-    # Build optional UW signals block
+    # Build two-pass signal blocks
     signals_block = ""
     if signals:
-        recent = sorted(signals, key=lambda s: s.get("fetched_at", ""), reverse=True)[:20]
-        signal_lines = "\n".join(
-            f'- [{s.get("source", "").upper()}] {s.get("ticker", "?")} '
-            f'{s.get("direction", "")} {s.get("signal_type", "")} '
-            f'— {s.get("description", "")}'
-            for s in recent
-        )
-        signals_block = (
-            f"\nActive market signals (Unusual Whales):\n{signal_lines}\n\n"
-            "When analyzing Polymarket markets, consider whether any of these signals "
-            "suggest a related outcome is more or less likely. A bullish options sweep "
-            "on NVDA is a signal that sophisticated money expects NVDA to rise — factor "
-            "this into any Polymarket market about Nvidia price, earnings, or "
-            "company performance.\n"
-        )
+        # Partition signals for two-pass injection
+        crucix_ideas = [s for s in signals if s.get("source") == "crucix_ideas"]
+        regime_signals = [s for s in signals if s.get("source") == "crucix_delta"]
+        raw_signals = [s for s in signals if s.get("source") not in ("crucix_ideas", "crucix_delta")]
+
+        # Pass 1: Crucix OSINT Intelligence Summary (ideas + regime)
+        ideas_block = ""
+        if crucix_ideas or regime_signals:
+            ideas_lines = []
+            for rs in regime_signals:
+                ideas_lines.append(f"Overall regime: {rs.get('description', 'unknown')}")
+            for idea in crucix_ideas:
+                ideas_lines.append(f"- {idea.get('description', '')}")
+            ideas_block = (
+                "\nCrucix OSINT Intelligence Summary:\n"
+                + "\n".join(ideas_lines)
+                + "\n"
+            )
+
+        # Pass 2: Raw signals (merged UW + Crucix, capped)
+        raw_block = ""
+        if raw_signals:
+            recent = sorted(raw_signals, key=lambda s: s.get("fetched_at", ""), reverse=True)
+            recent = recent[:MERGED_SIGNAL_LIMIT]
+            signal_lines = "\n".join(
+                f'- [{s.get("source", "").upper()}] {s.get("ticker", "?")} '
+                f'{s.get("direction", "")} {s.get("signal_type", "")} '
+                f'— {s.get("description", "")}'
+                for s in recent
+            )
+            raw_block = (
+                f"\nActive market signals:\n{signal_lines}\n\n"
+                "When analyzing Polymarket markets, consider whether any of these signals "
+                "suggest a related outcome is more or less likely. OSINT signals (geopolitical "
+                "conflicts, economic indicators, military activity, environmental disasters) "
+                "indicate macro regime shifts. Market flow signals (options sweeps, dark pool "
+                "blocks, congressional trades) indicate where sophisticated money is positioning. "
+                "Both can create edge in prediction markets tied to related outcomes.\n"
+            )
+
+        signals_block = ideas_block + raw_block
 
     prompt = f"""You are Mirofish, a prediction market paper trading system.
 Current portfolio: ${balance:.2f} balance, {open_positions} open positions.
