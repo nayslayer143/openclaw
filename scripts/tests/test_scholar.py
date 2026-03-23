@@ -423,6 +423,8 @@ class TestActionRouting(unittest.TestCase):
 
     def tearDown(self):
         self.s.OPENCLAW_ROOT = self._orig_root
+        import shutil
+        shutil.rmtree(self._tmpdir, ignore_errors=True)
 
     def test_p1_with_techniques_writes_improvement(self):
         self.s.save_paper("2401.40001", "Action Paper", None, None, None, 0.9)
