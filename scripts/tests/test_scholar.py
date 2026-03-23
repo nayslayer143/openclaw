@@ -242,8 +242,8 @@ class TestDiscovery(unittest.TestCase):
             return [1.0, 0.0]  # trivial — all papers get same score
 
         with patch("requests.get", return_value=self._hf_response(hf_results)), \
-             patch.object(scholar, "embed_text", side_effect=fake_embed), \
-             patch.object(scholar, "_GOAL_VECTOR", None):
+             patch.object(scholar, "_get_goal_vector", return_value=[1.0, 0.0]), \
+             patch.object(scholar, "embed_text", side_effect=fake_embed):
             results = scholar.discover(query="agents", limit=5)
 
         self.assertEqual(len(results), 1)
