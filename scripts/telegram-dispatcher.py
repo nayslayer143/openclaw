@@ -475,6 +475,92 @@ def handle_reject_proc(chat_id: str, proc_id_str: str):
     send(chat_id, f"Procedure {proc_id} rejected.")
 
 
+# ── Mirofish paper trading commands ──────────────────────────────────────────
+def handle_portfolio(chat_id: str):
+    try:
+        import scripts.mirofish.dashboard as dash
+        send(chat_id, dash.format_portfolio_message())
+    except Exception as e:
+        send(chat_id, f"Portfolio error: {e}")
+
+
+def handle_pnl(chat_id: str):
+    try:
+        import scripts.mirofish.dashboard as dash
+        send(chat_id, dash.format_pnl_message())
+    except Exception as e:
+        send(chat_id, f"P&L error: {e}")
+
+
+def handle_trades(chat_id: str):
+    try:
+        import scripts.mirofish.dashboard as dash
+        send(chat_id, dash.format_trades_message())
+    except Exception as e:
+        send(chat_id, f"Trades error: {e}")
+
+
+def handle_bet(chat_id: str, text: str):
+    """
+    /bet [market_id] [YES|NO] [amount]
+    Example: /bet 0xabc123 YES 50
+    """
+    parts = text.split()
+    if len(parts) < 3:
+        send(chat_id, "Usage: /bet [market_id] [YES|NO] [amount]\nExample: /bet 0xabc YES 50")
+        return
+    market_id = parts[0]
+    direction = parts[1].upper()
+    if direction not in ("YES", "NO"):
+        send(chat_id, "Direction must be YES or NO")
+        return
+    try:
+        amount = float(parts[2])
+    except ValueError:
+        send(chat_id, f"Invalid amount: {parts[2]}")
+        return
+
+    try:
+        import scripts.mirofish.paper_wallet as pw
+        import scripts.mirofish.polymarket_feed as feed
+        from types import SimpleNamespace
+
+        prices = feed.get_latest_prices()
+        p = prices.get(market_id, {})
+        if direction == "YES":
+            entry_price = p.get("yes_price", 0.50)
+        else:
+            entry_price = p.get("no_price", 0.50)
+
+        shares = amount / entry_price if entry_price > 0 else 0
+
+        decision = SimpleNamespace(
+            market_id=market_id,
+            question=f"Manual bet on {market_id}",
+            direction=direction,
+            amount_usd=amount,
+            entry_price=entry_price,
+            shares=shares,
+            confidence=1.0,
+            reasoning="manual via /bet",
+            strategy="manual",
+        )
+        result = pw.execute_trade(decision)
+        if result:
+            send(chat_id,
+                 f"Paper trade executed\n"
+                 f"{direction} ${amount:.2f} on {market_id}\n"
+                 f"Entry: ${entry_price:.3f} | Shares: {shares:.1f}")
+        else:
+            state = pw.get_state()
+            cap = state["balance"] * 0.10
+            send(chat_id,
+                 f"Trade rejected — ${amount:.2f} exceeds 10% position cap "
+                 f"(max ${cap:.2f} at current balance ${state['balance']:.2f})")
+    except Exception as e:
+        send(chat_id, f"Bet error: {e}")
+
+
 # ── Direct command execution ──────────────────────────────────────────────────
 
 def handle_direct_command(chat_id: str, text: str):
@@ -673,6 +759,19 @@ def handle_message(msg: dict):
         if lower.startswith("/scholar"):
             subcommand = text[len("/scholar"):].strip()
             handle_scholar(chat_id, subcommand)
+            return
+        if lower == "/portfolio":
+            handle_portfolio(chat_id)
+            return
+        if lower == "/pnl":
+            handle_pnl(chat_id)
+            return
+        if lower == "/trades":
+            handle_trades(chat_id)
+            return
+        if lower.startswith("/bet ") or lower == "/bet":
+            bet_args = text[len("/bet"):].strip()
+            handle_bet(chat_id, bet_args)
             return
 
     # ── 3. Process media if present ───────────────────────────────────────────
