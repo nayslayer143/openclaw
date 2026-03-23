@@ -314,12 +314,14 @@ def _extract_title_from_markdown(md: str) -> str | None:
 
 
 def _strip_json_fences(raw: str) -> str:
-    """Remove markdown code fences from LLM response."""
+    """Remove markdown code fences from LLM response, handling leading text."""
     raw = raw.strip()
-    if raw.startswith("```"):
-        raw = re.sub(r"^```(?:json)?\s*", "", raw)
-        raw = re.sub(r"\s*```$", "", raw)
-    return raw.strip()
+    # Try to find a JSON fence block anywhere in the response
+    match = re.search(r"```(?:json)?\s*(\{[\s\S]*?\})\s*```", raw)
+    if match:
+        return match.group(1).strip()
+    # No fence found — return as-is (may or may not be valid JSON)
+    return raw
 
 
 def digest_paper(paper_id: str) -> dict:
