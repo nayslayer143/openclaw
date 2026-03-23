@@ -230,7 +230,7 @@ def scan_incoming(notify_fn=None) -> list[AuditResult]:
 
 
 def verify_all_skills(notify_fn=None) -> list[tuple[str, str]]:
-    """Hash-check all registered skills. DM Jordan if any changed or missing."""
+    """Hash-check all registered skills. DM Jordan if any changed."""
     results = registry.verify_all()
     for skill_name, status in results:
         if status in ("changed", "missing"):
@@ -276,6 +276,8 @@ def audit_mcp(notify_fn=None) -> list[AuditResult]:
                 (source_url and not source_url.startswith("file://"))
             )
             if is_remote:
+                if registry.get(skill_name):
+                    continue  # already registered — skip to avoid repeat DMs
                 registry.register(
                     skill_name, str(settings_path), score=55,
                     category=scorer.REVIEW, findings=[], source_url=source_url,
