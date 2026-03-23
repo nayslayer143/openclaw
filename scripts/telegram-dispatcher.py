@@ -49,13 +49,8 @@ import clawmson_references as refs
 import model_router as router
 import clawmson_scout as scout
 
-# Security auditor (lazy import to avoid startup cost if module missing)
+# Security auditor (lazy import — scripts/ already in sys.path via lines 41-42)
 try:
-    import sys as _sys
-    from pathlib import Path as _Path
-    _sec_path = str(_Path(__file__).parent)
-    if _sec_path not in _sys.path:
-        _sys.path.insert(0, _sec_path)
     from security import auditor as _security_auditor
     _SECURITY_AVAILABLE = True
 except ImportError:
@@ -426,6 +421,10 @@ def handle_audit_skill(chat_id: str, skill_name_or_path: str):
     if not skill_name_or_path:
         send(chat_id, "Usage: /audit <skill_name_or_path>")
         return
+    # Resolve name to path: try literal path first, then incoming/ dir
+    target = Path(skill_name_or_path)
+    if not target.exists():
+        target = Path.home() / "openclaw" / "skills" / "incoming" / skill_name_or_path
     send(chat_id, f"Auditing {skill_name_or_path}...")
 
     def _notify(msg: str):
@@ -433,7 +432,7 @@ def handle_audit_skill(chat_id: str, skill_name_or_path: str):
 
     try:
         result = _security_auditor.audit_skill(
-            skill_name_or_path, notify_fn=_notify
+            str(target), notify_fn=_notify
         )
         send(chat_id, f"Audit complete: {result.skill_name} — {result.category} "
                       f"({result.score}/100)")
