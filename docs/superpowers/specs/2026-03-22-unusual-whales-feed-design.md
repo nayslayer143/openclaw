@@ -43,7 +43,7 @@ class DataFeed(Protocol):
     def get_cached(self) -> list[dict]: ...
 ```
 
-No inheritance required. `unusual_whales_feed.py` satisfies it structurally. `polymarket_feed.py` is not modified — it also satisfies the protocol structurally via its existing `fetch_markets()` / `get_latest_prices()` functions exposed at module level. Future feeds just implement `fetch()` and `get_cached()`.
+No inheritance required. `unusual_whales_feed.py` satisfies it structurally by exposing `source_name`, `fetch()`, and `get_cached()` at module level. `polymarket_feed.py` is **not** modified and does **not** satisfy the protocol (its functions are named `fetch_markets()` / `get_latest_prices()`). `polymarket_feed` is called directly by name in `simulator.py` and is not wired through the `DataFeed` protocol. Future feeds implement `fetch()` and `get_cached()` to satisfy the protocol.
 
 ---
 
@@ -60,11 +60,14 @@ CREATE TABLE IF NOT EXISTS uw_signals (
     direction   TEXT NOT NULL,
     amount_usd  REAL,
     description TEXT NOT NULL,
-    fetched_at  TEXT NOT NULL
+    fetched_at  TEXT NOT NULL,
+    UNIQUE (source, ticker, signal_type, fetched_at)
 );
 CREATE INDEX IF NOT EXISTS idx_uw_signals_ticker_time
     ON uw_signals(ticker, fetched_at);
 ```
+
+The `UNIQUE` constraint on `(source, ticker, signal_type, fetched_at)` ensures `INSERT OR IGNORE` in `_store_signals()` correctly skips duplicates when two processes fetch simultaneously within the same TTL window.
 
 **`source` values:** `options_flow` | `dark_pool` | `congressional` | `institutional`
 
@@ -246,6 +249,8 @@ if uw_signals:
     print(f"[mirofish] UW signals: {len(uw_signals)} ({len(set(s['ticker'] for s in uw_signals))} tickers)")
 
 decisions = brain.analyze(markets, state, signals=uw_signals or None)
+# Note: uw_signals=[] (empty fetch) collapses to None here intentionally.
+# analyze() branches on `if signals:` (truthy), so both None and [] skip injection.
 ```
 
 ---
