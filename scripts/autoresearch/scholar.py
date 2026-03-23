@@ -261,3 +261,29 @@ def discover(query: str | None = None, limit: int = 10) -> list[dict]:
             relevance_score=paper.get("relevance_score"),
         )
     return ranked[:limit]
+
+
+# ── Digestion ─────────────────────────────────────────────────────────────────
+
+def fetch_paper_markdown(paper_id: str) -> str:
+    """
+    Fetch full paper markdown from HuggingFace.
+    On HTTP error: fall back to abstract from DB.
+    If paper not in DB either: return empty string.
+    """
+    try:
+        resp = requests.get(
+            f"https://huggingface.co/papers/{paper_id}.md",
+            timeout=HF_REQUEST_TIMEOUT,
+        )
+        resp.raise_for_status()
+        return resp.text
+    except Exception:
+        # Fallback: abstract from DB
+        with db._get_conn() as conn:
+            row = conn.execute(
+                "SELECT abstract FROM papers WHERE paper_id=?", (paper_id,)
+            ).fetchone()
+        if row and row["abstract"]:
+            return row["abstract"]
+        return ""
