@@ -52,6 +52,7 @@ SEMANTIC_TOP_K   = int(os.environ.get("CLAWMSON_SEMANTIC_TOP_K", "5"))
 SEMANTIC_MIN_SIM = float(os.environ.get("CLAWMSON_SEMANTIC_MIN_SIM", "0.5"))
 SEMANTIC_MIN_CONF= float(os.environ.get("CLAWMSON_SEMANTIC_MIN_CONF", "0.6"))
 PROC_THRESHOLD   = int(os.environ.get("CLAWMSON_PROC_THRESHOLD", "3"))
+CLAWMSON_FTS_LIMIT = int(os.environ.get("CLAWMSON_FTS_LIMIT", "5"))
 
 _DEFAULT_PROBE   = "what do you know about Jordan and the current projects?"
 
@@ -214,11 +215,13 @@ class ShortTermMemory:
         ids = [r["id"] for r in rows]
         ts  = _now()
         with db._get_conn() as conn:
-            conn.execute(
+            cur = conn.execute(
                 "INSERT INTO stm_summaries (chat_id, summary, from_ts, to_ts, timestamp)"
                 " VALUES (?, ?, ?, ?, ?)",
                 (chat_id, summary, from_ts, to_ts, ts)
             )
+            source_id = cur.lastrowid
+            db.fts_index(chat_id, "stm", source_id, summary, ts, conn=conn)
             conn.execute(
                 f"UPDATE conversations SET archived=1"
                 f" WHERE id IN ({','.join('?' * len(ids))})",
@@ -287,12 +290,14 @@ class EpisodicMemory:
 
         ts = _now()
         with db._get_conn() as conn:
-            conn.execute(
+            cur = conn.execute(
                 "INSERT INTO episodic_memories"
                 " (chat_id, content, summary, timestamp, valence, embedding)"
                 " VALUES (?, ?, ?, ?, ?, ?)",
                 (chat_id, combined[:1000], summary, ts, valence, embedding)
             )
+            source_id = cur.lastrowid
+            db.fts_index(chat_id, "episodic", source_id, summary, ts, conn=conn)
 
     def retrieve(self, chat_id: str, query: str,
                  embed_fn=None, min_sim: float = EPISODIC_MIN_SIM) -> list:
@@ -371,7 +376,7 @@ class SemanticMemory:
             except Exception:
                 embedding = None
             with db._get_conn() as conn:
-                conn.execute(
+                cur = conn.execute(
                     "INSERT INTO semantic_facts"
                     " (chat_id, key, value, confidence, source, timestamp, embedding)"
                     " VALUES (?, ?, ?, ?, ?, ?, ?)"
@@ -380,6 +385,9 @@ class SemanticMemory:
                     " timestamp=excluded.timestamp, embedding=excluded.embedding",
                     (chat_id, key, value, conf, source, ts, embedding)
                 )
+                source_id = cur.lastrowid
+                fts_content = f"{key}: {value}"
+                db.fts_index(chat_id, "semantic", source_id, fts_content, ts, conn=conn)
 
     def ingest_explicit(self, chat_id: str, key: str, value: str):
         """Store a fact explicitly (/remember fact: key = value)."""
@@ -389,7 +397,7 @@ class SemanticMemory:
             embedding = None
         ts = _now()
         with db._get_conn() as conn:
-            conn.execute(
+            cur = conn.execute(
                 "INSERT INTO semantic_facts"
                 " (chat_id, key, value, confidence, source, timestamp, embedding)"
                 " VALUES (?, ?, ?, ?, ?, ?, ?)"
@@ -398,6 +406,8 @@ class SemanticMemory:
                 " timestamp=excluded.timestamp, embedding=excluded.embedding",
                 (chat_id, key[:100], value[:500], 1.0, "explicit", ts, embedding)
             )
+            source_id = cur.lastrowid
+            db.fts_index(chat_id, "semantic", source_id, f"{key}: {value}", ts, conn=conn)
 
     def retrieve(self, chat_id: str, query: str,
                  embed_fn=None, min_sim: float = SEMANTIC_MIN_SIM) -> list:
@@ -582,6 +592,8 @@ class MemoryManager:
         probe = query.strip() or _DEFAULT_PROBE
 
         parts = []
+        # Track (source, source_id) to deduplicate FTS results
+        seen_ids: set[tuple] = set()
 
         # Layer 2: STM summaries
         stm = self._stm.retrieve(chat_id)
@@ -606,11 +618,29 @@ class MemoryManager:
             parts.append("**Procedures:**")
             parts.extend(procs)
 
+        # FTS search — complementary to cosine, works even when Ollama is down
+        try:
+            import clawmson_fts as fts
+            fts_results = fts.search(chat_id, probe, limit=CLAWMSON_FTS_LIMIT)
+            fts_parts = []
+            for r in fts_results:
+                key = (r.get("source"), r.get("source_id"))
+                if key in seen_ids:
+                    continue
+                seen_ids.add(key)
+                snippet = r.get("snippet") or r.get("content", "")[:100]
+                ts_short = (r.get("ts") or "")[:10]
+                fts_parts.append(f"[Search] {snippet} ({ts_short})")
+            if fts_parts:
+                parts.append("**Search matches:**")
+                parts.extend(fts_parts)
+        except Exception:
+            pass
+
         if not parts:
             return ""
 
         body = "\n".join(parts)
-        # Cap at ~2000 chars
         if len(body) > 2000:
             body = body[:1997] + "..."
         return f"### Memory Context\n{body}"
