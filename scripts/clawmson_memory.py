@@ -214,11 +214,13 @@ class ShortTermMemory:
         ids = [r["id"] for r in rows]
         ts  = _now()
         with db._get_conn() as conn:
-            conn.execute(
+            cur = conn.execute(
                 "INSERT INTO stm_summaries (chat_id, summary, from_ts, to_ts, timestamp)"
                 " VALUES (?, ?, ?, ?, ?)",
                 (chat_id, summary, from_ts, to_ts, ts)
             )
+            source_id = cur.lastrowid
+            db.fts_index(chat_id, "stm", source_id, summary, ts, conn=conn)
             conn.execute(
                 f"UPDATE conversations SET archived=1"
                 f" WHERE id IN ({','.join('?' * len(ids))})",
@@ -287,12 +289,14 @@ class EpisodicMemory:
 
         ts = _now()
         with db._get_conn() as conn:
-            conn.execute(
+            cur = conn.execute(
                 "INSERT INTO episodic_memories"
                 " (chat_id, content, summary, timestamp, valence, embedding)"
                 " VALUES (?, ?, ?, ?, ?, ?)",
                 (chat_id, combined[:1000], summary, ts, valence, embedding)
             )
+            source_id = cur.lastrowid
+            db.fts_index(chat_id, "episodic", source_id, summary, ts, conn=conn)
 
     def retrieve(self, chat_id: str, query: str,
                  embed_fn=None, min_sim: float = EPISODIC_MIN_SIM) -> list:
@@ -371,7 +375,7 @@ class SemanticMemory:
             except Exception:
                 embedding = None
             with db._get_conn() as conn:
-                conn.execute(
+                cur = conn.execute(
                     "INSERT INTO semantic_facts"
                     " (chat_id, key, value, confidence, source, timestamp, embedding)"
                     " VALUES (?, ?, ?, ?, ?, ?, ?)"
@@ -380,6 +384,9 @@ class SemanticMemory:
                     " timestamp=excluded.timestamp, embedding=excluded.embedding",
                     (chat_id, key, value, conf, source, ts, embedding)
                 )
+                source_id = cur.lastrowid
+                fts_content = f"{key}: {value}"
+                db.fts_index(chat_id, "semantic", source_id, fts_content, ts, conn=conn)
 
     def ingest_explicit(self, chat_id: str, key: str, value: str):
         """Store a fact explicitly (/remember fact: key = value)."""
@@ -389,7 +396,7 @@ class SemanticMemory:
             embedding = None
         ts = _now()
         with db._get_conn() as conn:
-            conn.execute(
+            cur = conn.execute(
                 "INSERT INTO semantic_facts"
                 " (chat_id, key, value, confidence, source, timestamp, embedding)"
                 " VALUES (?, ?, ?, ?, ?, ?, ?)"
@@ -398,6 +405,8 @@ class SemanticMemory:
                 " timestamp=excluded.timestamp, embedding=excluded.embedding",
                 (chat_id, key[:100], value[:500], 1.0, "explicit", ts, embedding)
             )
+            source_id = cur.lastrowid
+            db.fts_index(chat_id, "semantic", source_id, f"{key}: {value}", ts, conn=conn)
 
     def retrieve(self, chat_id: str, query: str,
                  embed_fn=None, min_sim: float = SEMANTIC_MIN_SIM) -> list:
