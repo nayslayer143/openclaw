@@ -4,7 +4,7 @@ import tempfile
 import pytest
 
 # Point DB at a temp file so tests don't touch production DB
-os.environ["CLAWMSON_DB_PATH"] = tempfile.mkstemp(suffix=".db")[1]
+os.environ.setdefault("CLAWMSON_DB_PATH", tempfile.mkstemp(suffix=".db")[1])
 
 import clawmson_db as db
 
