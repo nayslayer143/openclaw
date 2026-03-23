@@ -193,3 +193,70 @@ def rank_by_relevance(candidates: list[dict]) -> list[dict]:
             print(f"[scholar] embed failed for {candidate.get('paper_id')}: {e}")
             candidate["relevance_score"] = 0.0
     return sorted(candidates, key=lambda c: c["relevance_score"], reverse=True)
+
+
+# ── Discovery ─────────────────────────────────────────────────────────────────
+
+def _known_paper_ids() -> set[str]:
+    """Return set of paper_ids already in DB."""
+    with db._get_conn() as conn:
+        rows = conn.execute("SELECT paper_id FROM papers").fetchall()
+    return {r["paper_id"] for r in rows}
+
+
+def search_papers(query: str | None = None, limit: int = 20) -> list[dict]:
+    """
+    Fetch papers from HuggingFace API. Deduplicates against known DB papers.
+    If query is None, fetches trending papers.
+    Returns list of candidate dicts with paper_id, title, abstract, authors, url.
+    """
+    if query:
+        url = f"https://huggingface.co/api/papers?search={requests.utils.quote(query)}"
+    else:
+        url = "https://huggingface.co/api/papers"
+
+    resp = requests.get(url, timeout=HF_REQUEST_TIMEOUT)
+    resp.raise_for_status()
+    raw = resp.json()
+
+    known = _known_paper_ids()
+    candidates = []
+    for item in raw[:limit * 2]:  # fetch extra to account for dedup
+        pid = item.get("id") or item.get("paper_id", "")
+        if not pid or pid in known:
+            continue
+        candidates.append({
+            "paper_id": pid,
+            "title":    item.get("title", ""),
+            "authors":  json.dumps([a.get("name", a) if isinstance(a, dict) else a
+                                    for a in item.get("authors", [])]),
+            "abstract": item.get("summary") or item.get("abstract", ""),
+            "url":      f"https://huggingface.co/papers/{pid}",
+        })
+        if len(candidates) >= limit:
+            break
+    return candidates
+
+
+def discover(query: str | None = None, limit: int = 10) -> list[dict]:
+    """
+    Full discovery pipeline:
+    1. Search HF (or trending if no query)
+    2. Rank by relevance against goal vector
+    3. Save all candidates to DB
+    4. Return ranked list
+    """
+    candidates = search_papers(query=query, limit=limit * 2)
+    if not candidates:
+        return []
+    ranked = rank_by_relevance(candidates)
+    for paper in ranked:
+        save_paper(
+            paper_id=paper["paper_id"],
+            title=paper["title"],
+            authors=paper.get("authors"),
+            abstract=paper.get("abstract"),
+            url=paper.get("url"),
+            relevance_score=paper.get("relevance_score"),
+        )
+    return ranked[:limit]

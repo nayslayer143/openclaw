@@ -200,5 +200,59 @@ class TestEmbedAndRank(unittest.TestCase):
         self.assertAlmostEqual(scholar._cosine([1, 0], [0, 1]), 0.0, places=5)
 
 
+class TestDiscovery(unittest.TestCase):
+    def setUp(self):
+        conn = db._get_conn()
+        conn.execute("DELETE FROM paper_digests")
+        conn.execute("DELETE FROM papers")
+        conn.commit()
+
+    def _hf_response(self, papers: list) -> MagicMock:
+        mock = MagicMock()
+        mock.raise_for_status = MagicMock()
+        mock.json.return_value = papers
+        return mock
+
+    def test_search_papers_deduplicates(self):
+        from autoresearch import scholar
+        # Pre-seed one known paper
+        scholar.save_paper("2401.00010", "Known", None, None, None, 0.8)
+
+        hf_results = [
+            {"id": "2401.00010", "title": "Known", "authors": [],
+             "publishedAt": "2024-01-01", "summary": "abstract"},
+            {"id": "2401.00011", "title": "New", "authors": [],
+             "publishedAt": "2024-01-02", "summary": "new abstract"},
+        ]
+        with patch("requests.get", return_value=self._hf_response(hf_results)):
+            results = scholar.search_papers("test query", limit=20)
+
+        ids = [p["paper_id"] for p in results]
+        self.assertNotIn("2401.00010", ids)  # already known — deduplicated
+        self.assertIn("2401.00011", ids)
+
+    def test_discover_saves_and_returns_ranked(self):
+        from autoresearch import scholar
+        hf_results = [
+            {"id": "2401.00020", "title": "Paper X", "authors": [],
+             "publishedAt": "2024-01-01", "summary": "agent orchestration paper"},
+        ]
+
+        def fake_embed(text):
+            return [1.0, 0.0]  # trivial — all papers get same score
+
+        with patch("requests.get", return_value=self._hf_response(hf_results)), \
+             patch.object(scholar, "embed_text", side_effect=fake_embed), \
+             patch.object(scholar, "_GOAL_VECTOR", None):
+            results = scholar.discover(query="agents", limit=5)
+
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["paper_id"], "2401.00020")
+        # Verify saved to DB
+        conn = db._get_conn()
+        row = conn.execute("SELECT * FROM papers WHERE paper_id='2401.00020'").fetchone()
+        self.assertIsNotNone(row)
+
+
 if __name__ == "__main__":
     unittest.main()
