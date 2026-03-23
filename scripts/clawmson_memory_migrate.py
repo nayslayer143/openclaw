@@ -47,7 +47,8 @@ def migrate():
 
     print(f"\nMigration complete.")
     print(f"  Existing rows: conversations={conv_count}, context={ctx_count}, refs={ref_count}")
-    print(f"  New tables ready: stm_summaries, episodic_memories, semantic_facts, procedures, procedure_candidates")
+    print(f"  New tables ready: stm_summaries, episodic_memories, semantic_facts,"
+          f" procedures, procedure_candidates, memory_fts, sessions")
 
 
 if __name__ == "__main__":
