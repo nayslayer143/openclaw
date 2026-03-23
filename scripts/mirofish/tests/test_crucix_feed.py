@@ -457,3 +457,128 @@ def test_fetch_uses_cache_when_fresh(temp_db):
         signals = cf.fetch()
     assert len(signals) >= 1
     assert signals[0]["ticker"] == "GEO:TEST"
+
+
+def test_prompt_two_pass_injection(temp_db):
+    import scripts.mirofish.trading_brain as tb
+    captured: list[str] = []
+
+    def fake_ollama(prompt: str) -> str:
+        captured.append(prompt)
+        return "[]"
+
+    idea_signal = {
+        "source": "crucix_ideas", "ticker": "IDEA:1",
+        "signal_type": "crucix_idea", "direction": "bullish",
+        "amount_usd": None, "fetched_at": datetime.datetime.utcnow().isoformat(),
+        "description": "[long|Medium|swing] Test Idea — test text",
+    }
+    regime_signal = {
+        "source": "crucix_delta", "ticker": "META:REGIME",
+        "signal_type": "regime_signal", "direction": "bearish",
+        "amount_usd": None, "fetched_at": datetime.datetime.utcnow().isoformat(),
+        "description": "Regime: risk-off | 2 critical changes",
+    }
+    raw_signal = {
+        "source": "gdelt", "ticker": "GEO:UKRAINE",
+        "signal_type": "conflict_event", "direction": "bearish",
+        "amount_usd": None, "fetched_at": datetime.datetime.utcnow().isoformat(),
+        "description": "GDELT: 42 conflicts",
+    }
+    markets = [{"market_id": "m1", "question": "Test?",
+                "yes_price": 0.50, "no_price": 0.50, "volume": 50000}]
+    wallet = {"balance": 1000.0, "open_positions": 0}
+
+    with patch.object(tb, "_call_ollama", side_effect=fake_ollama):
+        tb.analyze(markets, wallet, signals=[idea_signal, regime_signal, raw_signal])
+
+    assert len(captured) == 1
+    prompt = captured[0]
+    ideas_pos = prompt.find("OSINT Intelligence Summary")
+    raw_pos = prompt.find("Active market signals")
+    assert ideas_pos > 0, "Ideas block missing from prompt"
+    assert raw_pos > 0, "Raw signals block missing from prompt"
+    assert ideas_pos < raw_pos, "Ideas block must appear before raw signals"
+    assert "Test Idea" in prompt
+    assert "risk-off" in prompt
+
+
+def test_prompt_no_ideas_omits_block(temp_db):
+    import scripts.mirofish.trading_brain as tb
+    captured: list[str] = []
+
+    def fake_ollama(prompt: str) -> str:
+        captured.append(prompt)
+        return "[]"
+
+    raw_signal = {
+        "source": "options_flow", "ticker": "NVDA",
+        "signal_type": "call_sweep", "direction": "bullish",
+        "amount_usd": 2500000, "fetched_at": datetime.datetime.utcnow().isoformat(),
+        "description": "NVDA call_sweep $2.5M",
+    }
+    markets = [{"market_id": "m1", "question": "Test?",
+                "yes_price": 0.50, "no_price": 0.50, "volume": 50000}]
+    wallet = {"balance": 1000.0, "open_positions": 0}
+
+    with patch.object(tb, "_call_ollama", side_effect=fake_ollama):
+        tb.analyze(markets, wallet, signals=[raw_signal])
+
+    prompt = captured[0]
+    assert "OSINT Intelligence Summary" not in prompt
+    assert "Active market signals" in prompt
+    assert "NVDA" in prompt
+
+
+def test_signal_dict_shape_all_domains(temp_db):
+    """Every signal from a full normalize_all pass must have the required keys and types."""
+    cf = _cf()
+    data = {
+        "gdelt": {"conflicts": 20, "crisis": 5, "totalArticles": 500,
+                   "geoPoints": [{"name": "Kyiv", "count": 10}]},
+        "acled": {"deadliestEvents": [
+            {"date": "2026-03-23", "type": "Airstrike", "country": "Syria",
+             "location": "Aleppo", "fatalities": 10}]},
+        "tg": {"urgent": [{"channel": "test", "text": "Breaking news",
+                            "views": 1000, "urgentFlags": ["breaking"]}]},
+        "fred": [{"id": "VIXCLS", "label": "VIX", "value": 25, "momChangePct": 12.0,
+                  "momChange": 3.0, "recent": [22, 25]}],
+        "energy": {"signals": [{"type": "SPIKE", "severity": "high", "value": 100}]},
+        "treasury": {"signals": [{"type": "DEBT_MILESTONE", "severity": "high",
+                                   "threshold": 36000000000000}]},
+        "bls": [], "gscpi": {"value": 1.5, "interpretation": "High"},
+        "markets": {"crypto": [{"symbol": "BTC-USD", "name": "BTC",
+                                 "price": 42000, "changePct": 5.0, "change": 2000}],
+                    "indexes": [], "commodities": []},
+        "thermal": [{"region": "Ukraine", "det": 100, "hc": 50, "fires": []}],
+        "tSignals": [{"type": "MILITARY_STRIKE", "confidence": 0.95, "lat": 48, "lon": 37}],
+        "air": [{"region": "Eastern Europe", "total": 50, "noCallsign": 15}],
+        "space": {"signals": [{"type": "MILSAT", "country": "China", "count": 2}],
+                  "recentLaunches": [{"name": "Falcon 9", "country": "US"}]},
+        "sdr": {},
+        "noaa": {"alerts": [{"event": "Tornado", "severity": "Extreme",
+                              "headline": "Tornado warning"}]},
+        "nuke": [], "nukeSignals": [{"type": "ELEVATED", "location": "Test",
+                                      "cpm": 900, "severity": "high"}],
+        "epa": {}, "who": [{"title": "Outbreak", "summary": "test"}],
+        "chokepoints": [{"label": "Suez Canal", "note": "key route"}],
+        "delta": {"summary": {"direction": "risk-off", "criticalChanges": 1},
+                  "signals": [{"type": "VIX_SPIKE", "severity": "critical",
+                               "from": 20, "to": 25}]},
+        "ideas": [{"title": "Test", "text": "test idea", "type": "long",
+                   "confidence": "High", "horizon": "swing"}],
+        "health": [],
+    }
+    signals = cf._normalize_all(data)
+    assert len(signals) > 0
+
+    required_keys = {"source", "ticker", "signal_type", "direction", "description", "fetched_at"}
+    valid_directions = {"bullish", "bearish", "neutral"}
+
+    for s in signals:
+        missing = required_keys - set(s.keys())
+        assert not missing, f"Signal missing keys {missing}: {s}"
+        assert s["direction"] in valid_directions, f"Bad direction '{s['direction']}' in {s}"
+        assert isinstance(s["ticker"], str) and len(s["ticker"]) > 0
+        assert isinstance(s["description"], str) and len(s["description"]) > 0
+        assert "amount_usd" in s

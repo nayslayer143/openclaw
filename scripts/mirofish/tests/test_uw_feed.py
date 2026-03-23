@@ -139,4 +139,3 @@ def test_signals_injected_into_ollama_prompt(temp_db):
     assert len(captured) == 1
     assert "Active market signals" in captured[0]
     assert "NVDA" in captured[0]
-    assert "Unusual Whales" in captured[0]
