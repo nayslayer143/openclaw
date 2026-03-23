@@ -1,0 +1,177 @@
+[
+  {
+    "name": "Neon Agency Landing",
+    "tier": 1,
+    "prompt": "Build a dark cinematic landing page for a creative agency called 'Void Studio'. Neon accent colors on pitch black. Hero with massive serif typography, scroll-triggered fade-in sections, hover glow cards for portfolio items. Smooth scroll. Google Fonts. Single HTML file."
+  },
+  {
+    "name": "Restaurant Ambiance",
+    "tier": 1,
+    "prompt": "Build a luxury restaurant landing page for 'KURO' — Japanese fine dining. Warm blacks, gold accents, elegant serif typography. Hero with a single statement word that fades in. Menu sections reveal on scroll. Hover effects on dish cards. Single HTML file."
+  },
+  {
+    "name": "Minimal Portfolio",
+    "tier": 1,
+    "prompt": "Build a minimalist developer portfolio — dark mode, monospace typography, terminal aesthetic. Name is 'zero.dev'. Projects listed with staggered entrance animations. Custom cursor dot. Smooth transitions between sections on scroll. Single HTML file."
+  },
+  {
+    "name": "SaaS Product Hero",
+    "tier": 1,
+    "prompt": "Build a SaaS landing page for an AI writing tool called 'Inkwell'. Clean dark UI with a purple-to-blue gradient accent. Hero with typing animation effect. Feature cards with icons that animate on hover. Scroll-triggered stats counter. Single HTML file."
+  },
+  {
+    "name": "Music Artist Page",
+    "tier": 1,
+    "prompt": "Build a music artist landing page for an electronic producer called 'HXLF'. Cyberpunk aesthetic — dark with cyan and magenta. Large album art hero section. Discography grid with hover effects. Pulsing animated background element. Single HTML file."
+  },
+  {
+    "name": "Scroll Storytelling Brand",
+    "tier": 2,
+    "prompt": "Build a scroll-driven brand story for a sustainable fashion label called 'EARTH THREAD'. As the user scrolls, reveal the story: origin → materials → process → impact. Use GSAP ScrollTrigger with pinned sections. Parallax layers at different scroll speeds. Text reveals word-by-word on scroll. Earthy dark palette. Single HTML file with GSAP CDN."
+  },
+  {
+    "name": "Product Showcase Scroll",
+    "tier": 2,
+    "prompt": "Build a product showcase page for wireless earbuds called 'ECHO PRO'. Apple-style scroll experience: hero with giant product name, then as user scrolls the product stays pinned while feature callouts animate in from sides. Smooth scroll with Lenis. Parallax depth on backgrounds. Single HTML file with GSAP + Lenis CDN."
+  },
+  {
+    "name": "Editorial Magazine",
+    "tier": 2,
+    "prompt": "Build a digital magazine landing page for 'MONOLITH' — a culture and design publication. Horizontal scroll article carousel that pins. Large editorial typography. Image reveals with mask animations on scroll. Dark sophisticated palette. Articles have hover effects that show preview text. Single HTML file with GSAP CDN."
+  },
+  {
+    "name": "Architect Portfolio Scroll",
+    "tier": 2,
+    "prompt": "Build an architecture firm portfolio — 'FORM+VOID'. Full-bleed project images that zoom in on scroll (layered zoom effect). Each project section pins and reveals details before releasing to the next. Minimal text, maximum visual impact. Dark concrete palette with warm light accent. Single HTML file with GSAP + ScrollTrigger CDN."
+  },
+  {
+    "name": "Timeline Scroll Experience",
+    "tier": 2,
+    "prompt": "Build a vertical timeline experience for a tech company's 10-year history. Each year is a pinned section with scroll-linked animations. Progress indicator on the side tracks your position. Key moments have parallax images and staggered text reveals. Counter animations for milestones. Single HTML file with GSAP CDN."
+  },
+  {
+    "name": "Liquid Hover Gallery",
+    "tier": 3,
+    "prompt": "Build a portfolio gallery where hovering over images creates a liquid distortion wave effect using CSS and JS (no WebGL needed — use CSS displacement-like transforms and clip-path animations). Cards should tilt with 3D perspective following the cursor. Custom cursor that morphs into a circle on hover. Staggered grid entrance with spring physics. Dark mode. Single HTML file."
+  },
+  {
+    "name": "Shader Background Landing",
+    "tier": 3,
+    "prompt": "Build a landing page with an animated gradient shader background using a canvas element with pure JavaScript (2D canvas noise animation — flowing, organic color blobs). The text floats above it. As user scrolls, the shader colors shift between warm and cool. Large typography. Vignette overlay. Film grain effect with CSS. Single HTML file."
+  },
+  {
+    "name": "Particle Field Hero",
+    "tier": 3,
+    "prompt": "Build a hero section with a canvas-based particle field — thousands of tiny dots connected by lines when close together (constellation effect). Particles react to mouse position (push away or attract). Below the hero: scroll-triggered content sections with parallax. The particles fade out as you scroll down. Single HTML file."
+  },
+  {
+    "name": "Glitch Interface",
+    "tier": 3,
+    "prompt": "Build a cyberpunk hacker-themed interface. Glitch effects on text (RGB split, scan lines, random character replacement). Terminal-style typing animations. Background with matrix-style falling characters on canvas. Hover effects that trigger brief screen distortion. Everything feels like a sci-fi movie computer. Single HTML file."
+  },
+  {
+    "name": "Audio-Reactive Visualizer",
+    "tier": 3,
+    "prompt": "Build a landing page for a DJ/producer with an interactive audio visualizer. Use canvas to draw frequency bars or waveforms that animate based on simulated audio data (sine waves with varying frequency and amplitude). The visualization responds to mouse movement — horizontal position controls frequency, vertical controls amplitude. Neon colors on black. Single HTML file."
+  },
+  {
+    "name": "3D Product Orbit",
+    "tier": 4,
+    "prompt": "Build a product page with a Three.js 3D object (geometric crystal/gem shape) that orbits slowly and responds to mouse hover by tilting toward the cursor. Add post-processing bloom glow effect. Scroll down reveals feature sections with parallax. The 3D scene stays visible as a fixed background. Dark luxury palette. Single HTML file with Three.js CDN."
+  },
+  {
+    "name": "Immersive 3D Scene Scroll",
+    "tier": 4,
+    "prompt": "Build an immersive experience where a Three.js camera moves through a 3D scene of floating geometric shapes as the user scrolls. Use GSAP ScrollTrigger to control camera position along a path. Shapes have different materials — glass, metal, emissive. Bloom post-processing. Film grain overlay. Single HTML file with Three.js + GSAP CDN."
+  },
+  {
+    "name": "3D Globe Network",
+    "tier": 4,
+    "prompt": "Build a landing page for a global SaaS company with a Three.js wireframe globe that slowly rotates. Points on the globe pulse and connect with arc lines showing network connections. The globe reacts to mouse — tilts and highlights nearest point. Below: scroll-triggered stats and feature sections. Dark space palette with cyan accents. Single HTML file with Three.js CDN."
+  },
+  {
+    "name": "Morphing 3D Blob",
+    "tier": 4,
+    "prompt": "Build a hero section featuring a Three.js morphing sphere — an organic blob that constantly deforms using vertex displacement with noise functions in a custom shader. It reacts to mouse proximity (deforms more when cursor is near). Iridescent material with holographic color shift. Bloom post-processing. Smooth scroll to content sections below. Single HTML file with Three.js CDN."
+  },
+  {
+    "name": "3D Text Monument",
+    "tier": 4,
+    "prompt": "Build a landing page where the brand name 'MONOLITH' is rendered as extruded 3D text in Three.js. The camera slowly orbits the text. Mouse movement affects camera orbit speed and angle. Dramatic lighting — single spotlight with shadows. Fog in the scene. Bloom on the text edges. Scroll past the 3D section to 2D content below. Single HTML file with Three.js CDN."
+  },
+  {
+    "name": "Dimensional Portal",
+    "tier": 5,
+    "prompt": "Build a reality-bending experience: a Three.js tunnel/portal that the user falls through on scroll. The tunnel is made of rings that the camera flies through, with each ring having different shader effects (noise distortion, chromatic aberration, color shifting). At certain scroll points, the tunnel opens into 'rooms' with different visual themes. Post-processing: bloom, film grain, vignette. Single HTML file with Three.js + GSAP CDN."
+  },
+  {
+    "name": "Interactive Physics Playground",
+    "tier": 5,
+    "prompt": "Build a full-screen interactive physics playground where clicking spawns colored shapes that fall and bounce with realistic 2D physics (implement simple verlet integration — no library). Shapes collide with each other and with the screen edges. Dragging creates slingshot launches. Background is a flowing gradient canvas. Everything has motion blur trails. Gamified: score counter for chain reactions when shapes collide. Single HTML file."
+  },
+  {
+    "name": "Synesthesia Engine",
+    "tier": 5,
+    "prompt": "Build an interactive experience where mouse movement generates visual art AND sound simultaneously. Canvas renders flowing ribbons and particles that follow the cursor with physics. Each movement triggers Tone.js synthesizer notes — X position controls pitch, Y controls volume, speed controls filter. The visual trails have chromatic aberration and glow. A recording/playback mode lets you replay your creation. Single HTML file with Tone.js CDN."
+  },
+  {
+    "name": "Infinite Zoom Fractal",
+    "tier": 5,
+    "prompt": "Build a mind-bending infinite zoom experience using canvas. The user scrolls and the viewport continuously zooms into a procedurally generated landscape of nested shapes (circles within circles within circles, each with different color schemes). The deeper you go, the color palette shifts. Add a parallax starfield background layer. The zoom should feel smooth and infinite with no perceptible loading. Single HTML file."
+  },
+  {
+    "name": "Gravity Well Game UI",
+    "tier": 5,
+    "prompt": "Build a gamified UI experience: the landing page itself IS the game. Floating UI elements (cards, buttons, text blocks) exist in a 2D space with simulated gravity. The user's cursor creates a gravity well that attracts or repels the UI elements based on distance and scroll position. Double-click on a card to 'capture' it and pin it in place. Captured cards reveal content. Background: animated constellation particle field. Score tracker. Sound effects on interactions. Single HTML file."
+  },
+  {
+    "name": "Gyroscope Art Gallery",
+    "tier": 4,
+    "prompt": "Build a 3D art gallery using Three.js where the camera is controlled by device orientation (gyroscope on mobile, mouse on desktop). The user tilts their phone to look around a virtual room with floating artwork frames. Each frame has a glowing border and parallax depth effect. Walking toward a painting (scroll) zooms in and reveals description text. Dark museum ambient lighting with spotlight on each piece. Post-processing bloom. iOS permission button for gyroscope access. Single HTML file with Three.js CDN."
+  },
+  {
+    "name": "Diagonal Scroll Portfolio",
+    "tier": 4,
+    "prompt": "Build a creative developer portfolio where scrolling moves content diagonally at 45 degrees instead of vertically. Projects are arranged along the diagonal axis — each project card rotates slightly as it enters view. The viewport acts as a window panning across a large diagonal canvas. Custom scroll physics with Lenis (smooth, buttery). Background: subtle grid that scrolls at a different diagonal angle creating a moiré drift effect. Monospace typography. Dark palette with one neon accent. Single HTML file with GSAP + Lenis CDN."
+  },
+  {
+    "name": "Portal Dimension Page",
+    "tier": 5,
+    "prompt": "Build a landing page with a literal portal in the center — a circular window that shows a completely different 3D world inside it (Three.js with stencil buffer masking). The 'real' page is dark and minimal. The portal shows a colorful alien landscape with floating geometry and particle effects. As the user scrolls, the portal expands until it consumes the entire page, transitioning the user INTO the other dimension. The other world has its own content sections. Mouse controls camera angle inside the portal before entry. Post-processing: bloom, chromatic aberration, film grain. Single HTML file with Three.js + GSAP CDN."
+  },
+  {
+    "name": "Non-Euclidean Infinite Scroll",
+    "tier": 5,
+    "prompt": "Build a page that loops infinitely — scrolling past the last section seamlessly wraps back to the first, but each loop TRANSFORMS the world. Pass 1: normal dark mode. Pass 2: colors invert to light mode. Pass 3: everything rotates 5 degrees. Pass 4: text becomes glitched. Pass 5: full chromatic distortion. A subtle counter in the corner tracks your 'loop depth'. The transition between end and beginning must be SEAMLESS — no jump, no flash. Background: canvas particle field whose gravity direction rotates with each pass. Single HTML file with GSAP CDN."
+  },
+  {
+    "name": "Gyroscope Parallax Landscape",
+    "tier": 4,
+    "prompt": "Build a parallax landscape scene with 5+ depth layers that respond to device gyroscope (DeviceOrientationEvent). On mobile, tilting the phone shifts the layers at different speeds creating a window-into-another-world effect. On desktop, mouse position controls the parallax instead. Layers: distant stars → nebula → mountains → forest → foreground fog. Each layer at different data-depth values. CSS transforms only (no WebGL needed). Smooth interpolation prevents jitter. iOS permission button. Atmospheric color palette — deep indigo to warm amber horizon. Single HTML file."
+  },
+  {
+    "name": "Reverse Gravity Portfolio",
+    "tier": 5,
+    "prompt": "Build a portfolio where scrolling DOWN makes content float UPWARD — reverse scroll direction with Lenis wheelMultiplier: -1. Content starts at the 'bottom' of the page. As you scroll down, sections rise like bubbles. Each project card has anti-gravity physics — slight float and gentle rotation as if in zero-G. Background: canvas with particles whose gravity direction is inverted (rising instead of falling). The whole experience feels like you're underwater or in space. Smooth, dreamlike, slow motion easing. Serif typography. Deep ocean blue palette. Single HTML file with Lenis + GSAP CDN."
+  },
+  {
+    "name": "Perception Corridor",
+    "tier": 5,
+    "prompt": "Build a CSS 3D perspective corridor — 20+ concentric rectangular rings receding into a vanishing point. Mouse position controls the vanishing point (perspective-origin), creating the illusion of peering down an infinite hallway from different angles. As the user scrolls, they 'walk' deeper into the corridor (rings scale up and pass behind the camera). At certain depth thresholds, the corridor opens into 'rooms' with content sections. Each room has a different color scheme. Moiré patterns emerge from overlapping ring edges. Pulsing glow on ring borders. Single HTML file with GSAP CDN."
+  },
+  {
+    "name": "Orbital Menu Experience",
+    "tier": 4,
+    "prompt": "Build a navigation experience where menu items orbit around a central logo in an elliptical path. Scrolling (or dragging) rotates the orbit. Items scale up and become opaque as they reach the 'front' of the orbit, and shrink/fade as they recede to the 'back'. Clicking a front-positioned item expands it to reveal a full content section with parallax. The orbit continues subtly in the background. Spring physics on the orbit rotation (momentum + decay). Dark space aesthetic with glowing items. Custom cursor. Single HTML file with GSAP CDN."
+  },
+  {
+    "name": "Anamorphic Type Experience",
+    "tier": 5,
+    "prompt": "Build an experience centered on anamorphic typography — text that appears stretched and unreadable at first. As the user scrolls to a specific 'sweet spot', the text transforms (un-stretches, un-skews) into perfect readability. Multiple sections each with different anamorphic distortions (scaleX, skewX, perspective rotation) that resolve at different scroll positions. Between the sweet spots, the text is abstract art. Background: flowing gradient canvas with noise. One section uses 3D CSS perspective — text only reads correctly when viewed from a specific angle (mouse-controlled). Dark palette. Single HTML file with GSAP CDN."
+  },
+  {
+    "name": "Gravity Shift World",
+    "tier": 5,
+    "prompt": "Build a full-page canvas experience where hundreds of particles fall under gravity — but the DIRECTION of gravity rotates based on scroll position. Scroll 25%: gravity pulls right. Scroll 50%: gravity pulls up. Scroll 75%: gravity pulls left. Scroll 100%: back to down. Particles leave motion trail ghosts. Over the canvas, content sections are positioned at the four gravity 'poles' — each section is only right-side-up when gravity points toward it, making the user scroll to the correct orientation to read each section. Color shifts with gravity direction (warm→cool→warm). Single HTML file."
+  }
+]

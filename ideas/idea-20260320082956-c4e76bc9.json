@@ -1,0 +1,11 @@
+{
+  "id": "idea-20260320082956-c4e76bc9",
+  "title": "9. **PromptBase AI-powered Content**",
+  "summary": "What it is: A service that utilizes Claude AI and local Ollama LLMs to create high-quality content, such as blog posts and social media posts, for sale on PromptBase.\nRevenue model: The service will earn revenue through sales of content on PromptBase, with payments collected through Stripe.\nTime to first dollar: 1-2 weeks\nFirst action: Clawmpson can start by creating a sample piece of content using Claude AI and local Ollama LLMs, and setting up a PromptBase store.\nRisk/blocker: The biggest obst",
+  "category": "product",
+  "source": "clawmpson",
+  "status": "pending",
+  "notes": [],
+  "created_at": "2026-03-20T08:29:56.143005",
+  "updated_at": "2026-03-20T08:29:56.143017"
+}

@@ -1,0 +1,11 @@
+{
+  "id": "idea-20260320082955-50d8898b",
+  "title": "3. **xyz.cards API Reseller**",
+  "summary": "What it is: A service that resells xyz.cards NFC card SaaS to businesses, offering customized solutions and support. The service will utilize the OpenClaw agent stack to manage client relationships.\nRevenue model: The service will charge a markup on top of the standard xyz.cards pricing, with payments collected through Stripe.\nTime to first dollar: 2-3 weeks\nFirst action: Clawmpson can start by researching potential clients and creating a sales pitch for the reseller service.\nRisk/blocker: The b",
+  "category": "research",
+  "source": "clawmpson",
+  "status": "pending",
+  "notes": [],
+  "created_at": "2026-03-20T08:29:55.820637",
+  "updated_at": "2026-03-20T08:29:55.820641"
+}

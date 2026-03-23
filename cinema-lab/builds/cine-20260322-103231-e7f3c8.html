@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HXLF — Electronic Producer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Grotesk:wght@300;400;500;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #020409;
+  --surface: #080d18;
+  --panel: #0c1422;
+  --cyan: #00f5ff;
+  --magenta: #ff00aa;
+  --yellow: #ffee00;
+  --text: #c8e8f8;
+  --dim: #3a5070;
+  --border: rgba(0,245,255,0.08);
+  --border-m: rgba(255,0,170,0.08);
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: auto; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ─── SCAN LINES ─── */
+.scanlines {
+  position: fixed; inset: 0; z-index: 8500; pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px, transparent 3px,
+    rgba(0,0,0,0.06) 3px, rgba(0,0,0,0.06) 4px
+  );
+}
+.vignette {
+  position: fixed; inset: 0; z-index: 8499; pointer-events: none;
+  background: radial-gradient(ellipse 75% 75% at 50% 50%, transparent 40%, rgba(0,0,0,0.8) 100%);
+}
+
+/* ─── CURSOR ─── */
+#cursor {
+  position: fixed; pointer-events: none; z-index: 9999;
+  width: 12px; height: 12px;
+  border: 2px solid var(--cyan);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 8px var(--cyan), 0 0 16px rgba(0,245,255,0.3);
+  transition: background 0.2s, border-color 0.2s;
+}
+#cursor-ring {
+  position: fixed; pointer-events: none; z-index: 9998;
+  width: 36px; height: 36px;
+  border: 1px solid rgba(0,245,255,0.2);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ─── VISUALIZER CANVAS ─── */
+#viz-canvas {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  width: 100%; height: 40%;
+  pointer-events: none;
+}
+
+/* ─── GRID LINES ─── */
+.grid-bg {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.03;
+  background-image:
+    linear-gradient(var(--cyan) 1px, transparent 1px),
+    linear-gradient(90deg, var(--cyan) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.5rem 4rem;
+  background: rgba(2,4,9,0.85);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+}
+.nav-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem; letter-spacing: 0.15em;
+  color: var(--cyan);
+  text-shadow: 0 0 20px rgba(0,245,255,0.5);
+}
+.nav-links { display: flex; gap: 2.5rem; list-style: none; }
+.nav-links a {
+  font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--dim); text-decoration: none; font-family: 'Share Tech Mono', monospace;
+  transition: color 0.3s;
+}
+.nav-links a:hover { color: var(--cyan); text-shadow: 0 0 10px var(--cyan); }
+.nav-right {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem; color: var(--dim);
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.nav-right .dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--magenta); box-shadow: 0 0 8px var(--magenta);
+  animation: blink 1s ease-in-out infinite;
+}
+@keyframes blink { 50% { opacity: 0.2; } }
+
+/* ─── HERO ─── */
+.hero {
+  position: relative; height: 100vh;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.hero-eyebrow {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.4em; text-transform: uppercase;
+  color: var(--magenta); margin-bottom: 1.5rem;
+  text-shadow: 0 0 12px var(--magenta);
+  opacity: 0; animation: fadeUp 0.8s 0.5s ease forwards;
+}
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.hero-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(8rem, 22vw, 18rem);
+  line-height: 0.85; letter-spacing: 0.08em;
+  color: var(--text);
+  position: relative;
+  text-align: center;
+  opacity: 0; animation: fadeUp 1s 0.7s ease forwards;
+}
+.hero-name .glitch-c {
+  color: var(--cyan);
+  text-shadow: 0 0 40px rgba(0,245,255,0.4), 0 0 80px rgba(0,245,255,0.1);
+}
+/* RGB split glitch */
+.hero-name-wrap { position: relative; display: inline-block; }
+.hero-name-wrap::before,
+.hero-name-wrap::after {
+  content: attr(data-text);
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: inherit; letter-spacing: inherit; line-height: inherit;
+}
+.hero-name-wrap::before {
+  color: var(--magenta);
+  animation: rgb-a 5s infinite;
+  clip-path: polygon(0 20%, 100% 20%, 100% 50%, 0 50%);
+}
+.hero-name-wrap::after {
+  color: var(--cyan);
+  animation: rgb-b 5s infinite;
+  clip-path: polygon(0 55%, 100% 55%, 100% 80%, 0 80%);
+}
+@keyframes rgb-a {
+  0%, 85%, 100% { transform: none; opacity: 0; }
+  87% { transform: translateX(-8px); opacity: 0.7; }
+  89% { transform: translateX(5px); opacity: 0.7; }
+  91% { transform: none; opacity: 0; }
+}
+@keyframes rgb-b {
+  0%, 88%, 100% { transform: none; opacity: 0; }
+  90% { transform: translateX(8px); opacity: 0.7; }
+  92% { transform: translateX(-4px); opacity: 0.7; }
+  94% { transform: none; opacity: 0; }
+}
+
+.hero-subtitle {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--dim); margin-top: 1.5rem;
+  text-align: center;
+  opacity: 0; animation: fadeUp 0.8s 1s ease forwards;
+}
+.hero-subtitle span { color: var(--cyan); }
+
+.hero-actions {
+  margin-top: 3rem; display: flex; gap: 1.5rem;
+  opacity: 0; animation: fadeUp 0.8s 1.2s ease forwards;
+}
+.btn-neon {
+  display: inline-block; padding: 0.8rem 2rem;
+  border: 1px solid var(--cyan); color: var(--cyan);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
+  text-decoration: none;
+  position: relative; overflow: hidden;
+  transition: color 0.3s;
+  box-shadow: 0 0 10px rgba(0,245,255,0.1), inset 0 0 10px rgba(0,245,255,0.05);
+}
+.btn-neon::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--cyan); transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-neon:hover::before { transform: scaleX(1); }
+.btn-neon:hover { color: var(--bg); }
+.btn-neon span { position: relative; z-index: 1; }
+.btn-neon-m {
+  display: inline-block; padding: 0.8rem 2rem;
+  border: 1px solid var(--magenta); color: var(--magenta);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 0 0 10px rgba(255,0,170,0.1);
+  transition: background 0.3s, color 0.3s;
+}
+.btn-neon-m:hover { background: var(--magenta); color: var(--bg); }
+
+/* ─── RELEASES ─── */
+.releases {
+  padding: 8rem 4rem;
+  max-width: 1300px; margin: 0 auto;
+  position: relative; z-index: 10;
+}
+.section-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 4rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.section-head-left {
+  display: flex; align-items: center; gap: 1.5rem;
+}
+.section-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem; letter-spacing: 0.5em; text-transform: uppercase;
+  color: var(--cyan);
+}
+.section-tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.3em;
+  color: var(--dim); border: 1px solid var(--border);
+  padding: 0.2rem 0.6rem;
+}
+.section-view-all {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--dim); text-decoration: none;
+  transition: color 0.3s;
+}
+.section-view-all:hover { color: var(--cyan); }
+
+.release-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+}
+.release-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 0;
+  position: relative; overflow: hidden;
+  cursor: none;
+  transition: border-color 0.4s;
+}
+.release-card:hover { border-color: rgba(0,245,255,0.3); }
+
+/* 3D tilt */
+.release-card { transform-style: preserve-3d; transition: transform 0.1s, border-color 0.4s; }
+
+.release-art {
+  aspect-ratio: 1; position: relative;
+  background: var(--panel);
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+.release-art-inner {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+/* Each album art is a unique generated design */
+.art-1 .art-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 30% 70%, var(--cyan) 0%, transparent 50%),
+              radial-gradient(circle at 70% 30%, var(--magenta) 0%, transparent 50%);
+  opacity: 0.4;
+}
+.art-2 .art-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 50% 50%, #ff6600 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, var(--magenta) 0%, transparent 40%);
+  opacity: 0.5;
+}
+.art-3 .art-bg {
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at 20% 20%, var(--cyan) 0%, transparent 40%),
+              linear-gradient(135deg, #0a0a20, #200a0a);
+  opacity: 0.6;
+}
+.art-geo {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.release-label {
+  position: absolute; top: 1rem; left: 1rem; z-index: 2;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.55rem; letter-spacing: 0.4em; text-transform: uppercase;
+  background: rgba(0,0,0,0.6); padding: 0.2rem 0.5rem;
+  color: var(--cyan); border: 1px solid var(--border);
+}
+.release-info { padding: 1.5rem; }
+.release-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem; letter-spacing: 0.05em;
+  color: var(--text); line-height: 1.1;
+  transition: color 0.3s;
+}
+.release-card:hover .release-name { color: var(--cyan); }
+.release-meta {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--dim); margin-top: 0.4rem;
+}
+.release-tags { display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap; }
+.release-tag {
+  font-size: 0.55rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--dim); border: 1px solid var(--border);
+  padding: 0.15rem 0.5rem;
+  font-family: 'Share Tech Mono', monospace;
+  transition: border-color 0.3s, color 0.3s;
+}
+.release-card:hover .release-tag { border-color: rgba(0,245,255,0.2); color: var(--cyan); }
+
+.release-play {
+  position: absolute; bottom: 6.5rem; right: 1.5rem;
+  width: 36px; height: 36px;
+  border: 1px solid rgba(0,245,255,0.2);
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.3s, background 0.3s;
+  opacity: 0; transform: scale(0.8);
+  transition: opacity 0.4s, transform 0.4s, border-color 0.3s;
+}
+.release-card:hover .release-play {
+  opacity: 1; transform: scale(1); border-color: var(--cyan);
+  background: rgba(0,245,255,0.1);
+}
+.play-icon { color: var(--cyan); }
+
+/* ─── PULSE RING ─── */
+.pulse-ring {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%; height: 60%;
+  border-radius: 50%;
+  border: 1px solid rgba(0,245,255,0.2);
+  animation: pulse-expand 3s ease-out infinite;
+}
+.pulse-ring:nth-child(2) { animation-delay: 1s; }
+.pulse-ring:nth-child(3) { animation-delay: 2s; }
+@keyframes pulse-expand {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.8; }
+  100% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+}
+
+/* ─── LIVE SECTION ─── */
+.live-section {
+  padding: 6rem 4rem;
+  position: relative; z-index: 10;
+  border-top: 1px solid var(--border);
+}
+.live-wrap { max-width: 1300px; margin: 0 auto; }
+.live-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3rem, 7vw, 6rem);
+  color: var(--text); letter-spacing: 0.05em;
+  margin-bottom: 3rem;
+}
+.live-title .hl { color: var(--magenta); text-shadow: 0 0 30px rgba(255,0,170,0.4); }
+
+.show-list { list-style: none; }
+.show-item {
+  display: grid; grid-template-columns: 120px 1fr 1fr auto;
+  gap: 3rem; align-items: center;
+  padding: 1.5rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  transition: background 0.3s, padding-left 0.3s;
+  cursor: none;
+}
+.show-item:hover { background: rgba(0,245,255,0.02); padding-left: 1rem; }
+.show-date {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem; color: var(--dim);
+}
+.show-date .dd { font-size: 1.8rem; color: var(--cyan); display: block; font-family: 'Bebas Neue', sans-serif; line-height: 1; }
+.show-venue {
+  font-size: 1rem; font-weight: 500; color: var(--text);
+  transition: color 0.3s;
+}
+.show-item:hover .show-venue { color: var(--cyan); }
+.show-city {
+  font-size: 0.72rem; color: var(--dim); margin-top: 0.2rem;
+  font-family: 'Share Tech Mono', monospace; letter-spacing: 0.2em;
+}
+.show-extra { font-size: 0.7rem; color: var(--dim); font-family: 'Share Tech Mono', monospace; }
+.show-ticket {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--magenta); border: 1px solid rgba(255,0,170,0.2);
+  padding: 0.5rem 1rem; text-decoration: none;
+  transition: background 0.3s, color 0.3s, border-color 0.3s;
+  white-space: nowrap;
+}
+.show-ticket:hover { background: var(--magenta); color: var(--bg); border-color: var(--magenta); }
+.show-ticket.sold-out { color: var(--dim); border-color: var(--dim); cursor: default; }
+
+/* ─── BIO ─── */
+.bio-section {
+  padding: 8rem 4rem;
+  position: relative; z-index: 10;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+.bio-wrap {
+  max-width: 1300px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8rem; align-items: center;
+}
+.bio-art {
+  aspect-ratio: 1; background: var(--panel);
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; justify-content: center;
+}
+.bio-art-inner {
+  width: 100%; height: 100%;
+  background: radial-gradient(circle at 40% 60%, rgba(0,245,255,0.15) 0%, transparent 50%),
+              radial-gradient(circle at 60% 40%, rgba(255,0,170,0.15) 0%, transparent 50%);
+  display: flex; align-items: center; justify-content: center;
+}
+.bio-initials {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 8rem; letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.05);
+  text-shadow: 0 0 60px rgba(0,245,255,0.1);
+}
+.bio-border-c {
+  position: absolute; inset: 0;
+  border: 1px solid rgba(0,245,255,0.1);
+}
+
+.bio-content {}
+.bio-tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem; letter-spacing: 0.4em; text-transform: uppercase;
+  color: var(--cyan); margin-bottom: 1.5rem; display: block;
+}
+.bio-name {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3rem, 5vw, 4.5rem); letter-spacing: 0.05em;
+  color: var(--text); margin-bottom: 1.5rem; line-height: 1;
+}
+.bio-text {
+  font-size: 0.85rem; line-height: 2; color: var(--dim);
+  font-weight: 300; margin-bottom: 2rem;
+}
+.bio-stats { display: flex; gap: 3rem; }
+.bio-stat {}
+.bio-stat-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2.5rem; color: var(--cyan);
+  text-shadow: 0 0 20px rgba(0,245,255,0.3);
+  display: block;
+}
+.bio-stat-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--dim); display: block; margin-top: 0.2rem;
+}
+
+/* ─── FOOTER ─── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 3rem 4rem;
+  display: flex; align-items: center; justify-content: space-between;
+  position: relative; z-index: 10;
+  background: var(--bg);
+}
+.footer-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 2rem; letter-spacing: 0.15em;
+  color: var(--cyan); text-shadow: 0 0 15px rgba(0,245,255,0.3);
+}
+.footer-links { display: flex; gap: 2rem; }
+.footer-links a {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--dim); text-decoration: none; transition: color 0.3s;
+}
+.footer-links a:hover { color: var(--cyan); }
+.footer-copy {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem; color: var(--dim);
+}
+</style>
+</head>
+<body>
+
+<div class="scanlines"></div>
+<div class="vignette"></div>
+<div class="grid-bg"></div>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">HXLF</div>
+  <ul class="nav-links">
+    <li><a href="#">Music</a></li>
+    <li><a href="#">Live</a></li>
+    <li><a href="#">Bio</a></li>
+    <li><a href="#">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="dot"></div>
+    <span>Live: Track 04 — VOID SIGNAL</span>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <canvas id="viz-canvas"></canvas>
+  <p class="hero-eyebrow">✦ New EP: SIGNAL/NOISE — Out Now</p>
+  <div style="position:relative;text-align:center;">
+    <h1 class="hero-name">
+      <div class="hero-name-wrap" data-text="HXLF">
+        <span>H</span><span class="glitch-c">X</span><span>LF</span>
+      </div>
+    </h1>
+  </div>
+  <p class="hero-subtitle">Electronic Producer · <span>Berlin</span> · Est. 2019</p>
+  <div class="hero-actions">
+    <a href="#" class="btn-neon"><span>Stream Now</span></a>
+    <a href="#" class="btn-neon-m">Tour Dates</a>
+  </div>
+</section>
+
+<!-- RELEASES -->
+<section class="releases">
+  <div class="section-head">
+    <div class="section-head-left">
+      <span class="section-label">Discography</span>
+      <span class="section-tag">3 Releases</span>
+    </div>
+    <a href="#" class="section-view-all">View All →</a>
+  </div>
+  <div class="release-grid">
+
+    <!-- EP 1 -->
+    <div class="release-card" data-tilt data-animate>
+      <div class="release-play">
+        <svg class="play-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </div>
+      <div class="release-art art-1">
+        <div class="art-bg"></div>
+        <div class="art-geo">
+          <svg width="60%" height="60%" viewBox="0 0 100 100" fill="none">
+            <polygon points="50,5 95,74 5,74" stroke="rgba(0,245,255,0.4)" stroke-width="0.5"/>
+            <polygon points="50,15 85,70 15,70" stroke="rgba(0,245,255,0.25)" stroke-width="0.5"/>
+            <polygon points="50,25 75,66 25,66" stroke="rgba(0,245,255,0.15)" stroke-width="0.5"/>
+            <circle cx="50" cy="50" r="20" stroke="rgba(255,0,170,0.3)" stroke-width="0.5" fill="none"/>
+          </svg>
+        </div>
+        <span class="release-label">EP · 2026</span>
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+      </div>
+      <div class="release-info">
+        <h3 class="release-name">SIGNAL / NOISE</h3>
+        <p class="release-meta">6 Tracks · 32:14 · Released Mar 2026</p>
+        <div class="release-tags">
+          <span class="release-tag">Techno</span>
+          <span class="release-tag">Ambient</span>
+          <span class="release-tag">Industrial</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- EP 2 -->
+    <div class="release-card" data-tilt data-animate>
+      <div class="release-play">
+        <svg class="play-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </div>
+      <div class="release-art art-2">
+        <div class="art-bg"></div>
+        <div class="art-geo">
+          <svg width="60%" height="60%" viewBox="0 0 100 100" fill="none">
+            <rect x="20" y="20" width="60" height="60" stroke="rgba(255,102,0,0.5)" stroke-width="0.5" transform="rotate(15 50 50)"/>
+            <rect x="25" y="25" width="50" height="50" stroke="rgba(255,0,170,0.3)" stroke-width="0.5" transform="rotate(30 50 50)"/>
+            <rect x="30" y="30" width="40" height="40" stroke="rgba(255,102,0,0.2)" stroke-width="0.5" transform="rotate(45 50 50)"/>
+          </svg>
+        </div>
+        <span class="release-label">LP · 2025</span>
+      </div>
+      <div class="release-info">
+        <h3 class="release-name">CASCADES</h3>
+        <p class="release-meta">10 Tracks · 51:40 · Released Sep 2025</p>
+        <div class="release-tags">
+          <span class="release-tag">IDM</span>
+          <span class="release-tag">Electro</span>
+          <span class="release-tag">Breaks</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- EP 3 -->
+    <div class="release-card" data-tilt data-animate>
+      <div class="release-play">
+        <svg class="play-icon" width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      </div>
+      <div class="release-art art-3">
+        <div class="art-bg"></div>
+        <div class="art-geo">
+          <svg width="60%" height="60%" viewBox="0 0 100 100" fill="none">
+            <circle cx="50" cy="50" r="40" stroke="rgba(0,245,255,0.3)" stroke-width="0.5"/>
+            <circle cx="50" cy="50" r="28" stroke="rgba(0,245,255,0.2)" stroke-width="0.5"/>
+            <circle cx="50" cy="50" r="16" stroke="rgba(0,245,255,0.1)" stroke-width="0.5"/>
+            <line x1="10" y1="50" x2="90" y2="50" stroke="rgba(0,245,255,0.2)" stroke-width="0.5"/>
+            <line x1="50" y1="10" x2="50" y2="90" stroke="rgba(0,245,255,0.2)" stroke-width="0.5"/>
+          </svg>
+        </div>
+        <span class="release-label">EP · 2024</span>
+      </div>
+      <div class="release-info">
+        <h3 class="release-name">DEPTH MAP</h3>
+        <p class="release-meta">5 Tracks · 28:55 · Released Jan 2024</p>
+        <div class="release-tags">
+          <span class="release-tag">Dark Techno</span>
+          <span class="release-tag">Minimal</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LIVE -->
+<section class="live-section">
+  <div class="live-wrap">
+    <h2 class="live-title">Live <span class="hl">Dates</span></h2>
+    <ul class="show-list">
+      <li class="show-item" data-animate>
+        <div class="show-date">
+          <span class="dd">14</span>APR 2026
+        </div>
+        <div>
+          <div class="show-venue">Berghain</div>
+          <div class="show-city">Berlin, DE</div>
+        </div>
+        <div class="show-extra">w/ Objekt · Steffi · Paula Temple</div>
+        <a href="#" class="show-ticket">Get Tickets</a>
+      </li>
+      <li class="show-item" data-animate>
+        <div class="show-date">
+          <span class="dd">28</span>APR 2026
+        </div>
+        <div>
+          <div class="show-venue">fabric</div>
+          <div class="show-city">London, UK</div>
+        </div>
+        <div class="show-extra">Main Room · All Night</div>
+        <a href="#" class="show-ticket">Get Tickets</a>
+      </li>
+      <li class="show-item" data-animate>
+        <div class="show-date">
+          <span class="dd">09</span>MAY 2026
+        </div>
+        <div>
+          <div class="show-venue">De School</div>
+          <div class="show-city">Amsterdam, NL</div>
+        </div>
+        <div class="show-extra">Closing Set</div>
+        <a href="#" class="show-ticket sold-out">Sold Out</a>
+      </li>
+      <li class="show-item" data-animate>
+        <div class="show-date">
+          <span class="dd">24</span>MAY 2026
+        </div>
+        <div>
+          <div class="show-venue">Primavera Sound</div>
+          <div class="show-city">Barcelona, ES</div>
+        </div>
+        <div class="show-extra">NTS Stage · Friday</div>
+        <a href="#" class="show-ticket">Get Tickets</a>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- BIO -->
+<section class="bio-section">
+  <div class="bio-wrap">
+    <div class="bio-art" data-animate>
+      <div class="bio-art-inner">
+        <span class="bio-initials">HXLF</span>
+      </div>
+      <div class="bio-border-c"></div>
+    </div>
+    <div class="bio-content" data-animate>
+      <span class="bio-tag">// About the Artist</span>
+      <h2 class="bio-name">HXLF</h2>
+      <p class="bio-text">
+        Berlin-based producer Felix Hahn performs as HXLF — a project built around the collision between industrial texture and melodic desolation. His music doesn't resolve. It accumulates. Drawn from late nights in the city's eastern edges, every track is a document of a specific, unrepeatable atmosphere.
+      </p>
+      <div class="bio-stats">
+        <div class="bio-stat">
+          <span class="bio-stat-num">4.2M</span>
+          <span class="bio-stat-label">Monthly Listeners</span>
+        </div>
+        <div class="bio-stat">
+          <span class="bio-stat-num">120+</span>
+          <span class="bio-stat-label">Shows Worldwide</span>
+        </div>
+        <div class="bio-stat">
+          <span class="bio-stat-num">3</span>
+          <span class="bio-stat-label">Releases</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">HXLF</div>
+  <nav class="footer-links">
+    <a href="#">Instagram</a>
+    <a href="#">SoundCloud</a>
+    <a href="#">Bandcamp</a>
+    <a href="#">RA</a>
+    <a href="#">Booking</a>
+  </nav>
+  <span class="footer-copy">© 2026 HXLF. All rights reserved.</span>
+</footer>
+
+<script>
+// ─── CURSOR ───
+const cursor = document.getElementById('cursor');
+const ring = document.getElementById('cursor-ring');
+let mx = -100, my = -100, rx = -100, ry = -100;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+});
+(function followRing() {
+  rx += (mx - rx) * 0.1;
+  ry += (my - ry) * 0.1;
+  ring.style.left = rx + 'px';
+  ring.style.top = ry + 'px';
+  requestAnimationFrame(followRing);
+})();
+
+// ─── VISUALIZER ───
+const canvas = document.getElementById('viz-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = canvas.parentElement.offsetHeight * 0.4;
+
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = canvas.parentElement.offsetHeight * 0.4;
+});
+
+const BAR_COUNT = 80;
+const bars = Array.from({ length: BAR_COUNT }, (_, i) => ({
+  height: Math.random() * 0.5 + 0.1,
+  target: Math.random() * 0.5 + 0.1,
+  freq: 0.005 + Math.random() * 0.02,
+  phase: Math.random() * Math.PI * 2,
+  speed: 0.02 + Math.random() * 0.04
+}));
+
+// Mouse influence on visualizer
+let vizMouseX = -1;
+document.addEventListener('mousemove', e => { vizMouseX = e.clientX; });
+
+let t = 0;
+function drawViz() {
+  t += 1;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const barW = canvas.width / BAR_COUNT;
+  const maxH = canvas.height * 0.85;
+
+  bars.forEach((bar, i) => {
+    // Base animation: sine wave pattern
+    const wave = Math.sin(t * bar.freq + bar.phase + i * 0.08) * 0.3 + 0.5;
+    const wave2 = Math.sin(t * 0.01 + i * 0.12) * 0.2;
+
+    // Mouse influence: boost bars near mouse X
+    let mouseBoost = 0;
+    if (vizMouseX > 0) {
+      const barX = i * barW + barW / 2;
+      const dist = Math.abs(barX - vizMouseX);
+      mouseBoost = Math.max(0, 1 - dist / 200) * 0.5;
+    }
+
+    bar.target = Math.min(1, wave + wave2 + mouseBoost + 0.05);
+    bar.height += (bar.target - bar.height) * bar.speed;
+
+    const h = bar.height * maxH;
+    const x = i * barW;
+    const y = canvas.height - h;
+
+    // Color gradient: cyan to magenta based on height
+    const t2 = bar.height;
+    const r = Math.floor(t2 * 255);
+    const g = Math.floor((1 - t2) * 245);
+    const b = Math.floor(255 * (1 - t2 * 0.5));
+
+    const grad = ctx.createLinearGradient(x, y, x, canvas.height);
+    grad.addColorStop(0, `rgba(0, 245, 255, ${bar.height * 0.9})`);
+    grad.addColorStop(0.4, `rgba(0, 180, 255, ${bar.height * 0.6})`);
+    grad.addColorStop(1, `rgba(255, 0, 170, ${bar.height * 0.3})`);
+
+    ctx.fillStyle = grad;
+    ctx.fillRect(x + 1, y, barW - 2, h);
+
+    // Glow top
+    if (bar.height > 0.5) {
+      ctx.fillStyle = `rgba(0, 245, 255, ${(bar.height - 0.5) * 0.8})`;
+      ctx.fillRect(x + 1, y, barW - 2, 2);
+    }
+  });
+
+  requestAnimationFrame(drawViz);
+}
+drawViz();
+
+// ─── TILT CARDS ───
+document.querySelectorAll('[data-tilt]').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    card.style.transform = `perspective(600px) rotateY(${x * 12}deg) rotateX(${-y * 12}deg) scale3d(1.02,1.02,1.02)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transition = 'transform 0.5s ease-out';
+    card.style.transform = 'perspective(600px) rotateY(0) rotateX(0) scale3d(1,1,1)';
+  });
+  card.addEventListener('mouseenter', () => {
+    card.style.transition = 'none';
+  });
+});
+
+// ─── SCROLL ANIMATIONS ───
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+      entry.target.style.opacity = '1';
+      entry.target.style.transform = 'translateY(0)';
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('[data-animate]').forEach((el, i) => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(30px)';
+  el.style.transitionDelay = (i % 4) * 0.1 + 's';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>

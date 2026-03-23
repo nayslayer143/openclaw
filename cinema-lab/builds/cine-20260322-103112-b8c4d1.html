@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KURO — Japanese Fine Dining</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Noto+Serif+JP:wght@200;300;400&family=Space+Grotesk:wght@300;400&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+<style>
+:root {
+  --ink: #07060a;
+  --warm-black: #0e0c0a;
+  --surface: #171410;
+  --gold: #c9a96e;
+  --gold-dim: #8a7045;
+  --cream: #f0e8d8;
+  --text: #d4c8b0;
+  --dim: #6a5e48;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: auto; }
+body {
+  background: var(--ink);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ─── CURSOR ─── */
+.cursor {
+  position: fixed; pointer-events: none; z-index: 9999;
+  width: 8px; height: 8px;
+  background: var(--gold);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s, height 0.3s, background 0.3s;
+  box-shadow: 0 0 10px rgba(201,169,110,0.5);
+}
+.cursor-follow {
+  position: fixed; pointer-events: none; z-index: 9998;
+  width: 44px; height: 44px;
+  border: 1px solid rgba(201,169,110,0.25);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* ─── CANVAS ─── */
+#smoke-canvas {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  pointer-events: none; opacity: 0.6;
+}
+
+/* ─── GRAIN + VIGNETTE ─── */
+.grain {
+  position: fixed; inset: 0; z-index: 8000; pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  animation: grain-shift 0.15s steps(1) infinite;
+}
+@keyframes grain-shift {
+  0%  { background-position: 0 0; }
+  25% { background-position: -80px 40px; }
+  50% { background-position: 60px -30px; }
+  75% { background-position: -40px 70px; }
+  100%{ background-position: 0 0; }
+}
+.vignette {
+  position: fixed; inset: 0; z-index: 7999; pointer-events: none;
+  background: radial-gradient(ellipse 70% 70% at 50% 40%, transparent 30%, rgba(0,0,0,0.8) 100%);
+}
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 2.5rem 5rem;
+}
+.nav-logo-wrap { display: flex; flex-direction: column; align-items: center; }
+.nav-logo-jp {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.75rem; color: var(--gold-dim); letter-spacing: 0.3em;
+  line-height: 1.2;
+}
+.nav-logo-en {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem; font-weight: 300; color: var(--cream);
+  letter-spacing: 0.3em; text-transform: uppercase;
+}
+.nav-links {
+  display: flex; gap: 3rem; list-style: none;
+}
+.nav-links a {
+  font-size: 0.65rem; letter-spacing: 0.35em; text-transform: uppercase;
+  color: var(--dim); text-decoration: none;
+  transition: color 0.4s;
+}
+.nav-links a:hover { color: var(--gold); }
+.nav-reserve {
+  font-size: 0.65rem; letter-spacing: 0.35em; text-transform: uppercase;
+  color: var(--gold); border: 1px solid rgba(201,169,110,0.3);
+  padding: 0.7rem 1.8rem; text-decoration: none;
+  transition: background 0.4s, color 0.4s;
+}
+.nav-reserve:hover { background: var(--gold); color: var(--ink); }
+
+/* ─── HERO ─── */
+.hero {
+  position: relative; height: 100vh;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  overflow: hidden;
+  background: var(--ink);
+}
+
+.hero-kana {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.7rem; letter-spacing: 0.8em;
+  color: var(--gold-dim); margin-bottom: 2.5rem;
+  opacity: 0;
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(7rem, 18vw, 15rem);
+  font-weight: 300; line-height: 0.9;
+  letter-spacing: 0.18em; text-align: center;
+  color: var(--cream);
+  text-shadow: 0 0 80px rgba(201,169,110,0.12);
+  opacity: 0;
+  clip-path: inset(0 0 100% 0);
+}
+
+.hero-divider {
+  display: flex; align-items: center; gap: 2rem; margin-top: 2.5rem;
+  opacity: 0;
+}
+.hero-divider-line {
+  width: 80px; height: 1px;
+  background: linear-gradient(to right, transparent, var(--gold));
+}
+.hero-divider-line.right {
+  background: linear-gradient(to left, transparent, var(--gold));
+}
+.hero-divider-text {
+  font-size: 0.65rem; letter-spacing: 0.5em; text-transform: uppercase;
+  color: var(--gold-dim);
+}
+
+.hero-scroll {
+  position: absolute; bottom: 3.5rem; left: 50%; transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 1rem;
+  opacity: 0;
+}
+.scroll-kanji {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.6rem; letter-spacing: 0.4em; color: var(--dim);
+  text-transform: uppercase;
+}
+.scroll-bar {
+  width: 1px; height: 50px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  animation: scroll-fall 2.5s ease-in-out infinite;
+}
+@keyframes scroll-fall {
+  0% { transform: scaleY(0); transform-origin: top; opacity: 0; }
+  40% { transform: scaleY(1); transform-origin: top; opacity: 1; }
+  60% { transform: scaleY(1); transform-origin: bottom; opacity: 1; }
+  100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+}
+
+/* ─── GOLD DIVIDER ─── */
+.section-divide {
+  width: 100%; height: 1px;
+  background: linear-gradient(to right, transparent 0%, var(--gold-dim) 20%, var(--gold) 50%, var(--gold-dim) 80%, transparent 100%);
+  box-shadow: 0 0 12px rgba(201,169,110,0.2);
+  margin: 0;
+}
+
+/* ─── PHILOSOPHY ─── */
+.philosophy {
+  padding: 8rem 5rem;
+  display: grid; grid-template-columns: 1fr 2fr; gap: 6rem; align-items: start;
+  max-width: 1300px; margin: 0 auto;
+}
+.phil-label {
+  font-size: 0.6rem; letter-spacing: 0.6em; text-transform: uppercase;
+  color: var(--gold-dim); padding-top: 0.5rem;
+  writing-mode: vertical-rl; transform: rotate(180deg);
+}
+.phil-content { display: flex; flex-direction: column; gap: 2rem; }
+.phil-statement {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 3.5vw, 3rem); font-weight: 300;
+  line-height: 1.4; color: var(--cream);
+}
+.phil-statement em { font-style: italic; color: var(--gold); }
+.phil-body {
+  font-size: 0.85rem; line-height: 1.9; color: var(--dim);
+  max-width: 520px; font-weight: 300;
+}
+
+/* ─── MENU ─── */
+.menu-section {
+  padding: 8rem 5rem;
+  max-width: 1300px; margin: 0 auto;
+}
+.menu-header {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 5rem;
+  border-bottom: 1px solid rgba(201,169,110,0.1);
+  padding-bottom: 2rem;
+}
+.menu-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 300;
+  color: var(--cream); letter-spacing: 0.05em;
+}
+.menu-season {
+  font-size: 0.6rem; letter-spacing: 0.5em; text-transform: uppercase;
+  color: var(--gold-dim);
+}
+.course-list { list-style: none; }
+.course-item {
+  display: grid; grid-template-columns: 1fr auto;
+  align-items: end;
+  padding: 2.5rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  position: relative;
+  overflow: hidden;
+  cursor: none;
+  transition: padding-left 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.course-item::before {
+  content: ''; position: absolute;
+  left: 0; top: 0; bottom: 0; width: 2px;
+  background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+  transform: scaleY(0); transform-origin: center;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.course-item:hover::before { transform: scaleY(1); }
+.course-item:hover { padding-left: 1.5rem; }
+
+.course-info {}
+.course-num {
+  font-size: 0.6rem; letter-spacing: 0.5em; color: var(--gold-dim);
+  display: block; margin-bottom: 0.5rem;
+}
+.course-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.6rem, 2.8vw, 2.4rem); font-weight: 300;
+  color: var(--cream); line-height: 1.1;
+  transition: color 0.3s;
+}
+.course-item:hover .course-name { color: var(--gold); }
+.course-desc {
+  font-size: 0.75rem; color: var(--dim); margin-top: 0.5rem;
+  font-weight: 300; line-height: 1.6;
+}
+.course-jp {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 1.2rem; color: var(--gold-dim);
+  font-weight: 200; padding-bottom: 0.25rem;
+  transition: color 0.3s;
+}
+.course-item:hover .course-jp { color: var(--gold); }
+
+/* ─── EXPERIENCE ─── */
+.experience {
+  padding: 8rem 5rem;
+  background: var(--warm-black);
+  text-align: center;
+}
+.exp-wrap { max-width: 800px; margin: 0 auto; }
+.exp-kana {
+  font-family: 'Noto Serif JP', serif;
+  font-size: 0.65rem; letter-spacing: 0.7em;
+  color: var(--gold-dim); margin-bottom: 1.5rem;
+  display: block;
+}
+.exp-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 300;
+  color: var(--cream); margin-bottom: 2rem;
+  letter-spacing: 0.05em;
+}
+.exp-body {
+  font-size: 0.9rem; line-height: 2; color: var(--dim); font-weight: 300;
+  margin-bottom: 3rem;
+}
+.exp-details {
+  display: flex; justify-content: center; gap: 5rem;
+  border-top: 1px solid rgba(201,169,110,0.1);
+  padding-top: 3rem;
+}
+.exp-detail { text-align: center; }
+.exp-detail-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem; font-weight: 300;
+  color: var(--gold); display: block; margin-bottom: 0.5rem;
+}
+.exp-detail-label {
+  font-size: 0.6rem; letter-spacing: 0.4em; text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* ─── RESERVATION ─── */
+.reservation {
+  padding: 8rem 5rem;
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  gap: 3rem;
+}
+.res-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(3rem, 7vw, 6rem); font-weight: 300;
+  color: var(--cream); letter-spacing: 0.05em;
+}
+.res-sub {
+  font-size: 0.8rem; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--dim);
+}
+.res-btn {
+  display: inline-block; padding: 1.2rem 4rem;
+  border: 1px solid rgba(201,169,110,0.5);
+  font-size: 0.7rem; letter-spacing: 0.5em; text-transform: uppercase;
+  color: var(--gold); text-decoration: none;
+  transition: background 0.5s, color 0.5s, box-shadow 0.5s;
+  position: relative; overflow: hidden;
+}
+.res-btn::before {
+  content: ''; position: absolute; inset: 0;
+  background: var(--gold); transform: scaleX(0); transform-origin: left;
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.res-btn:hover::before { transform: scaleX(1); }
+.res-btn:hover { color: var(--ink); box-shadow: 0 0 40px rgba(201,169,110,0.2); }
+.res-btn span { position: relative; z-index: 1; }
+
+/* ─── FOOTER ─── */
+footer {
+  background: var(--ink);
+  border-top: 1px solid rgba(201,169,110,0.08);
+  padding: 4rem 5rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.footer-left { display: flex; flex-direction: column; gap: 0.5rem; }
+.footer-logo-big {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem; font-weight: 300;
+  color: var(--cream); letter-spacing: 0.3em;
+}
+.footer-loc { font-size: 0.65rem; letter-spacing: 0.3em; color: var(--dim); text-transform: uppercase; }
+.footer-right { text-align: right; font-size: 0.65rem; letter-spacing: 0.25em; color: var(--dim); line-height: 1.8; }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-follow" id="cursor-follow"></div>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo-wrap">
+    <span class="nav-logo-jp">黒</span>
+    <span class="nav-logo-en">Kuro</span>
+  </div>
+  <ul class="nav-links">
+    <li><a href="#">Menu</a></li>
+    <li><a href="#">Philosophy</a></li>
+    <li><a href="#">Experience</a></li>
+    <li><a href="#">Contact</a></li>
+  </ul>
+  <a href="#" class="nav-reserve">Reserve a Table</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+  <canvas id="smoke-canvas"></canvas>
+  <p class="hero-kana" id="hero-kana">黒 — 暗闇の中の光</p>
+  <h1 class="hero-title" id="hero-title">KURO</h1>
+  <div class="hero-divider" id="hero-divider">
+    <div class="hero-divider-line"></div>
+    <span class="hero-divider-text">Japanese Fine Dining · Kyoto</span>
+    <div class="hero-divider-line right"></div>
+  </div>
+  <div class="hero-scroll" id="hero-scroll">
+    <span class="scroll-kanji">Scroll</span>
+    <div class="scroll-bar"></div>
+  </div>
+</section>
+
+<div class="section-divide"></div>
+
+<!-- PHILOSOPHY -->
+<section>
+  <div class="philosophy">
+    <div class="phil-label" data-animate>間 Ma · Negative Space</div>
+    <div class="phil-content">
+      <p class="phil-statement" data-animate>
+        Every dish is a meditation — <em>silence rendered edible,</em> darkness made beautiful.
+      </p>
+      <p class="phil-body" data-animate>
+        KURO was born from the Japanese concept of <em>Ma</em> — the profound meaning found in emptiness. Our kaiseki menu traces the arc of a single night: from the first hesitant light to the deep silence that follows. We use only what the season offers. Nothing more. Nothing less.
+      </p>
+    </div>
+  </div>
+</section>
+
+<div class="section-divide"></div>
+
+<!-- MENU -->
+<section>
+  <div class="menu-section">
+    <div class="menu-header" data-animate>
+      <h2 class="menu-title">Omakase Menu</h2>
+      <span class="menu-season">Spring · Haru 2026</span>
+    </div>
+    <ul class="course-list">
+      <li class="course-item" data-animate>
+        <div class="course-info">
+          <span class="course-num">Course I</span>
+          <h3 class="course-name">Saki-zuke</h3>
+          <p class="course-desc">Firefly squid, young bamboo shoots, dashi gelée</p>
+        </div>
+        <span class="course-jp">先付</span>
+      </li>
+      <li class="course-item" data-animate>
+        <div class="course-info">
+          <span class="course-num">Course II</span>
+          <h3 class="course-name">Wanmono</h3>
+          <p class="course-desc">Clear broth with hamaguri clam, wood sorrel, yuzu</p>
+        </div>
+        <span class="course-jp">椀物</span>
+      </li>
+      <li class="course-item" data-animate>
+        <div class="course-info">
+          <span class="course-num">Course III</span>
+          <h3 class="course-name">Tsukuri</h3>
+          <p class="course-desc">Otoro, kinmedai, and cherry blossom cured seabream</p>
+        </div>
+        <span class="course-jp">造り</span>
+      </li>
+      <li class="course-item" data-animate>
+        <div class="course-info">
+          <span class="course-num">Course IV</span>
+          <h3 class="course-name">Yakimono</h3>
+          <p class="course-desc">A5 Wagyu, black garlic, mountain vegetables, charcoal smoke</p>
+        </div>
+        <span class="course-jp">焼物</span>
+      </li>
+      <li class="course-item" data-animate>
+        <div class="course-info">
+          <span class="course-num">Course V</span>
+          <h3 class="course-name">Mizumono</h3>
+          <p class="course-desc">Black sesame mousse, sakura ice, kinako powder</p>
+        </div>
+        <span class="course-jp">水物</span>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section class="experience">
+  <div class="exp-wrap" data-animate>
+    <span class="exp-kana">体験 · Taiken</span>
+    <h2 class="exp-title">The Experience</h2>
+    <p class="exp-body">
+      A private dining room for no more than twelve. No menus, no choices — only trust. We cook once nightly, from ingredients selected at dawn, for guests who arrive at dusk.
+    </p>
+    <div class="exp-details">
+      <div class="exp-detail">
+        <span class="exp-detail-val">12</span>
+        <span class="exp-detail-label">Seats Only</span>
+      </div>
+      <div class="exp-detail">
+        <span class="exp-detail-val">7</span>
+        <span class="exp-detail-label">Courses</span>
+      </div>
+      <div class="exp-detail">
+        <span class="exp-detail-val">3 ✦</span>
+        <span class="exp-detail-label">Michelin Stars</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESERVATION -->
+<section class="reservation" data-animate>
+  <p class="res-sub">We receive guests Friday through Sunday</p>
+  <h2 class="res-title">Reserve Your Evening</h2>
+  <a href="#" class="res-btn"><span>Request a Table</span></a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-left">
+    <span class="footer-logo-big">KURO</span>
+    <span class="footer-loc">Kyoto, Japan · Established 2018</span>
+  </div>
+  <div class="footer-right">
+    <p>reservations@kuro-kyoto.jp</p>
+    <p>+81 75 000 0000</p>
+    <p style="margin-top:1rem">© 2026 KURO. All Rights Reserved.</p>
+  </div>
+</footer>
+
+<script>
+// ─── CURSOR ───
+const cursor = document.getElementById('cursor');
+const cf = document.getElementById('cursor-follow');
+let mx = -100, my = -100, fx = -100, fy = -100;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+});
+(function follow() {
+  fx += (mx - fx) * 0.1;
+  fy += (my - fy) * 0.1;
+  cf.style.left = fx + 'px';
+  cf.style.top = fy + 'px';
+  requestAnimationFrame(follow);
+})();
+
+// ─── SMOKE CANVAS ───
+const canvas = document.getElementById('smoke-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = canvas.offsetWidth;
+canvas.height = canvas.offsetHeight;
+
+window.addEventListener('resize', () => {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+});
+
+const particles = [];
+for (let i = 0; i < 60; i++) {
+  particles.push({
+    x: canvas.width * (0.2 + Math.random() * 0.6),
+    y: canvas.height * (0.4 + Math.random() * 0.4),
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: -Math.random() * 0.6 - 0.1,
+    size: Math.random() * 80 + 30,
+    opacity: Math.random() * 0.15 + 0.02,
+    life: Math.random(),
+    maxLife: Math.random() * 200 + 150
+  });
+}
+
+function drawSmoke() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  particles.forEach(p => {
+    p.life++;
+    if (p.life > p.maxLife) {
+      p.life = 0;
+      p.x = canvas.width * (0.3 + Math.random() * 0.4);
+      p.y = canvas.height * (0.5 + Math.random() * 0.3);
+      p.vy = -Math.random() * 0.5 - 0.1;
+    }
+    p.x += p.vx + Math.sin(p.life * 0.02) * 0.3;
+    p.y += p.vy;
+    p.size += 0.08;
+
+    const lifeRatio = p.life / p.maxLife;
+    const alpha = p.opacity * (1 - lifeRatio) * Math.sin(lifeRatio * Math.PI);
+
+    const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.size);
+    grad.addColorStop(0, `rgba(201, 169, 110, ${alpha})`);
+    grad.addColorStop(1, `rgba(201, 169, 110, 0)`);
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  requestAnimationFrame(drawSmoke);
+}
+drawSmoke();
+
+// ─── GSAP + LENIS ───
+gsap.registerPlugin(ScrollTrigger);
+
+const lenis = new Lenis({ lerp: 0.07, wheelMultiplier: 0.9 });
+lenis.on('scroll', ScrollTrigger.update);
+gsap.ticker.add(t => lenis.raf(t * 1000));
+gsap.ticker.lagSmoothing(0);
+
+// Hero reveal
+const tl = gsap.timeline({ delay: 0.3 });
+tl.to('#hero-kana', { opacity: 1, y: 0, duration: 1, ease: 'power2.out', from: { y: 20 } })
+  .from('#hero-title', {
+    clipPath: 'inset(0 0 100% 0)',
+    opacity: 0, duration: 1.4, ease: 'power4.out'
+  }, '-=0.5')
+  .to('#hero-title', { opacity: 1 }, '<')
+  .to('#hero-divider', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', from: { y: 20 } }, '-=0.4')
+  .to('#hero-scroll', { opacity: 1, duration: 0.8, ease: 'power2.out' }, '-=0.3');
+
+// Scroll animations
+gsap.utils.toArray('[data-animate]').forEach((el, i) => {
+  gsap.from(el, {
+    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
+    y: 40, opacity: 0, duration: 1,
+    delay: (i % 3) * 0.1,
+    ease: 'power3.out'
+  });
+});
+
+// Course items stagger
+gsap.utils.toArray('.course-item').forEach((item, i) => {
+  gsap.from(item, {
+    scrollTrigger: { trigger: item, start: 'top 90%', toggleActions: 'play none none none' },
+    x: -30, opacity: 0, duration: 0.8,
+    delay: i * 0.1,
+    ease: 'power2.out'
+  });
+});
+</script>
+</body>
+</html>

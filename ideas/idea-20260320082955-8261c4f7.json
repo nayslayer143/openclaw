@@ -1,0 +1,11 @@
+{
+  "id": "idea-20260320082955-8261c4f7",
+  "title": "5. **Kalshi Trading Bot**",
+  "summary": "What it is: A bot that analyzes market trends and places trades on Kalshi, allowing for potential profits through correct trades. The bot will utilize Claude AI and local Ollama LLMs to analyze market data.\nRevenue model: The bot will place trades on Kalshi using a paper trading account initially, with the goal of transitioning to a real money account once profitability is demonstrated.\nTime to first dollar: 2-3 weeks\nFirst action: Clawmpson can start by researching and analyzing existing Kalshi",
+  "category": "arbitrage",
+  "source": "clawmpson",
+  "status": "pending",
+  "notes": [],
+  "created_at": "2026-03-20T08:29:55.925033",
+  "updated_at": "2026-03-20T08:29:55.925036"
+}

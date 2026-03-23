@@ -1,0 +1,30 @@
+{
+  "task_id": "tsk-hotfix-approved-20260322171409",
+  "source": "telegram",
+  "repo_path": "/Users/nayslayer/projects/EmergentWebActions",
+  "repo": "EmergentWebActions",
+  "goal": "hotfix approved",
+  "parsed": {
+    "action": "approved",
+    "target": "hotfix",
+    "project": null
+  },
+  "attachments": [],
+  "clarification": null,
+  "acceptance_criteria": [
+    "All existing tests still pass",
+    "New functionality has at least one test",
+    "No direct commits to main branch"
+  ],
+  "forbidden_operations": [
+    "never touch main branch directly",
+    "never commit .env",
+    "never push --force"
+  ],
+  "priority": "normal",
+  "time_budget_minutes": 30,
+  "risk_level": "low",
+  "model": "qwen2.5:7b",
+  "timestamp": "2026-03-22T17:14:09.952643",
+  "output_location": "/Users/nayslayer/openclaw/build-results/tsk-hotfix-approved-20260322171409"
+}

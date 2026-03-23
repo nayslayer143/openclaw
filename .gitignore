@@ -21,3 +21,19 @@ chatgpt-mcp/.terminal-insights.md
 __pycache__/
 *.pyc
 .venv/
+
+# Runtime state
+*.pid
+.dispatcher.pid
+.queue-runner.pid
+.queue-empty-notified
+
+# Claude worktrees
+.claude/worktrees/
+
+# Embedded repos (separate git repos)
+clawmpson-logs/
+doctor-claw/
+punch-my-baby/
+shiny-new/
+openclaw-build/

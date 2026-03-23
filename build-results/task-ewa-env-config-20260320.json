@@ -1,0 +1,21 @@
+{
+  "task_id": "build-ewa-env-config-20260320",
+  "repo_path": "/Users/nayslayer/projects/EmergentWebActions",
+  "goal": "Refactor backend/server.py to load configuration from environment variables with sensible defaults: PORT (default 8000), HOST (default 0.0.0.0), DEBUG (default false), APP_ENV (default development). Add a /config endpoint (no auth) that returns the non-sensitive config as JSON: {port, host, debug, env}. Add tests for the /config endpoint.",
+  "acceptance_criteria": [
+    "Server reads PORT, HOST, DEBUG, APP_ENV from environment",
+    "GET /config returns current non-sensitive config as JSON",
+    "New pytest tests pass",
+    "All existing tests still pass"
+  ],
+  "forbidden_operations": [
+    "never touch main branch directly",
+    "never commit .env",
+    "never push --force"
+  ],
+  "time_budget_minutes": 20,
+  "risk_level": "low",
+  "output_location": "/Users/nayslayer/openclaw/build-results/build-ewa-env-config-20260320/",
+  "status": "success",
+  "note": "Already implemented in backend/server.py"
+}

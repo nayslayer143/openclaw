@@ -1,0 +1,11 @@
+{
+  "id": "idea-20260320082955-115cbbb0",
+  "title": "6. **Gig Scanner Upwork Agent**",
+  "summary": "What it is: An agent that utilizes the Gig Scanner tool to find and apply for freelance gigs on Upwork, automating the application process using Clawmpson's Upwork account.\nRevenue model: The agent will earn revenue through completed gigs, with payments collected through Stripe.\nTime to first dollar: 1-2 weeks\nFirst action: Clawmpson can start by setting up the Gig Scanner tool and integrating it with the Upwork account.\nRisk/blocker: The biggest obstacle will be competing with existing freelanc",
+  "category": "product",
+  "source": "clawmpson",
+  "status": "pending",
+  "notes": [],
+  "created_at": "2026-03-20T08:29:55.980429",
+  "updated_at": "2026-03-20T08:29:55.980431"
+}

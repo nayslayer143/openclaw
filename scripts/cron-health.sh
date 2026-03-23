@@ -15,6 +15,24 @@ set -a
 source "${OPENCLAW_ROOT}/.env" 2>/dev/null || true
 set +a
 
+# --- Auto-deploy: pull main and restart dispatcher if new commits ---
+DISP_PID="${OPENCLAW_ROOT}/.dispatcher.pid"
+cd "${OPENCLAW_ROOT}" || true
+BEFORE=$(git rev-parse HEAD 2>/dev/null)
+git fetch origin main --quiet 2>/dev/null
+AFTER=$(git rev-parse origin/main 2>/dev/null)
+if [[ -n "$BEFORE" && -n "$AFTER" && "$BEFORE" != "$AFTER" ]]; then
+  git pull origin main --quiet 2>/dev/null
+  # Bounce dispatcher so it picks up new code
+  if [[ -f "$DISP_PID" ]]; then
+    kill "$(cat "$DISP_PID")" 2>/dev/null || true
+    rm -f "$DISP_PID"
+  fi
+  pkill -f "telegram-dispatcher" 2>/dev/null || true
+  bash "${OPENCLAW_ROOT}/scripts/notify-telegram.sh" "Auto-deployed new code ($(git rev-parse --short HEAD)) — dispatcher restarting" 2>/dev/null || true
+  echo "{\"event\":\"auto_deploy\",\"timestamp\":${TS},\"from\":\"${BEFORE:0:7}\",\"to\":\"${AFTER:0:7}\"}" >> "$LOG"
+fi
+
 # --- Check Ollama ---
 # Use a lightweight API ping with 30s timeout (large models can take time to load)
 if curl -sf --max-time 30 http://127.0.0.1:11434/ >/dev/null 2>&1; then

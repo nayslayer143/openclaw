@@ -816,6 +816,22 @@ def handle_message(msg: dict):
                 )
             send(chat_id, f"Swarm started. I'll ping you when it's done.\nTask: {task[:80]}...")
             return
+        if text.startswith("!simulate "):
+            topic = text[10:].strip()[:500]
+            if not topic:
+                send(chat_id, "Usage: !simulate <question>\nE.g. !simulate Should we enter the Open WebUI consulting market?")
+                return
+            send(chat_id, f"Running MiroFish simulation... ~3 min.\nTopic: {topic[:80]}")
+            sim_script = str(OPENCLAW_ROOT / "scripts" / "mirofish-simulate.py")
+            log_path = OPENCLAW_ROOT / "logs" / f"mirofish-{datetime.date.today()}.log"
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(log_path, "a") as log_file:
+                subprocess.Popen(
+                    [sys.executable, sim_script, topic, "--notify"],
+                    stdout=log_file, stderr=log_file,
+                    close_fds=True
+                )
+            return
         if lower in ("!status", "/status"):
             handle_status(chat_id)
             return

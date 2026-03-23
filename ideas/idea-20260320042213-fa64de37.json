@@ -1,0 +1,12 @@
+{
+  "id": "idea-20260320042213-fa64de37",
+  "title": "3. **Crypto Arbitrage Bot**",
+  "summary": "What it is: Develop and deploy an arbitrage bot that exploits price differences between crypto assets on various exchanges (e.g., Binance, Kraken). Initially paper-trade to refine strategies.\nRevenue model: Profit from buying low on one exchange and selling high on another, minus transaction fees.\nTime to first dollar: 2-4 weeks, considering development, testing, and initial deployment phases.\nFirst action: Conduct market research to identify the most volatile crypto pairs with sufficient liquid",
+  "category": "arbitrage",
+  "source": "clawmpson",
+  "status": "in_production",
+  "notes": [],
+  "created_at": "2026-03-20T04:22:13.155949",
+  "updated_at": "2026-03-20T17:17:47.816661",
+  "pushed_at": "2026-03-20T17:17:47.816645"
+}
