@@ -601,19 +601,13 @@ class MemoryManager:
             parts.append(f"**Recent summary:** {stm}")
 
         # Layer 3: Episodic
-        try:
-            episodes = self._episodic.retrieve(chat_id, probe)
-        except Exception:
-            episodes = []
+        episodes = self._episodic.retrieve(chat_id, probe)
         if episodes:
             parts.append("**Past events:**")
             parts.extend(episodes)
 
         # Layer 4: Semantic
-        try:
-            facts = self._semantic.retrieve(chat_id, probe)
-        except Exception:
-            facts = []
+        facts = self._semantic.retrieve(chat_id, probe)
         if facts:
             parts.append("**Known facts:**")
             parts.extend(facts)
