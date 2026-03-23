@@ -76,7 +76,7 @@ def search(chat_id: str, query: str, limit: int = 10) -> list[dict]:
     try:
         with db._get_conn() as conn:
             rows = conn.execute(
-                "SELECT source, content,"
+                "SELECT source, source_id, content,"
                 " snippet(memory_fts, 0, '>>', '<<', '...', 8) AS snippet,"
                 " ts, rank"
                 " FROM memory_fts"

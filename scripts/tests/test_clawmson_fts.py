@@ -113,6 +113,7 @@ class TestFTSIndexAndSearch(unittest.TestCase):
         with patch("clawmson_memory._embed", side_effect=Exception("Ollama down")):
             result = mm.retrieve("chat4", "qwen3")
         self.assertIn("qwen3", result.lower())
+        self.assertIn("[Search]", result)
 
     @unittest.skipUnless(FTS5_AVAILABLE, "FTS5 not supported")
     def test_search_command_formats_results(self):
