@@ -124,7 +124,11 @@ def _extract_json(text: str) -> list[dict]:
     return []
 
 
-def analyze(markets: list[dict], wallet: dict[str, Any]) -> list[TradeDecision]:
+def analyze(
+    markets: list[dict],
+    wallet: dict[str, Any],
+    signals: list[dict] | None = None,
+) -> list[TradeDecision]:
     """
     Main entry point. Returns list of TradeDecisions sorted by confidence desc.
     Step 1: Arbitrage fast-path (no Ollama).
@@ -155,6 +159,24 @@ def analyze(markets: list[dict], wallet: dict[str, Any]) -> list[TradeDecision]:
         for m in non_arb[:30]
     )
 
+    # Build optional UW signals block
+    signals_block = ""
+    if signals:
+        recent = sorted(signals, key=lambda s: s.get("fetched_at", ""), reverse=True)[:20]
+        signal_lines = "\n".join(
+            f'- [{s["source"].upper()}] {s["ticker"]} {s["direction"]} '
+            f'{s["signal_type"]} — {s["description"]}'
+            for s in recent
+        )
+        signals_block = (
+            f"\nActive market signals (Unusual Whales):\n{signal_lines}\n\n"
+            "When analyzing Polymarket markets, consider whether any of these signals "
+            "suggest a related outcome is more or less likely. A bullish options sweep "
+            "on NVDA is a signal that sophisticated money expects NVDA to rise — factor "
+            "this into any Polymarket market about Nvidia price, earnings, or "
+            "company performance.\n"
+        )
+
     prompt = f"""You are Mirofish, a prediction market paper trading system.
 Current portfolio: ${balance:.2f} balance, {open_positions} open positions.
 
@@ -171,7 +193,7 @@ For each opportunity, calculate:
 
 Markets:
 {market_lines}
-
+{signals_block}
 Return ONLY a JSON array (no explanation), max 5 opportunities:
 [
   {{
