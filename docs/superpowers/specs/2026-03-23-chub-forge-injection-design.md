@@ -70,16 +70,18 @@ Scans prompt with regex patterns in priority order:
 
 Candidates are:
 - Deduplicated (preserve first-seen order)
-- Filtered against blocklist: `python`, `code`, `function`, `data`, `file`, `string`, `list`, `dict`, `api`, `json`, `http`
+- Filtered to valid package-name shape: `re.match(r'^[\w][\w.\-]*$', c)` — drops any candidate with spaces or disallowed characters
+- Filtered by minimum length: discard any candidate shorter than 4 characters (prevents `re`, `os`, `io`, `gc` etc. from reaching chub)
+- Filtered against blocklist: `python`, `code`, `function`, `data`, `file`, `string`, `list`, `dict`, `api`, `json`, `http`, `re`, `os`, `io`, `sys`, `time`, `math`, `csv`, `abc`, `ast`, `uuid`, `enum`, `copy`, `ssl`, `xml`, `url`, `app`, `sql`, `log`, `cli`, `db`
 - Capped at 3 candidates (to bound worst-case latency: 3 × 3s = 9s)
 
 ### Lookup — `_lookup_chub(candidate: str) -> str`
 
-1. Run `chub search <candidate> --json` (subprocess, `timeout=3`, `capture_output=True`)
-2. Parse JSON response. Accept top result if `result["name"].lower()` equals or starts with `candidate.lower()`
-3. If accepted: run `chub get <result_id> --lang py` (subprocess, `timeout=5`, `capture_output=True`)
-4. Return stdout string, capped at 3000 chars with `[API DOCS: {result_id}]\n` prepended
-5. Return `""` if: chub not on PATH (`FileNotFoundError`), empty results array, name mismatch, timeout, JSON parse error, non-zero exit code
+1. Run `chub search <candidate> --json` (subprocess, `timeout=3`, `capture_output=True`, `check=False` — do not use `check=True`; non-zero exit codes are handled by inspecting `returncode`)
+2. Parse JSON response. Guard: if parsed value is not a `list`, return `""`. If list is empty, return `""`. Accept top result if `result["name"].lower()` exactly equals `candidate.lower()`, OR (`startswith` AND `len(candidate) >= 4`).
+3. If accepted: run `chub get <result_id> --lang py` (subprocess, `timeout=5`, `capture_output=True`, `check=False`)
+4. Cap doc body (stdout) at 3000 chars, then prepend `[API DOCS: {result_id}]\n`. Total returned string is at most ~3020 chars. The 3000-char limit applies to the doc body only.
+5. Return `""` if: chub not on PATH (`FileNotFoundError`), empty results array, non-list JSON response, name mismatch, timeout, JSON parse error, non-zero exit code
 
 ### Integration in `runner.py`
 
@@ -108,9 +110,10 @@ All subprocess calls are wrapped in a top-level `try/except Exception`. Specific
 | `FileNotFoundError` | chub not on PATH | `""` |
 | `subprocess.TimeoutExpired` | search or get exceeded timeout | `""` |
 | `json.JSONDecodeError` | malformed chub search output | `""` |
+| Valid JSON but not a list | chub returns error object e.g. `{"error": "..."}` | `""` |
 | Empty results array | no match in chub registry | `""` |
 | Name mismatch | top result unrelated to candidate | `""` |
-| Non-zero exit code | chub CLI error | `""` |
+| Non-zero exit code | chub CLI error (`check=False`, inspect `returncode`) | `""` |
 | Any other exception | unexpected failure | `""` |
 
 FORGE is never blocked. The Ollama call always proceeds.
@@ -123,15 +126,19 @@ FORGE is never blocked. The Ollama call always proceeds.
 |---|---|
 | `test_detect_backtick` | `` `requests` `` in prompt → `requests` in candidates |
 | `test_detect_import` | `import boto3` → `boto3` in candidates |
-| `test_lookup_success` | mock `chub search` returns match, mock `chub get` returns docs → `fetch_chub_context` returns `"[API DOCS: requests]\n..."`, content capped at 3000 chars |
+| `test_lookup_success` | mock `chub search` returns match, mock `chub get` returns docs → `fetch_chub_context` returns `"[API DOCS: requests]\n..."`, doc body capped at 3000 chars |
+| `test_cap_boundary` | mock `chub get` returns string of exactly 3001 chars → returned doc body is exactly 3000 chars (verifies `[:3000]` slice) |
 | `test_graceful_chub_not_found` | `subprocess.run` raises `FileNotFoundError` → returns `""` |
 | `test_graceful_no_match` | `chub search` returns `[]` → returns `""` |
+| `test_graceful_non_list_json` | `chub search` returns `{"error": "rate limited"}` → returns `""` |
+| `test_short_candidate_filtered` | prompt `"import os"` → `os` filtered by min-length rule, no subprocess call |
+| `test_candidate_with_spaces_filtered` | regex pattern extracts candidate with space → filtered, no subprocess call |
 
 All tests mock `subprocess.run` — no real chub calls in the test suite.
 
-One additional case added to `test_runner.py`:
-- FORGE codename + mocked non-empty `fetch_chub_context` → user content has prepended docs
-- Non-FORGE codename → `fetch_chub_context` never called
+Two additional cases added to `test_runner.py`:
+- FORGE codename + `patch("clawteam.chub.fetch_chub_context", return_value="[API DOCS: x]\ndocs")` → user content has prepended docs
+- Non-FORGE codename + same patch → `assert mock_fetch.call_count == 0` (chub never called)
 
 ---
 
