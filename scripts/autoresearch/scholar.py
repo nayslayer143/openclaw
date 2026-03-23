@@ -76,8 +76,9 @@ DEFAULT_DOMAINS = [
 
 # ── DB helpers ────────────────────────────────────────────────────────────────
 
-def save_paper(paper_id: str, title: str, authors, abstract, url,
-               relevance_score) -> None:
+def save_paper(paper_id: str, title: str, authors: str | None,
+               abstract: str | None, url: str | None,
+               relevance_score: float | None) -> None:
     """INSERT OR IGNORE a paper row. discovered_at set to UTC now."""
     ts = datetime.datetime.utcnow().isoformat()
     with db._get_conn() as conn:
@@ -90,6 +91,7 @@ def save_paper(paper_id: str, title: str, authors, abstract, url,
 
 
 def mark_digested(paper_id: str) -> None:
+    """Set digested=1 for a paper."""
     with db._get_conn() as conn:
         conn.execute("UPDATE papers SET digested=1 WHERE paper_id=?", (paper_id,))
 
