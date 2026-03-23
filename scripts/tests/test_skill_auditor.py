@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
 """Unit tests for skill/MCP security audit system."""
 import sys
-import os
-import hashlib
-import sqlite3
-import tempfile
 import unittest
 from pathlib import Path
-from unittest.mock import patch, MagicMock
 
 _SCRIPTS = Path(__file__).parent.parent
 if str(_SCRIPTS) not in sys.path:
