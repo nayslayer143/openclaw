@@ -47,6 +47,7 @@ import clawmson_intents as intents
 import clawmson_media as media
 import clawmson_references as refs
 import model_router as router
+from autoresearch import scholar
 
 # Prefixes that indicate Ollama inference failed (from clawmson_chat.py error returns)
 _OLLAMA_ERROR_PREFIXES = (
@@ -327,6 +328,79 @@ def handle_references(chat_id: str):
     send(chat_id, refs.format_references(ref_list))
 
 
+def handle_papers(chat_id: str, topic: str):
+    """Discover and summarize top 5 papers on a topic."""
+    send_typing(chat_id)
+    try:
+        results = scholar.discover(query=topic or None, limit=5)
+    except Exception as e:
+        send(chat_id, f"Paper search failed: {e}")
+        return
+    if not results:
+        send(chat_id, f"No papers found for '{topic}'." if topic else "No trending papers found.")
+        return
+    lines = [f"Top papers{' on ' + topic if topic else ' (trending)'}:\n"]
+    for i, p in enumerate(results, 1):
+        score = p.get("relevance_score", 0)
+        lines.append(f"{i}. {p['title']} (relevance: {score:.2f})\n"
+                     f"   {p.get('url', '')}\n")
+    send(chat_id, "".join(lines))
+
+
+def handle_digest(chat_id: str, paper_id: str):
+    """Deep-dive digest a specific paper."""
+    if not paper_id:
+        send(chat_id, "Usage: /digest <paper_id>")
+        return
+    send_typing(chat_id)
+    result = scholar.digest_paper(paper_id)
+    if "error" in result:
+        if result["error"] == "unknown_paper":
+            send(chat_id, f"Paper {paper_id} not found. Try /papers [topic] to discover it first.")
+        else:
+            send(chat_id, f"Digest failed: {result['error']}")
+        return
+    lines = [
+        f"Digest: {paper_id}\n",
+        f"Priority: {result.get('priority', '?')}\n\n",
+        "Key Findings:\n",
+    ]
+    for f in result.get("key_findings", []):
+        lines.append(f"• {f}\n")
+    techniques = result.get("implementable_techniques", [])
+    if techniques:
+        lines.append("\nImplementable:\n")
+        for t in techniques:
+            lines.append(f"• {t}\n")
+    relevance = result.get("relevance_to_builds", "")
+    if relevance:
+        lines.append(f"\nRelevance: {relevance}\n")
+    actions = result.get("actions", [])
+    if actions:
+        lines.append(f"\nActions taken: {', '.join(actions)}\n")
+    send(chat_id, "".join(lines))
+
+
+def handle_scholar(chat_id: str, subcommand: str):
+    """Handle /scholar [subcommand]."""
+    sub = subcommand.strip().lower()
+    if sub == "status" or sub == "":
+        summary = scholar.get_recent_papers(days=7)
+        lines = [
+            f"AutoScholar — last 7 days\n",
+            f"Discovered: {summary['total']} papers\n",
+            f"Digested: {summary['digested']} papers\n",
+        ]
+        if summary["top_titles"]:
+            lines.append("\nTop digested:\n")
+            for t in summary["top_titles"]:
+                lines.append(f"• {t}\n")
+        send(chat_id, "".join(lines))
+    else:
+        send(chat_id, "Usage:\n/scholar status — recent activity\n"
+                      "/papers [topic] — search papers\n"
+                      "/digest [paper_id] — deep dive a paper")
+
 
 def handle_memory(chat_id: str, query: str = ""):
     """Show current memory context for this chat."""
@@ -558,6 +632,18 @@ def handle_message(msg: dict):
                 send(chat_id, "Usage: /approve <task_id>")
             else:
                 handle_approve(task_id, chat_id)
+            return
+        if lower.startswith("/papers"):
+            topic = text[len("/papers"):].strip()
+            handle_papers(chat_id, topic)
+            return
+        if lower.startswith("/digest ") or lower == "/digest":
+            paper_id = text[len("/digest"):].strip()
+            handle_digest(chat_id, paper_id)
+            return
+        if lower.startswith("/scholar"):
+            subcommand = text[len("/scholar"):].strip()
+            handle_scholar(chat_id, subcommand)
             return
 
     # ── 3. Process media if present ───────────────────────────────────────────
