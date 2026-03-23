@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>zero.dev — Full-Stack Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100;0,300;0,400;0,700;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #010204;
+  --surface: #090d14;
+  --panel: #0d1520;
+  --green: #00ff88;
+  --green-dim: #00aa55;
+  --green-glow: rgba(0,255,136,0.15);
+  --blue: #00aaff;
+  --amber: #ffaa00;
+  --text: #c8d8e8;
+  --dim: #4a6080;
+  --border: rgba(0,255,136,0.08);
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ─── SCANLINES ─── */
+.scanlines {
+  position: fixed; inset: 0; z-index: 8500; pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(0,0,0,0.08) 3px,
+    rgba(0,0,0,0.08) 4px
+  );
+}
+.crt-flicker {
+  position: fixed; inset: 0; z-index: 8499; pointer-events: none;
+  background: rgba(0,255,136,0.012);
+  animation: crt-flicker 0.1s infinite;
+}
+@keyframes crt-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.97; }
+}
+.vignette {
+  position: fixed; inset: 0; z-index: 8498; pointer-events: none;
+  background: radial-gradient(ellipse 75% 75% at 50% 50%, transparent 40%, rgba(0,0,0,0.75) 100%);
+}
+
+/* ─── CURSOR ─── */
+#cursor-block {
+  position: fixed; pointer-events: none; z-index: 9999;
+  width: 10px; height: 16px;
+  background: var(--green);
+  transform: translate(0, -50%);
+  opacity: 0.9;
+  animation: blink 1s steps(1) infinite;
+  box-shadow: 0 0 8px var(--green);
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* ─── BOOT SCREEN ─── */
+#boot {
+  position: fixed; inset: 0; z-index: 9998;
+  background: var(--bg);
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 4rem;
+  overflow: hidden;
+}
+.boot-line {
+  font-size: 0.75rem; line-height: 1.8;
+  color: var(--green-dim); white-space: nowrap;
+  opacity: 0;
+}
+.boot-line.amber { color: var(--amber); }
+.boot-line.blue { color: var(--blue); }
+.boot-line.bright { color: var(--green); }
+
+/* ─── MAIN ─── */
+main { opacity: 0; }
+
+/* ─── NAV TERMINAL BAR ─── */
+.terminal-bar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  background: rgba(9,13,20,0.95);
+  border-bottom: 1px solid var(--border);
+  padding: 0.75rem 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  backdrop-filter: blur(10px);
+}
+.tb-path {
+  font-size: 0.7rem; color: var(--green-dim);
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.tb-path .prompt { color: var(--green); }
+.tb-path .dir { color: var(--blue); }
+.tb-links { display: flex; gap: 2rem; }
+.tb-links a {
+  font-size: 0.65rem; color: var(--dim); text-decoration: none;
+  transition: color 0.2s;
+}
+.tb-links a:hover { color: var(--green); }
+.tb-right { font-size: 0.65rem; color: var(--dim); }
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 8rem 4rem 4rem;
+  position: relative;
+  border-bottom: 1px solid var(--border);
+}
+.hero-prompt {
+  display: flex; align-items: center; gap: 1rem;
+  margin-bottom: 2rem;
+}
+.prompt-symbol { color: var(--green); font-size: 0.8rem; }
+.prompt-path { color: var(--blue); font-size: 0.75rem; }
+.prompt-cmd { color: var(--text); font-size: 0.75rem; }
+
+.hero-name {
+  font-size: clamp(3.5rem, 9vw, 8rem);
+  font-weight: 700; line-height: 1;
+  color: var(--green);
+  text-shadow: 0 0 40px rgba(0,255,136,0.3), 0 0 80px rgba(0,255,136,0.1);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+.hero-name-comment {
+  color: var(--dim); font-weight: 300;
+  font-size: clamp(0.8rem, 1.5vw, 1rem);
+  margin-bottom: 3rem;
+}
+.hero-name-comment .c { color: var(--green-dim); }
+
+.typing-output {
+  font-size: 0.85rem; line-height: 2;
+  max-width: 600px;
+}
+.typing-output .kw { color: var(--amber); }
+.typing-output .str { color: var(--green); }
+.typing-output .fn { color: var(--blue); }
+.typing-output .comment { color: var(--dim); font-style: italic; }
+.typing-output .num { color: #ff8c69; }
+
+.hero-caret {
+  display: inline-block; width: 8px; height: 1em;
+  background: var(--green); vertical-align: text-bottom;
+  animation: blink 1s steps(1) infinite;
+  box-shadow: 0 0 6px var(--green);
+}
+
+.hero-status {
+  position: absolute; bottom: 3rem; left: 4rem; right: 4rem;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.status-left { display: flex; gap: 2rem; }
+.status-item {
+  font-size: 0.65rem; color: var(--dim);
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.status-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+.status-right { font-size: 0.65rem; color: var(--dim); }
+
+/* ─── PROJECTS ─── */
+.projects {
+  padding: 6rem 4rem;
+  border-bottom: 1px solid var(--border);
+}
+.section-head {
+  display: flex; align-items: center; gap: 1rem;
+  margin-bottom: 3rem;
+  font-size: 0.7rem; color: var(--dim);
+}
+.section-head .sym { color: var(--green); }
+.section-head .label { color: var(--text); font-weight: 400; }
+.section-head::after {
+  content: ''; flex: 1; height: 1px;
+  background: var(--border);
+}
+
+.project-list { list-style: none; }
+.project-item {
+  padding: 2rem 0;
+  border-bottom: 1px solid rgba(0,255,136,0.04);
+  display: grid; grid-template-columns: 2rem 1fr auto;
+  gap: 1.5rem; align-items: start;
+  position: relative;
+  transition: background 0.3s, padding-left 0.3s;
+  cursor: none;
+}
+.project-item::before {
+  content: ''; position: absolute;
+  left: 0; top: 0; bottom: 0; width: 2px;
+  background: var(--green);
+  box-shadow: 0 0 10px var(--green);
+  transform: scaleY(0); transform-origin: bottom;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.project-item:hover::before { transform: scaleY(1); }
+.project-item:hover { background: rgba(0,255,136,0.02); }
+
+.proj-index { font-size: 0.65rem; color: var(--dim); padding-top: 0.2rem; }
+.proj-main {}
+.proj-name {
+  font-size: clamp(1.2rem, 2.5vw, 2rem); font-weight: 400;
+  color: var(--text); line-height: 1.2;
+  transition: color 0.3s;
+  margin-bottom: 0.5rem;
+}
+.project-item:hover .proj-name { color: var(--green); text-shadow: 0 0 20px rgba(0,255,136,0.3); }
+.proj-desc {
+  font-size: 0.7rem; color: var(--dim); line-height: 1.7;
+  font-weight: 300; margin-bottom: 1rem;
+  max-width: 500px;
+}
+.proj-tags { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.proj-tag {
+  font-size: 0.6rem; padding: 0.2rem 0.7rem;
+  border: 1px solid rgba(0,255,136,0.12);
+  color: var(--green-dim); border-radius: 2px;
+  transition: border-color 0.3s, color 0.3s;
+}
+.project-item:hover .proj-tag {
+  border-color: rgba(0,255,136,0.3);
+  color: var(--green);
+}
+.proj-right { text-align: right; padding-top: 0.2rem; }
+.proj-year { font-size: 0.65rem; color: var(--dim); display: block; margin-bottom: 0.5rem; }
+.proj-status {
+  font-size: 0.6rem; color: var(--green);
+  display: flex; align-items: center; gap: 0.4rem; justify-content: flex-end;
+}
+.proj-status::before {
+  content: ''; width: 5px; height: 5px;
+  border-radius: 50%; background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+}
+
+/* ─── STACK ─── */
+.stack {
+  padding: 6rem 4rem;
+  border-bottom: 1px solid var(--border);
+}
+.stack-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 2px;
+  margin-top: 2rem;
+}
+.stack-item {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  transition: border-color 0.3s, background 0.3s;
+}
+.stack-item:hover {
+  border-color: rgba(0,255,136,0.25);
+  background: rgba(0,255,136,0.03);
+}
+.stack-icon { font-size: 1.4rem; display: block; margin-bottom: 0.5rem; }
+.stack-name { font-size: 0.7rem; color: var(--text); display: block; margin-bottom: 0.25rem; }
+.stack-level { font-size: 0.6rem; color: var(--dim); display: block; }
+.stack-bar {
+  margin-top: 0.75rem; height: 2px;
+  background: rgba(0,255,136,0.08);
+}
+.stack-bar-fill {
+  height: 100%; background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.stack-item:hover .stack-bar-fill { transform: scaleX(1); }
+
+/* ─── CONTACT ─── */
+.contact {
+  padding: 6rem 4rem;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center;
+}
+.contact-left {}
+.contact-prompt {
+  font-size: 0.7rem; color: var(--dim); margin-bottom: 1.5rem;
+  display: flex; align-items: center; gap: 0.75rem;
+}
+.contact-prompt .sym { color: var(--green); }
+.contact-heading {
+  font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 700;
+  color: var(--green); line-height: 1.1; margin-bottom: 1.5rem;
+  text-shadow: 0 0 30px rgba(0,255,136,0.2);
+}
+.contact-sub {
+  font-size: 0.8rem; color: var(--dim); line-height: 1.9;
+  font-weight: 300; margin-bottom: 2rem;
+}
+.contact-email {
+  font-size: 0.85rem; color: var(--green-dim);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(0,255,136,0.2);
+  padding-bottom: 2px;
+  transition: color 0.3s, border-color 0.3s;
+}
+.contact-email:hover { color: var(--green); border-color: var(--green); }
+
+.contact-right { font-size: 0.7rem; color: var(--dim); line-height: 2.2; }
+.contact-right a { color: var(--blue); text-decoration: none; }
+.contact-right a:hover { color: var(--green); }
+
+/* ─── FOOTER ─── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 2rem 4rem;
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--surface);
+}
+.footer-left { font-size: 0.65rem; color: var(--dim); }
+.footer-left .highlight { color: var(--green-dim); }
+.footer-right { font-size: 0.65rem; color: var(--dim); display: flex; gap: 2rem; }
+.footer-right a { color: var(--dim); text-decoration: none; transition: color 0.3s; }
+.footer-right a:hover { color: var(--green); }
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div id="cursor-block"></div>
+<div class="scanlines"></div>
+<div class="crt-flicker"></div>
+<div class="vignette"></div>
+
+<!-- BOOT SCREEN -->
+<div id="boot" aria-hidden="true">
+  <div id="boot-lines"></div>
+</div>
+
+<!-- MAIN CONTENT -->
+<main id="main">
+
+  <!-- NAV -->
+  <div class="terminal-bar">
+    <div class="tb-path">
+      <span class="prompt">❯</span>
+      <span class="dir">~/zero.dev</span>
+      <span style="color:var(--dim)">on</span>
+      <span class="prompt">main</span>
+      <span style="color:var(--dim)">✓</span>
+    </div>
+    <nav class="tb-links">
+      <a href="#">projects</a>
+      <a href="#">stack</a>
+      <a href="#">writing</a>
+      <a href="#">contact</a>
+    </nav>
+    <span class="tb-right" id="tb-time">00:00:00</span>
+  </div>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-prompt">
+      <span class="prompt-symbol">❯</span>
+      <span class="prompt-path">~/zero.dev</span>
+      <span class="prompt-cmd">whoami</span>
+    </div>
+    <h1 class="hero-name" id="hero-name"></h1>
+    <p class="hero-name-comment"><span class="c">// </span><span id="hero-sub"></span></p>
+    <div class="typing-output" id="typing-output" style="margin-top:2.5rem"></div>
+
+    <div class="hero-status">
+      <div class="status-left">
+        <div class="status-item"><div class="status-dot"></div>Available for work</div>
+        <div class="status-item" style="color:var(--dim)">UTC+0 · London</div>
+        <div class="status-item" style="color:var(--dim)">5 yrs experience</div>
+      </div>
+      <div class="status-right">Press <span style="color:var(--green)">↓</span> to explore</div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="projects">
+    <div class="section-head">
+      <span class="sym">#</span>
+      <span class="label">selected_projects</span>
+    </div>
+    <ul class="project-list">
+      <li class="project-item" data-animate>
+        <span class="proj-index">01</span>
+        <div class="proj-main">
+          <h3 class="proj-name">Cascade</h3>
+          <p class="proj-desc">Real-time collaborative data pipeline builder. WebSocket-driven graph UI with live execution tracing and custom DSL compiler.</p>
+          <div class="proj-tags">
+            <span class="proj-tag">Rust</span>
+            <span class="proj-tag">TypeScript</span>
+            <span class="proj-tag">WebSockets</span>
+            <span class="proj-tag">Canvas</span>
+          </div>
+        </div>
+        <div class="proj-right">
+          <span class="proj-year">2025</span>
+          <span class="proj-status">live</span>
+        </div>
+      </li>
+      <li class="project-item" data-animate>
+        <span class="proj-index">02</span>
+        <div class="proj-main">
+          <h3 class="proj-name">Phantom</h3>
+          <p class="proj-desc">Zero-knowledge proof generation framework for browser environments. WASM-compiled zkSNARKs with React integration layer.</p>
+          <div class="proj-tags">
+            <span class="proj-tag">ZK Proofs</span>
+            <span class="proj-tag">WASM</span>
+            <span class="proj-tag">React</span>
+            <span class="proj-tag">Cryptography</span>
+          </div>
+        </div>
+        <div class="proj-right">
+          <span class="proj-year">2025</span>
+          <span class="proj-status">open source</span>
+        </div>
+      </li>
+      <li class="project-item" data-animate>
+        <span class="proj-index">03</span>
+        <div class="proj-main">
+          <h3 class="proj-name">Chronicle</h3>
+          <p class="proj-desc">Distributed event sourcing system with automatic conflict resolution. Built on Kafka with custom CRDT merge strategies.</p>
+          <div class="proj-tags">
+            <span class="proj-tag">Go</span>
+            <span class="proj-tag">Kafka</span>
+            <span class="proj-tag">CRDTs</span>
+            <span class="proj-tag">Postgres</span>
+          </div>
+        </div>
+        <div class="proj-right">
+          <span class="proj-year">2024</span>
+          <span class="proj-status">production</span>
+        </div>
+      </li>
+      <li class="project-item" data-animate>
+        <span class="proj-index">04</span>
+        <div class="proj-main">
+          <h3 class="proj-name">Refract</h3>
+          <p class="proj-desc">Visual ray-tracing engine in the browser. WebGPU-accelerated BVH traversal with real-time denoising via temporal accumulation.</p>
+          <div class="proj-tags">
+            <span class="proj-tag">WebGPU</span>
+            <span class="proj-tag">WGSL</span>
+            <span class="proj-tag">C++</span>
+            <span class="proj-tag">Emscripten</span>
+          </div>
+        </div>
+        <div class="proj-right">
+          <span class="proj-year">2024</span>
+          <span class="proj-status">open source</span>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- STACK -->
+  <section class="stack">
+    <div class="section-head">
+      <span class="sym">#</span>
+      <span class="label">tech_stack</span>
+    </div>
+    <div class="stack-grid">
+      <div class="stack-item" data-animate>
+        <span class="stack-icon">🦀</span>
+        <span class="stack-name">Rust</span>
+        <span class="stack-level">// systems, wasm, perf</span>
+        <div class="stack-bar"><div class="stack-bar-fill" style="width:92%"></div></div>
+      </div>
+      <div class="stack-item" data-animate>
+        <span class="stack-icon">🐹</span>
+        <span class="stack-name">Go</span>
+        <span class="stack-level">// backends, CLIs, k8s</span>
+        <div class="stack-bar"><div class="stack-bar-fill" style="width:88%"></div></div>
+      </div>
+      <div class="stack-item" data-animate>
+        <span class="stack-icon">⚡</span>
+        <span class="stack-name">TypeScript</span>
+        <span class="stack-level">// frontends, node</span>
+        <div class="stack-bar"><div class="stack-bar-fill" style="width:95%"></div></div>
+      </div>
+      <div class="stack-item" data-animate>
+        <span class="stack-icon">⚛️</span>
+        <span class="stack-name">React</span>
+        <span class="stack-level">// UI, state, perf</span>
+        <div class="stack-bar"><div class="stack-bar-fill" style="width:90%"></div></div>
+      </div>
+      <div class="stack-item" data-animate>
+        <span class="stack-icon">🐘</span>
+        <span class="stack-name">Postgres</span>
+        <span class="stack-level">// data, indexing, rls</span>
+        <div class="stack-bar"><div class="stack-bar-fill" style="width:85%"></div></div>
+      </div>
+      <div class="stack-item" data-animate>
+        <span class="stack-icon">☸️</span>
+        <span class="stack-name">Kubernetes</span>
+        <span class="stack-level">// infra, argo, helm</span>
+        <div class="stack-bar"><div class="stack-bar-fill" style="width:78%"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact">
+    <div class="contact-left" data-animate>
+      <div class="contact-prompt">
+        <span class="sym">❯</span>
+        <span>new collaboration</span>
+      </div>
+      <h2 class="contact-heading">Let's build<br>something real.</h2>
+      <p class="contact-sub">
+        I work on problems that are genuinely hard. If yours is one of them — infrastructure at scale, cryptography, creative engineering — get in touch.
+      </p>
+      <a href="mailto:z@zero.dev" class="contact-email">z@zero.dev</a>
+    </div>
+    <div class="contact-right" data-animate>
+      <p><span style="color:var(--green-dim)">github</span> · <a href="#">github.com/zero</a></p>
+      <p><span style="color:var(--green-dim)">twitter</span> · <a href="#">@zerodotdev</a></p>
+      <p><span style="color:var(--green-dim)">linkedin</span> · <a href="#">linkedin.com/in/zero</a></p>
+      <p><span style="color:var(--green-dim)">cv</span> · <a href="#">Download PDF</a></p>
+      <br>
+      <p style="color:var(--dim);font-size:0.6rem">// Currently: open to full-time &amp; contracts</p>
+      <p style="color:var(--dim);font-size:0.6rem">// Response time: &lt; 24h</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-left">
+      <span class="highlight">zero.dev</span> — built with ♥ and too much coffee
+    </div>
+    <div class="footer-right">
+      <a href="#">source</a>
+      <a href="#">rss</a>
+      <a href="#">pgp</a>
+      <span>© 2026</span>
+    </div>
+  </footer>
+
+</main>
+
+<script>
+// ─── CURSOR ───
+const cursorBlock = document.getElementById('cursor-block');
+document.addEventListener('mousemove', e => {
+  cursorBlock.style.left = e.clientX + 'px';
+  cursorBlock.style.top = e.clientY + 'px';
+});
+
+// ─── CLOCK ───
+function updateClock() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const s = String(now.getSeconds()).padStart(2,'0');
+  document.getElementById('tb-time').textContent = `${h}:${m}:${s}`;
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ─── BOOT SEQUENCE ───
+const bootLines = [
+  { text: 'ZERO.DEV BIOS v2.6.1 — Press DEL to enter setup', type: 'amber', delay: 0 },
+  { text: 'Detecting hardware... OK', type: '', delay: 300 },
+  { text: 'Loading kernel modules... done', type: '', delay: 500 },
+  { text: 'Mounting filesystems... OK', type: '', delay: 700 },
+  { text: '[ OK ] Started Node.js runtime environment', type: 'bright', delay: 900 },
+  { text: '[ OK ] Loaded portfolio data (14 projects, 847KB)', type: 'bright', delay: 1100 },
+  { text: '[ OK ] WebSocket server listening on :3000', type: 'bright', delay: 1300 },
+  { text: 'WARNING: 3 open PRs detected on main branch', type: 'amber', delay: 1500 },
+  { text: '[ OK ] Linting... 0 errors, 2 warnings (acceptable)', type: 'bright', delay: 1700 },
+  { text: 'Authenticating user... done', type: '', delay: 1900 },
+  { text: '', delay: 2000 },
+  { text: 'Welcome back, zero.', type: 'bright', delay: 2100 },
+];
+
+const bootContainer = document.getElementById('boot-lines');
+bootLines.forEach(line => {
+  setTimeout(() => {
+    const div = document.createElement('div');
+    div.className = `boot-line ${line.type}`;
+    div.textContent = line.text;
+    div.style.opacity = '1';
+    bootContainer.appendChild(div);
+    div.scrollIntoView({ behavior: 'smooth' });
+  }, line.delay);
+});
+
+setTimeout(() => {
+  const bootEl = document.getElementById('boot');
+  bootEl.style.transition = 'opacity 0.5s';
+  bootEl.style.opacity = '0';
+  setTimeout(() => {
+    bootEl.remove();
+    const main = document.getElementById('main');
+    main.style.transition = 'opacity 0.6s';
+    main.style.opacity = '1';
+    startHeroTyping();
+  }, 500);
+}, 2800);
+
+// ─── HERO TYPING ───
+function typeText(el, text, speed, cb) {
+  let i = 0;
+  el.innerHTML = '';
+  const interval = setInterval(() => {
+    el.innerHTML = text.slice(0, i + 1);
+    i++;
+    if (i >= text.length) { clearInterval(interval); if (cb) cb(); }
+  }, speed);
+}
+
+function startHeroTyping() {
+  const nameEl = document.getElementById('hero-name');
+  const subEl = document.getElementById('hero-sub');
+  const outputEl = document.getElementById('typing-output');
+
+  typeText(nameEl, 'zero.dev', 80, () => {
+    setTimeout(() => {
+      typeText(subEl, 'full-stack engineer · systems thinker · open source contributor', 25, () => {
+        setTimeout(() => {
+          const code = `<span class="kw">const</span> engineer = {
+  <span class="fn">name</span>: <span class="str">"zero"</span>,
+  <span class="fn">focus</span>: [<span class="str">"distributed systems"</span>, <span class="str">"creative tech"</span>],
+  <span class="fn">languages</span>: [<span class="str">"Rust"</span>, <span class="str">"Go"</span>, <span class="str">"TypeScript"</span>],
+  <span class="fn">available</span>: <span class="kw">true</span>,
+  <span class="comment">// building things that shouldn't exist yet</span>
+};`;
+          outputEl.innerHTML = code + '<span class="hero-caret"></span>';
+        }, 300);
+      });
+    }, 200);
+  });
+}
+
+// ─── SCROLL ANIMATIONS ───
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const el = entry.target;
+      el.style.transition = 'opacity 0.7s ease, transform 0.7s ease';
+      el.style.opacity = '1';
+      el.style.transform = 'translateY(0)';
+      observer.unobserve(el);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('[data-animate]').forEach((el, i) => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(30px)';
+  el.style.transitionDelay = (i % 4) * 0.08 + 's';
+  observer.observe(el);
+});
+
+// Stack bar animate on hover (in addition to CSS)
+document.querySelectorAll('.stack-item').forEach(item => {
+  const bar = item.querySelector('.stack-bar-fill');
+  const w = bar.style.width;
+  bar.style.width = '100%'; // set max-width via data or hardcoded
+  bar.setAttribute('data-width', w);
+  bar.style.width = w; // restore
+});
+</script>
+</body>
+</html>

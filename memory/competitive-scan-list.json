@@ -1,0 +1,6 @@
+[
+  {"name": "Doctor Claw", "slug": "doctor-claw", "added_at": "2026-03-22", "scan_frequency": "weekly"},
+  {"name": "xyz.cards", "slug": "xyz-cards", "added_at": "2026-03-22", "scan_frequency": "weekly"},
+  {"name": "Lenticular Fashion", "slug": "lenticular-fashion", "added_at": "2026-03-22", "scan_frequency": "weekly"},
+  {"name": "AutoResearch", "slug": "autoresearch", "added_at": "2026-03-22", "scan_frequency": "weekly"}
+]

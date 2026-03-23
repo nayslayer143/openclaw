@@ -1,0 +1,116 @@
+{
+  "builds": [
+    {
+      "id": "cine-20260322-103045-a3f7e2",
+      "name": "Neon Agency Landing",
+      "prompt": "Build a dark cinematic landing page for a creative agency called 'Void Studio'. Neon accent colors on pitch black. Hero with massive serif typography, scroll-triggered fade-in sections, hover glow cards for portfolio items. Smooth scroll. Google Fonts. Single HTML file.",
+      "tier": 1,
+      "score": 0,
+      "notes": "",
+      "created_at": "2026-03-22T10:30:45.000000",
+      "graded_at": null,
+      "file": "cine-20260322-103045-a3f7e2.html"
+    },
+    {
+      "id": "cine-20260322-103112-b8c4d1",
+      "name": "Restaurant Ambiance",
+      "prompt": "Build a luxury restaurant landing page for 'KURO' \u2014 Japanese fine dining. Warm blacks, gold accents, elegant serif typography. Hero with a single statement word that fades in. Menu sections reveal on scroll. Hover effects on dish cards. Single HTML file.",
+      "tier": 1,
+      "score": 0,
+      "notes": "",
+      "created_at": "2026-03-22T10:31:12.000000",
+      "graded_at": null,
+      "file": "cine-20260322-103112-b8c4d1.html"
+    },
+    {
+      "id": "cine-20260322-103139-c9e6f4",
+      "name": "Minimal Portfolio",
+      "prompt": "Build a minimalist developer portfolio \u2014 dark mode, monospace typography, terminal aesthetic. Name is 'zero.dev'. Projects listed with staggered entrance animations. Custom cursor dot. Smooth transitions between sections on scroll. Single HTML file.",
+      "tier": 1,
+      "score": 5,
+      "notes": "",
+      "created_at": "2026-03-22T10:31:39.000000",
+      "graded_at": "2026-03-22T00:17:29.847697",
+      "file": "cine-20260322-103139-c9e6f4.html"
+    },
+    {
+      "id": "cine-20260322-103205-d2a1b5",
+      "name": "SaaS Product Hero",
+      "prompt": "Build a SaaS landing page for an AI writing tool called 'Inkwell'. Clean dark UI with a purple-to-blue gradient accent. Hero with typing animation effect. Feature cards with icons that animate on hover. Scroll-triggered stats counter. Single HTML file.",
+      "tier": 1,
+      "score": 0,
+      "notes": "",
+      "created_at": "2026-03-22T10:32:05.000000",
+      "graded_at": null,
+      "file": "cine-20260322-103205-d2a1b5.html"
+    },
+    {
+      "id": "cine-20260322-103231-e7f3c8",
+      "name": "Music Artist Page",
+      "prompt": "Build a music artist landing page for an electronic producer called 'HXLF'. Cyberpunk aesthetic \u2014 dark with cyan and magenta. Large album art hero section. Discography grid with hover effects. Pulsing animated background element. Single HTML file.",
+      "tier": 1,
+      "score": 0,
+      "notes": "",
+      "created_at": "2026-03-22T10:32:31.000000",
+      "graded_at": null,
+      "file": "cine-20260322-103231-e7f3c8.html"
+    },
+    {
+      "id": "cine-20260321-235856-89fe39",
+      "name": "Restaurant Ambiance",
+      "prompt": "Build a luxury restaurant landing page for 'KURO' \u2014 Japanese fine dining. Warm blacks, gold accents, elegant serif typography. Hero with a single statement word that fades in. Menu sections reveal on scroll. Hover effects on dish cards. Single HTML file.",
+      "tier": 1,
+      "score": 0,
+      "notes": "",
+      "created_at": "2026-03-21T23:58:56.661893",
+      "graded_at": null,
+      "file": "cine-20260321-235856-89fe39.html"
+    },
+    {
+      "id": "cine-20260321-235856-81ac86",
+      "name": "Neon Agency Landing",
+      "prompt": "Build a dark cinematic landing page for a creative agency called 'Void Studio'. Neon accent colors on pitch black. Hero with massive serif typography, scroll-triggered fade-in sections, hover glow cards for portfolio items. Smooth scroll. Google Fonts. Single HTML file.",
+      "tier": 1,
+      "score": 0,
+      "notes": "",
+      "created_at": "2026-03-21T23:58:56.662777",
+      "graded_at": null,
+      "file": "cine-20260321-235856-81ac86.html"
+    },
+    {
+      "id": "cine-20260321-235856-82cec5",
+      "name": "SaaS Product Hero",
+      "prompt": "Build a SaaS landing page for an AI writing tool called 'Inkwell'. Clean dark UI with a purple-to-blue gradient accent. Hero with typing animation effect. Feature cards with icons that animate on hover. Scroll-triggered stats counter. Single HTML file.",
+      "tier": 1,
+      "score": 0,
+      "notes": "",
+      "created_at": "2026-03-21T23:58:56.663494",
+      "graded_at": null,
+      "file": "cine-20260321-235856-82cec5.html"
+    },
+    {
+      "id": "cine-20260321-235856-0c28eb",
+      "name": "Minimal Portfolio",
+      "prompt": "Build a minimalist developer portfolio \u2014 dark mode, monospace typography, terminal aesthetic. Name is 'zero.dev'. Projects listed with staggered entrance animations. Custom cursor dot. Smooth transitions between sections on scroll. Single HTML file.",
+      "tier": 1,
+      "score": 0,
+      "notes": "",
+      "created_at": "2026-03-21T23:58:56.663842",
+      "graded_at": null,
+      "file": "cine-20260321-235856-0c28eb.html"
+    },
+    {
+      "id": "cine-20260321-235856-8ee54a",
+      "name": "Music Artist Page",
+      "prompt": "Build a music artist landing page for an electronic producer called 'HXLF'. Cyberpunk aesthetic \u2014 dark with cyan and magenta. Large album art hero section. Discography grid with hover effects. Pulsing animated background element. Single HTML file.",
+      "tier": 1,
+      "score": 0,
+      "notes": "",
+      "created_at": "2026-03-21T23:58:56.664187",
+      "graded_at": null,
+      "file": "cine-20260321-235856-8ee54a.html"
+    }
+  ],
+  "current_tier": 1,
+  "last_batch": "2026-03-22T10:32:31.000000"
+}

@@ -1,0 +1,30 @@
+{
+  "task_id": "tsk-we-deployed-the-new-market-simulator-tod-20260322170431",
+  "source": "telegram",
+  "repo_path": "/Users/nayslayer/projects/EmergentWebActions",
+  "repo": "EmergentWebActions",
+  "goal": "we deployed the new market simulator today\n\nthe polymarket integration broke, rolled back",
+  "parsed": {
+    "action": "deployed",
+    "target": "market simulator",
+    "project": null
+  },
+  "attachments": [],
+  "clarification": null,
+  "acceptance_criteria": [
+    "All existing tests still pass",
+    "New functionality has at least one test",
+    "No direct commits to main branch"
+  ],
+  "forbidden_operations": [
+    "never touch main branch directly",
+    "never commit .env",
+    "never push --force"
+  ],
+  "priority": "normal",
+  "time_budget_minutes": 30,
+  "risk_level": "low",
+  "model": "qwen2.5:7b",
+  "timestamp": "2026-03-22T17:04:31.315670",
+  "output_location": "/Users/nayslayer/openclaw/build-results/tsk-we-deployed-the-new-market-simulator-tod-20260322170431"
+}

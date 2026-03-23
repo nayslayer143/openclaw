@@ -1,0 +1,21 @@
+{
+  "task_id": "build-ewa-request-logging-20260320",
+  "repo_path": "/Users/nayslayer/projects/EmergentWebActions",
+  "goal": "Add request logging middleware to backend/server.py. Each incoming request should log: timestamp, HTTP method, path, status code, and response time in milliseconds. Log to stdout in format: [2026-03-20T00:00:00Z] GET /health 200 12ms. Add a test that makes a request and verifies a log entry is produced.",
+  "acceptance_criteria": [
+    "Every request produces a log line in the specified format",
+    "Log includes method, path, status code, and response time",
+    "New pytest test passes",
+    "All existing tests still pass"
+  ],
+  "forbidden_operations": [
+    "never touch main branch directly",
+    "never commit .env",
+    "never push --force"
+  ],
+  "time_budget_minutes": 20,
+  "risk_level": "low",
+  "output_location": "/Users/nayslayer/openclaw/build-results/build-ewa-request-logging-20260320/",
+  "status": "success",
+  "note": "Already implemented in backend/server.py"
+}

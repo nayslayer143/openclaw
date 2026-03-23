@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inkwell — Write Like You Mean It</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:ital,wght@0,300;0,600;0,900;1,300;1,600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<style>
+:root {
+  --bg: #07060f;
+  --surface: #0f0e1c;
+  --surface2: #17152a;
+  --purple: #8b5cf6;
+  --purple-bright: #a78bfa;
+  --blue: #3b82f6;
+  --pink: #ec4899;
+  --text: #e2e0f5;
+  --dim: #6460a0;
+  --border: rgba(139,92,246,0.12);
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: auto; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ─── CANVAS BG ─── */
+#orb-canvas {
+  position: fixed; inset: 0; z-index: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+
+/* ─── GRAIN + VIGNETTE ─── */
+.grain {
+  position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  animation: g 0.14s steps(1) infinite;
+}
+@keyframes g {
+  0%   { background-position: 0 0; }
+  25%  { background-position: -70px 40px; }
+  50%  { background-position: 80px -30px; }
+  75%  { background-position: -40px 70px; }
+  100% { background-position: 0 0; }
+}
+.vignette {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(ellipse 80% 80% at 50% 50%, transparent 30%, rgba(0,0,0,0.7) 100%);
+}
+
+/* ─── CURSOR ─── */
+#cursor {
+  position: fixed; pointer-events: none; z-index: 9999;
+  width: 10px; height: 10px;
+  background: var(--purple-bright);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 15px var(--purple-bright), 0 0 30px rgba(167,139,250,0.3);
+  transition: transform 0.15s, background 0.3s;
+}
+#cursor-trail {
+  position: fixed; pointer-events: none; z-index: 9998;
+  width: 40px; height: 40px;
+  border: 1px solid rgba(139,92,246,0.35);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* CONTENT above canvas */
+.content { position: relative; z-index: 10; }
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.5rem 4rem;
+  border-bottom: 1px solid rgba(139,92,246,0.08);
+  backdrop-filter: blur(24px) saturate(180%);
+  background: rgba(7,6,15,0.6);
+}
+.nav-logo {
+  font-family: 'Fraunces', serif;
+  font-size: 1.3rem; font-weight: 600;
+  background: linear-gradient(135deg, var(--purple-bright), var(--blue));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em;
+}
+.nav-links { display: flex; gap: 2.5rem; list-style: none; }
+.nav-links a {
+  font-size: 0.8rem; color: var(--dim); text-decoration: none;
+  transition: color 0.3s; font-weight: 400;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-right { display: flex; gap: 1rem; align-items: center; }
+.nav-btn-outline {
+  font-size: 0.75rem; padding: 0.5rem 1.2rem;
+  border: 1px solid var(--border); color: var(--dim);
+  text-decoration: none; border-radius: 6px;
+  transition: border-color 0.3s, color 0.3s;
+}
+.nav-btn-outline:hover { border-color: var(--purple); color: var(--purple-bright); }
+.nav-btn-solid {
+  font-size: 0.75rem; padding: 0.5rem 1.2rem;
+  background: var(--purple);
+  color: white; text-decoration: none; border-radius: 6px;
+  font-weight: 500;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.nav-btn-solid:hover { background: var(--purple-bright); box-shadow: 0 0 20px rgba(139,92,246,0.4); }
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  text-align: center;
+  padding: 8rem 4rem 4rem;
+}
+.hero-badge {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  background: rgba(139,92,246,0.1);
+  border: 1px solid rgba(139,92,246,0.2);
+  border-radius: 100px;
+  padding: 0.4rem 1rem;
+  font-size: 0.7rem; color: var(--purple-bright);
+  margin-bottom: 2.5rem;
+  font-weight: 500;
+}
+.hero-badge::before {
+  content: ''; width: 6px; height: 6px;
+  background: var(--purple-bright); border-radius: 50%;
+  box-shadow: 0 0 8px var(--purple-bright);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.hero-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(3rem, 7vw, 6.5rem);
+  font-weight: 900; line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.5rem;
+  max-width: 900px;
+}
+.hero-title .static { color: var(--text); }
+.hero-title .gradient {
+  background: linear-gradient(135deg, var(--purple-bright) 0%, var(--blue) 50%, var(--pink) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.hero-title .scramble-wrap {
+  display: inline-block; min-width: 3em;
+  background: linear-gradient(135deg, var(--purple-bright) 0%, var(--pink) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+
+.hero-sub {
+  font-size: 1.1rem; color: var(--dim); line-height: 1.7;
+  max-width: 520px; margin: 0 auto 3rem;
+  font-weight: 300;
+}
+
+.hero-actions {
+  display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+  margin-bottom: 5rem;
+}
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  background: linear-gradient(135deg, var(--purple), var(--blue));
+  color: white; text-decoration: none; border-radius: 10px;
+  padding: 0.9rem 2rem; font-size: 0.85rem; font-weight: 600;
+  transition: opacity 0.3s, box-shadow 0.3s, transform 0.3s;
+  position: relative; overflow: hidden;
+}
+.btn-primary::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1), transparent);
+  opacity: 0; transition: opacity 0.3s;
+}
+.btn-primary:hover { opacity: 0.9; box-shadow: 0 0 30px rgba(139,92,246,0.5), 0 8px 30px rgba(0,0,0,0.3); transform: translateY(-2px); }
+.btn-primary:hover::after { opacity: 1; }
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  border: 1px solid var(--border); color: var(--dim);
+  text-decoration: none; border-radius: 10px;
+  padding: 0.9rem 2rem; font-size: 0.85rem; font-weight: 500;
+  transition: border-color 0.3s, color 0.3s;
+}
+.btn-ghost:hover { border-color: var(--purple); color: var(--text); }
+
+.hero-social-proof {
+  display: flex; align-items: center; gap: 1rem; font-size: 0.8rem; color: var(--dim);
+}
+.avatar-stack {
+  display: flex;
+}
+.avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 2px solid var(--bg);
+  background: linear-gradient(135deg, #8b5cf6, #3b82f6);
+  margin-left: -8px;
+}
+.avatar:first-child { margin-left: 0; }
+.avatar:nth-child(2) { background: linear-gradient(135deg, #ec4899, #8b5cf6); }
+.avatar:nth-child(3) { background: linear-gradient(135deg, #3b82f6, #06b6d4); }
+.avatar:nth-child(4) { background: linear-gradient(135deg, #10b981, #3b82f6); }
+
+/* ─── FEATURES ─── */
+.features {
+  padding: 8rem 4rem;
+  max-width: 1300px; margin: 0 auto;
+}
+.feat-header { text-align: center; margin-bottom: 5rem; }
+.feat-eyebrow {
+  font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--purple-bright); margin-bottom: 1rem; font-weight: 500;
+}
+.feat-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 600;
+  color: var(--text); letter-spacing: -0.02em; line-height: 1.2;
+}
+
+.feat-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+}
+.feat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 2.5rem;
+  position: relative; overflow: hidden;
+  transition: border-color 0.4s, background 0.4s;
+  cursor: none;
+  --glow-x: 50%; --glow-y: 50%;
+}
+.feat-card::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at var(--glow-x) var(--glow-y), rgba(139,92,246,0.1), transparent 60%);
+  opacity: 0; transition: opacity 0.4s;
+}
+.feat-card:hover::before { opacity: 1; }
+.feat-card:hover { border-color: rgba(139,92,246,0.3); background: var(--surface2); }
+
+.feat-icon {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: rgba(139,92,246,0.12);
+  border: 1px solid rgba(139,92,246,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; margin-bottom: 1.5rem;
+  transition: background 0.3s, border-color 0.3s;
+}
+.feat-card:hover .feat-icon {
+  background: rgba(139,92,246,0.2);
+  border-color: rgba(139,92,246,0.4);
+  box-shadow: 0 0 20px rgba(139,92,246,0.2);
+}
+.feat-name {
+  font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 0.75rem;
+}
+.feat-desc { font-size: 0.82rem; color: var(--dim); line-height: 1.75; font-weight: 300; }
+
+/* ─── STATS ─── */
+.stats {
+  padding: 6rem 4rem;
+  max-width: 1300px; margin: 0 auto;
+}
+.stats-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px;
+}
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 3rem 2rem;
+  text-align: center;
+}
+.stat-num {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2.5rem, 4vw, 3.5rem); font-weight: 600;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--purple-bright), var(--blue));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  display: block; margin-bottom: 0.75rem;
+}
+.stat-num[data-target] { -webkit-text-fill-color: transparent; }
+.stat-label { font-size: 0.75rem; color: var(--dim); font-weight: 400; line-height: 1.5; }
+
+/* ─── TESTIMONIAL ─── */
+.testimonial {
+  padding: 8rem 4rem;
+  text-align: center; max-width: 800px; margin: 0 auto;
+}
+.quote {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem); font-weight: 300;
+  font-style: italic; line-height: 1.45;
+  color: var(--text); margin-bottom: 2.5rem;
+}
+.quote em {
+  font-style: normal;
+  background: linear-gradient(135deg, var(--purple-bright), var(--pink));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.quote-attr { font-size: 0.75rem; color: var(--dim); letter-spacing: 0.2em; text-transform: uppercase; }
+
+/* ─── CTA ─── */
+.cta {
+  padding: 8rem 4rem;
+  text-align: center; max-width: 700px; margin: 0 auto;
+}
+.cta-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2.5rem, 5vw, 4.5rem); font-weight: 900;
+  letter-spacing: -0.03em; line-height: 1.1;
+  color: var(--text); margin-bottom: 1.5rem;
+}
+.cta-title .hl {
+  background: linear-gradient(135deg, var(--purple-bright), var(--blue), var(--pink));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.cta-sub { font-size: 0.9rem; color: var(--dim); margin-bottom: 2.5rem; line-height: 1.7; }
+.cta-form {
+  display: flex; gap: 0.75rem; max-width: 480px; margin: 0 auto;
+}
+.cta-input {
+  flex: 1; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 10px;
+  padding: 0.9rem 1.2rem; color: var(--text);
+  font-family: 'Inter', sans-serif; font-size: 0.85rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.cta-input:focus { border-color: var(--purple); }
+.cta-input::placeholder { color: var(--dim); }
+.cta-submit {
+  background: linear-gradient(135deg, var(--purple), var(--blue));
+  color: white; border: none; border-radius: 10px;
+  padding: 0.9rem 1.5rem; font-size: 0.85rem; font-weight: 600;
+  cursor: none; white-space: nowrap;
+  transition: opacity 0.3s, box-shadow 0.3s;
+}
+.cta-submit:hover { opacity: 0.9; box-shadow: 0 0 25px rgba(139,92,246,0.4); }
+.cta-disclaimer { font-size: 0.7rem; color: var(--dim); margin-top: 1rem; }
+
+/* ─── FOOTER ─── */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 3rem 4rem;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.footer-logo {
+  font-family: 'Fraunces', serif; font-size: 1.1rem; font-weight: 600;
+  background: linear-gradient(135deg, var(--purple-bright), var(--blue));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.footer-links { display: flex; gap: 2rem; }
+.footer-links a { font-size: 0.72rem; color: var(--dim); text-decoration: none; transition: color 0.3s; }
+.footer-links a:hover { color: var(--text); }
+.footer-copy { font-size: 0.7rem; color: var(--dim); }
+</style>
+</head>
+<body>
+
+<canvas id="orb-canvas"></canvas>
+<div class="grain"></div>
+<div class="vignette"></div>
+<div id="cursor"></div>
+<div id="cursor-trail"></div>
+
+<div class="content">
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">Inkwell</div>
+    <ul class="nav-links">
+      <li><a href="#">Features</a></li>
+      <li><a href="#">Pricing</a></li>
+      <li><a href="#">Blog</a></li>
+      <li><a href="#">Docs</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="#" class="nav-btn-outline">Log in</a>
+      <a href="#" class="nav-btn-solid">Get started</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">✦ Powered by Claude 4</div>
+    <h1 class="hero-title">
+      <span class="static">Write </span><span class="scramble-wrap" id="scramble">faster</span><span class="static">.<br>Ship </span><span class="gradient">better content.</span>
+    </h1>
+    <p class="hero-sub">Inkwell is the AI writing assistant that learns your voice, then amplifies it. Not a replacement — a collaborator.</p>
+    <div class="hero-actions">
+      <a href="#" class="btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        Start writing free
+      </a>
+      <a href="#" class="btn-ghost">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+        Watch 2-min demo
+      </a>
+    </div>
+    <div class="hero-social-proof">
+      <div class="avatar-stack">
+        <div class="avatar"></div><div class="avatar"></div><div class="avatar"></div><div class="avatar"></div>
+      </div>
+      <span>Trusted by <strong style="color:var(--text)">12,000+</strong> writers &amp; teams</span>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <div class="feat-header" data-animate>
+      <p class="feat-eyebrow">What Inkwell Does</p>
+      <h2 class="feat-title">Every tool a writer needs.<br>Built into one place.</h2>
+    </div>
+    <div class="feat-grid">
+      <div class="feat-card" data-animate>
+        <div class="feat-icon">✍️</div>
+        <h3 class="feat-name">Voice Matching</h3>
+        <p class="feat-desc">Train Inkwell on your best work. It learns your tone, vocabulary, and style — then writes drafts that sound unmistakably like you.</p>
+      </div>
+      <div class="feat-card" data-animate>
+        <div class="feat-icon">⚡</div>
+        <h3 class="feat-name">Instant Drafts</h3>
+        <p class="feat-desc">From brief to blog post in under 60 seconds. Give Inkwell a headline and three bullet points. Watch a full draft appear.</p>
+      </div>
+      <div class="feat-card" data-animate>
+        <div class="feat-icon">🔍</div>
+        <h3 class="feat-name">SEO Intelligence</h3>
+        <p class="feat-desc">Real-time keyword analysis, readability scoring, and semantic gap detection built into every draft — no plugins required.</p>
+      </div>
+      <div class="feat-card" data-animate>
+        <div class="feat-icon">🔄</div>
+        <h3 class="feat-name">Repurpose Engine</h3>
+        <p class="feat-desc">Write once. Inkwell transforms any long-form piece into threads, LinkedIn posts, email sequences, and short-form content.</p>
+      </div>
+      <div class="feat-card" data-animate>
+        <div class="feat-icon">🤝</div>
+        <h3 class="feat-name">Team Workflows</h3>
+        <p class="feat-desc">Review, comment, and approve directly inside Inkwell. No more Google Docs ping-pong. Brand guidelines enforced automatically.</p>
+      </div>
+      <div class="feat-card" data-animate>
+        <div class="feat-icon">📊</div>
+        <h3 class="feat-name">Performance Tracking</h3>
+        <p class="feat-desc">Connect your CMS and analytics. Inkwell shows which content converts — then suggests what to write more of.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats">
+    <div class="stats-grid">
+      <div class="stat-card" data-animate>
+        <span class="stat-num" data-target="12000" id="stat-1">0</span>
+        <span class="stat-label">Active writers and<br>content teams</span>
+      </div>
+      <div class="stat-card" data-animate>
+        <span class="stat-num" data-target="340" id="stat-2">0</span>
+        <span class="stat-label">Average words per<br>minute generated</span>
+      </div>
+      <div class="stat-card" data-animate>
+        <span class="stat-num" data-target="94" id="stat-3">0</span>
+        <span class="stat-label">% user satisfaction<br>score (NPS 71)</span>
+      </div>
+      <div class="stat-card" data-animate>
+        <span class="stat-num" data-target="4" id="stat-4">0</span>
+        <span class="stat-label">Hours saved per writer<br>per week on average</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIAL -->
+  <section class="testimonial" data-animate>
+    <p class="quote">"Before Inkwell, I was spending <em>14 hours a week</em> on content. Now I spend three — and the output is better."</p>
+    <p class="quote-attr">— Maya Chen, Head of Content · Vercel</p>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" data-animate>
+    <h2 class="cta-title">Start your first <span class="hl">draft now.</span></h2>
+    <p class="cta-sub">No credit card. No onboarding call. Just open a blank page and start writing with an AI that actually understands you.</p>
+    <div class="cta-form">
+      <input class="cta-input" type="email" placeholder="your@email.com">
+      <button class="cta-submit">Get early access</button>
+    </div>
+    <p class="cta-disclaimer">Free forever plan available. Upgrade when you need more.</p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-logo">Inkwell</div>
+    <nav class="footer-links">
+      <a href="#">Features</a>
+      <a href="#">Pricing</a>
+      <a href="#">Blog</a>
+      <a href="#">Changelog</a>
+      <a href="#">Privacy</a>
+    </nav>
+    <span class="footer-copy">© 2026 Inkwell Inc.</span>
+  </footer>
+
+</div><!-- .content -->
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ─── CURSOR ───
+const cursor = document.getElementById('cursor');
+const trail = document.getElementById('cursor-trail');
+let mx = -100, my = -100, tx = -100, ty = -100;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top = my + 'px';
+});
+(function followTrail() {
+  tx += (mx - tx) * 0.11;
+  ty += (my - ty) * 0.11;
+  trail.style.left = tx + 'px';
+  trail.style.top = ty + 'px';
+  requestAnimationFrame(followTrail);
+})();
+
+// ─── ORB CANVAS ───
+const canvas = document.getElementById('orb-canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+window.addEventListener('resize', () => {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  orbs.forEach(o => { o.baseX = Math.random() * canvas.width; o.baseY = Math.random() * canvas.height; });
+});
+
+const orbs = [
+  { x: canvas.width * 0.2, y: canvas.height * 0.3, baseX: canvas.width * 0.2, baseY: canvas.height * 0.3, r: 350, speed: 0.0008, phase: 0, color: [139, 92, 246] },
+  { x: canvas.width * 0.8, y: canvas.height * 0.6, baseX: canvas.width * 0.8, baseY: canvas.height * 0.6, r: 280, speed: 0.0012, phase: Math.PI, color: [59, 130, 246] },
+  { x: canvas.width * 0.5, y: canvas.height * 0.8, baseX: canvas.width * 0.5, baseY: canvas.height * 0.8, r: 200, speed: 0.001, phase: Math.PI * 0.7, color: [236, 72, 153] },
+];
+let t = 0;
+function drawOrbs() {
+  t += 1;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  orbs.forEach(o => {
+    o.x = o.baseX + Math.sin(t * o.speed + o.phase) * 120;
+    o.y = o.baseY + Math.cos(t * o.speed * 0.7 + o.phase) * 80;
+    const grad = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
+    grad.addColorStop(0, `rgba(${o.color[0]},${o.color[1]},${o.color[2]},0.15)`);
+    grad.addColorStop(1, `rgba(${o.color[0]},${o.color[1]},${o.color[2]},0)`);
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  requestAnimationFrame(drawOrbs);
+}
+drawOrbs();
+
+// ─── TEXT SCRAMBLE ───
+const scrambleEl = document.getElementById('scramble');
+const words = ['faster', 'smarter', 'cleaner', 'louder', 'clearer', 'bolder'];
+const chars = '!<>-_\\/[]{}—=+*^?#ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+let wordIdx = 0;
+function scrambleTo(target) {
+  const len = target.length;
+  let frame = 0;
+  const maxFrames = 30;
+  const interval = setInterval(() => {
+    let out = '';
+    for (let i = 0; i < len; i++) {
+      if (frame > i * 2) { out += target[i]; }
+      else { out += chars[Math.floor(Math.random() * chars.length)]; }
+    }
+    scrambleEl.textContent = out;
+    frame++;
+    if (frame > maxFrames + len * 2) clearInterval(interval);
+  }, 40);
+}
+setInterval(() => {
+  wordIdx = (wordIdx + 1) % words.length;
+  scrambleTo(words[wordIdx]);
+}, 2500);
+
+// ─── HERO ENTRANCE ───
+gsap.from('nav', { y: -20, opacity: 0, duration: 0.8, ease: 'power2.out', delay: 0.2 });
+gsap.from('.hero-badge', { y: 20, opacity: 0, duration: 0.7, ease: 'power2.out', delay: 0.4 });
+gsap.from('.hero-title', { y: 40, opacity: 0, duration: 1, ease: 'power3.out', delay: 0.6 });
+gsap.from('.hero-sub', { y: 20, opacity: 0, duration: 0.8, ease: 'power2.out', delay: 0.8 });
+gsap.from('.hero-actions', { y: 20, opacity: 0, duration: 0.8, ease: 'power2.out', delay: 1 });
+gsap.from('.hero-social-proof', { y: 20, opacity: 0, duration: 0.8, ease: 'power2.out', delay: 1.2 });
+
+// ─── SCROLL ANIMATIONS ───
+gsap.utils.toArray('[data-animate]').forEach((el, i) => {
+  gsap.from(el, {
+    scrollTrigger: { trigger: el, start: 'top 87%', toggleActions: 'play none none none' },
+    y: 40, opacity: 0, duration: 0.8,
+    delay: (i % 3) * 0.1,
+    ease: 'power3.out'
+  });
+});
+
+// Feature cards stagger
+gsap.utils.toArray('.feat-card').forEach((card, i) => {
+  gsap.from(card, {
+    scrollTrigger: { trigger: card, start: 'top 90%', toggleActions: 'play none none none' },
+    y: 30, opacity: 0, duration: 0.7,
+    delay: (i % 3) * 0.12,
+    ease: 'power2.out'
+  });
+  // Glow follow
+  card.addEventListener('mousemove', e => {
+    const rect = card.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width * 100);
+    const y = ((e.clientY - rect.top) / rect.height * 100);
+    card.style.setProperty('--glow-x', `${x}%`);
+    card.style.setProperty('--glow-y', `${y}%`);
+  });
+});
+
+// ─── COUNTER ANIMATION ───
+function animateCounter(el, target, suffix) {
+  let start = 0;
+  const duration = 1800;
+  const startTime = performance.now();
+  function update(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    const val = Math.floor(ease * target);
+    el.textContent = val.toLocaleString() + (suffix || '');
+    if (progress < 1) requestAnimationFrame(update);
+  }
+  requestAnimationFrame(update);
+}
+
+const statsSection = document.querySelector('.stats');
+let statsDone = false;
+ScrollTrigger.create({
+  trigger: statsSection,
+  start: 'top 80%',
+  onEnter: () => {
+    if (statsDone) return;
+    statsDone = true;
+    animateCounter(document.getElementById('stat-1'), 12000, '+');
+    animateCounter(document.getElementById('stat-2'), 340, '');
+    animateCounter(document.getElementById('stat-3'), 94, '%');
+    animateCounter(document.getElementById('stat-4'), 4, 'x');
+  }
+});
+</script>
+</body>
+</html>

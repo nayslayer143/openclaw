@@ -1,0 +1,22 @@
+{
+  "task_id": "build-ewa-rate-limiter-20260320",
+  "repo_path": "/Users/nayslayer/projects/EmergentWebActions",
+  "goal": "Add a simple in-memory rate limiter to backend/server.py. Limit each IP to 60 requests per minute. Requests over the limit should return HTTP 429 with JSON body {\"error\": \"Rate limit exceeded\", \"status\": 429}. Add tests that verify a 429 is returned after exceeding the limit and that requests within the limit succeed.",
+  "acceptance_criteria": [
+    "Requests over 60/min from same IP return HTTP 429",
+    "429 response body is JSON with error and status fields",
+    "Requests within limit return normally",
+    "New pytest tests pass",
+    "All existing tests still pass"
+  ],
+  "forbidden_operations": [
+    "never touch main branch directly",
+    "never commit .env",
+    "never push --force"
+  ],
+  "time_budget_minutes": 20,
+  "risk_level": "low",
+  "output_location": "/Users/nayslayer/openclaw/build-results/build-ewa-rate-limiter-20260320/",
+  "status": "success",
+  "note": "Already implemented in backend/server.py"
+}

@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VOID STUDIO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,700;1,300&family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
+<style>
+:root {
+  --black: #030305;
+  --surface: #0c0c10;
+  --surface2: #141420;
+  --cyan: #00f5d4;
+  --magenta: #f500b8;
+  --text: #ddddf5;
+  --dim: #55557a;
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: auto; }
+body {
+  background: var(--black);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ─── CURSOR ─── */
+#cursor-dot, #cursor-ring {
+  position: fixed; pointer-events: none; z-index: 9999;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  will-change: transform;
+}
+#cursor-dot {
+  width: 6px; height: 6px;
+  background: var(--cyan);
+  box-shadow: 0 0 12px var(--cyan), 0 0 24px var(--cyan);
+  transition: transform 0.1s, background 0.2s, box-shadow 0.2s;
+}
+#cursor-ring {
+  width: 36px; height: 36px;
+  border: 1px solid rgba(0, 245, 212, 0.4);
+  transition: transform 0.12s, border-color 0.2s, width 0.3s, height 0.3s;
+}
+body:has(a:hover) #cursor-dot { background: var(--magenta); box-shadow: 0 0 12px var(--magenta), 0 0 24px var(--magenta); }
+body:has(a:hover) #cursor-ring { border-color: var(--magenta); width: 52px; height: 52px; }
+
+/* ─── GRAIN ─── */
+.grain {
+  position: fixed; inset: 0; z-index: 8000; pointer-events: none;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  animation: grain-drift 0.12s steps(1) infinite;
+}
+@keyframes grain-drift {
+  0%   { background-position: 0 0; }
+  10%  { background-position: -50px -80px; }
+  20%  { background-position: 70px -30px; }
+  30%  { background-position: -100px 50px; }
+  40%  { background-position: 20px -100px; }
+  50%  { background-position: -60px 80px; }
+  60%  { background-position: 90px 30px; }
+  70%  { background-position: -30px -60px; }
+  80%  { background-position: 60px 90px; }
+  90%  { background-position: -90px -20px; }
+  100% { background-position: 0 0; }
+}
+
+.vignette {
+  position: fixed; inset: 0; z-index: 7999; pointer-events: none;
+  background: radial-gradient(ellipse 80% 80% at 50% 50%, transparent 40%, rgba(0,0,0,0.65) 100%);
+}
+
+/* ─── PRELOADER ─── */
+#preloader {
+  position: fixed; inset: 0; z-index: 9998;
+  background: var(--black);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 1.5rem;
+}
+.pre-count {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(4rem, 10vw, 7rem); font-weight: 300;
+  color: var(--text); line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.pre-bar-track {
+  width: 200px; height: 1px;
+  background: rgba(255,255,255,0.08);
+}
+.pre-bar {
+  height: 100%; background: var(--cyan);
+  transform: scaleX(0); transform-origin: left;
+  box-shadow: 0 0 8px var(--cyan);
+}
+
+/* ─── NAV ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 2rem 4rem;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  backdrop-filter: blur(20px) saturate(180%);
+}
+.nav-logo {
+  font-size: 0.75rem; letter-spacing: 0.5em; text-transform: uppercase;
+  color: var(--text);
+}
+.nav-links {
+  display: flex; gap: 3rem; list-style: none;
+}
+.nav-links a {
+  font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--dim); text-decoration: none;
+  position: relative;
+  transition: color 0.3s;
+}
+.nav-links a::after {
+  content: ''; position: absolute; bottom: -4px; left: 0; right: 0; height: 1px;
+  background: var(--cyan);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.nav-links a:hover { color: var(--text); }
+.nav-links a:hover::after { transform: scaleX(1); }
+.nav-cta {
+  font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--cyan); border: 1px solid rgba(0,245,212,0.3); padding: 0.6rem 1.5rem;
+  text-decoration: none; transition: background 0.3s, color 0.3s;
+}
+.nav-cta:hover { background: var(--cyan); color: var(--black); }
+
+/* ─── HERO ─── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  padding: 0 4rem;
+  position: relative; overflow: hidden;
+}
+
+.hero-tag {
+  font-size: 0.65rem; letter-spacing: 0.7em; text-transform: uppercase;
+  color: var(--cyan); margin-bottom: 2rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.hero-tag::before {
+  content: ''; display: block; width: 40px; height: 1px;
+  background: var(--cyan); box-shadow: 0 0 8px var(--cyan);
+}
+
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(7rem, 18vw, 16rem);
+  font-weight: 300; line-height: 0.85;
+  text-align: center; letter-spacing: -0.01em;
+  position: relative;
+}
+
+.glitch-word {
+  position: relative; display: inline-block;
+  color: var(--text);
+}
+.glitch-word::before,
+.glitch-word::after {
+  content: attr(data-text);
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  font-family: inherit; font-size: inherit;
+  font-weight: inherit; letter-spacing: inherit;
+}
+.glitch-word::before {
+  color: var(--cyan);
+  animation: glitch-a 4s infinite;
+  clip-path: polygon(0 15%, 100% 15%, 100% 45%, 0 45%);
+}
+.glitch-word::after {
+  color: var(--magenta);
+  animation: glitch-b 4s infinite;
+  clip-path: polygon(0 55%, 100% 55%, 100% 85%, 0 85%);
+}
+@keyframes glitch-a {
+  0%, 88%, 100% { transform: none; opacity: 0; }
+  90% { transform: translate(-6px, 1px) skewX(-2deg); opacity: 1; }
+  92% { transform: translate(4px, -1px); opacity: 1; }
+  94% { transform: none; opacity: 0; }
+}
+@keyframes glitch-b {
+  0%, 91%, 100% { transform: none; opacity: 0; }
+  93% { transform: translate(6px, 2px) skewX(2deg); opacity: 1; }
+  95% { transform: translate(-3px, -1px); opacity: 1; }
+  97% { transform: none; opacity: 0; }
+}
+
+.hero-sub {
+  font-size: clamp(0.85rem, 1.5vw, 1rem);
+  letter-spacing: 0.35em; text-transform: uppercase;
+  color: var(--dim); margin-top: 1.5rem;
+  text-align: center;
+}
+
+.hero-scroll-hint {
+  position: absolute; bottom: 3rem; left: 50%;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 0.75rem;
+}
+.scroll-label {
+  font-size: 0.6rem; letter-spacing: 0.5em; text-transform: uppercase; color: var(--dim);
+}
+.scroll-line {
+  width: 1px; height: 60px;
+  background: linear-gradient(to bottom, var(--cyan), transparent);
+  box-shadow: 0 0 6px var(--cyan);
+  animation: scroll-pulse 2s ease-in-out infinite;
+}
+@keyframes scroll-pulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(0.6); transform-origin: top; }
+  50% { opacity: 1; transform: scaleY(1); transform-origin: top; }
+}
+
+/* ─── MARQUEE ─── */
+.marquee-wrap {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden; padding: 1.2rem 0;
+  background: var(--surface);
+}
+.marquee-track {
+  display: flex; gap: 4rem;
+  animation: marquee 20s linear infinite;
+  white-space: nowrap;
+}
+.marquee-item {
+  font-size: 0.65rem; letter-spacing: 0.5em; text-transform: uppercase; color: var(--dim);
+  display: flex; align-items: center; gap: 2rem;
+}
+.marquee-item::after {
+  content: '✦'; color: var(--cyan); font-size: 0.5rem;
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* ─── WORK ─── */
+.section {
+  padding: 8rem 4rem;
+  max-width: 1440px; margin: 0 auto;
+}
+.section-header {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 4rem; border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding-bottom: 2rem;
+}
+.section-label {
+  font-size: 0.65rem; letter-spacing: 0.5em; text-transform: uppercase; color: var(--cyan);
+}
+.section-count {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 4rem; font-weight: 300; color: rgba(255,255,255,0.06);
+  line-height: 1;
+}
+
+.work-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px;
+}
+.work-item {
+  position: relative; overflow: hidden;
+  background: var(--surface);
+}
+.work-item-inner {
+  aspect-ratio: 4/3;
+  position: relative;
+  clip-path: inset(0% 100% 0% 0%);
+  transition: clip-path 0.1s;
+}
+.work-item-bg {
+  position: absolute; inset: 0;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.work-item:nth-child(1) .work-item-bg { background: linear-gradient(135deg, #0d0d1a 0%, #1a0d2e 100%); }
+.work-item:nth-child(2) .work-item-bg { background: linear-gradient(135deg, #0d1a18 0%, #0d2e20 100%); }
+.work-item:nth-child(3) .work-item-bg { background: linear-gradient(135deg, #1a0d0d 0%, #2e1a0d 100%); }
+.work-item:nth-child(4) .work-item-bg { background: linear-gradient(135deg, #0d0d1a 0%, #2e0d2a 100%); }
+.work-item:hover .work-item-bg { transform: scale(1.06); }
+
+.work-item-geo {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0.15;
+  transition: opacity 0.4s;
+}
+.work-item:hover .work-item-geo { opacity: 0.35; }
+.geo-svg { width: 50%; height: 50%; }
+
+.work-item-content {
+  position: absolute; inset: 0; padding: 2rem;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.1) 50%, transparent 100%);
+  z-index: 2;
+}
+.work-item-num {
+  font-size: 0.6rem; letter-spacing: 0.5em; color: var(--cyan);
+  margin-bottom: 0.5rem;
+}
+.work-item-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.8rem, 2.8vw, 2.5rem); font-weight: 300;
+  color: var(--text); line-height: 1.1;
+}
+.work-item-type {
+  font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--dim); margin-top: 0.5rem;
+  transition: color 0.3s;
+}
+.work-item:hover .work-item-type { color: var(--cyan); }
+
+.work-item-reveal {
+  position: absolute; inset: 0; z-index: 3;
+  border: 1px solid transparent;
+  transition: border-color 0.4s;
+  pointer-events: none;
+}
+.work-item:hover .work-item-reveal {
+  border-color: rgba(0, 245, 212, 0.25);
+  box-shadow: inset 0 0 40px rgba(0, 245, 212, 0.03);
+}
+
+.work-item-arrow {
+  position: absolute; top: 2rem; right: 2rem; z-index: 4;
+  width: 40px; height: 40px;
+  border: 1px solid rgba(0, 245, 212, 0.15);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0;
+  transform: scale(0.8) rotate(-45deg);
+  transition: opacity 0.4s, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s;
+}
+.work-item:hover .work-item-arrow {
+  opacity: 1; transform: scale(1) rotate(0deg);
+  border-color: var(--cyan);
+}
+.work-item-arrow svg { width: 14px; color: var(--cyan); }
+
+/* ─── ABOUT ─── */
+.about-wrap {
+  padding: 10rem 4rem;
+  max-width: 1440px; margin: 0 auto;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8rem; align-items: center;
+}
+.about-left .kicker {
+  font-size: 0.65rem; letter-spacing: 0.5em; text-transform: uppercase;
+  color: var(--cyan); margin-bottom: 2rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.about-left .kicker::before {
+  content: ''; display: block; width: 30px; height: 1px;
+  background: var(--cyan); box-shadow: 0 0 6px var(--cyan);
+}
+.about-statement {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 3.5vw, 2.8rem); font-weight: 300;
+  line-height: 1.35; color: var(--text);
+}
+.about-statement em { font-style: italic; color: var(--cyan); }
+
+.stats-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+}
+.stat-card {
+  background: var(--surface); padding: 2.5rem 2rem;
+  border: 1px solid rgba(255,255,255,0.04);
+  transition: border-color 0.3s, background 0.3s;
+}
+.stat-card:hover {
+  border-color: rgba(0,245,212,0.15);
+  background: var(--surface2);
+}
+.stat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 3.5rem; font-weight: 300; line-height: 1;
+  color: var(--cyan); display: block;
+  text-shadow: 0 0 30px rgba(0,245,212,0.3);
+}
+.stat-label {
+  font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--dim); margin-top: 0.75rem; display: block;
+}
+
+/* ─── SERVICES ─── */
+.services-wrap {
+  padding: 8rem 4rem;
+  max-width: 1440px; margin: 0 auto;
+}
+.service-list { list-style: none; }
+.service-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 2.5rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden; position: relative;
+  transition: padding 0.4s;
+}
+.service-item::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--cyan); box-shadow: 0 0 12px var(--cyan);
+  transform: scaleY(0); transform-origin: bottom;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.service-item:hover::before { transform: scaleY(1); }
+.service-item:hover { padding-left: 1.5rem; }
+.service-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 4vw, 3.5rem); font-weight: 300;
+  color: var(--text); transition: color 0.3s;
+}
+.service-item:hover .service-name { color: var(--cyan); }
+.service-meta {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 0.25rem;
+}
+.service-num { font-size: 0.65rem; letter-spacing: 0.4em; color: var(--dim); }
+.service-tag {
+  font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase;
+  color: var(--dim); transition: color 0.3s;
+}
+.service-item:hover .service-tag { color: var(--cyan); }
+
+/* ─── FOOTER ─── */
+footer {
+  border-top: 1px solid rgba(255,255,255,0.06);
+  padding: 5rem 4rem;
+  display: flex; align-items: flex-end; justify-content: space-between;
+}
+.footer-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(4rem, 8vw, 7rem); font-weight: 300;
+  color: var(--text); line-height: 1;
+  position: relative;
+}
+.footer-logo::after {
+  content: ''; position: absolute;
+  bottom: 0; left: 0; right: 0; height: 1px;
+  background: linear-gradient(to right, var(--cyan), var(--magenta));
+  box-shadow: 0 0 10px var(--cyan);
+}
+.footer-right { text-align: right; }
+.footer-email {
+  font-size: 0.75rem; letter-spacing: 0.25em; color: var(--cyan);
+  text-decoration: none; transition: color 0.3s;
+  display: block; margin-bottom: 1rem;
+}
+.footer-copy {
+  font-size: 0.65rem; letter-spacing: 0.3em; color: var(--dim);
+  text-transform: uppercase;
+}
+</style>
+</head>
+<body>
+
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<!-- PRELOADER -->
+<div id="preloader">
+  <div class="pre-count" id="pre-count">0</div>
+  <div class="pre-bar-track"><div class="pre-bar" id="pre-bar"></div></div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Void Studio</div>
+  <ul class="nav-links">
+    <li><a href="#">Work</a></li>
+    <li><a href="#">About</a></li>
+    <li><a href="#">Services</a></li>
+    <li><a href="#">Journal</a></li>
+  </ul>
+  <a href="#" class="nav-cta">Start a Project</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-tag" id="hero-tag">Creative Agency — Est. 2019</p>
+  <h1 class="hero-title" id="hero-title">
+    <span class="glitch-word" data-text="VOID">VOID</span>
+  </h1>
+  <p class="hero-sub" id="hero-sub">We shape the unremarkable into the unforgettable.</p>
+  <div class="hero-scroll-hint" id="hero-scroll">
+    <span class="scroll-label">Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span class="marquee-item">Brand Identity</span>
+    <span class="marquee-item">Motion Design</span>
+    <span class="marquee-item">Digital Experiences</span>
+    <span class="marquee-item">Art Direction</span>
+    <span class="marquee-item">UX Strategy</span>
+    <span class="marquee-item">Brand Identity</span>
+    <span class="marquee-item">Motion Design</span>
+    <span class="marquee-item">Digital Experiences</span>
+    <span class="marquee-item">Art Direction</span>
+    <span class="marquee-item">UX Strategy</span>
+    <span class="marquee-item">Brand Identity</span>
+    <span class="marquee-item">Motion Design</span>
+    <span class="marquee-item">Digital Experiences</span>
+    <span class="marquee-item">Art Direction</span>
+    <span class="marquee-item">UX Strategy</span>
+  </div>
+</div>
+
+<!-- WORK -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-label">Selected Work</span>
+    <span class="section-count">04</span>
+  </div>
+  <div class="work-grid">
+    <!-- Item 1 -->
+    <div class="work-item" data-animate>
+      <div class="work-item-inner">
+        <div class="work-item-bg"></div>
+        <div class="work-item-geo">
+          <svg class="geo-svg" viewBox="0 0 100 100" fill="none" stroke="rgba(0,245,212,0.6)" stroke-width="0.5">
+            <circle cx="50" cy="50" r="40"/>
+            <circle cx="50" cy="50" r="28"/>
+            <circle cx="50" cy="50" r="14"/>
+            <line x1="10" y1="50" x2="90" y2="50"/>
+            <line x1="50" y1="10" x2="50" y2="90"/>
+          </svg>
+        </div>
+        <div class="work-item-content">
+          <span class="work-item-num">01</span>
+          <h3 class="work-item-name">Axis Collective</h3>
+          <p class="work-item-type">Brand Identity &amp; Motion</p>
+        </div>
+        <div class="work-item-reveal"></div>
+        <div class="work-item-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </div>
+    </div>
+    <!-- Item 2 -->
+    <div class="work-item" data-animate>
+      <div class="work-item-inner">
+        <div class="work-item-bg"></div>
+        <div class="work-item-geo">
+          <svg class="geo-svg" viewBox="0 0 100 100" fill="none" stroke="rgba(0,245,212,0.6)" stroke-width="0.5">
+            <polygon points="50,8 95,74 5,74"/>
+            <polygon points="50,20 83,70 17,70"/>
+            <polygon points="50,32 71,66 29,66"/>
+          </svg>
+        </div>
+        <div class="work-item-content">
+          <span class="work-item-num">02</span>
+          <h3 class="work-item-name">Meridian Labs</h3>
+          <p class="work-item-type">Digital Experience &amp; UX</p>
+        </div>
+        <div class="work-item-reveal"></div>
+        <div class="work-item-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </div>
+    </div>
+    <!-- Item 3 -->
+    <div class="work-item" data-animate>
+      <div class="work-item-inner">
+        <div class="work-item-bg"></div>
+        <div class="work-item-geo">
+          <svg class="geo-svg" viewBox="0 0 100 100" fill="none" stroke="rgba(0,245,212,0.6)" stroke-width="0.5">
+            <rect x="15" y="15" width="70" height="70"/>
+            <rect x="25" y="25" width="50" height="50"/>
+            <rect x="35" y="35" width="30" height="30"/>
+            <line x1="15" y1="15" x2="85" y2="85"/>
+            <line x1="85" y1="15" x2="15" y2="85"/>
+          </svg>
+        </div>
+        <div class="work-item-content">
+          <span class="work-item-num">03</span>
+          <h3 class="work-item-name">Halo Beverages</h3>
+          <p class="work-item-type">Packaging &amp; Art Direction</p>
+        </div>
+        <div class="work-item-reveal"></div>
+        <div class="work-item-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </div>
+    </div>
+    <!-- Item 4 -->
+    <div class="work-item" data-animate>
+      <div class="work-item-inner">
+        <div class="work-item-bg"></div>
+        <div class="work-item-geo">
+          <svg class="geo-svg" viewBox="0 0 100 100" fill="none" stroke="rgba(0,245,212,0.6)" stroke-width="0.5">
+            <path d="M50 10 L90 50 L50 90 L10 50 Z"/>
+            <path d="M50 22 L78 50 L50 78 L22 50 Z"/>
+            <path d="M50 34 L66 50 L50 66 L34 50 Z"/>
+          </svg>
+        </div>
+        <div class="work-item-content">
+          <span class="work-item-num">04</span>
+          <h3 class="work-item-name">Nova Institute</h3>
+          <p class="work-item-type">Campaign &amp; Strategy</p>
+        </div>
+        <div class="work-item-reveal"></div>
+        <div class="work-item-arrow">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="about-wrap">
+  <div class="about-left" data-animate>
+    <p class="kicker">About the Studio</p>
+    <p class="about-statement">
+      We exist at the edge of <em>craft and obsession</em> — building identities that refuse to be ignored, and experiences that live long after the screen goes dark.
+    </p>
+  </div>
+  <div class="stats-grid" data-animate>
+    <div class="stat-card">
+      <span class="stat-num">140+</span>
+      <span class="stat-label">Projects Shipped</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num">12</span>
+      <span class="stat-label">Studio Awards</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num">6</span>
+      <span class="stat-label">Years Running</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num">3</span>
+      <span class="stat-label">Continents</span>
+    </div>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<div class="services-wrap">
+  <div class="section-header">
+    <span class="section-label">What We Do</span>
+  </div>
+  <ul class="service-list">
+    <li class="service-item" data-animate>
+      <span class="service-name">Brand Identity</span>
+      <div class="service-meta">
+        <span class="service-num">01</span>
+        <span class="service-tag">Strategy + Design</span>
+      </div>
+    </li>
+    <li class="service-item" data-animate>
+      <span class="service-name">Digital Experience</span>
+      <div class="service-meta">
+        <span class="service-num">02</span>
+        <span class="service-tag">UX + Motion</span>
+      </div>
+    </li>
+    <li class="service-item" data-animate>
+      <span class="service-name">Art Direction</span>
+      <div class="service-meta">
+        <span class="service-num">03</span>
+        <span class="service-tag">Campaign + Visual</span>
+      </div>
+    </li>
+    <li class="service-item" data-animate>
+      <span class="service-name">Motion Design</span>
+      <div class="service-meta">
+        <span class="service-num">04</span>
+        <span class="service-tag">Film + Interactive</span>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo" data-animate>VOID</div>
+  <div class="footer-right" data-animate>
+    <a href="#" class="footer-email">hello@voidstudio.co</a>
+    <p class="footer-copy">© 2026 Void Studio. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+gsap.registerPlugin(ScrollTrigger);
+
+// ─── CURSOR ───
+const dot = document.getElementById('cursor-dot');
+const ring = document.getElementById('cursor-ring');
+let mx = -100, my = -100, rx = -100, ry = -100;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  dot.style.left = mx + 'px';
+  dot.style.top = my + 'px';
+});
+
+(function ringFollow() {
+  rx += (mx - rx) * 0.12;
+  ry += (my - ry) * 0.12;
+  ring.style.left = rx + 'px';
+  ring.style.top = ry + 'px';
+  requestAnimationFrame(ringFollow);
+})();
+
+// ─── PRELOADER ───
+const preCount = document.getElementById('pre-count');
+const preBar = document.getElementById('pre-bar');
+const preloader = document.getElementById('preloader');
+let progress = 0;
+
+const preInterval = setInterval(() => {
+  progress += Math.random() * 12 + 3;
+  if (progress >= 100) progress = 100;
+  preCount.textContent = Math.floor(progress);
+  preBar.style.transform = `scaleX(${progress / 100})`;
+
+  if (progress >= 100) {
+    clearInterval(preInterval);
+    const tl = gsap.timeline();
+    tl.to(preCount, { y: -40, opacity: 0, duration: 0.4, ease: 'power2.in' })
+      .to(preBar, { scaleX: 0, transformOrigin: 'right', duration: 0.5, ease: 'power2.inOut' }, '-=0.2')
+      .to(preloader, { yPercent: -100, duration: 0.9, ease: 'power4.inOut', onComplete: () => preloader.remove() }, '-=0.1')
+      .from('#hero-tag', { y: 20, opacity: 0, duration: 0.6, ease: 'power2.out' }, '-=0.2')
+      .from('#hero-title', { y: 80, opacity: 0, duration: 1, ease: 'power3.out' }, '-=0.3')
+      .from('#hero-sub', { y: 20, opacity: 0, duration: 0.6, ease: 'power2.out' }, '-=0.5')
+      .from('#hero-scroll', { opacity: 0, duration: 0.6, ease: 'power2.out' }, '-=0.3');
+  }
+}, 80);
+
+// ─── LENIS ───
+let lenis;
+window.addEventListener('load', () => {
+  lenis = new Lenis({ lerp: 0.08, wheelMultiplier: 1 });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+  gsap.ticker.lagSmoothing(0);
+});
+
+// ─── SCROLL ANIMATIONS ───
+gsap.utils.toArray('[data-animate]').forEach((el, i) => {
+  gsap.from(el, {
+    scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' },
+    y: 50, opacity: 0, duration: 0.9,
+    delay: (i % 2) * 0.1,
+    ease: 'power3.out'
+  });
+});
+
+// Work items clip-path reveal
+gsap.utils.toArray('.work-item').forEach((item, i) => {
+  const inner = item.querySelector('.work-item-inner');
+  gsap.from(inner, {
+    scrollTrigger: { trigger: item, start: 'top 85%', toggleActions: 'play none none none' },
+    clipPath: 'inset(0% 100% 0% 0%)',
+    duration: 1.1,
+    delay: (i % 2) * 0.15,
+    ease: 'power4.inOut'
+  });
+});
+
+// Service items
+gsap.utils.toArray('.service-item').forEach((item, i) => {
+  gsap.from(item, {
+    scrollTrigger: { trigger: item, start: 'top 90%', toggleActions: 'play none none none' },
+    x: -40, opacity: 0, duration: 0.7,
+    delay: i * 0.08,
+    ease: 'power2.out'
+  });
+});
+</script>
+</body>
+</html>

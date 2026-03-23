@@ -4,7 +4,7 @@
     "schema_version": "1.0",
     "max_entries": 200,
     "max_age_days": 90,
-    "last_trimmed": "2026-03-22",
+    "last_trimmed": "2026-03-23",
     "inject_script": "agents/tools/design-inject.py"
   },
   "entries": [
@@ -13,13 +13,403 @@
       "name": "SHINY.NEW — Omega MegaCorp",
       "discovered": "2026-03-22",
       "source": "internal",
-      "what_makes_it_special": "Pure state machine replaces scroll — 8 scenes fire on timer, forcing forward-only pacing the user cannot skip. Conic-gradient rotated via @property CSS custom property because GSAP cannot tween gradient strings directly.",
-      "techniques": ["gsap", "state-machine", "conic-gradient", "css-custom-property", "canvas-2d", "mix-blend-mode", "rgb-split", "css-keyframes-orbit"],
-      "aesthetic_tags": ["corporate-surreal", "void", "brutalist", "typographic", "glitch", "neon"],
+      "what_makes_it_special": "Pure state machine replaces scroll — 8 scenes fire on timer, forcing forward-only pacing. Conic-gradient rotated via @property CSS custom property because GSAP cannot tween gradient strings directly.",
+      "techniques": [
+        "gsap",
+        "state-machine",
+        "conic-gradient",
+        "css-custom-property",
+        "canvas-2d",
+        "mix-blend-mode",
+        "rgb-split",
+        "css-keyframes-orbit"
+      ],
+      "aesthetic_tags": [
+        "corporate-surreal",
+        "void",
+        "brutalist",
+        "typographic",
+        "glitch",
+        "neon"
+      ],
       "intensity": 8,
-      "applicable_to": ["experience", "landing", "product"],
-      "the_unexpected": "The artifact reveal is decided silently on §3 submit — all of §4 through §6 is pure theater for a decision already made.",
+      "applicable_to": [
+        "experience",
+        "landing",
+        "product"
+      ],
+      "the_unexpected": "The artifact reveal is decided silently on §3 submit — all of §4-§6 is pure theater for a decision already made.",
       "brief_injection": "Make the system's decision feel like fate — compute the outcome first, then stage the theater of it arriving."
+    },
+    {
+      "url": "https://lusion.co",
+      "name": "Lusion",
+      "discovered": "2026-03-22",
+      "source": "awwwards",
+      "what_makes_it_special": "WebGL/Three.js 3D environments respond to scroll with morphing scenes — 3D content is structural, not decorative. Scroll triggers geometry deformation, not just parallax.",
+      "techniques": [
+        "webgl",
+        "three-js",
+        "scroll-scrub",
+        "geometry-deformation",
+        "gsap"
+      ],
+      "aesthetic_tags": [
+        "cinematic",
+        "immersive",
+        "dark",
+        "3d",
+        "minimal"
+      ],
+      "intensity": 9,
+      "applicable_to": [
+        "portfolio",
+        "studio",
+        "experience"
+      ],
+      "the_unexpected": "3D scenes morph as you scroll as if the geometry is alive — not pre-rendered video, real-time WebGL that responds to your exact scroll position.",
+      "brief_injection": "Make 3D content respond to user input like a physical object — deform it, don't just move it."
+    },
+    {
+      "url": "https://activetheory.net",
+      "name": "Active Theory",
+      "discovered": "2026-03-22",
+      "source": "awwwards",
+      "what_makes_it_special": "Case studies presented like film trailers — scroll-triggered theatrical reveals build anticipation before showing any content. Navigation is choreography, not wayfinding.",
+      "techniques": [
+        "webgl",
+        "gsap",
+        "scroll-trigger",
+        "theatrical-reveals",
+        "custom-cursor"
+      ],
+      "aesthetic_tags": [
+        "cinematic",
+        "editorial",
+        "dark",
+        "immersive",
+        "typographic"
+      ],
+      "intensity": 9,
+      "applicable_to": [
+        "portfolio",
+        "agency",
+        "experience",
+        "landing"
+      ],
+      "the_unexpected": "The case study page loads with 4 seconds of pure atmosphere before showing a single piece of work — the anticipation is the product.",
+      "brief_injection": "Build anticipation before revealing content — 3-4 seconds of atmosphere before the product appears makes the reveal feel earned."
+    },
+    {
+      "url": "https://uncommonstudio.com.au",
+      "name": "Uncommon Studio",
+      "discovered": "2026-03-22",
+      "source": "godly",
+      "what_makes_it_special": "Animation timing creates a rhythm that guides viewer attention — staggered grid reveals with precisely calibrated delays make the page feel like it breathes rather than loads.",
+      "techniques": [
+        "gsap",
+        "stagger",
+        "grid-animation",
+        "scroll-reveal",
+        "smooth-scroll"
+      ],
+      "aesthetic_tags": [
+        "editorial",
+        "minimal",
+        "typographic",
+        "breathing"
+      ],
+      "intensity": 7,
+      "applicable_to": [
+        "studio",
+        "portfolio",
+        "editorial"
+      ],
+      "the_unexpected": "The page feels like it has a heartbeat — each element arrives at a tempo that feels musical, not mechanical.",
+      "brief_injection": "Calibrate animation stagger so the page has a tempo — elements should arrive like a melody, not a dump."
+    },
+    {
+      "url": "https://www.epic.net/en/",
+      "name": "Epic",
+      "discovered": "2026-03-22",
+      "source": "godly",
+      "what_makes_it_special": "Typography morphs and shifts as you scroll — letter-spacing, size, and weight are scroll-driven variables, not static properties. The type IS the animation.",
+      "techniques": [
+        "variable-fonts",
+        "scroll-scrub",
+        "gsap",
+        "kinetic-type",
+        "stagger"
+      ],
+      "aesthetic_tags": [
+        "typographic",
+        "editorial",
+        "kinetic",
+        "bold",
+        "experimental"
+      ],
+      "intensity": 8,
+      "applicable_to": [
+        "editorial",
+        "landing",
+        "portfolio",
+        "experience"
+      ],
+      "the_unexpected": "Font weight and letter-spacing change continuously as you scroll — the same text reads differently at different scroll positions, creating meaning through form.",
+      "brief_injection": "Use variable fonts with scroll-driven axes so the typography itself is the primary animation — weight, width, and spacing as motion design."
+    },
+    {
+      "url": "https://www.bdsn.club/",
+      "name": "BDSN Club",
+      "discovered": "2026-03-22",
+      "source": "godly",
+      "what_makes_it_special": "Generative art responds to cursor position in real-time — the entire canvas recomputes based on where your mouse is, not just on hover states.",
+      "techniques": [
+        "canvas-2d",
+        "generative-art",
+        "cursor-reactive",
+        "perlin-noise",
+        "mix-blend-mode"
+      ],
+      "aesthetic_tags": [
+        "generative",
+        "experimental",
+        "dark",
+        "organic",
+        "neon"
+      ],
+      "intensity": 9,
+      "applicable_to": [
+        "experience",
+        "portfolio",
+        "creative"
+      ],
+      "the_unexpected": "The entire background is a different generative system every time you visit — it seeds from the current timestamp, so no two sessions look the same.",
+      "brief_injection": "Let the cursor be a brush — the user's mouse position should continuously alter the visual environment, not just trigger hover states."
+    },
+    {
+      "url": "https://kris.cool",
+      "name": "Stuff by Kris Temmerman",
+      "discovered": "2026-03-22",
+      "source": "awwwards",
+      "what_makes_it_special": "Portfolio is also a game — WebGL + GSAP used to create interactive experiments that ARE the portfolio pieces, not images of them. Winner of SOTD March 2026.",
+      "techniques": [
+        "webgl",
+        "gsap",
+        "game-mechanics",
+        "interactive-experiments",
+        "canvas"
+      ],
+      "aesthetic_tags": [
+        "playful",
+        "experimental",
+        "interactive",
+        "game-like",
+        "creative-coding"
+      ],
+      "intensity": 10,
+      "applicable_to": [
+        "portfolio",
+        "experience",
+        "creative"
+      ],
+      "the_unexpected": "You can play the portfolio — each case study is interactive. The navigation itself is a mini-game. This turns browsing into doing.",
+      "brief_injection": "Make the interface a toy — if users can play with it rather than read it, they will stay 10x longer and remember 10x more."
+    },
+    {
+      "url": "https://unseen.co",
+      "name": "Unseen Studio",
+      "discovered": "2026-03-22",
+      "source": "siteinspire",
+      "what_makes_it_special": "Full-screen navigation reveal on hover — instead of a dropdown, the entire viewport transforms into the nav. Navigation as spatial transition, not UI element.",
+      "techniques": [
+        "full-screen-nav",
+        "gsap",
+        "hover-reveal",
+        "clip-path",
+        "smooth-transition"
+      ],
+      "aesthetic_tags": [
+        "editorial",
+        "minimal",
+        "dark",
+        "typographic",
+        "spatial"
+      ],
+      "intensity": 7,
+      "applicable_to": [
+        "studio",
+        "portfolio",
+        "editorial"
+      ],
+      "the_unexpected": "Hovering the menu trigger causes the entire page to transform — not a dropdown, a full viewport takeover that you navigate through.",
+      "brief_injection": "Navigation can be a spatial transition, not a UI dropdown — let the menu take over the whole viewport and become the environment."
+    },
+    {
+      "url": "https://www.utopiatokyo.com/",
+      "name": "Utopia Tokyo",
+      "discovered": "2026-03-23",
+      "source": "cssawards",
+      "what_makes_it_special": "Surveillance-themed cyberpunk experience using CSS clip-path polygons for angular deconstructed hero frames, a three-layer glitch text system built entirely in CSS (no JS canvas) using staggered clip-path polygon animations with RGB drop-shadow color shifting, and an SVG radar visualization with animated stroke-dasharray. The entire glitch system is accessible and reduced-motion compliant.",
+      "techniques": [
+        "clip-path-polygon",
+        "css-only-glitch",
+        "rgb-drop-shadow-shift",
+        "svg-stroke-dasharray",
+        "css-custom-property-theming",
+        "data-attribute-cascade",
+        "character-scramble",
+        "scanline-noise-keyframes",
+        "contain-layout-paint"
+      ],
+      "aesthetic_tags": [
+        "cyberpunk",
+        "dystopian",
+        "surveillance",
+        "japanese",
+        "dark-editorial",
+        "high-contrast"
+      ],
+      "intensity": 9,
+      "applicable_to": [
+        "experience",
+        "editorial",
+        "landing"
+      ],
+      "the_unexpected": "The entire glitch system — scanlines, noise, RGB text split, character scramble — is implemented in pure CSS with zero canvas or WebGL, making it fully accessible and reduced-motion compliant.",
+      "brief_injection": "Build the hero section using clip-path polygons to fracture the frame into angular shards, layer CSS keyframe scanline and noise animations over a dark base, and trigger full-palette theme flips via data-attribute cascades through custom properties on hover."
+    },
+    {
+      "url": "https://www.sanrita.ca",
+      "name": "San Rita",
+      "discovered": "2026-03-23",
+      "source": "fwa",
+      "what_makes_it_special": "The entire site is structured as an interactive topographical map — navigation is spatial, not hierarchical. Sections are labeled as trails, fishing spots, and viewpoints. The loader sequence stages progressive UI revelation as terrain terraforming: 'Atmosphere deployment → Geosystem creation.' Built on Next.js with Lenis smooth scroll.",
+      "techniques": [
+        "spatial-map-navigation",
+        "lenis-smooth-scroll",
+        "raf-loading-sequence",
+        "staged-state-progression",
+        "topographic-metaphor",
+        "embedded-video-hotspots",
+        "dato-cms"
+      ],
+      "aesthetic_tags": [
+        "nature-metaphor",
+        "topographic",
+        "earthy",
+        "adventurous",
+        "narrative-driven",
+        "warm"
+      ],
+      "intensity": 8,
+      "applicable_to": [
+        "landing",
+        "experience",
+        "portfolio"
+      ],
+      "the_unexpected": "The loader doesn't say 'Loading...' — it narrates a world being built: 'Terraforming activated → Atmosphere deployment → Geosystem creation,' reframing a technical wait as environmental immersion.",
+      "brief_injection": "Replace conventional nav with a spatial map interface where sections are named as terrain features (trails, viewpoints, camps), and stage the page load as a terraforming sequence with progressive narrative copy rather than a spinner."
+    },
+    {
+      "url": "https://obsidianassembly.com",
+      "name": "The Obsidian Assembly",
+      "discovered": "2026-03-23",
+      "source": "cssawards",
+      "what_makes_it_special": "Uses @property (Houdini CSS) for animatable custom properties, character-by-character text reveals via --char-index/--line-index CSS variables, and a scroll-linked --progress custom property driving CSS-native parallax with no JavaScript touching transforms.",
+      "techniques": [
+        "houdini-at-property",
+        "css-custom-property-stagger",
+        "clip-path-inset-text-reveal",
+        "char-index-line-index-variables",
+        "scroll-linked-progress",
+        "conic-gradient-indicators",
+        "mask-image-gradient-reveal",
+        "nested-calc-grid"
+      ],
+      "aesthetic_tags": [
+        "luxury-dark",
+        "warm-blacks",
+        "editorial",
+        "premium",
+        "minimal",
+        "occult-adjacent"
+      ],
+      "intensity": 8,
+      "applicable_to": [
+        "landing",
+        "editorial",
+        "product",
+        "portfolio"
+      ],
+      "the_unexpected": "The parallax is entirely CSS-driven through a --progress custom property bound to scroll position, with no JavaScript touching transforms — Houdini @property enables smooth interpolation of the numeric value.",
+      "brief_injection": "Drive all scroll animations through a single --progress CSS custom property registered via @property, then use it across clip-path, translate, and opacity to create CSS-native parallax without a single JS scroll listener."
+    },
+    {
+      "url": "https://arnaudrocca.fr/",
+      "name": "Arnaud Rocca Portfolio",
+      "discovered": "2026-03-23",
+      "source": "cssawards",
+      "what_makes_it_special": "Hero display type scaled via clamp() from 56px to 308px — a nearly 6x range in a single rule, making the headline the entire composition at wide viewports. Per-project brand color metadata drives full --color-theme-* custom property resets as you scroll between projects.",
+      "techniques": [
+        "clamp-display-scaling",
+        "per-project-theme-custom-properties",
+        "grid-template-rows-overlap",
+        "negative-offset-depth-layering",
+        "nuxt3-pinia",
+        "prismic-webp-adaptive",
+        "golden-ratio-line-height",
+        "visibility-opacity-translate3d-entrance"
+      ],
+      "aesthetic_tags": [
+        "editorial",
+        "typographic",
+        "premium-portfolio",
+        "multi-color",
+        "french-design",
+        "refined-motion"
+      ],
+      "intensity": 7,
+      "applicable_to": [
+        "portfolio",
+        "editorial",
+        "landing"
+      ],
+      "the_unexpected": "The display headline scales 6x in physical size using a single clamp() rule — at the widest viewport it reads at 308px, becoming the entire composition rather than just a heading element.",
+      "brief_injection": "Set your hero display type with clamp(56px, 20vw, 308px) so the headline becomes the layout at wide viewports, and let each content section carry its own --color-theme-* custom properties so the palette fully resets as you scroll between projects."
+    },
+    {
+      "url": "https://andandand.studio",
+      "name": "And And And Studio",
+      "discovered": "2026-03-23",
+      "source": "siteinspire",
+      "what_makes_it_special": "Uses the View Transitions API for native browser page transitions with no GSAP or Framer Motion, plus a 400vh floating parallax gallery. Default gallery state is full grayscale — hover reveals color, inverting the typical highlight pattern so interaction feels like developing a photograph.",
+      "techniques": [
+        "view-transitions-api",
+        "400vh-parallax-section",
+        "grayscale-default-hover-reveals-color",
+        "translateZ-gpu-acceleration",
+        "vmax-vmin-viewport-typography",
+        "react-server-components",
+        "sanity-cms",
+        "backface-visibility-hidden"
+      ],
+      "aesthetic_tags": [
+        "editorial",
+        "architectural",
+        "neutral",
+        "earth-tones",
+        "refined",
+        "minimal-luxury"
+      ],
+      "intensity": 7,
+      "applicable_to": [
+        "portfolio",
+        "editorial",
+        "landing"
+      ],
+      "the_unexpected": "The gallery defaults to full grayscale and hover reveals color — the opposite of every standard hover effect — making the interaction feel like developing a photograph rather than selecting an item.",
+      "brief_injection": "Apply grayscale(1) to all gallery items by default and transition to grayscale(0) on hover, so browsing feels like selectively developing photographs from a contact sheet rather than picking from a color grid."
     }
   ]
 }

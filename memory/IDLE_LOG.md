@@ -9,6 +9,12 @@
 
 <!-- Entries added below this line, newest first -->
 
+### Design Intel Scout — 2026-03-23 06:00
+- New sites found: 5
+- KB total: 13 entries
+- Sources checked: awwwards, godly, siteinspire, cssdesignawards, fwa
+- Brief: outputs/design-intel-scout-2026-03-23.md
+
 ### Nightly Consolidation — 2026-03-19 23:03
 Tasks: 0
 0 complete, 0
@@ -19,3 +25,69 @@ Consolidation unavailable — Ollama not responding
 ### Market Intel Skip — 2026-03-20 02:19
 - No scout reports found for today
 - Skipped market intel run
+
+### Memory Librarian — 2026-03-22 18:00
+Tasks: 0
+0 | Errors: 0
+0 | Blocked: 0
+0
+Synthesis unavailable — Ollama not responding
+
+### Evening Summary — 2026-03-22 18:03
+- Tasks completed: 0
+- Tasks pending: 0
+- Log activity: 84 lines
+- Errors: 0
+- Nightly consolidation: scheduled for 23:03
+[2026-03-22 21:00] Bounty scan complete — 0
+0 actionable
+
+### AutoResearch Weekly — 2026-03-22 22:00
+- Experiments run: 0
+- Wall clock: 0 minutes
+- Outputs: 5 files written
+[2026-03-22 23:30] Idea engine ran — wrote /Users/nayslayer/openclaw/outputs/ideas-2026-03-22-23.md, ingested to Ideas Lab
+
+### Nightly Consolidation — 2026-03-22 23:03
+Tasks: 0
+0 complete, 0
+0 blocked, 0
+0 errors
+Consolidation unavailable — Ollama not responding
+[2026-03-22] Daily log committed to clawmpson-logs
+
+### Memory Librarian — 2026-03-23 00:00
+Tasks: 0
+0 | Errors: 0
+0 | Blocked: 0
+0
+Synthesis unavailable — Ollama not responding
+
+### Memory Librarian — 2026-03-23 06:00
+Tasks: 0
+0 | Errors: 0
+0 | Blocked: 0
+0
+Synthesis unavailable — Ollama not responding
+[2026-03-23] Skill upgrade brief generated → /Users/nayslayer/openclaw/improvements/skill-upgrade-2026-03-23.md
+
+### Intel Scan — 2026-03-23 07:03
+- Reports scanned: 0
+- No new scout reports found
+[2026-03-23] No competitive scan list found — skipping
+[2026-03-23] No competitive scan list found — skipping
+[2026-03-23] Competitive intel scan complete
+[2026-03-23 23:30] Idea engine ran — wrote /Users/nayslayer/openclaw/outputs/ideas-2026-03-23-08.md, ingested to Ideas Lab
+
+### Morning Brief — 2026-03-23 08:03
+- Completed overnight: 0
+- Pending queue: 0
+[2026-03-23 23:30] Idea engine ran — wrote /Users/nayslayer/openclaw/outputs/ideas-2026-03-23-08.md, ingested to Ideas Lab
+
+### Memory Librarian — 2026-03-23 12:00
+Tasks: 0
+0 | Errors: 0
+0 | Blocked: 0
+0
+Synthesis unavailable — Ollama not responding
+[2026-03-23 23:30] Idea engine ran — wrote /Users/nayslayer/openclaw/outputs/ideas-2026-03-23-14.md, ingested to Ideas Lab

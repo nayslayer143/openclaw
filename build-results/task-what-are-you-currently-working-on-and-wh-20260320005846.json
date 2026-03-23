@@ -1,0 +1,19 @@
+{
+  "task_id": "build-what-are-you-currently-working-on-and-wh-20260320005846",
+  "repo_path": "/Users/nayslayer/projects/EmergentWebActions",
+  "repo": "EmergentWebActions",
+  "goal": "what are you currently working on and what is your eta to completion?",
+  "acceptance_criteria": [
+    "All existing tests still pass",
+    "New functionality has at least one test",
+    "No direct commits to main branch"
+  ],
+  "forbidden_operations": [
+    "never touch main branch directly",
+    "never commit .env",
+    "never push --force"
+  ],
+  "time_budget_minutes": 30,
+  "risk_level": "low",
+  "output_location": "/Users/nayslayer/openclaw/build-results/build-what-are-you-currently-working-on-and-wh-20260320005846"
+}
