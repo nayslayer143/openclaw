@@ -570,6 +570,8 @@ class TestAutoMode(unittest.TestCase):
         self.assertIn("discovered", result)
         self.assertIn("digested", result)
         self.assertIn("top_titles", result)
+        self.assertIsInstance(result["top_titles"], list)
+        self.assertIn("High Score", result["top_titles"])
 
     def test_auto_mode_returns_correct_structure(self):
         from autoresearch import scholar
