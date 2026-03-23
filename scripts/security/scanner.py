@@ -25,7 +25,7 @@ _PATTERNS: list[tuple[str, str, str]] = [
     # (category, severity, regex)
     ("obfuscation",        "CRITICAL", r"\beval\s*\("),
     ("obfuscation",        "CRITICAL", r"\bexec\s*\("),
-    ("obfuscation",        "CRITICAL", r"\bcompile\s*\("),
+    ("obfuscation",        "CRITICAL", r"(?<![.\w])compile\s*\("),
     ("obfuscation",        "CRITICAL", r"\bbase64\.b64decode\b"),
     ("obfuscation",        "CRITICAL", r"\b__import__\s*\("),
     ("exfiltration",       "CRITICAL", r"requests\.(post|put|patch)\s*\(\s*['\"]https?://(?!localhost|127\.0\.0\.1)"),
@@ -106,7 +106,11 @@ def scan_skill_md_capabilities(skill_md_path: str) -> dict[str, bool] | None:
     caps: dict[str, bool] = {}
     in_block = False
 
-    for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+    try:
+        text = path.read_text(encoding="utf-8", errors="replace")
+    except Exception:
+        return None
+    for line in text.splitlines():
         stripped = line.strip()
         if stripped == "# capabilities:":
             in_block = True
