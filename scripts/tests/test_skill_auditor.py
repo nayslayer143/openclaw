@@ -297,6 +297,23 @@ class TestRegistry(unittest.TestCase):
         finally:
             os.unlink(path)
 
+    def test_verify_all_handles_deleted_file(self):
+        import security.registry as reg
+        path = self._make_temp_skill("def deleteme(): pass\n")
+        reg.register("deleteme-skill", path, score=85, category="TRUSTED",
+                     findings=[], source_url=None)
+        # Delete the file before verify
+        os.unlink(path)
+        results = reg.verify_all()
+        missing = [r for r in results if r[1] == "missing"]
+        self.assertEqual(len(missing), 1)
+        self.assertEqual(missing[0][0], "deleteme-skill")
+
+    def test_set_approved_raises_on_missing_skill(self):
+        import security.registry as reg
+        with self.assertRaises(KeyError):
+            reg.set_approved("nonexistent-skill", "jordan")
+
 
 if __name__ == "__main__":
     unittest.main()
