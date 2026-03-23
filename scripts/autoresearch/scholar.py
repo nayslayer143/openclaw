@@ -22,6 +22,7 @@ import datetime
 import math
 import requests
 from pathlib import Path
+from urllib.parse import quote as _url_quote
 
 # Add scripts/ to path so clawmson_db is importable when this module
 # is run directly (e.g. from cron). When imported by telegram-dispatcher,
@@ -211,7 +212,7 @@ def search_papers(query: str | None = None, limit: int = 20) -> list[dict]:
     Returns list of candidate dicts with paper_id, title, abstract, authors, url.
     """
     if query:
-        url = f"https://huggingface.co/api/papers?search={requests.utils.quote(query)}"
+        url = f"https://huggingface.co/api/papers?search={_url_quote(query)}"
     else:
         url = "https://huggingface.co/api/papers"
 
