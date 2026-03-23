@@ -278,12 +278,13 @@ def fetch_paper_markdown(paper_id: str) -> str:
         )
         resp.raise_for_status()
         return resp.text
-    except Exception:
-        # Fallback: abstract from DB
-        with db._get_conn() as conn:
-            row = conn.execute(
-                "SELECT abstract FROM papers WHERE paper_id=?", (paper_id,)
-            ).fetchone()
-        if row and row["abstract"]:
-            return row["abstract"]
-        return ""
+    except requests.exceptions.RequestException:
+        pass
+    # Fallback: abstract from DB
+    with db._get_conn() as conn:
+        row = conn.execute(
+            "SELECT abstract FROM papers WHERE paper_id=?", (paper_id,)
+        ).fetchone()
+    if row and row["abstract"]:
+        return row["abstract"]
+    return ""

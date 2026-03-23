@@ -291,6 +291,26 @@ class TestFetchMarkdown(unittest.TestCase):
             result = scholar.fetch_paper_markdown("2401.99003")
         self.assertEqual(result, "")
 
+    def test_fetch_empty_response_returns_empty_string(self):
+        from autoresearch import scholar
+        # HTTP 200 but empty body — no fallback, return empty string
+        mock_resp = MagicMock()
+        mock_resp.raise_for_status = MagicMock()
+        mock_resp.text = ""
+        with patch("requests.get", return_value=mock_resp):
+            result = scholar.fetch_paper_markdown("2401.99004")
+        self.assertEqual(result, "")
+
+    def test_fetch_fallback_null_abstract_returns_empty_string(self):
+        from autoresearch import scholar
+        # Paper in DB but abstract is NULL
+        scholar.save_paper("2401.99005", "No Abstract Paper", None, None, None, None)
+        mock_resp = MagicMock()
+        mock_resp.raise_for_status.side_effect = requests.exceptions.HTTPError("404")
+        with patch("requests.get", return_value=mock_resp):
+            result = scholar.fetch_paper_markdown("2401.99005")
+        self.assertEqual(result, "")
+
 
 if __name__ == "__main__":
     unittest.main()
