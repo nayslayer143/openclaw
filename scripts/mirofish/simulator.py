@@ -100,6 +100,43 @@ CREATE TABLE IF NOT EXISTS crucix_signals (
 CREATE INDEX IF NOT EXISTS idx_crucix_signals_ticker_time
     ON crucix_signals(ticker, fetched_at);
 
+CREATE TABLE IF NOT EXISTS spot_prices (
+    id          INTEGER PRIMARY KEY,
+    source      TEXT NOT NULL,
+    ticker      TEXT NOT NULL,
+    signal_type TEXT NOT NULL,
+    direction   TEXT NOT NULL,
+    amount_usd  REAL,
+    description TEXT NOT NULL,
+    fetched_at  TEXT NOT NULL,
+    UNIQUE (source, ticker, signal_type, fetched_at)
+);
+CREATE INDEX IF NOT EXISTS idx_spot_prices_ticker_time
+    ON spot_prices(ticker, fetched_at);
+
+CREATE TABLE IF NOT EXISTS price_lag_trades (
+    id              INTEGER PRIMARY KEY,
+    market_id       TEXT NOT NULL,
+    question        TEXT NOT NULL,
+    asset           TEXT NOT NULL,
+    contract_type   TEXT NOT NULL,
+    spot_price      REAL NOT NULL,
+    threshold       REAL,
+    bracket_low     REAL,
+    bracket_high    REAL,
+    polymarket_price REAL NOT NULL,
+    raw_dislocation REAL NOT NULL,
+    decayed_edge    REAL NOT NULL,
+    days_to_expiry  REAL NOT NULL,
+    direction       TEXT NOT NULL,
+    confidence      REAL NOT NULL,
+    amount_usd      REAL NOT NULL,
+    entry_price     REAL NOT NULL,
+    detected_at     TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_price_lag_market_time
+    ON price_lag_trades(market_id, detected_at);
+
 INSERT OR IGNORE INTO context (chat_id, key, value)
 VALUES ('mirofish', 'starting_balance', '1000.00');
 """
