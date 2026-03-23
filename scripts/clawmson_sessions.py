@@ -154,8 +154,8 @@ def get_resume_context(chat_id: str, current_session_key: str) -> str:
     if not row:
         return ""
 
-    ended_at = row["ended_at"] if hasattr(row, "keys") else row[0]
-    summary = row["summary"] if hasattr(row, "keys") else row[1]
+    ended_at = row["ended_at"]
+    summary = row["summary"]
 
     if not ended_at:
         return ""
