@@ -49,6 +49,18 @@ import clawmson_references as refs
 import model_router as router
 import clawmson_scout as scout
 
+# Security auditor (lazy import to avoid startup cost if module missing)
+try:
+    import sys as _sys
+    from pathlib import Path as _Path
+    _sec_path = str(_Path(__file__).parent)
+    if _sec_path not in _sys.path:
+        _sys.path.insert(0, _sec_path)
+    from security import auditor as _security_auditor
+    _SECURITY_AVAILABLE = True
+except ImportError:
+    _SECURITY_AVAILABLE = False
+
 # Prefixes that indicate Ollama inference failed (from clawmson_chat.py error returns)
 _OLLAMA_ERROR_PREFIXES = (
     "Ollama is not reachable",
@@ -259,7 +271,10 @@ def handle_help(chat_id: str):
         "/forget          — clear conversation history\n"
         "/context         — show persistent notes\n"
         "/references      — list saved links\n"
-        "/scout              — digest of recently scouted Twitter links\n\n"
+        "/scout              — digest of recently scouted Twitter links\n"
+        "/audit <name>    — security audit a skill\n"
+        "/skills          — list registered skills with trust scores\n"
+        "/block <name>    — manually block a skill\n\n"
         "Anything else: just talk to me.\n"
         "Send a URL and I'll read and summarize it.\n"
         "Send a photo, file, or voice note and I'll process it.\n"
@@ -269,6 +284,15 @@ def handle_help(chat_id: str):
 
 def handle_approve(task_id: str, chat_id: str):
     """Merge a passing build branch into main (unchanged from original)."""
+    # Route to skill approval if this matches a registered skill name
+    if _SECURITY_AVAILABLE:
+        from security import registry as _reg
+        if _reg.get(task_id):
+            def _notify(msg: str):
+                send(chat_id, msg)
+            result = _security_auditor.handle_approval(task_id, notify_fn=_notify)
+            send(chat_id, result)
+            return
     contract_path = BUILD_RESULTS / f"{task_id}.json"
     if not contract_path.exists():
         matches = list(BUILD_RESULTS.glob(f"{task_id}*.json"))
@@ -391,6 +415,63 @@ def handle_reject_proc(chat_id: str, proc_id_str: str):
         return
     _memory.reject_procedure(chat_id, proc_id)
     send(chat_id, f"Procedure {proc_id} rejected.")
+
+
+# ── Security audit handlers ───────────────────────────────────────────────────
+
+def handle_audit_skill(chat_id: str, skill_name_or_path: str):
+    if not _SECURITY_AVAILABLE:
+        send(chat_id, "Security auditor not available.")
+        return
+    if not skill_name_or_path:
+        send(chat_id, "Usage: /audit <skill_name_or_path>")
+        return
+    send(chat_id, f"Auditing {skill_name_or_path}...")
+
+    def _notify(msg: str):
+        send(chat_id, msg)
+
+    try:
+        result = _security_auditor.audit_skill(
+            skill_name_or_path, notify_fn=_notify
+        )
+        send(chat_id, f"Audit complete: {result.skill_name} — {result.category} "
+                      f"({result.score}/100)")
+    except Exception as e:
+        send(chat_id, f"Audit error: {e}")
+
+
+def handle_skills_list(chat_id: str):
+    if not _SECURITY_AVAILABLE:
+        send(chat_id, "Security auditor not available.")
+        return
+    from security import registry as _reg
+    rows = _reg.get_all()
+    if not rows:
+        send(chat_id, "No skills registered.")
+        return
+    lines = ["Registered skills:"]
+    for r in rows:
+        lines.append(
+            f"• {r['skill_name']}: {r['trust_score']}/100 [{r['category']}] "
+            f"approved={r.get('approved_by') or '—'}"
+        )
+    send(chat_id, "\n".join(lines))
+
+
+def handle_skill_block(chat_id: str, skill_name: str):
+    if not _SECURITY_AVAILABLE:
+        send(chat_id, "Security auditor not available.")
+        return
+    if not skill_name:
+        send(chat_id, "Usage: /block <skill_name>")
+        return
+
+    def _notify(msg: str):
+        send(chat_id, msg)
+
+    result = _security_auditor.handle_block(skill_name, notify_fn=_notify)
+    send(chat_id, result)
 
 
 # ── Direct command execution ──────────────────────────────────────────────────
@@ -559,6 +640,17 @@ def handle_message(msg: dict):
         if lower.startswith("/remember "):
             args = text[len("/remember "):].strip()
             handle_remember(chat_id, args)
+            return
+        if lower.startswith("/audit "):
+            skill_arg = text[len("/audit "):].strip()
+            handle_audit_skill(chat_id, skill_arg)
+            return
+        if lower == "/skills":
+            handle_skills_list(chat_id)
+            return
+        if lower.startswith("/block "):
+            skill_arg = text[len("/block "):].strip()
+            handle_skill_block(chat_id, skill_arg)
             return
         if lower.startswith("/approve-proc"):
             proc_id_str = text[len("/approve-proc"):].strip()
