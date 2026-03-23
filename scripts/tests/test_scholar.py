@@ -47,5 +47,22 @@ class TestDBSchema(unittest.TestCase):
         self.assertTrue(expected.issubset(cols))
 
 
+class TestModuleConstants(unittest.TestCase):
+    def test_import(self):
+        """scholar module imports without error."""
+        from autoresearch import scholar
+        self.assertIsNotNone(scholar)
+
+    def test_hf_request_timeout(self):
+        from autoresearch import scholar
+        self.assertEqual(scholar.HF_REQUEST_TIMEOUT, 30)
+
+    def test_default_threshold(self):
+        from autoresearch import scholar
+        # Default is 0.75; env var SCHOLAR_RELEVANCE_THRESHOLD can override
+        self.assertGreater(scholar.RELEVANCE_THRESHOLD, 0)
+        self.assertLessEqual(scholar.RELEVANCE_THRESHOLD, 1.0)
+
+
 if __name__ == "__main__":
     unittest.main()
