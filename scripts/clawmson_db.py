@@ -224,9 +224,9 @@ def save_scout_link(chat_id: str, url: str, extraction: dict, categorization: di
     tweet_text  = extraction.get("text")
     linked_urls = extraction.get("linked_urls", [])
 
-    # Temporary inline until clawmson_twitter.py exists (Task 2 will restore the import)
+    from clawmson_twitter import extract_github_repos
     all_text = (tweet_text or "") + " ".join(linked_urls)
-    github_repos = list(dict.fromkeys(_SCOUT_GITHUB_RE.findall(all_text)))
+    github_repos = extract_github_repos(all_text)
 
     category        = categorization.get("category")
     relevance_score = categorization.get("relevance_score")
