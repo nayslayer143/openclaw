@@ -127,6 +127,16 @@ def _init_db():
                 processed_at    TEXT NOT NULL,
                 raw_data        TEXT
             );
+            CREATE TABLE IF NOT EXISTS sessions (
+                id            INTEGER PRIMARY KEY AUTOINCREMENT,
+                session_key   TEXT NOT NULL,
+                chat_id       TEXT NOT NULL,
+                started_at    TEXT NOT NULL,
+                ended_at      TEXT,
+                message_count INTEGER NOT NULL DEFAULT 0,
+                summary       TEXT,
+                UNIQUE(session_key, chat_id)
+            );
             CREATE INDEX IF NOT EXISTS idx_conv_chat      ON conversations(chat_id);
             CREATE INDEX IF NOT EXISTS idx_conv_archived  ON conversations(chat_id, archived);
             CREATE INDEX IF NOT EXISTS idx_ref_chat       ON refs(chat_id);
@@ -137,6 +147,7 @@ def _init_db():
             CREATE INDEX IF NOT EXISTS idx_candidates_chat ON procedure_candidates(chat_id);
             CREATE INDEX IF NOT EXISTS idx_scout_chat ON scout_links(chat_id);
             CREATE INDEX IF NOT EXISTS idx_scout_cat  ON scout_links(category);
+            CREATE INDEX IF NOT EXISTS idx_sessions_chat  ON sessions(chat_id, started_at DESC);
             CREATE TABLE IF NOT EXISTS papers (
                 paper_id        TEXT PRIMARY KEY,
                 title           TEXT NOT NULL,
@@ -162,17 +173,34 @@ def _init_db():
             CREATE INDEX IF NOT EXISTS idx_papers_score ON papers(relevance_score);
             CREATE INDEX IF NOT EXISTS idx_digests_paper ON paper_digests(paper_id);
         """)
+    # FTS5 creation is separate — not all SQLite builds support it
+    try:
+        with _get_conn() as conn:
+            conn.execute("""
+                CREATE VIRTUAL TABLE IF NOT EXISTS memory_fts USING fts5(
+                    content,
+                    source    UNINDEXED,
+                    chat_id   UNINDEXED,
+                    source_id UNINDEXED,
+                    ts        UNINDEXED,
+                    tokenize = 'porter unicode61'
+                )
+            """)
+    except Exception as e:
+        print(f"[db] FTS5 not available: {e}")
 
 
 def save_message(chat_id: str, role: str, content: str,
                  message_id: int = None, media_type: str = None):
     ts = datetime.datetime.utcnow().isoformat()
     with _get_conn() as conn:
-        conn.execute(
+        cur = conn.execute(
             "INSERT INTO conversations (chat_id, message_id, role, content, timestamp, media_type)"
             " VALUES (?, ?, ?, ?, ?, ?)",
             (chat_id, message_id, role, content, ts, media_type)
         )
+        source_id = cur.lastrowid
+        fts_index(chat_id, "conversation", source_id, content, ts, conn=conn)
 
 
 def get_history(chat_id: str, limit: int = 50) -> list:
@@ -210,11 +238,28 @@ def set_context(chat_id: str, key: str, value: str):
 def save_reference(chat_id: str, url: str, title: str, summary: str, content: str):
     ts = datetime.datetime.utcnow().isoformat()
     with _get_conn() as conn:
-        conn.execute(
+        cur = conn.execute(
             "INSERT INTO refs (chat_id, url, title, summary, content, timestamp)"
             " VALUES (?, ?, ?, ?, ?, ?)",
             (chat_id, url, title or url, summary, content, ts)
         )
+        source_id = cur.lastrowid
+        fts_content = f"{title or url} {summary or ''}".strip()
+        fts_index(chat_id, "reference", source_id, fts_content, ts, conn=conn)
+
+
+def fts_index(chat_id: str, source: str, source_id: int,
+              content: str, ts: str, conn=None):
+    """Insert one item into memory_fts. No-op if FTS5 unavailable.
+
+    When conn is provided, INSERT runs inside the caller's existing transaction.
+    When conn=None, a new connection is opened.
+    """
+    try:
+        import clawmson_fts as _fts
+        _fts.index(chat_id, source, source_id, content, ts, conn=conn)
+    except ImportError:
+        pass
 
 
 def search_references(chat_id: str, keyword: str) -> list:
