@@ -52,6 +52,7 @@ SEMANTIC_TOP_K   = int(os.environ.get("CLAWMSON_SEMANTIC_TOP_K", "5"))
 SEMANTIC_MIN_SIM = float(os.environ.get("CLAWMSON_SEMANTIC_MIN_SIM", "0.5"))
 SEMANTIC_MIN_CONF= float(os.environ.get("CLAWMSON_SEMANTIC_MIN_CONF", "0.6"))
 PROC_THRESHOLD   = int(os.environ.get("CLAWMSON_PROC_THRESHOLD", "3"))
+CLAWMSON_FTS_LIMIT = int(os.environ.get("CLAWMSON_FTS_LIMIT", "5"))
 
 _DEFAULT_PROBE   = "what do you know about Jordan and the current projects?"
 
@@ -591,6 +592,8 @@ class MemoryManager:
         probe = query.strip() or _DEFAULT_PROBE
 
         parts = []
+        # Track (source, source_id) to deduplicate FTS results
+        seen_ids: set[tuple] = set()
 
         # Layer 2: STM summaries
         stm = self._stm.retrieve(chat_id)
@@ -598,13 +601,19 @@ class MemoryManager:
             parts.append(f"**Recent summary:** {stm}")
 
         # Layer 3: Episodic
-        episodes = self._episodic.retrieve(chat_id, probe)
+        try:
+            episodes = self._episodic.retrieve(chat_id, probe)
+        except Exception:
+            episodes = []
         if episodes:
             parts.append("**Past events:**")
             parts.extend(episodes)
 
         # Layer 4: Semantic
-        facts = self._semantic.retrieve(chat_id, probe)
+        try:
+            facts = self._semantic.retrieve(chat_id, probe)
+        except Exception:
+            facts = []
         if facts:
             parts.append("**Known facts:**")
             parts.extend(facts)
@@ -615,11 +624,29 @@ class MemoryManager:
             parts.append("**Procedures:**")
             parts.extend(procs)
 
+        # FTS search — complementary to cosine, works even when Ollama is down
+        try:
+            import clawmson_fts as fts
+            fts_results = fts.search(chat_id, probe, limit=CLAWMSON_FTS_LIMIT)
+            fts_parts = []
+            for r in fts_results:
+                key = (r.get("source"), r.get("source_id"))
+                if key in seen_ids:
+                    continue
+                seen_ids.add(key)
+                snippet = r.get("snippet") or r.get("content", "")[:100]
+                ts_short = (r.get("ts") or "")[:10]
+                fts_parts.append(f"[Search] {snippet} ({ts_short})")
+            if fts_parts:
+                parts.append("**Search matches:**")
+                parts.extend(fts_parts)
+        except Exception:
+            pass
+
         if not parts:
             return ""
 
         body = "\n".join(parts)
-        # Cap at ~2000 chars
         if len(body) > 2000:
             body = body[:1997] + "..."
         return f"### Memory Context\n{body}"
