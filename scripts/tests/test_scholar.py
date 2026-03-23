@@ -16,6 +16,7 @@ if str(_SCRIPTS) not in sys.path:
     sys.path.insert(0, str(_SCRIPTS))
 
 import clawmson_db as db
+import json
 
 
 class TestDBSchema(unittest.TestCase):
@@ -310,6 +311,83 @@ class TestFetchMarkdown(unittest.TestCase):
         with patch("requests.get", return_value=mock_resp):
             result = scholar.fetch_paper_markdown("2401.99005")
         self.assertEqual(result, "")
+
+
+class TestDigestPaper(unittest.TestCase):
+    def setUp(self):
+        conn = db._get_conn()
+        conn.execute("DELETE FROM paper_digests")
+        conn.execute("DELETE FROM papers")
+        conn.commit()
+        from autoresearch import scholar
+        self.s = scholar
+
+    def _mock_ollama(self, content: str) -> MagicMock:
+        mock = MagicMock()
+        mock.raise_for_status = MagicMock()
+        mock.json.return_value = {"message": {"content": content}}
+        return mock
+
+    def _good_digest_json(self) -> str:
+        return json.dumps({
+            "KEY_FINDINGS": ["finding 1", "finding 2"],
+            "IMPLEMENTABLE_TECHNIQUES": ["technique A"],
+            "LINKED_MODELS": ["bert-base-uncased"],
+            "RELEVANCE_TO_BUILDS": "Relevant to RAG pipeline",
+            "PRIORITY": "P1",
+        })
+
+    def test_digest_saves_to_db(self):
+        self.s.save_paper("2401.30001", "Digest Test", None,
+                          "Abstract text.", None, 0.8)
+        with patch("requests.get") as mock_get, \
+             patch("requests.post", return_value=self._mock_ollama(self._good_digest_json())):
+            mock_get.return_value = MagicMock(
+                raise_for_status=MagicMock(), text="# Digest Test\n\nFull content."
+            )
+            result = self.s.digest_paper("2401.30001")
+
+        self.assertNotIn("error", result)
+        conn = db._get_conn()
+        row = conn.execute("SELECT * FROM paper_digests WHERE paper_id='2401.30001'").fetchone()
+        self.assertIsNotNone(row)
+        self.assertEqual(row["priority"], "P1")
+        # Paper should be marked digested
+        p = conn.execute("SELECT digested FROM papers WHERE paper_id='2401.30001'").fetchone()
+        self.assertEqual(p["digested"], 1)
+
+    def test_digest_handles_json_parse_error(self):
+        self.s.save_paper("2401.30002", "Parse Error Paper", None, "abs", None, 0.7)
+        with patch("requests.get") as mock_get, \
+             patch("requests.post", return_value=self._mock_ollama("not json at all")):
+            mock_get.return_value = MagicMock(raise_for_status=MagicMock(), text="# Title\n")
+            result = self.s.digest_paper("2401.30002")
+
+        self.assertIn("error", result)
+        self.assertEqual(result["error"], "parse_failed")
+        # No digest row written
+        conn = db._get_conn()
+        row = conn.execute("SELECT * FROM paper_digests WHERE paper_id='2401.30002'").fetchone()
+        self.assertIsNone(row)
+
+    def test_digest_unknown_paper_extracts_title(self):
+        # paper_id not in DB — fetch succeeds with title in markdown
+        md = "# Discovered Paper Title\n\nContent here."
+        with patch("requests.get") as mock_get, \
+             patch("requests.post", return_value=self._mock_ollama(self._good_digest_json())):
+            mock_get.return_value = MagicMock(raise_for_status=MagicMock(), text=md)
+            result = self.s.digest_paper("2401.30003")
+
+        self.assertNotIn("error", result)
+        conn = db._get_conn()
+        row = conn.execute("SELECT title FROM papers WHERE paper_id='2401.30003'").fetchone()
+        self.assertIsNotNone(row)
+        self.assertEqual(row["title"], "Discovered Paper Title")
+
+    def test_digest_unknown_paper_no_markdown_returns_error(self):
+        with patch.object(self.s, "fetch_paper_markdown", return_value=""):
+            result = self.s.digest_paper("2401.30004")
+        self.assertEqual(result.get("error"), "unknown_paper")
 
 
 if __name__ == "__main__":

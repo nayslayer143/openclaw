@@ -288,3 +288,128 @@ def fetch_paper_markdown(paper_id: str) -> str:
     if row and row["abstract"]:
         return row["abstract"]
     return ""
+
+
+_DIGEST_PROMPT = """\
+Given this research paper, extract:
+1. KEY_FINDINGS: 3-7 bullet points of the most important findings
+2. IMPLEMENTABLE_TECHNIQUES: specific techniques we could build right now, \
+in the context of: agent orchestration, prediction markets, memory architectures, \
+local LLM optimization, multi-agent systems, RAG, tool use, web business automation
+3. LINKED_MODELS: any HuggingFace model/dataset IDs mentioned
+4. RELEVANCE_TO_BUILDS: how this relates to the above domains
+5. PRIORITY: P1 (use now) / P2 (useful soon) / P3 (interesting later)
+
+Return JSON only.\
+"""
+
+
+def _extract_title_from_markdown(md: str) -> str | None:
+    """Extract first # Heading from markdown. Returns None if not found."""
+    for line in md.splitlines():
+        line = line.strip()
+        if line.startswith("# "):
+            return line[2:].strip()
+    return None
+
+
+def _strip_json_fences(raw: str) -> str:
+    """Remove markdown code fences from LLM response."""
+    raw = raw.strip()
+    if raw.startswith("```"):
+        raw = re.sub(r"^```(?:json)?\s*", "", raw)
+        raw = re.sub(r"\s*```$", "", raw)
+    return raw.strip()
+
+
+def digest_paper(paper_id: str) -> dict:
+    """
+    Fetch and digest a paper. Saves digest to DB and runs action routing.
+
+    Returns the parsed digest dict on success, or {"error": "...", ...} on failure.
+    Never raises.
+    """
+    # Check if paper is in DB
+    with db._get_conn() as conn:
+        row = conn.execute("SELECT * FROM papers WHERE paper_id=?",
+                           (paper_id,)).fetchone()
+    in_db = row is not None
+
+    # Fetch content
+    content = fetch_paper_markdown(paper_id)
+    if not content:
+        return {"error": "unknown_paper", "paper_id": paper_id}
+
+    # If paper wasn't in DB, save a placeholder row with extracted title
+    if not in_db:
+        title = _extract_title_from_markdown(content) or paper_id
+        save_paper(
+            paper_id=paper_id,
+            title=title,
+            authors=None,
+            abstract=None,
+            url=f"https://huggingface.co/papers/{paper_id}",
+            relevance_score=None,
+        )
+
+    # Build prompt — truncate content to avoid overwhelming the model
+    prompt_content = content[:8000] if len(content) > 8000 else content
+    prompt = f"{_DIGEST_PROMPT}\n\n---\n\n{prompt_content}"
+
+    # Call qwen3:30b
+    try:
+        resp = requests.post(
+            f"{OLLAMA_BASE_URL}/api/chat",
+            json={
+                "model": DIGEST_MODEL,
+                "messages": [{"role": "user", "content": prompt}],
+                "stream": False,
+            },
+            timeout=120,
+        )
+        resp.raise_for_status()
+        raw = resp.json().get("message", {}).get("content", "")
+    except Exception as e:
+        print(f"[scholar] Ollama call failed for {paper_id}: {e}")
+        return {"error": "ollama_failed", "paper_id": paper_id}
+
+    # Defensive JSON parsing
+    try:
+        parsed = json.loads(_strip_json_fences(raw))
+    except json.JSONDecodeError:
+        print(f"[scholar] JSON parse failed for {paper_id}. Raw: {raw[:200]}")
+        return {"error": "parse_failed", "raw": raw[:200]}
+
+    findings     = parsed.get("KEY_FINDINGS", [])
+    techniques   = parsed.get("IMPLEMENTABLE_TECHNIQUES", [])
+    models       = parsed.get("LINKED_MODELS", [])
+    relevance    = parsed.get("RELEVANCE_TO_BUILDS", "")
+    priority     = parsed.get("PRIORITY", "P3")
+
+    # Persist
+    actions = _route_paper_actions(paper_id, priority, techniques, models, relevance)
+    save_digest(
+        paper_id=paper_id,
+        findings=json.dumps(findings),
+        techniques=json.dumps(techniques),
+        models=json.dumps(models),
+        relevance=relevance,
+        priority=priority,
+        action=",".join(actions) if actions else "none",
+    )
+    mark_digested(paper_id)
+
+    return {
+        "paper_id": paper_id,
+        "key_findings": findings,
+        "implementable_techniques": techniques,
+        "linked_models": models,
+        "relevance_to_builds": relevance,
+        "priority": priority,
+        "actions": actions,
+    }
+
+
+def _route_paper_actions(paper_id, priority, techniques, models, relevance) -> list[str]:
+    """Stub — implemented in Task 8."""
+    return []
