@@ -64,3 +64,55 @@ def _extract_candidates(prompt: str) -> list[str]:
         filtered.append(c)
 
     return filtered[:3]
+
+
+def _lookup_chub(candidate: str) -> str:
+    """
+    Search chub registry for candidate. Returns formatted doc string or "".
+    Uses check=False — non-zero exit codes are handled by inspecting returncode.
+    """
+    search = subprocess.run(
+        ["chub", "search", candidate, "--json"],
+        capture_output=True, timeout=3, check=False,
+    )
+    if search.returncode != 0:
+        return ""
+    try:
+        data = json.loads(search.stdout)
+    except json.JSONDecodeError:
+        return ""
+    if not isinstance(data, list) or not data:
+        return ""
+    top = data[0]
+    name = top.get("name", "")
+    if not (
+        name.lower() == candidate.lower()
+        or (name.lower().startswith(candidate.lower()) and len(candidate) >= 4)
+    ):
+        return ""
+    result_id = top.get("id") or name or candidate
+    doc = subprocess.run(
+        ["chub", "get", result_id, "--lang", "py"],
+        capture_output=True, timeout=5, check=False,
+    )
+    if doc.returncode != 0:
+        return ""
+    body = doc.stdout.decode("utf-8", errors="replace")[:_DOC_CAP]
+    return f"[API DOCS: {result_id}]\n{body}"
+
+
+def fetch_chub_context(prompt: str) -> str:
+    """
+    Detect library references in prompt, fetch docs via chub CLI.
+    Returns "[API DOCS: {id}]\n{docs}" on success, "" on any failure.
+    Never raises.
+    """
+    try:
+        candidates = _extract_candidates(prompt)
+        for candidate in candidates:
+            doc = _lookup_chub(candidate)
+            if doc:
+                return doc
+        return ""
+    except Exception:
+        return ""
