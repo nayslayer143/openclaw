@@ -125,24 +125,34 @@ def set_approved(skill_name: str, approved_by: str) -> None:
     """
     Pure DB update — sets approved_by field only.
     Hash re-verification before calling this is the caller's (auditor.py) responsibility.
+    Raises KeyError if skill_name is not registered.
     """
     with _get_conn() as conn:
-        conn.execute(
+        cursor = conn.execute(
             "UPDATE skill_registry SET approved_by = ? WHERE skill_name = ?",
             (approved_by, skill_name),
         )
+        if cursor.rowcount == 0:
+            raise KeyError(f"skill not found in registry: {skill_name}")
 
 
 def verify_all() -> list[tuple[str, str]]:
     """
     Recompute SHA256 for every registered skill.
-    Returns list of (skill_name, status) where status is 'ok' or 'changed'.
+    Returns list of (skill_name, status) where status is 'ok', 'changed', or 'missing'.
+    - 'ok'      : file exists and hash matches
+    - 'changed' : file exists but hash differs (possible tamper)
+    - 'missing' : registered source_path no longer exists
     """
     results = []
     now     = datetime.datetime.utcnow().isoformat()
     for row in get_all():
-        live_hash = compute_hash(row["source_path"])
-        status    = "ok" if live_hash == row["hash_sha256"] else "changed"
+        source = Path(row["source_path"])
+        if not source.exists():
+            status = "missing"
+        else:
+            live_hash = compute_hash(row["source_path"])
+            status    = "ok" if live_hash == row["hash_sha256"] else "changed"
         with _get_conn() as conn:
             conn.execute(
                 "UPDATE skill_registry SET last_verified = ? WHERE skill_name = ?",
