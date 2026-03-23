@@ -4,7 +4,7 @@ import tempfile
 import pytest
 
 # Point DB at a temp file so tests don't touch production DB
-os.environ["CLAWMSON_DB_PATH"] = tempfile.mktemp(suffix=".db")
+os.environ["CLAWMSON_DB_PATH"] = tempfile.mkstemp(suffix=".db")[1]
 
 import clawmson_db as db
 
@@ -34,6 +34,18 @@ CATEGORIZATION_OK = {
     "summary": "A new tool for agentic AI workflows.",
     "action_items": ["Check the repo", "Try the demo"],
 }
+
+
+@pytest.fixture(autouse=True)
+def clean_db():
+    """Clear scout_links table before each test for isolation."""
+    import sqlite3
+    from pathlib import Path
+    db_path = Path(os.environ["CLAWMSON_DB_PATH"])
+    if db_path.exists():
+        with sqlite3.connect(str(db_path)) as conn:
+            conn.execute("DELETE FROM scout_links")
+    yield
 
 
 def test_save_scout_link_success():

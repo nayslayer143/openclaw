@@ -7,12 +7,15 @@ DB at ~/.openclaw/clawmson.db
 """
 
 import os
+import re
+import json
 import sqlite3
 import datetime
 from pathlib import Path
 
 DB_PATH = Path(os.environ.get("CLAWMSON_DB_PATH", Path.home() / ".openclaw" / "clawmson.db"))
 _SHARED_MEM_CONN = None  # For in-memory DB testing
+_SCOUT_GITHUB_RE = re.compile(r'https?://github\.com/[\w.-]+/[\w.-]+')
 
 
 def _get_conn() -> sqlite3.Connection:
@@ -214,7 +217,6 @@ def list_references(chat_id: str, limit: int = 20) -> list:
 
 def save_scout_link(chat_id: str, url: str, extraction: dict, categorization: dict):
     """Store one scouted tweet. Works for both success and extraction-failed dicts."""
-    import json as _json
     ts = datetime.datetime.utcnow().isoformat()
 
     # For extraction-failed dicts, most fields will be None
@@ -223,10 +225,8 @@ def save_scout_link(chat_id: str, url: str, extraction: dict, categorization: di
     linked_urls = extraction.get("linked_urls", [])
 
     # Temporary inline until clawmson_twitter.py exists (Task 2 will restore the import)
-    import re as _re
-    _GITHUB_RE = _re.compile(r'https?://github\.com/[\w.-]+/[\w.-]+')
     all_text = (tweet_text or "") + " ".join(linked_urls)
-    github_repos = list(dict.fromkeys(_GITHUB_RE.findall(all_text)))
+    github_repos = list(dict.fromkeys(_SCOUT_GITHUB_RE.findall(all_text)))
 
     category        = categorization.get("category")
     relevance_score = categorization.get("relevance_score")
@@ -234,7 +234,7 @@ def save_scout_link(chat_id: str, url: str, extraction: dict, categorization: di
     action_items    = categorization.get("action_items", [])
 
     # raw_data: full extraction dict (includes methods_tried for failures)
-    raw_data = _json.dumps(extraction)
+    raw_data = json.dumps(extraction)
 
     with _get_conn() as conn:
         conn.execute(
@@ -244,9 +244,9 @@ def save_scout_link(chat_id: str, url: str, extraction: dict, categorization: di
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             (
                 chat_id, url, author, tweet_text, category, relevance_score, summary,
-                _json.dumps(action_items),
-                _json.dumps(github_repos),
-                _json.dumps(linked_urls),
+                json.dumps(action_items),
+                json.dumps(github_repos),
+                json.dumps(linked_urls),
                 ts, raw_data,
             )
         )
@@ -254,8 +254,7 @@ def save_scout_link(chat_id: str, url: str, extraction: dict, categorization: di
 
 def get_scout_links(chat_id: str, since_hours: int = 24, category: str = None) -> list:
     """Return scout_links rows for chat_id within since_hours, newest first."""
-    import datetime as _dt
-    cutoff = (_dt.datetime.utcnow() - _dt.timedelta(hours=since_hours)).isoformat()
+    cutoff = (datetime.datetime.utcnow() - datetime.timedelta(hours=since_hours)).isoformat()
     with _get_conn() as conn:
         if category:
             rows = conn.execute(
@@ -274,8 +273,7 @@ def get_scout_links(chat_id: str, since_hours: int = 24, category: str = None) -
 
 def get_scout_digest(chat_id: str, since_hours: int = 24) -> dict:
     """Return category counts + top 5 items by relevance for the last N hours."""
-    import datetime as _dt
-    cutoff = (_dt.datetime.utcnow() - _dt.timedelta(hours=since_hours)).isoformat()
+    cutoff = (datetime.datetime.utcnow() - datetime.timedelta(hours=since_hours)).isoformat()
     with _get_conn() as conn:
         count_rows = conn.execute(
             "SELECT category, COUNT(*) as n FROM scout_links "
