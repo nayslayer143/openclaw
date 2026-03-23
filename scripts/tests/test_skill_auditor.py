@@ -360,5 +360,27 @@ class TestDebate(unittest.TestCase):
         self.assertTrue(result["parse_failed"])
 
 
+class TestReporter(unittest.TestCase):
+    def test_report_contains_key_fields(self):
+        from security.reporter import build_report
+        from security.scanner import Finding
+        findings = [Finding("obfuscation", "CRITICAL", 5, "eval(x)", "eval(x)")]
+        report = build_report(
+            skill_name="test-skill",
+            score=30,
+            category="BLOCKED",
+            findings=findings,
+            mismatch=False,
+            debate_transcript=None,
+            approved_by=None,
+            source_url=None,
+        )
+        self.assertIn("test-skill", report)
+        self.assertIn("30", report)
+        self.assertIn("BLOCKED", report)
+        self.assertIn("CRITICAL", report)
+        self.assertIn("eval", report)
+
+
 if __name__ == "__main__":
     unittest.main()
