@@ -412,6 +412,58 @@ def digest_paper(paper_id: str) -> dict:
     }
 
 
-def _route_paper_actions(paper_id, priority, techniques, models, relevance) -> list[str]:
-    """Stub — implemented in Task 8."""
-    return []
+def _route_paper_actions(paper_id: str, priority: str, techniques: list,
+                          models: list, relevance: str) -> list[str]:
+    """
+    Route paper to downstream outputs. All matching rules fire.
+    Returns list of action strings taken (may be empty).
+    """
+    actions = []
+    today = datetime.datetime.utcnow().strftime("%Y-%m-%d")
+    slug = re.sub(r"[^a-z0-9]+", "-", paper_id.lower())[:30].strip("-")
+
+    # Fetch paper title for output files
+    with db._get_conn() as conn:
+        row = conn.execute("SELECT title FROM papers WHERE paper_id=?",
+                           (paper_id,)).fetchone()
+    title = row["title"] if row else paper_id
+
+    # Rule 1: P1 + implementable techniques → improvement proposal
+    if priority == "P1" and isinstance(techniques, list) and len(techniques) > 0:
+        path = OPENCLAW_ROOT / "improvements" / f"scholar-{slug}-{today}.md"
+        path.write_text(
+            f"# Scholar Improvement: {title}\n\n"
+            f"**Paper:** https://huggingface.co/papers/{paper_id}\n"
+            f"**Priority:** {priority}\n\n"
+            f"## Implementable Techniques\n\n"
+            + "\n".join(f"- {t}" for t in techniques) + "\n\n"
+            f"## Relevance\n\n{relevance}\n"
+        )
+        actions.append("improvement")
+
+    # Rule 2: Linked models → bakeoff queue
+    if isinstance(models, list) and len(models) > 0:
+        bakeoff = OPENCLAW_ROOT / "benchmark" / "bakeoff-queue.md"
+        entry = (
+            f"\n## {today} — {paper_id}\n"
+            f"- Title: {title}\n"
+            f"- Models: {', '.join(models)}\n"
+            f"- Source: autoscholar\n"
+        )
+        with open(bakeoff, "a") as f:
+            f.write(entry)
+        actions.append("bakeoff")
+
+    # Rule 3: P1 + non-empty relevance → build context note
+    if priority == "P1" and relevance and relevance.strip():
+        path = OPENCLAW_ROOT / "autoresearch" / "outputs" / "papers" / \
+               f"academic-{slug}-{today}.md"
+        path.write_text(
+            f"# Academic Note: {title}\n\n"
+            f"**Paper:** https://huggingface.co/papers/{paper_id}\n"
+            f"**Priority:** {priority}\n\n"
+            f"## Relevance to Active Builds\n\n{relevance}\n"
+        )
+        actions.append("build_note")
+
+    return actions

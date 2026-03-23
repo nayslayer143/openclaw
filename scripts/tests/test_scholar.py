@@ -404,5 +404,71 @@ class TestDigestPaper(unittest.TestCase):
         self.assertIsNone(row)
 
 
+class TestActionRouting(unittest.TestCase):
+    def setUp(self):
+        conn = db._get_conn()
+        conn.execute("DELETE FROM paper_digests")
+        conn.execute("DELETE FROM papers")
+        conn.commit()
+        from autoresearch import scholar
+        self.s = scholar
+        # Use a temp dir for file outputs in tests
+        import tempfile
+        self._tmpdir = tempfile.mkdtemp()
+        self._orig_root = self.s.OPENCLAW_ROOT
+        self.s.OPENCLAW_ROOT = Path(self._tmpdir)
+        (Path(self._tmpdir) / "improvements").mkdir()
+        (Path(self._tmpdir) / "benchmark").mkdir()
+        (Path(self._tmpdir) / "autoresearch" / "outputs" / "papers").mkdir(parents=True)
+
+    def tearDown(self):
+        self.s.OPENCLAW_ROOT = self._orig_root
+
+    def test_p1_with_techniques_writes_improvement(self):
+        self.s.save_paper("2401.40001", "Action Paper", None, None, None, 0.9)
+        actions = self.s._route_paper_actions(
+            "2401.40001", "P1", ["technique A"], [], "some relevance"
+        )
+        self.assertIn("improvement", actions)
+        # Check file written
+        improv_files = list((Path(self._tmpdir) / "improvements").glob("scholar-*.md"))
+        self.assertEqual(len(improv_files), 1)
+
+    def test_linked_models_appends_to_bakeoff_queue(self):
+        self.s.save_paper("2401.40002", "Model Paper", None, None, None, 0.85)
+        actions = self.s._route_paper_actions(
+            "2401.40002", "P2", [], ["bert-base", "t5-small"], ""
+        )
+        self.assertIn("bakeoff", actions)
+        bakeoff = Path(self._tmpdir) / "benchmark" / "bakeoff-queue.md"
+        self.assertTrue(bakeoff.exists())
+        content = bakeoff.read_text()
+        self.assertIn("bert-base", content)
+        self.assertIn("autoscholar", content)
+
+    def test_p1_with_relevance_writes_build_note(self):
+        self.s.save_paper("2401.40003", "Relevant Paper", None, None, None, 0.95)
+        actions = self.s._route_paper_actions(
+            "2401.40003", "P1", [], [], "Directly relevant to RAG pipeline"
+        )
+        self.assertIn("build_note", actions)
+
+    def test_no_match_returns_none(self):
+        self.s.save_paper("2401.40004", "P3 Paper", None, None, None, 0.6)
+        actions = self.s._route_paper_actions(
+            "2401.40004", "P3", [], [], ""
+        )
+        self.assertEqual(actions, [])
+
+    def test_all_rules_can_fire(self):
+        self.s.save_paper("2401.40005", "Full Paper", None, None, None, 0.99)
+        actions = self.s._route_paper_actions(
+            "2401.40005", "P1", ["technique X"], ["model-y"], "Very relevant"
+        )
+        self.assertIn("improvement", actions)
+        self.assertIn("bakeoff", actions)
+        self.assertIn("build_note", actions)
+
+
 if __name__ == "__main__":
     unittest.main()
