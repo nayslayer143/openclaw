@@ -78,7 +78,7 @@ def _lookup_chub(candidate: str) -> str:
     if search.returncode != 0:
         return ""
     try:
-        data = json.loads(search.stdout)
+        data = json.loads(search.stdout.decode("utf-8", errors="replace"))
     except json.JSONDecodeError:
         return ""
     if not isinstance(data, list) or not data:
