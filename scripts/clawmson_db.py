@@ -137,6 +137,30 @@ def _init_db():
             CREATE INDEX IF NOT EXISTS idx_candidates_chat ON procedure_candidates(chat_id);
             CREATE INDEX IF NOT EXISTS idx_scout_chat ON scout_links(chat_id);
             CREATE INDEX IF NOT EXISTS idx_scout_cat  ON scout_links(category);
+            CREATE TABLE IF NOT EXISTS papers (
+                paper_id        TEXT PRIMARY KEY,
+                title           TEXT NOT NULL,
+                authors         TEXT,
+                abstract        TEXT,
+                url             TEXT,
+                relevance_score REAL,
+                discovered_at   TEXT NOT NULL,
+                digested        INTEGER NOT NULL DEFAULT 0
+            );
+            CREATE TABLE IF NOT EXISTS paper_digests (
+                id                       INTEGER PRIMARY KEY AUTOINCREMENT,
+                paper_id                 TEXT NOT NULL,
+                key_findings             TEXT,
+                implementable_techniques TEXT,
+                linked_models            TEXT,
+                relevance_to_builds      TEXT,
+                priority                 TEXT,
+                action_taken             TEXT,
+                digested_at              TEXT NOT NULL
+            );
+            CREATE INDEX IF NOT EXISTS idx_papers_digested ON papers(digested);
+            CREATE INDEX IF NOT EXISTS idx_papers_score ON papers(relevance_score);
+            CREATE INDEX IF NOT EXISTS idx_digests_paper ON paper_digests(paper_id);
         """)
 
 
