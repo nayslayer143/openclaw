@@ -8,6 +8,7 @@ from __future__ import annotations
 import json
 import os
 import requests
+from clawteam.chub import fetch_chub_context
 
 OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
 
@@ -30,9 +31,11 @@ def run_agent(codename: str, model: str, prompt: str) -> str:
     Returns assembled response string. Never raises — returns error string on failure.
     """
     system = _SYSTEM_PROMPTS.get(codename.upper(), _DEFAULT_SYSTEM)
+    chub_ctx = fetch_chub_context(prompt) if codename.upper() == "FORGE" else ""
+    user_content = f"{chub_ctx}\n\n{prompt}" if chub_ctx else prompt
     messages = [
         {"role": "system", "content": system},
-        {"role": "user",   "content": prompt},
+        {"role": "user",   "content": user_content},
     ]
     try:
         resp = requests.post(

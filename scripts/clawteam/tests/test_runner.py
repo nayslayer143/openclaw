@@ -68,3 +68,29 @@ def test_run_includes_system_prompt():
     assert messages[0]["role"] == "system"
     assert messages[-1]["role"] == "user"
     assert "synthesize this" in messages[-1]["content"]
+
+
+def test_forge_prepends_chub_context():
+    """FORGE codename: chub context is prepended with double-newline separator."""
+    from clawteam.runner import run_agent
+    chub_ctx = "[API DOCS: requests]\nSample docs."
+    prompt = "write a GET request"
+    mock_resp = _mock_streaming_response("done")
+    # Patch the name as bound in runner's namespace (from clawteam.chub import fetch_chub_context)
+    with patch("clawteam.runner.requests.post", return_value=mock_resp) as mock_post, \
+         patch("clawteam.runner.fetch_chub_context", return_value=chub_ctx):
+        run_agent("FORGE", "qwen3-coder-next", prompt)
+    payload = mock_post.call_args[1]["json"]
+    user_content = payload["messages"][-1]["content"]
+    assert user_content == f"{chub_ctx}\n\n{prompt}"
+
+
+def test_non_forge_skips_chub():
+    """Non-FORGE codenames never call fetch_chub_context."""
+    from clawteam.runner import run_agent
+    mock_resp = _mock_streaming_response("done")
+    # Patch the name as bound in runner's namespace
+    with patch("clawteam.runner.requests.post", return_value=mock_resp), \
+         patch("clawteam.runner.fetch_chub_context") as mock_fetch:
+        run_agent("SCOUT", "qwen3:30b", "do research")
+    assert mock_fetch.call_count == 0
