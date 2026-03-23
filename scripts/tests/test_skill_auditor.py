@@ -339,6 +339,8 @@ class TestDebate(unittest.TestCase):
         self.assertEqual(result["adjusted_score"], 78)
         self.assertEqual(result["verdict"], "APPROVE")
         self.assertIsNotNone(result["transcript"])
+        self.assertFalse(result["parse_failed"])
+        self.assertIn("defender", result["transcript"])
 
     def test_parse_failure_returns_original_score(self):
         from security.debate import run_debate

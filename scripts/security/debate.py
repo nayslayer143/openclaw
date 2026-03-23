@@ -52,21 +52,33 @@ def _call_ollama(prompt: str, model: str = PRIMARY_MODEL) -> str:
 def _parse_judge(response: str) -> dict | None:
     """
     Extract JSON from judge response. Returns dict or None on failure.
-    Tries full parse first, then regex extraction.
+    Tries: (1) direct parse, (2) strip markdown fences then parse,
+    (3) regex extraction for simple {"verdict":...} patterns.
     """
-    # Try direct parse
+    text = response.strip()
+
+    # Step 1: Direct parse
     try:
-        return json.loads(response.strip())
+        return json.loads(text)
     except json.JSONDecodeError:
         pass
 
-    # Regex fallback: find first {...} block containing "verdict"
-    m = re.search(r'\{[^{}]*"verdict"[^{}]*\}', response, re.DOTALL)
+    # Step 2: Strip markdown code fences and retry
+    stripped = re.sub(r"^```(?:json)?\s*|\s*```$", "", text, flags=re.MULTILINE).strip()
+    try:
+        return json.loads(stripped)
+    except json.JSONDecodeError:
+        pass
+
+    # Step 3: Regex — find the outermost {...} containing "verdict"
+    # Use a non-greedy scan to handle braces in string values
+    m = re.search(r'\{[^}]*"verdict"[^}]*\}', stripped, re.DOTALL)
     if m:
         try:
             return json.loads(m.group(0))
         except json.JSONDecodeError:
             pass
+
     return None
 
 
@@ -110,7 +122,7 @@ def run_debate(code: str, findings: list, original_score: int) -> dict:
     try:
         attacker = _call_ollama(attacker_prompt)
     except Exception as e:
-        return _failed_result(original_score, str(e))
+        return _failed_result(original_score, str(e), {"defender": defender})
 
     # ── Agent C: Judge ────────────────────────────────────────────────────────
     judge_prompt = (
@@ -125,7 +137,7 @@ def run_debate(code: str, findings: list, original_score: int) -> dict:
     try:
         judge = _call_ollama(judge_prompt)
     except Exception as e:
-        return _failed_result(original_score, str(e))
+        return _failed_result(original_score, str(e), {"defender": defender, "attacker": attacker})
 
     parsed = _parse_judge(judge)
     if not parsed or "adjusted_score" not in parsed:
@@ -147,11 +159,18 @@ def run_debate(code: str, findings: list, original_score: int) -> dict:
     }
 
 
-def _failed_result(original_score: int, reason: str) -> dict:
+def _failed_result(original_score: int, reason: str, partial_transcript: dict | None = None) -> dict:
+    """
+    Build a failed-debate result. transcript keys are always present (empty string if not available).
+    partial_transcript: any agent responses collected before failure.
+    """
+    base = {"defender": "", "attacker": "", "judge": ""}
+    if partial_transcript:
+        base.update(partial_transcript)
     return {
         "adjusted_score": original_score,
         "verdict":        None,
         "reasoning":      f"Debate failed: {reason}",
-        "transcript":     {},
+        "transcript":     base,
         "parse_failed":   True,
     }
