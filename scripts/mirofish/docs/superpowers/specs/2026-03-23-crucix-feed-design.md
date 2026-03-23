@@ -44,7 +44,9 @@ def get_cached() -> list[dict]:
     """Return cached signals from DB without hitting Crucix."""
 ```
 
-Satisfies the `DataFeed` Protocol defined in `base_feed.py` via duck typing (no inheritance).
+Provides the same module-level interface as `unusual_whales_feed.py`. Note: module-level duck typing means `isinstance(crucix_feed, DataFeed)` will return False; callers must invoke `crucix_feed.fetch()` directly (same limitation as the UW feed). Includes its own `_get_conn()` following the same pattern as `unusual_whales_feed.py`.
+
+All logging uses `print(f"[crucix_feed] ...")` following the established convention.
 
 ### Environment Variables
 
@@ -52,7 +54,7 @@ Satisfies the `DataFeed` Protocol defined in `base_feed.py` via duck typing (no 
 |----------|---------|---------|
 | `CRUCIX_BASE_URL` | `http://localhost:3117` | Crucix API base URL |
 | `CRUCIX_CACHE_TTL_HOURS` | `0.25` | Cache TTL in hours (15 min) |
-| `CRUCIX_SIGNAL_LIMIT` | `30` | Max raw signals per fetch after priority sort |
+| `CRUCIX_SIGNAL_LIMIT` | `20` | Max Crucix signals per fetch after priority sort |
 | `CLAWMSON_DB_PATH` | `~/.openclaw/clawmson.db` | Shared SQLite database |
 
 ---
@@ -195,7 +197,11 @@ Minimal normalizer — chokepoint data is mostly positional context. Signals onl
 | `ideas` | `IDEA:{n}` | `crucix_idea` | `long` → bullish, `hedge` → bearish, `watch` → neutral |
 | `health` | (not emitted as signals) | — | Used for filtering only |
 
-**Ideas handling:** Signals with `source == "crucix_ideas"` are tagged specially so `trading_brain.py` can extract them for the first pass of prompt injection.
+**Source naming for partition:** The `_normalize_meta` function must use these exact `source` values so `trading_brain.py` can partition signals for two-pass injection:
+- Delta/regime signals: `source` = `"crucix_delta"` (not `"delta"`)
+- Idea signals: `source` = `"crucix_ideas"` (not `"ideas"` or `"crucix"`)
+
+**Health structure:** The `health` field is an array of objects: `[{n: "GDELT", err: false, stale: false}, ...]`. The `n` field maps to the Crucix source name. Before normalizing a source, look up its health entry by matching `health[].n` against the source key name (case-insensitive). Skip any source where `err == true` or `stale == true`.
 
 ---
 
@@ -241,7 +247,7 @@ This block is built from signals where `source == "crucix_ideas"`. If no ideas e
 
 **Pass 2 — Raw Signals** (modified existing block):
 
-The header changes from `"Active market signals (Unusual Whales):"` to `"Active market signals:"`. Both UW and Crucix signals are merged into one list, sorted by `fetched_at` descending, and capped at 30 total (configurable). Each signal line includes its source for attribution:
+The header changes from `"Active market signals (Unusual Whales):"` to `"Active market signals:"`. Both UW and Crucix signals are merged into one list, sorted by `fetched_at` descending, and capped at `MERGED_SIGNAL_LIMIT` (default 30, new env var in `trading_brain.py`). Crucix contributes up to `CRUCIX_SIGNAL_LIMIT` (20), UW contributes up to `UW_SIGNAL_LIMIT` (20), merged list capped at 30 after interleaved sort. Each signal line includes its source for attribution:
 
 ```
 - [GDELT] GEO:UKRAINE bearish conflict_escalation — 42 conflicts, Kyiv hotspot
@@ -249,11 +255,7 @@ The header changes from `"Active market signals (Unusual Whales):"` to `"Active 
 - [FRED] MACRO:VIX bearish indicator_spike — VIX at 18.5, +1.65% MoM
 ```
 
-The contextual instruction also becomes source-aware:
-```
-When analyzing Polymarket markets, consider whether any of these OSINT signals
-or market flow data suggest a related outcome is more or less likely...
-```
+The contextual instruction is replaced with the full text specified in the `trading_brain.py` changes section above.
 
 ---
 
@@ -298,11 +300,24 @@ Request timeout: 30 seconds (Crucix response is local, should be fast).
 
 ### `trading_brain.py` changes
 
-1. Extract `crucix_ideas` signals from the merged list for Pass 1 block.
-2. Build the ideas summary block (regime + ideas lines).
-3. Change the raw signals header from UW-specific to generic.
-4. Update the contextual instruction to reference OSINT + market flow.
-5. Remaining raw signals (both UW and non-idea Crucix) go into Pass 2 block.
+1. **Partition signals** at the top of the prompt-building section:
+   ```python
+   crucix_ideas = [s for s in signals if s.get("source") == "crucix_ideas"]
+   regime_signals = [s for s in signals if s.get("source") == "crucix_delta"]
+   raw_signals = [s for s in signals if s.get("source") not in ("crucix_ideas", "crucix_delta")]
+   ```
+2. **Build Pass 1 ideas block** from `crucix_ideas` + `regime_signals`. Omit entirely if both are empty.
+3. **Build Pass 2 raw signals block** from `raw_signals` (both UW and Crucix). Replace the existing `[:20]` slice with a merged cap of `MERGED_SIGNAL_LIMIT` (default 30, env var). Signals are sorted by `fetched_at` descending, then capped.
+4. **Replace the prompt header** from `"Active market signals (Unusual Whales):"` to `"Active market signals:"`.
+5. **Replace the contextual instruction** (currently UW-specific with NVDA example) with:
+   ```
+   When analyzing Polymarket markets, consider whether any of these signals
+   suggest a related outcome is more or less likely. OSINT signals (geopolitical
+   conflicts, economic indicators, military activity, environmental disasters)
+   indicate macro regime shifts. Market flow signals (options sweeps, dark pool
+   blocks, congressional trades) indicate where sophisticated money is positioning.
+   Both can create edge in prediction markets tied to related outcomes.
+   ```
 
 ---
 
@@ -330,6 +345,7 @@ A realistic but trimmed `/api/data` JSON blob covering all 6 domains (~50-80 lin
 | `test_fetch_crucix_down` | ConnectionError → returns cached or `[]` |
 | `test_health_filtering` | Sources with `err: true` skipped |
 | `test_signal_dict_shape` | Every emitted signal has all required keys with correct types |
+| `test_old_signals_purged` | Rows older than 24h are deleted on fetch |
 
 ### Test for `trading_brain.py` changes
 
@@ -338,6 +354,7 @@ A realistic but trimmed `/api/data` JSON blob covering all 6 domains (~50-80 lin
 | `test_prompt_two_pass_injection` | Ideas block appears before raw signals block |
 | `test_prompt_mixed_sources` | Both UW and Crucix signals appear in raw block with correct source labels |
 | `test_prompt_no_ideas` | When no crucix_ideas signals, ideas block is omitted |
+| `test_merged_signal_cap` | Merged UW + Crucix signals capped at MERGED_SIGNAL_LIMIT |
 
 ---
 
@@ -349,4 +366,5 @@ A realistic but trimmed `/api/data` JSON blob covering all 6 domains (~50-80 lin
 | `simulator.py` | Edit | Add migration, fetch Crucix in run_loop, merge signals |
 | `trading_brain.py` | Edit | Two-pass prompt injection, generic signal header |
 | `tests/test_crucix_feed.py` | **New** | Unit + integration tests for the feed |
+| `tests/test_uw_feed.py` | Edit | Update `"Unusual Whales"` assertion to match new generic header |
 | `tests/test_feed.py` or `tests/test_brain.py` | Edit | Add tests for modified prompt construction |
