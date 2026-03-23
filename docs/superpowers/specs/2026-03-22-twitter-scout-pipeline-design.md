@@ -69,12 +69,27 @@ CREATE INDEX IF NOT EXISTS idx_scout_chat ON scout_links(chat_id);
 CREATE INDEX IF NOT EXISTS idx_scout_cat  ON scout_links(category);
 ```
 
-**Category values:** `tool | technique | business_intel | code_pattern | market_intel | irrelevant | extraction_failed`
+**Category values:** `tool | technique | business_intel | code_pattern | market_intel | irrelevant | extraction_failed | categorization_failed`
+
+- `extraction_failed` — tweet content could not be retrieved (all extraction methods failed); `tweet_text` will be `NULL`
+- `categorization_failed` — tweet content was retrieved but Ollama was unreachable; `tweet_text` will be populated
 
 **New DB functions (additive, no existing functions changed):**
-- `save_scout_link(chat_id, url, extraction, categorization)` — inserts one row
-- `get_scout_links(chat_id, since_hours=24, category=None)` — filtered fetch
-- `get_scout_digest(chat_id, since_hours=24)` — counts by category + top items by relevance
+
+- `save_scout_link(chat_id, url, extraction, categorization)` — inserts one row. `processed_at` is generated internally as `datetime.datetime.utcnow().isoformat()`. All optional DB columns (`author`, `tweet_text`, `linked_urls`, etc.) are populated via `.get(field, None)` on both dicts, so extraction-failed dicts (which lack most fields) insert cleanly with `NULL` values. When `extraction.get("extraction_failed")` is `True`, `raw_data` stores the full `extraction` dict (including `methods_tried`) as JSON.
+
+- `get_scout_links(chat_id, since_hours=24, category=None) -> list[dict]` — returns rows matching chat_id within the time window, optionally filtered by category, ordered by `processed_at DESC`.
+
+- `get_scout_digest(chat_id, since_hours=24) -> dict` — returns:
+  ```python
+  {
+      "counts": {"tool": int, "technique": int, ...},  # all categories
+      "top_items": [                                    # top 5 by relevance_score DESC
+          {"url": str, "author": str, "summary": str, "category": str, "relevance_score": int},
+          ...
+      ]
+  }
+  ```
 
 ---
 
@@ -133,12 +148,12 @@ Calls Ollama with `format: "json"`. System prompt:
 >
 > Return JSON: {category, relevance_score (1-10), summary (1 sentence), action_items (array of specific next steps)}"
 
-Falls back to `{category: "extraction_failed", relevance_score: 0, summary: "", action_items: []}` if Ollama is unreachable.
+Falls back to `{category: "categorization_failed", relevance_score: 0, summary: "", action_items: []}` if Ollama is unreachable. This is distinct from `extraction_failed` (which means no tweet content was retrieved).
 
 ### Other Functions
 
 - `extract_github_repos(text: str) -> list` — regex scan for `github.com/owner/repo` patterns, returns deduplicated list
-- `process_batch(urls: list) -> dict` — iterates with `time.sleep(RATE_LIMIT_DELAY)` between requests. Returns `{results: [...], stats: {total, succeeded, failed, by_category: {}}}`
+- `process_batch(urls: list) -> dict` — iterates over URLs; after all extraction strategies for a given URL are exhausted (whether successful or not), sleeps `RATE_LIMIT_DELAY` seconds before processing the next URL. The delay is per-URL, not per-HTTP-request. Returns `{results: [...], stats: {total, succeeded, failed, by_category: {}}}`
 
 ---
 
@@ -146,8 +161,14 @@ Falls back to `{category: "extraction_failed", relevance_score: 0, summary: "", 
 
 ### Functions
 
-**`handle_scout_links(chat_id, message_text) -> str`**
-Entry point called from dispatcher thread. Extracts Twitter URLs from message, sends "🔍 Scouting N links..." immediately, calls `process_batch()`, saves each result, returns formatted summary.
+**`handle_scout_links(chat_id, message_text, send_fn) -> None`**
+Entry point called from `_scout_thread`. Accepts `send_fn` (the `send` callable from `telegram-dispatcher.py`) as a parameter to avoid a circular import — `clawmson_scout` never imports from `telegram-dispatcher`. Extracts Twitter URLs from message, calls `send_fn(chat_id, "🔍 Scouting N links...")` immediately, calls `process_batch()`, saves each result via `save_scout_link()`, then calls `send_fn(chat_id, format_scout_report(results))`. All Telegram sends happen inside this function.
+
+`_scout_thread` in `telegram-dispatcher.py`:
+```python
+def _scout_thread(chat_id: str, text: str):
+    scout.handle_scout_links(chat_id, text, send)
+```
 
 **`generate_digest(chat_id, since_hours=24) -> str`**
 Pulls from `get_scout_digest()`, formats grouped breakdown by category, sorted by relevance score descending. Used by `/scout` command.
@@ -173,6 +194,7 @@ Send /scout for full digest.
 | market_intel | 📊 |
 | irrelevant | 🗑 |
 | extraction_failed | ❌ |
+| categorization_failed | ⚠️ |
 
 ---
 
@@ -182,23 +204,31 @@ Send /scout for full digest.
 
 ### 1. Pre-route Twitter detection
 
-Inserted at the top of `handle_message()`, before the `!` shortcut block:
+Inserted at the top of `handle_message()`, before the `!` shortcut block. Any message containing a Twitter/X status URL — even if it also contains other text or non-Twitter URLs — is consumed entirely by the scout pipeline. REFERENCE_INGEST is never triggered for these messages; the scout pipeline is the authoritative handler.
 
 ```python
 _TWITTER_RE = re.compile(r'https?://(x\.com|twitter\.com)/\w+/status/\d+')
 
-# in handle_message(), before shortcut block:
+# in handle_message(), BEFORE the existing shortcut block:
 if text and _TWITTER_RE.search(text):
+    db.save_message(chat_id, "user", text, message_id=msg_id)
     t = threading.Thread(target=_scout_thread, args=(chat_id, text), daemon=True)
     t.start()
-    send(chat_id, f"🔍 Scouting {len(_TWITTER_RE.findall(text))} link(s)...")
-    db.save_message(chat_id, "user", text, message_id=msg_id)
     return
+# (existing !status / !queue / !help block follows unchanged)
 ```
+
+`_scout_thread` is defined in `telegram-dispatcher.py` as:
+```python
+def _scout_thread(chat_id: str, text: str):
+    scout.handle_scout_links(chat_id, text, send)
+```
+
+The "🔍 Scouting N links..." acknowledgement is sent inside `handle_scout_links()` via `send_fn`, not in the dispatcher, so the `send()` happens from the thread (non-blocking for the dispatcher loop).
 
 ### 2. `/scout` command
 
-Added to the slash commands block:
+Added to the **second** `if text:` block in `handle_message()` (the slash commands block at line 427+, not the shortcut block at line 414). Insert after the `/references` check and before the `/approve` check. Both checks use exact string equality — `/scout` and `/scout clear` are mutually exclusive by the string values themselves; no prefix conflict exists.
 
 ```python
 if lower == "/scout":
@@ -229,17 +259,18 @@ import clawmson_scout as scout
 
 - If a nitter instance times out or returns non-200, try the next instance silently.
 - If ALL extraction methods fail for a URL, store with `category="extraction_failed"` and `raw_data` containing `methods_tried` list. Never drop a URL silently.
-- If Ollama is unreachable during categorization, store the extraction result with `category="extraction_failed"` and `relevance_score=0`. Bot continues processing remaining URLs.
+- If Ollama is unreachable during categorization, store the extraction result with `category="categorization_failed"` and `relevance_score=0`. Bot continues processing remaining URLs.
 - Rate limit: `RATE_LIMIT_DELAY = 0.5s` between nitter requests. No rate limiting on fxtwitter/oembed calls.
 - Extraction + categorization runs in a daemon thread — dispatcher is never blocked.
+- `send()` is thread-safe: it makes a stateless `requests.post()` call with no shared mutable state (no session object, no shared headers). Concurrent calls from multiple threads are safe, consistent with the existing REFERENCE_INGEST threading pattern in the dispatcher.
 
 ---
 
 ## End-to-End Flow Example
 
 1. Jordan sends: `"check these out https://x.com/foo/status/123 https://x.com/bar/status/456"`
-2. Dispatcher detects 2 Twitter status URLs, sends "🔍 Scouting 2 links...", returns immediately.
-3. Background thread: `process_batch([url1, url2])` → extract each → categorize each → save each.
-4. Clawmson sends: "📊 Scout Report (2 links)\n🔧 1 tool · 📈 1 business_intel\n\nTop find (8/10): ..."
+2. Dispatcher detects 2 Twitter status URLs, saves user message to DB, starts `_scout_thread`, returns immediately (no send from dispatcher).
+3. Background thread starts; `handle_scout_links()` sends "🔍 Scouting 2 links..." via `send_fn`, then calls `process_batch([url1, url2])`.
+4. Extraction + categorization completes; `handle_scout_links()` sends: "📊 Scout Report (2 links)\n🔧 1 tool · 📈 1 business_intel\n\nTop find (8/10): ..."
 5. Jordan sends `/scout` → gets full digest of last 24h grouped by category.
 6. All results queryable forever via `get_scout_links()`.
