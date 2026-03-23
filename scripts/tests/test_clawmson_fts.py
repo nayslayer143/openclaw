@@ -15,28 +15,15 @@ if str(_SCRIPTS) not in sys.path:
 import clawmson_db as db
 db._init_db()
 
-# Probe FTS5 availability at module level
-FTS5_AVAILABLE = False
-try:
-    import sqlite3 as _sqlite3
-    _conn = _sqlite3.connect(":memory:")
-    _conn.execute("CREATE VIRTUAL TABLE IF NOT EXISTS _fts5_check USING fts5(x)")
-    _conn.close()
-    FTS5_AVAILABLE = True
-except Exception:
-    pass
-
-import clawmson_fts as fts  # noqa: E402 — imported after DB setup
+from clawmson_fts import FTS5_AVAILABLE
+import clawmson_fts as fts
 
 
 class TestFTSSchema(unittest.TestCase):
     @unittest.skipUnless(FTS5_AVAILABLE, "FTS5 not supported")
     def test_fts_tables_exist(self):
         """memory_fts and sessions tables exist after _init_db()."""
-        import importlib
-        import clawmson_db
-        importlib.reload(clawmson_db)
-        with clawmson_db._get_conn() as conn:
+        with db._get_conn() as conn:
             all_names = {r[0] for r in conn.execute(
                 "SELECT name FROM sqlite_master"
             ).fetchall()}
