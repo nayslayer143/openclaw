@@ -1744,8 +1744,8 @@ body {
       <div id="tradingLastUpdate" style="font-size:0.50rem;color:var(--grey2);letter-spacing:1px;text-align:right"></div>
     </div>
 
-    <!-- 3-Engine Hero Grid -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px" id="heroGrid">
+    <!-- 4-Engine Hero Grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:14px" id="heroGrid">
 
       <!-- PhantomClaw -->
       <div class="t-section" style="border-color:rgba(255,0,200,0.25);background:linear-gradient(135deg,rgba(15,0,20,0.95),rgba(5,0,10,0.98));margin-bottom:0">
@@ -1801,9 +1801,28 @@ body {
         </div>
       </div>
 
+      <!-- ArbClaw -->
+      <div class="t-section" style="border-color:rgba(0,255,136,0.25);background:linear-gradient(135deg,rgba(0,10,5,0.95),rgba(0,5,2,0.98));margin-bottom:0">
+        <div class="t-section-title" style="color:#00ff88;border-bottom-color:rgba(0,255,136,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
+          ARBCLAW
+          <span class="t-live-dot" style="background:#00ff88;box-shadow:0 0 6px #00ff88;width:6px;height:6px"></span>
+        </div>
+        <div style="font-size:0.38rem;color:rgba(0,255,136,0.4);letter-spacing:1px;margin:-8px 0 8px 0">PURE ARB · ASK PRICES · */5 CRON</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+          <div><div class="t-card-label">P&L</div><div class="t-card-value" id="acPnlHero" style="font-size:1rem">$0</div></div>
+          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="acWLHero" style="font-size:1rem">0/0</div></div>
+          <div><div class="t-card-label">OPEN</div><div class="t-card-value" id="acOpenHero" style="font-size:1rem;color:#00ff88">0</div></div>
+        </div>
+        <div class="t-table-wrap" style="max-height:200px;overflow-y:auto">
+          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>P&L</th><th>STATUS</th></tr></thead>
+          <tbody id="acHeroBody"><tr><td colspan="4" style="color:rgba(0,255,136,0.3);text-align:center">no true arbs (markets efficient)</td></tr></tbody></table>
+        </div>
+      </div>
+
     </div>
     <style>
-      @media (max-width:1100px) { #heroGrid { grid-template-columns: 1fr !important; } }
+      @media (max-width:1400px) { #heroGrid { grid-template-columns: 1fr 1fr !important; } }
+      @media (max-width:800px) { #heroGrid { grid-template-columns: 1fr !important; } }
     </style>
 
     <!-- Compact stats row -->
@@ -1812,7 +1831,7 @@ body {
       <div class="t-card"><div class="t-card-label">OPEN</div><div class="t-card-sub" id="tPositions" style="margin:0">0</div></div>
       <div class="t-card"><div class="t-card-label">WIN RATE</div><div class="t-card-sub" id="tWinRate" style="margin:0">0%</div></div>
       <div class="t-card"><div class="t-card-label">UNREALIZED</div><div class="t-card-sub" id="tUnrealized" style="margin:0">$0</div></div>
-      <div class="t-card"><div class="t-card-label">PHANTOM WR</div><div class="t-card-sub" id="phWR" style="margin:0">0%</div></div>
+      <div class="t-card"><div class="t-card-label">PHANTOM WR</div><div class="t-card-sub" id="phWR2" style="margin:0">0%</div></div>
       <div class="t-card"><div class="t-card-label">STATUS</div><div class="t-card-sub" id="tGradStatus" style="margin:0">TESTING</div></div>
     </div>
 
@@ -4392,7 +4411,7 @@ function renderTrading() {
   document.getElementById('phPnl').style.color = phPnl >= 0 ? '#00e5ff' : '#ff2d95'
   document.getElementById('phWL').textContent = (ph.wins || 0) + '/' + (ph.losses || 0)
   document.getElementById('phWL').style.color = (ph.wins || 0) >= (ph.losses || 0) ? '#00e5ff' : '#ff2d95'
-  try { document.getElementById('phWR').textContent = (ph.win_rate || 0).toFixed(0) + '%' } catch(e){}
+  document.querySelectorAll('#phWR, #phWR2').forEach(el => { el.textContent = (ph.win_rate || 0).toFixed(0) + '%' })
   document.getElementById('phOpen').textContent = ph.open || 0
 
   const phBody = document.getElementById('phBody')
@@ -4474,10 +4493,38 @@ function renderExperiment(d) {
     pnlEl.textContent = (w.total_pnl >= 0 ? '+' : '') + '$' + w.total_pnl.toFixed(2)
     pnlEl.style.color = w.total_pnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
 
-    document.getElementById('acWinRate').textContent = w.win_rate + '%'
-    document.getElementById('acTrades').textContent = w.total_trades
-    document.getElementById('acOpen').textContent = w.open_positions
-    document.getElementById('acLatency').textContent = w.avg_latency_ms.toFixed(0) + 'ms'
+    try { document.getElementById('acWinRate').textContent = w.win_rate + '%' } catch(e){}
+    try { document.getElementById('acTrades').textContent = w.total_trades } catch(e){}
+    try { document.getElementById('acOpen').textContent = w.open_positions } catch(e){}
+    try { document.getElementById('acLatency').textContent = w.avg_latency_ms.toFixed(0) + 'ms' } catch(e){}
+
+    // Hero card
+    const acHeroPnl = document.getElementById('acPnlHero')
+    if (acHeroPnl) {
+      acHeroPnl.textContent = (w.total_pnl >= 0 ? '+' : '') + '$' + w.total_pnl.toFixed(2)
+      acHeroPnl.style.color = w.total_pnl >= 0 ? '#00ff88' : '#ff002e'
+    }
+    const acHeroWL = document.getElementById('acWLHero')
+    if (acHeroWL) {
+      acHeroWL.textContent = (w.win_count || 0) + '/' + ((w.total_trades || 0) - (w.win_count || 0))
+    }
+    const acHeroOpen = document.getElementById('acOpenHero')
+    if (acHeroOpen) acHeroOpen.textContent = w.open_positions
+
+    // Hero trade body
+    const acHBody = document.getElementById('acHeroBody')
+    if (acHBody) {
+      const acRows = [...(ac.open_positions || []).map(p => ({m: (p.question||p.market_id||'').substring(0,25), d: p.direction, pnl: p.pnl||0, s: 'OPEN'})),
+                       ...(ac.recent_trades || []).slice(0,5).map(t => ({m: (t.market_id||'').substring(0,25), d: t.direction, pnl: t.pnl||0, s: t.pnl > 0 ? 'WIN' : 'LOSS'}))]
+      if (acRows.length) {
+        acHBody.innerHTML = acRows.slice(0,6).map(r => {
+          const cls = r.s === 'OPEN' ? 'color:var(--neon-cyan)' : (r.pnl >= 0 ? 'color:#00ff88' : 'color:#ff002e')
+          return `<tr><td style="color:rgba(0,255,136,0.7)">${r.m}</td><td>${r.d}</td><td style="${cls}">${r.s==='OPEN'?'':'$'}${r.s==='OPEN'?'OPEN':r.pnl.toFixed(2)}</td><td style="${cls}">${r.s}</td></tr>`
+        }).join('')
+      } else {
+        acHBody.innerHTML = '<tr><td colspan="4" style="color:rgba(0,255,136,0.3);text-align:center">no true arbs found</td></tr>'
+      }
+    }
 
     const body = document.getElementById('acTradesBody')
     const rows = [...(ac.open_positions || []).map(p => ({
