@@ -266,27 +266,48 @@ def fetch_orderbook(ticker: str) -> dict | None:
 # ---------------------------------------------------------------------------
 
 # Series tickers for markets we actually care about
+# Ordered by resolution speed: 15min → hourly → daily → weekly → long-term
 TARGET_SERIES = [
-    "KXBTC",       # Bitcoin price
+    # 15-minute crypto (fastest feedback)
+    "KXDOGE15M",   # Dogecoin 15min
+    "KXADA15M",    # Cardano 15min
+    "KXBNB15M",    # BNB 15min
+    "KXBCH15M",    # Bitcoin Cash 15min
+    # Hourly
+    "INXI",        # S&P 500 hourly
+    "NASDAQ100I",  # Nasdaq-100 hourly
+    "KXUSDJPYH",   # USD/JPY hourly
+    "KXTEMPNYCH",  # NYC temperature hourly
+    # Daily crypto
+    "KXBTC",       # Bitcoin price (daily ranges)
+    "KXBTCMAXD",   # BTC daily max
     "KXETH",       # Ethereum price
-    "KXINXSPX",    # S&P 500
-    "KXINXNDX",    # Nasdaq
-    "KXFEDRATE",   # Fed rate decisions
-    "KXCPI",       # CPI / inflation
-    "KXGDP",       # GDP
-    "KXJOBLESS",   # Jobless claims
-    "KXELECTION",  # Elections
-    "KXNEWPOPE",   # Pope
-    "KXTRUMP",     # Trump-related
-    "KXGOV",       # Government
-    "KXTARIFF",    # Tariffs
+    # Daily financials
+    "KXINXSPX",    # S&P 500 daily
+    "KXINXNDX",    # Nasdaq daily
+    "KXGOLDD",     # Gold daily
+    "KXSILVERD",   # Silver daily
+    "KXTNOTED",    # 10Y Treasury daily
+    "KXUSDJPY",    # USD/JPY daily
+    # Daily other
+    "KXHIGHTDC",   # DC temperature daily
+    "KXHIGHTSFO",  # SF temperature daily
+    "KXTRUMPACT",  # "Will Trump do anything today?"
+    "KXTRUMPPOLLDAILY",  # Trump approval daily
+    "KXTSA",       # TSA check-ins daily
+    # Sports (resolve same day/week)
     "KXNBA",       # NBA
     "KXNFL",       # NFL
     "KXMLB",       # MLB
-    "KXSOCCER",    # Soccer
     "KXNCAA",      # NCAA
-    "KXWEATHER",   # Weather
-    "KXHURRICANE", # Hurricanes
+    "KXSOCCER",    # Soccer
+    # Weekly/medium-term
+    "KXFEDRATE",   # Fed rate decisions
+    "KXCPI",       # CPI / inflation
+    "KXJOBLESS",   # Jobless claims
+    "KXELECTION",  # Elections
+    "KXTARIFF",    # Tariffs
+    "KXNEWPOPE",   # Pope
 ]
 
 

@@ -486,14 +486,62 @@ def analyze(
                 arb_market_ids.add(market["market_id"])
 
     # Step 2: Ollama analysis for non-arb markets
+    # Merge Polymarket + Kalshi into a single list for the LLM
     non_arb = [m for m in markets if m["market_id"] not in arb_market_ids]
+
+    # Add Kalshi markets as flat dicts so LLM can analyze them too
+    if kalshi_events:
+        for ke in kalshi_events:
+            if ke.market_id in arb_market_ids:
+                continue
+            yes_price = ke.outcomes[0].bid if ke.outcomes else 0
+            no_price = ke.outcomes[1].bid if len(ke.outcomes) > 1 else (1.0 - yes_price)
+            close_time = ""
+            if ke.contract.expiry_ts_ms:
+                import datetime as _dtc
+                close_time = _dtc.datetime.utcfromtimestamp(ke.contract.expiry_ts_ms / 1000).isoformat() + "Z"
+            non_arb.append({
+                "market_id": ke.market_id,
+                "question": ke.question,
+                "yes_price": yes_price or 0.5,
+                "no_price": no_price or 0.5,
+                "volume": ke.volume_24h,
+                "end_date": close_time,
+                "close_time": close_time,
+                "category": ke.category,
+                "venue": "kalshi",
+            })
+
     if not non_arb:
         return sorted(decisions, key=lambda d: d.confidence, reverse=True)
 
+    # Sort by expiry: markets resolving soonest first (prefer fast feedback)
+    import datetime as _dt
+    _now = _dt.datetime.utcnow()
+    def _hours_to_expiry(m):
+        ed = m.get("end_date") or m.get("close_time") or ""
+        if not ed:
+            return 999999
+        try:
+            dt = _dt.datetime.fromisoformat(str(ed).replace("Z", "+00:00"))
+            return max(0, (dt.replace(tzinfo=None) - _now).total_seconds() / 3600)
+        except (ValueError, TypeError):
+            return 999999
+
+    non_arb_sorted = sorted(non_arb, key=_hours_to_expiry)
+
     open_positions = wallet.get("open_positions", 0)
+
+    def _expiry_label(m):
+        h = _hours_to_expiry(m)
+        if h < 1: return "⚡<1h"
+        if h < 24: return f"🔥{h:.0f}h"
+        if h < 168: return f"📅{h/24:.0f}d"
+        return f"📆{h/24:.0f}d"
+
     market_lines = "\n".join(
-        f'- [{m["market_id"]}] {m["question"][:80]} | YES={m["yes_price"]:.2f} NO={m["no_price"]:.2f} vol=${m["volume"]:,.0f}'
-        for m in non_arb[:30]
+        f'- [{m["market_id"]}] {m["question"][:70]} | YES={m["yes_price"]:.2f} NO={m["no_price"]:.2f} vol=${m["volume"]:,.0f} {_expiry_label(m)} [{m.get("venue","polymarket")[:5]}]'
+        for m in non_arb_sorted[:40]
     )
 
     # Build two-pass signal blocks
@@ -541,10 +589,16 @@ def analyze(
 
         signals_block = ideas_block + raw_block
 
-    prompt = f"""You are Mirofish, a prediction market paper trading system.
+    prompt = f"""You are Mirofish, a prediction market paper trading system in TESTING PHASE.
 Current portfolio: ${balance:.2f} balance, {open_positions} open positions.
 
-Analyze these Polymarket markets and identify trading opportunities using:
+CRITICAL: We are paper trading and need FAST FEEDBACK. Strongly prefer markets that resolve SOON:
+- ⚡ Markets resolving in <1 hour = HIGHEST PRIORITY (15min crypto, hourly S&P/Nasdaq)
+- 🔥 Markets resolving in <24 hours = HIGH PRIORITY (daily price ranges, sports tonight, weather today)
+- 📅 Markets resolving in <7 days = MEDIUM (weekly events, near-term politics)
+- 📆 Markets resolving in >7 days = LOW PRIORITY (only if edge is overwhelming)
+
+Analyze these markets and identify trading opportunities using:
 - momentum: YES price trending upward strongly (>5% over recent snapshots)
 - contrarian: YES price moved >20% in one direction (likely overreaction)
 - news_catalyst: you know of recent news that changes the true probability significantly
@@ -555,10 +609,10 @@ For each opportunity, calculate:
 - Direction (YES or NO)
 - One-sentence reasoning
 
-Markets:
+Markets (sorted by expiry, soonest first):
 {market_lines}
 {signals_block}
-Return ONLY a JSON array (no explanation), max 5 opportunities:
+Return ONLY a JSON array (no explanation), max 5 opportunities. PREFER SHORT-EXPIRY MARKETS:
 [
   {{
     "market_id": "...",
