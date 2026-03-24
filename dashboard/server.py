@@ -943,6 +943,15 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
             pnl = t["shares"] * (current_price - t["entry_price"])
             pnl_pct = (pnl / t["amount_usd"] * 100) if t["amount_usd"] > 0 else 0
             unrealized += pnl
+            # Look up close_time from kalshi_markets or market_data
+            close_time = None
+            km = conn.execute("SELECT close_time FROM kalshi_markets WHERE ticker=? ORDER BY fetched_at DESC LIMIT 1", (t["market_id"],)).fetchone()
+            if km and km["close_time"]:
+                close_time = km["close_time"]
+            else:
+                md = conn.execute("SELECT end_date FROM market_data WHERE market_id=? ORDER BY fetched_at DESC LIMIT 1", (t["market_id"],)).fetchone()
+                if md and md["end_date"]:
+                    close_time = md["end_date"]
             open_list.append({
                 "id": t["id"], "market_id": t["market_id"],
                 "question": t["question"][:80], "direction": t["direction"],
@@ -950,7 +959,7 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
                 "current_price": current_price, "shares": t["shares"],
                 "amount_usd": t["amount_usd"], "pnl": round(pnl, 2),
                 "pnl_pct": round(pnl_pct, 1), "confidence": t["confidence"],
-                "opened_at": t["opened_at"],
+                "opened_at": t["opened_at"], "close_time": close_time,
             })
 
         balance = starting + closed_pnl + unrealized
@@ -1103,6 +1112,192 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
         }
     finally:
         conn.close()
+
+
+# ── ArbClaw / RivalClaw Experiment ────────────────────────────────────────────
+
+def _experiment_db(instance):
+    """Open SQLite DB for an experiment instance (arbclaw or rivalclaw)."""
+    paths = {
+        "arbclaw": Path.home() / "arbclaw" / "arbclaw.db",
+        "rivalclaw": Path.home() / "rivalclaw" / "rivalclaw.db",
+    }
+    db_path = paths.get(instance)
+    if not db_path or not db_path.exists():
+        return None
+    conn = sqlite3.connect(str(db_path))
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def _arbclaw_state(conn):
+    """Read ArbClaw wallet state (different schema: positions/trades tables)."""
+    starting = 1000.0
+    total_pnl = conn.execute("SELECT COALESCE(SUM(pnl), 0) FROM trades").fetchone()[0]
+    locked = conn.execute("SELECT COALESCE(SUM(amount_usd), 0) FROM positions WHERE status='open'").fetchone()[0]
+    balance = starting + total_pnl - locked
+
+    open_pos = conn.execute("SELECT * FROM positions WHERE status='open' ORDER BY opened_at DESC").fetchall()
+    open_list = []
+    for p in open_pos:
+        latest = conn.execute(
+            "SELECT yes_price, no_price FROM market_snapshots WHERE market_id=? ORDER BY fetched_at DESC LIMIT 1",
+            (p["market_id"],)
+        ).fetchone()
+        current = p["entry_price"]
+        if latest:
+            current = latest["yes_price"] if p["direction"] == "YES" else latest["no_price"]
+        pnl = (current - p["entry_price"]) * p["shares"] if p["shares"] else 0
+        pnl_pct = (pnl / p["amount_usd"] * 100) if p["amount_usd"] and p["amount_usd"] > 0 else 0
+        open_list.append({
+            "market_id": p["market_id"], "question": (p["question"] or "")[:80],
+            "direction": p["direction"], "entry_price": p["entry_price"],
+            "current_price": current, "amount_usd": p["amount_usd"],
+            "pnl": round(pnl, 2), "pnl_pct": round(pnl_pct, 1),
+            "latency_ms": p["signal_to_trade_latency_ms"] or 0,
+            "opened_at": p["opened_at"],
+        })
+
+    recent = conn.execute(
+        "SELECT * FROM trades ORDER BY closed_at DESC LIMIT 20"
+    ).fetchall()
+    recent_list = [{
+        "market_id": r["market_id"], "direction": r["direction"],
+        "entry_price": r["entry_price"], "exit_price": r["exit_price"],
+        "pnl": round(r["pnl"] or 0, 2),
+        "latency_ms": r["signal_to_trade_latency_ms"] or 0,
+        "opened_at": r["opened_at"], "closed_at": r["closed_at"],
+    } for r in recent]
+
+    total_trades = conn.execute("SELECT COUNT(*) FROM trades").fetchone()[0]
+    wins = conn.execute("SELECT COUNT(*) FROM trades WHERE pnl > 0").fetchone()[0]
+    avg_latency = conn.execute("SELECT AVG(signal_to_trade_latency_ms) FROM trades WHERE signal_to_trade_latency_ms > 0").fetchone()[0]
+
+    # Daily PnL curve
+    daily = conn.execute("SELECT date, balance FROM daily_pnl ORDER BY date ASC").fetchall()
+    pnl_curve = [{"date": r["date"], "balance": r["balance"]} for r in daily]
+
+    return {
+        "instance": "arbclaw",
+        "wallet": {
+            "balance": round(balance, 2), "starting_balance": starting,
+            "total_pnl": round(total_pnl, 2),
+            "total_trades": total_trades, "wins": wins,
+            "win_rate": round(wins / total_trades * 100, 1) if total_trades > 0 else 0,
+            "open_positions": len(open_list),
+            "avg_latency_ms": round(avg_latency or 0, 1),
+        },
+        "open_positions": open_list,
+        "recent_trades": recent_list,
+        "pnl_curve": pnl_curve,
+    }
+
+
+def _rivalclaw_state(conn):
+    """Read RivalClaw wallet state (Mirofish-compatible schema)."""
+    starting = 1000.0
+    ctx = conn.execute("SELECT value FROM context WHERE chat_id='rivalclaw' AND key='starting_balance'").fetchone()
+    if ctx:
+        starting = float(ctx[0])
+
+    closed_pnl = conn.execute("SELECT COALESCE(SUM(pnl), 0) FROM paper_trades WHERE status != 'open'").fetchone()[0]
+    open_trades = conn.execute("SELECT * FROM paper_trades WHERE status='open' ORDER BY opened_at DESC").fetchall()
+
+    unrealized = 0.0
+    open_list = []
+    for t in open_trades:
+        latest = conn.execute(
+            "SELECT yes_price, no_price FROM market_data WHERE market_id=? ORDER BY fetched_at DESC LIMIT 1",
+            (t["market_id"],)
+        ).fetchone()
+        current = t["entry_price"]
+        if latest:
+            current = latest["yes_price"] if t["direction"] == "YES" else latest["no_price"]
+            if current is None:
+                current = t["entry_price"]
+        pnl = t["shares"] * (current - t["entry_price"])
+        pnl_pct = (pnl / t["amount_usd"] * 100) if t["amount_usd"] > 0 else 0
+        unrealized += pnl
+        open_list.append({
+            "market_id": t["market_id"], "question": (t["question"] or "")[:80],
+            "direction": t["direction"], "strategy": t["strategy"],
+            "entry_price": t["entry_price"], "current_price": current,
+            "amount_usd": t["amount_usd"], "pnl": round(pnl, 2), "pnl_pct": round(pnl_pct, 1),
+            "latency_ms": t["signal_to_trade_latency_ms"] or 0,
+            "opened_at": t["opened_at"],
+        })
+
+    balance = starting + closed_pnl + unrealized
+
+    recent = conn.execute(
+        "SELECT * FROM paper_trades WHERE status != 'open' ORDER BY closed_at DESC LIMIT 20"
+    ).fetchall()
+    recent_list = [{
+        "market_id": r["market_id"], "direction": r["direction"],
+        "entry_price": r["entry_price"], "exit_price": r["exit_price"],
+        "pnl": round(r["pnl"] or 0, 2), "status": r["status"],
+        "latency_ms": r["signal_to_trade_latency_ms"] or 0,
+        "opened_at": r["opened_at"], "closed_at": r["closed_at"],
+    } for r in recent]
+
+    all_closed = conn.execute("SELECT status, pnl FROM paper_trades WHERE status != 'open'").fetchall()
+    total_closed = len(all_closed)
+    wins = sum(1 for t in all_closed if t["status"] == "closed_win")
+
+    avg_latency = conn.execute(
+        "SELECT AVG(signal_to_trade_latency_ms) FROM paper_trades WHERE signal_to_trade_latency_ms > 0"
+    ).fetchone()[0]
+
+    # Cycle metrics
+    cycle_metrics = []
+    try:
+        rows = conn.execute(
+            "SELECT * FROM cycle_metrics ORDER BY id DESC LIMIT 20"
+        ).fetchall()
+        cycle_metrics = [dict(r) for r in rows]
+    except Exception:
+        pass
+
+    # Daily PnL curve
+    daily = conn.execute("SELECT date, balance, roi_pct FROM daily_pnl ORDER BY date ASC").fetchall()
+    pnl_curve = [{"date": r["date"], "balance": r["balance"], "roi_pct": r["roi_pct"]} for r in daily]
+
+    return {
+        "instance": "rivalclaw",
+        "wallet": {
+            "balance": round(balance, 2), "starting_balance": starting,
+            "total_pnl": round(closed_pnl, 2),
+            "unrealized_pnl": round(unrealized, 2),
+            "total_trades": total_closed, "wins": wins,
+            "win_rate": round(wins / total_closed * 100, 1) if total_closed > 0 else 0,
+            "open_positions": len(open_list),
+            "avg_latency_ms": round(avg_latency or 0, 1),
+        },
+        "open_positions": open_list,
+        "recent_trades": recent_list,
+        "pnl_curve": pnl_curve,
+        "cycle_metrics": cycle_metrics,
+    }
+
+
+@app.get("/api/trading/experiment")
+async def get_experiment_dashboard(user: str = Depends(get_current_user)):
+    """Three-way experiment dashboard: ArbClaw + RivalClaw data."""
+    result = {"arbclaw": None, "rivalclaw": None}
+    for instance in ("arbclaw", "rivalclaw"):
+        conn = _experiment_db(instance)
+        if not conn:
+            continue
+        try:
+            if instance == "arbclaw":
+                result[instance] = _arbclaw_state(conn)
+            else:
+                result[instance] = _rivalclaw_state(conn)
+        except Exception as e:
+            result[instance] = {"error": str(e)}
+        finally:
+            conn.close()
+    return result
 
 
 # ── Terminal Watch ────────────────────────────────────────────────────────────
