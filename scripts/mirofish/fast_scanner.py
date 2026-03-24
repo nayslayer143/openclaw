@@ -46,8 +46,10 @@ MIN_EDGE = float(os.environ.get("FAST_SCAN_MIN_EDGE", "0.04"))
 POSITION_PCT = float(os.environ.get("FAST_SCAN_POSITION_PCT", "0.05"))
 MAX_POSITION_PCT = float(os.environ.get("MIROFISH_MAX_POSITION_PCT", "0.10"))
 ARB_THRESHOLD = 0.03
-MAX_TRADES_PER_RUN = int(os.environ.get("FAST_SCAN_MAX_TRADES", "10"))
-MAX_PER_EVENT = int(os.environ.get("FAST_SCAN_MAX_PER_EVENT", "1"))  # 1 bracket per event
+MAX_TRADES_PER_RUN = int(os.environ.get("FAST_SCAN_MAX_TRADES", "5"))
+MAX_PER_EVENT = int(os.environ.get("FAST_SCAN_MAX_PER_EVENT", "1"))
+MIN_ENTRY_PRICE = 0.05   # skip penny contracts (<5 cents)
+MAX_SPREAD_PCT = 0.30     # skip markets with >30% bid/ask spread
 
 # Crypto assets we can price-check against spot
 CRYPTO_TICKERS = {
@@ -216,15 +218,16 @@ def run():
     except Exception:
         balance = 1000.0
 
-    # Check for duplicate positions
+    # Check for duplicate positions — by ticker AND by question prefix
     try:
-        open_ids = set(
-            r[0] for r in conn.execute(
-                "SELECT market_id FROM paper_trades WHERE status='open'"
-            ).fetchall()
-        )
+        open_rows = conn.execute(
+            "SELECT market_id, question FROM paper_trades WHERE status='open'"
+        ).fetchall()
+        open_ids = set(r[0] for r in open_rows)
+        open_questions = set(r[1][:30] for r in open_rows if r[1])
     except Exception:
         open_ids = set()
+        open_questions = set()
 
     trades_placed = 0
     events_traded: set[str] = set()  # limit 1 bracket per event
@@ -245,9 +248,12 @@ def run():
         if not ticker or ticker in open_ids:
             continue
 
-        # Skip if already traded this event (avoid spamming every bracket)
+        # Skip if already traded this event or similar question
         event_ticker = _g(m, "event_ticker") or ticker[:20]
         if event_ticker in events_traded:
+            continue
+        question_prefix = (title_str or "")[:30]
+        if question_prefix in open_questions:
             continue
 
         yes_bid = _g(m, "yes_bid", 0) or 0
@@ -267,6 +273,14 @@ def run():
         yes_p = yes_mid / 100.0 if yes_mid > 1 else yes_mid
         no_p = no_mid / 100.0 if no_mid > 1 else no_mid
 
+        # Skip penny contracts and wide spreads
+        if yes_p < MIN_ENTRY_PRICE and no_p < MIN_ENTRY_PRICE:
+            continue
+        if yes_bid > 0 and yes_ask > 0:
+            spread = (yes_ask - yes_bid) / yes_mid if yes_mid > 0 else 1.0
+            if spread > MAX_SPREAD_PCT:
+                continue
+
         # Strategy 1: Single-venue arb (yes + no != 1.0)
         if yes_p > 0 and no_p > 0:
             gap = abs(yes_p + no_p - 1.0)
@@ -280,6 +294,7 @@ def run():
                                  entry, amount, shares, gap, "fast_arb")
                     trades_placed += 1
                     open_ids.add(ticker)
+                    open_questions.add(question_prefix)
                     events_traded.add(event_ticker)
                     continue
 
@@ -317,6 +332,7 @@ def run():
                                                  entry, amount, shares, abs(trend_pct), "fast_15m_trend")
                                     trades_placed += 1
                                     open_ids.add(ticker)
+                                    open_questions.add(question_prefix)
                                     events_traded.add(event_ticker)
                 except Exception:
                     pass
@@ -360,6 +376,7 @@ def run():
                                  entry, amount, shares, distance_pct, "fast_spot_lag")
                     trades_placed += 1
                     open_ids.add(ticker)
+                    open_questions.add(question_prefix)
                     events_traded.add(event_ticker)
             break
 
