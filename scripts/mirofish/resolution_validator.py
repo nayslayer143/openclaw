@@ -15,7 +15,7 @@ import re
 from dataclasses import dataclass, field
 from typing import Optional
 
-from market_event import MarketEvent, ResolutionSpec, ContractSpec
+from scripts.mirofish.market_event import MarketEvent, ResolutionSpec, ContractSpec
 
 
 # ---------------------------------------------------------------------------
@@ -291,7 +291,7 @@ def validate_resolution_compatibility(
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    from market_event import (
+    from scripts.mirofish.market_event import (
         MarketEvent, ContractSpec, ResolutionSpec, OutcomeBook,
         VenueFees, _ms_now,
     )

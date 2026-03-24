@@ -529,17 +529,162 @@ class MarketEventNormalizer:
     # Kalshi  (stub — not yet implemented)
     # ------------------------------------------------------------------
 
+    # Default Kalshi fee schedule (as of 2026-03).
+    # Kalshi: 0 maker fee, variable taker fee, $2 withdrawal fee.
+    _KALSHI_FEES = VenueFees(
+        taker_bps=0.0,  # variable per-trade, not a flat bps — modeled per-trade
+        maker_bps=0.0,
+        settlement_fee_bps=0.0,
+        withdrawal_fee_fixed=2.0,
+        notes="Kalshi: maker free, taker = max_earnings * implied_prob, $2 withdrawal",
+    )
+
     @staticmethod
     def normalize_kalshi(raw_data: dict) -> MarketEvent:
         """
         Convert a single market dict from the Kalshi API into a canonical
         MarketEvent.
 
-        Not yet implemented — Kalshi API integration is pending.
+        Expected raw_data keys (Kalshi REST v2):
+            ticker, event_ticker, title, subtitle, yes_bid, yes_ask,
+            no_bid, no_ask, last_price, volume, volume_24h, open_interest,
+            status, category, close_time, expiration_time, rules_primary,
+            rules_secondary, strike_type, cap_strike, floor_strike, result
         """
-        raise NotImplementedError(
-            "Kalshi normalizer not yet implemented. "
-            "See openclaw-v4.2-strategy.md Phase 5 for integration plan."
+        now_ms = _ms_now()
+
+        # --- identifiers ---
+        ticker = str(raw_data.get("ticker", ""))
+        title = str(raw_data.get("title") or raw_data.get("subtitle", ""))
+        question = title
+        category = (raw_data.get("category") or "").lower()
+
+        # --- status ---
+        raw_status = (raw_data.get("status") or "").lower()
+        result = raw_data.get("result", "")
+        if result:
+            status: MarketStatus = "resolved"
+        elif raw_status in ("closed", "settled"):
+            status = "closed"
+        elif raw_status == "halted":
+            status = "halted"
+        else:
+            status = "open"
+
+        # --- prices (Kalshi uses cents 0-99, normalize to 0.00-0.99) ---
+        def _cents(val) -> float:
+            if val is None:
+                return 0.0
+            try:
+                v = float(val)
+                return v / 100.0 if v > 1.0 else v
+            except (ValueError, TypeError):
+                return 0.0
+
+        yes_bid = _cents(raw_data.get("yes_bid"))
+        yes_ask = _cents(raw_data.get("yes_ask"))
+        no_bid = _cents(raw_data.get("no_bid"))
+        no_ask = _cents(raw_data.get("no_ask"))
+        last_price = _cents(raw_data.get("last_price"))
+
+        # --- outcomes ---
+        outcomes: list[OutcomeBook] = [
+            OutcomeBook(
+                outcome="YES",
+                bid=yes_bid,
+                ask=yes_ask,
+                last=last_price,
+                bid_size=0.0,
+                ask_size=0.0,
+            ),
+            OutcomeBook(
+                outcome="NO",
+                bid=no_bid,
+                ask=no_ask,
+                last=1.0 - last_price if last_price else 0.0,
+                bid_size=0.0,
+                ask_size=0.0,
+            ),
+        ]
+
+        # --- volume / OI ---
+        volume_24h = float(raw_data.get("volume_24h", 0) or 0)
+        open_interest = float(raw_data.get("open_interest", 0) or 0)
+
+        # --- expiry ---
+        close_time_str = raw_data.get("close_time") or raw_data.get("expiration_time", "")
+        expiry_ts_ms = 0
+        if close_time_str:
+            try:
+                import datetime
+                dt_str = str(close_time_str).replace("Z", "+00:00")
+                dt = datetime.datetime.fromisoformat(dt_str)
+                expiry_ts_ms = int(dt.timestamp() * 1000)
+            except (ValueError, TypeError):
+                pass
+
+        # --- contract spec ---
+        strike_type = (raw_data.get("strike_type") or "").lower()
+        cap_strike = raw_data.get("cap_strike")
+        floor_strike = raw_data.get("floor_strike")
+
+        if strike_type == "between" and cap_strike is not None and floor_strike is not None:
+            contract_type: ContractType = "bracket"
+        elif strike_type in ("greater", "less", "greater_equal", "less_equal"):
+            contract_type = "threshold"
+        else:
+            contract_type = "binary"
+
+        underlying = category or "general"
+        event_ticker = raw_data.get("event_ticker", "")
+        if event_ticker:
+            underlying = event_ticker
+
+        contract = ContractSpec(
+            contract_type=contract_type,
+            underlying=underlying,
+            strike=float(cap_strike) if cap_strike is not None else (float(floor_strike) if floor_strike is not None else None),
+            lower_bound=float(floor_strike) if floor_strike is not None else None,
+            upper_bound=float(cap_strike) if cap_strike is not None else None,
+            expiry_ts_ms=expiry_ts_ms,
+        )
+
+        # --- resolution spec ---
+        rules_primary = str(raw_data.get("rules_primary", ""))
+        rules_secondary = str(raw_data.get("rules_secondary", ""))
+        resolution = ResolutionSpec(
+            resolution_text=rules_primary[:2000] if rules_primary else question,
+            source_rules_url=f"https://kalshi.com/markets/{ticker}" if ticker else None,
+            resolves_yes_if=rules_primary[:500] if rules_primary else None,
+            resolves_no_if=rules_secondary[:500] if rules_secondary else None,
+        )
+
+        # --- tags ---
+        tags: list[str] = []
+        if category:
+            tags.append(category)
+        if event_ticker:
+            tags.append(f"event:{event_ticker}")
+        if strike_type:
+            tags.append(f"strike:{strike_type}")
+
+        return MarketEvent(
+            market_id=ticker,
+            venue="kalshi",
+            title=title,
+            question=question,
+            category=category,
+            contract=contract,
+            resolution=resolution,
+            outcomes=outcomes,
+            volume_24h=volume_24h,
+            open_interest=open_interest,
+            fees=MarketEventNormalizer._KALSHI_FEES,
+            ts_ms=now_ms,
+            observed_at_ms=now_ms,
+            status=status,
+            raw_payload_ref=None,
+            tags=tags,
         )
 
 
@@ -548,6 +693,8 @@ class MarketEventNormalizer:
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
+    import pytest  # noqa: used for approx in self-test
+
     print("=" * 70)
     print("MarketEvent schema self-test")
     print("=" * 70)
@@ -644,12 +791,41 @@ if __name__ == "__main__":
     assert pair.left.market_id == pair2.left.market_id, "left market_id mismatch"
     print("[5] MatchedMarketPair round-trip: PASS")
 
-    # ---- 6. Kalshi stub raises NotImplementedError ----
-    try:
-        normalizer.normalize_kalshi({"id": "test"})
-        assert False, "Should have raised NotImplementedError"
-    except NotImplementedError:
-        print("[6] Kalshi NotImplementedError: PASS")
+    # ---- 6. Kalshi normalizer ----
+    mock_kalshi_response = {
+        "ticker": "KXBTC-26JUN30-T149999.99",
+        "event_ticker": "KXBTC-26JUN30",
+        "title": "Bitcoin above $150,000?",
+        "subtitle": "on June 30",
+        "yes_bid": 42,
+        "yes_ask": 44,
+        "no_bid": 56,
+        "no_ask": 58,
+        "last_price": 43,
+        "volume": 12345,
+        "volume_24h": 567,
+        "open_interest": 8901,
+        "status": "open",
+        "category": "Crypto",
+        "close_time": "2026-06-30T00:00:00Z",
+        "rules_primary": "Resolves Yes if BTC > $150k",
+        "rules_secondary": "Resolves No otherwise",
+        "strike_type": "greater",
+        "cap_strike": 150000,
+        "floor_strike": None,
+    }
+    kalshi_event = normalizer.normalize_kalshi(mock_kalshi_response)
+    assert kalshi_event.venue == "kalshi", "venue mismatch"
+    assert kalshi_event.market_id == "KXBTC-26JUN30-T149999.99", "market_id mismatch"
+    assert kalshi_event.outcomes[0].bid == pytest.approx(0.42, abs=0.01), "yes_bid mismatch"
+    assert kalshi_event.contract.contract_type == "threshold", "contract_type mismatch"
+    assert kalshi_event.contract.upper_bound == 150000, "cap_strike mismatch"
+    assert kalshi_event.status == "open", "status mismatch"
+    # Round-trip
+    kd = kalshi_event.to_dict()
+    kalshi_event2 = MarketEvent.from_dict(kd)
+    assert kalshi_event.market_id == kalshi_event2.market_id, "kalshi round-trip failed"
+    print("[6] Kalshi normalizer + round-trip: PASS")
 
     print("\n" + "=" * 70)
     print("All tests passed.")
