@@ -449,16 +449,52 @@ def main():
     parser.add_argument("--migrate", action="store_true", help="Create DB tables")
     parser.add_argument("--run", action="store_true", help="Run simulation loop")
     parser.add_argument("--report", action="store_true", help="Generate report only")
+    parser.add_argument("--backtest", action="store_true", help="Run backtester")
+    parser.add_argument("--from", dest="from_date", default=None, help="Backtest start date")
+    parser.add_argument("--to", dest="to_date", default=None, help="Backtest end date")
+    parser.add_argument("--strategies", default=None, help="Comma-separated strategies")
+    parser.add_argument("--tournament", action="store_true", help="Run strategy tournament")
     args = parser.parse_args()
 
     if args.migrate:
         migrate()
+        import scripts.mirofish.strategy_tracker as tracker
+        tracker.migrate()
     elif args.run:
         run_loop()
     elif args.report:
         import scripts.mirofish.dashboard as dash
         path = dash.generate_report("daily")
         print(f"[mirofish] Report: {path}")
+    elif args.backtest:
+        import scripts.mirofish.backtester as bt
+        from_date = args.from_date or (datetime.date.today() - datetime.timedelta(days=14)).isoformat()
+        to_date = args.to_date or datetime.date.today().isoformat()
+        strategies = args.strategies.split(",") if args.strategies else None
+        result = bt.run_backtest(from_date, to_date, strategies)
+        # Print text report
+        print(f"\n{'='*60}")
+        print(f"BACKTEST: {result.from_date} → {result.to_date}")
+        print(f"{'='*60}")
+        print(f"Starting: ${result.starting_balance:,.2f}")
+        print(f"Ending:   ${result.ending_balance:,.2f}")
+        print(f"Return:   {result.total_return_pct:+.2f}%")
+        print(f"Trades:   {len(result.all_trades)}")
+        for s in result.strategy_results:
+            if s.total_trades > 0:
+                print(f"\n  {s.strategy}: {s.total_trades} trades, "
+                      f"W:{s.wins} L:{s.losses}, PnL: ${s.total_pnl:+.2f}")
+        print(f"{'='*60}")
+    elif args.tournament:
+        import scripts.mirofish.strategy_tracker as tracker
+        tracker.migrate()
+        tracker.sync_from_paper_trades()
+        reports = tracker.run_tournament()
+        print("\nStrategy Tournament:")
+        for r in sorted(reports, key=lambda x: x.allocation_pct, reverse=True):
+            if r.total_trades > 0 or r.allocation_pct > 0:
+                print(f"  {r.strategy:20s} → {r.allocation_pct:6.1%} "
+                      f"(trades={r.total_trades})")
     else:
         parser.print_help()
 
