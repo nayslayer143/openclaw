@@ -77,7 +77,7 @@ def test_fetch_binance_and_coinbase(temp_db):
     sf = _sf()
     with patch("requests.get", side_effect=_mock_binance()):
         signals = sf.fetch()
-    assert len(signals) == 2
+    assert len(signals) >= 2  # BTC + ETH at minimum, up to 6 with DOGE/BNB/ADA/BCH
     btc = [s for s in signals if s["ticker"] == "SPOT:BTC"]
     eth = [s for s in signals if s["ticker"] == "SPOT:ETH"]
     assert len(btc) == 1

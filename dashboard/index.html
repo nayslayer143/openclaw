@@ -1528,19 +1528,27 @@ body {
         <div class="t-card-sub" id="tRoi">0.00%</div>
       </div>
       <div class="t-card">
-        <div class="t-card-label">POSITIONS</div>
-        <div class="t-card-value" id="tPositions">0</div>
+        <div class="t-card-label">OPEN / TOTAL</div>
+        <div class="t-card-value" id="tPositions">0 / 0</div>
         <div class="t-card-sub" id="tUnrealized">$0.00 unrealized</div>
       </div>
       <div class="t-card">
-        <div class="t-card-label">WIN RATE</div>
-        <div class="t-card-value" id="tWinRate">0%</div>
-        <div class="t-card-sub" id="tTotalTrades">0 trades</div>
+        <div class="t-card-label">WIN / LOSS</div>
+        <div class="t-card-value" id="tWinLoss">0 / 0</div>
+        <div class="t-card-sub" id="tWinRate">0% win rate</div>
       </div>
       <div class="t-card">
-        <div class="t-card-label">GRADUATION</div>
-        <div class="t-card-value" id="tGradStatus">TESTING</div>
-        <div class="t-card-sub" id="tGradDetail">awaiting 14d history</div>
+        <div class="t-card-label">REALIZED P&L</div>
+        <div class="t-card-value" id="tRealizedPnl">$0.00</div>
+        <div class="t-card-sub" id="tGradStatus">TESTING</div>
+      </div>
+    </div>
+
+    <!-- Live Balance Chart -->
+    <div class="t-section" id="tLiveChartSection">
+      <div class="t-section-title">LIVE CASH POSITION</div>
+      <div class="t-chart-container" style="height:120px">
+        <canvas id="liveBalanceChart" height="120"></canvas>
       </div>
     </div>
 
@@ -3736,36 +3744,49 @@ function renderTrading() {
   if (!d) return
 
   // Update time
-  document.getElementById('tradingLastUpdate').textContent = new Date().toLocaleTimeString()
+  document.getElementById('tradingLastUpdate').textContent = 'LIVE ' + new Date().toLocaleTimeString()
 
   // Portfolio cards
   const w = d.wallet
-  document.getElementById('tBalance').textContent = '$' + w.balance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})
+  const balEl = document.getElementById('tBalance')
+  balEl.textContent = '$' + w.balance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})
+  balEl.style.color = w.balance >= w.starting_balance ? 'var(--neon-green)' : 'var(--neon-red)'
+
   const roiEl = document.getElementById('tRoi')
-  roiEl.textContent = (w.roi_pct >= 0 ? '+' : '') + w.roi_pct.toFixed(2) + '%'
+  roiEl.textContent = (w.roi_pct >= 0 ? '+' : '') + w.roi_pct.toFixed(2) + '% ROI'
   roiEl.style.color = w.roi_pct >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
 
-  document.getElementById('tPositions').textContent = w.open_positions
+  document.getElementById('tPositions').textContent = w.open_positions + ' / ' + (w.total_trades + w.open_positions)
   const urEl = document.getElementById('tUnrealized')
   urEl.textContent = (w.unrealized_pnl >= 0 ? '+' : '') + '$' + w.unrealized_pnl.toFixed(2) + ' unrealized'
   urEl.style.color = w.unrealized_pnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
 
-  document.getElementById('tWinRate').textContent = w.win_rate.toFixed(0) + '%'
-  document.getElementById('tTotalTrades').textContent = w.total_trades + ' trades'
+  const winCount = w.wins || 0
+  const lossCount = w.total_trades - winCount
+  document.getElementById('tWinLoss').textContent = winCount + ' / ' + lossCount
+  document.getElementById('tWinLoss').style.color = winCount >= lossCount ? 'var(--neon-green)' : 'var(--neon-red)'
+  document.getElementById('tWinRate').textContent = w.win_rate.toFixed(0) + '% win rate'
 
-  // Graduation
+  const rpEl = document.getElementById('tRealizedPnl')
+  rpEl.textContent = (w.realized_pnl >= 0 ? '+' : '') + '$' + w.realized_pnl.toFixed(2)
+  rpEl.style.color = w.realized_pnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
+
+  // Graduation status in the realized PnL card subtitle
   const g = d.graduation
+  const gradEl = document.getElementById('tGradStatus')
   if (g.all_pass) {
-    document.getElementById('tGradStatus').textContent = 'READY'
-    document.getElementById('tGradStatus').style.color = 'var(--neon-green)'
-    document.getElementById('tGradDetail').textContent = 'all gates passed'
+    gradEl.textContent = 'READY FOR LIVE'
+    gradEl.style.color = 'var(--neon-green)'
   } else if (g.has_min_history) {
-    document.getElementById('tGradStatus').textContent = 'TESTING'
-    document.getElementById('tGradDetail').textContent = 'some gates failing'
+    gradEl.textContent = 'TESTING — some gates failing'
+    gradEl.style.color = 'var(--orange)'
   } else {
-    document.getElementById('tGradStatus').textContent = 'COLLECTING'
-    document.getElementById('tGradDetail').textContent = 'need 14d history'
+    gradEl.textContent = 'COLLECTING DATA — need 7d'
+    gradEl.style.color = 'var(--grey2)'
   }
+
+  // Live balance chart — track balance over time in-memory
+  trackBalance(w.balance)
 
   // Gates
   const gates = [
@@ -4001,23 +4022,101 @@ function renderPnlChart(curve) {
   ctx.stroke()
 }
 
-// Auto-refresh trading data every 60s as fallback
+// ── Live balance tracking ──────────────────────────────────────────────
+let balanceHistory = []
+const MAX_BALANCE_POINTS = 100
+
+function trackBalance(balance) {
+  const now = Date.now()
+  balanceHistory.push({t: now, b: balance})
+  if (balanceHistory.length > MAX_BALANCE_POINTS) balanceHistory.shift()
+  renderLiveBalanceChart()
+}
+
+function renderLiveBalanceChart() {
+  const canvas = document.getElementById('liveBalanceChart')
+  if (!canvas || balanceHistory.length < 2) return
+  const ctx = canvas.getContext('2d')
+  const rect = canvas.parentElement.getBoundingClientRect()
+  canvas.width = rect.width
+  canvas.height = 120
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+  const bals = balanceHistory.map(h => h.b)
+  const minB = Math.min(...bals) * 0.999
+  const maxB = Math.max(...bals) * 1.001
+  const range = maxB - minB || 1
+  const pad = {top: 10, bottom: 20, left: 55, right: 10}
+  const w = canvas.width - pad.left - pad.right
+  const h = canvas.height - pad.top - pad.bottom
+
+  // Starting balance reference
+  const startY = pad.top + h - ((1000 - minB) / range) * h
+  if (startY > pad.top && startY < pad.top + h) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)'
+    ctx.setLineDash([3, 3])
+    ctx.beginPath(); ctx.moveTo(pad.left, startY); ctx.lineTo(pad.left + w, startY); ctx.stroke()
+    ctx.setLineDash([])
+    ctx.fillStyle = 'rgba(150,145,135,0.3)'
+    ctx.font = '8px monospace'
+    ctx.textAlign = 'right'
+    ctx.fillText('$1,000', pad.left - 4, startY + 3)
+  }
+
+  // Line
+  ctx.beginPath()
+  balanceHistory.forEach((h2, i) => {
+    const x = pad.left + (i / (balanceHistory.length - 1)) * w
+    const y = pad.top + h - ((h2.b - minB) / range) * h
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y)
+  })
+  const lastBal = balanceHistory[balanceHistory.length - 1].b
+  const lineColor = lastBal >= 1000 ? '#00ff88' : '#ff002e'
+  ctx.strokeStyle = lineColor
+  ctx.lineWidth = 2
+  ctx.stroke()
+
+  // Fill
+  const lastX = pad.left + w
+  const lastY = pad.top + h - ((lastBal - minB) / range) * h
+  ctx.lineTo(lastX, pad.top + h)
+  ctx.lineTo(pad.left, pad.top + h)
+  ctx.closePath()
+  const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + h)
+  grad.addColorStop(0, lastBal >= 1000 ? 'rgba(0,255,136,0.12)' : 'rgba(255,0,46,0.12)')
+  grad.addColorStop(1, 'rgba(0,0,0,0)')
+  ctx.fillStyle = grad
+  ctx.fill()
+
+  // Current value label
+  ctx.fillStyle = lineColor
+  ctx.font = 'bold 11px monospace'
+  ctx.textAlign = 'right'
+  ctx.fillText('$' + lastBal.toFixed(2), pad.left - 4, lastY + 4)
+
+  // Dot
+  ctx.beginPath()
+  ctx.arc(lastX, lastY, 3, 0, Math.PI * 2)
+  ctx.fillStyle = lineColor
+  ctx.fill()
+}
+
+// ── Auto-refresh: SSE + polling ───────────────────────────────────────
+// Refresh every 15s (fast enough for 15-min markets)
 setInterval(() => {
   if (document.getElementById('pageTrading').classList.contains('active')) {
     loadTrading()
   }
-}, 60000)
+}, 15000)
 
-// SSE: real-time refresh when trades are placed/closed
+// SSE: instant refresh when trades are placed/closed
 let tradingSSE = null
 function connectTradingSSE() {
   if (tradingSSE) tradingSSE.close()
   tradingSSE = new EventSource('/api/trading/stream')
   tradingSSE.onmessage = (e) => {
-    console.log('[trading] SSE update:', e.data)
-    if (document.getElementById('pageTrading').classList.contains('active')) {
-      loadTrading()
-    }
+    loadTrading()
   }
   tradingSSE.onerror = () => {
     tradingSSE.close()
