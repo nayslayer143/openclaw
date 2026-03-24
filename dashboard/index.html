@@ -3989,12 +3989,30 @@ function renderPnlChart(curve) {
   ctx.stroke()
 }
 
-// Auto-refresh trading data every 60s when on the tab
+// Auto-refresh trading data every 60s as fallback
 setInterval(() => {
   if (document.getElementById('pageTrading').classList.contains('active')) {
     loadTrading()
   }
 }, 60000)
+
+// SSE: real-time refresh when trades are placed/closed
+let tradingSSE = null
+function connectTradingSSE() {
+  if (tradingSSE) tradingSSE.close()
+  tradingSSE = new EventSource('/api/trading/stream')
+  tradingSSE.onmessage = (e) => {
+    console.log('[trading] SSE update:', e.data)
+    if (document.getElementById('pageTrading').classList.contains('active')) {
+      loadTrading()
+    }
+  }
+  tradingSSE.onerror = () => {
+    tradingSSE.close()
+    setTimeout(connectTradingSSE, 5000)
+  }
+}
+connectTradingSSE()
 
 </script>
 </body>

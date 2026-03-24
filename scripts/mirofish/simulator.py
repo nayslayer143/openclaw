@@ -9,6 +9,7 @@ import os
 import sqlite3
 import datetime
 from pathlib import Path
+import requests
 
 
 def _get_conn() -> sqlite3.Connection:
@@ -220,6 +221,14 @@ def _log_price_lag_trade(decision) -> None:
         print(f"[mirofish] Price-lag tracking error: {e}")
 
 
+def _notify_dashboard():
+    """Ping the dashboard to trigger SSE refresh."""
+    try:
+        requests.post("http://127.0.0.1:7080/api/trading/notify", timeout=2)
+    except Exception:
+        pass
+
+
 def _log_cross_venue_arb_trade(decision) -> None:
     """Write cross-venue arb tracking row from decision.metadata."""
     m = decision.metadata
@@ -415,6 +424,7 @@ def run_loop():
             if result:
                 print(f"[mirofish] Executed: {d.direction} ${d.amount_usd:.0f} "
                       f"on '{d.question[:50]}' [{d.strategy}]")
+                _notify_dashboard()
                 if d.strategy == "price_lag_arb" and d.metadata:
                     _log_price_lag_trade(d)
                 elif d.strategy == "cross_venue_arb" and d.metadata:
@@ -455,6 +465,7 @@ def run_loop():
             sign = "+" if (c["pnl"] or 0) >= 0 else ""
             print(f"[mirofish] Stop closed: {c['market_id']} → {c['status']} "
                   f"{sign}${c['pnl']:.2f}")
+            _notify_dashboard()
             # Record closure in strategy tracker
             if tracker:
                 try:

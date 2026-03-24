@@ -849,6 +849,30 @@ async def manifest():
 async def login_page():
     return (Path(__file__).parent / "login.html").read_text()
 
+_trading_version = 0  # bumped on each trade change
+
+@app.post("/api/trading/notify")
+async def trading_notify():
+    """Called by simulator to signal a trade was placed or closed."""
+    global _trading_version
+    _trading_version += 1
+    return {"version": _trading_version}
+
+@app.get("/api/trading/stream")
+async def trading_stream(request: Request):
+    """SSE stream that fires when trades change."""
+    last_seen = 0
+    async def event_gen():
+        nonlocal last_seen
+        while True:
+            if await request.is_disconnected():
+                break
+            if _trading_version > last_seen:
+                last_seen = _trading_version
+                yield f"data: {json.dumps({'version': _trading_version})}\n\n"
+            await asyncio.sleep(2)
+    return StreamingResponse(event_gen(), media_type="text/event-stream")
+
 @app.get("/api/trading")
 async def get_trading(user: str = Depends(get_current_user)):
     """Return trading bot data — signals, positions, P&L."""
