@@ -55,14 +55,14 @@ def check_circuit_breaker() -> dict | None:
                    SUM(CASE WHEN status='closed_win' THEN 1 ELSE 0 END) as wins,
                    ROUND(SUM(pnl), 2) as total_pnl,
                    ROUND(AVG(entry_price), 4) as avg_entry
-            FROM paper_trades WHERE status != 'open'
+            FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')
             GROUP BY strategy ORDER BY total_pnl ASC
         """).fetchall()
 
         # Get worst trades
         worst = conn.execute("""
             SELECT market_id, question, strategy, entry_price, pnl
-            FROM paper_trades WHERE status != 'open'
+            FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')
             ORDER BY pnl ASC LIMIT 5
         """).fetchall()
 
@@ -179,8 +179,9 @@ def _compute_balance(starting: float, prices: dict[str, dict]) -> float:
     """Derive current balance from trade history + mark-to-market open positions."""
     with _get_conn() as conn:
         # Includes closed_win, closed_loss, and expired — all have their final pnl stored at close time
+        # Only count active trades (not reset rounds)
         closed = conn.execute(
-            "SELECT COALESCE(SUM(pnl), 0) as total FROM paper_trades WHERE status != 'open'"
+            "SELECT COALESCE(SUM(pnl), 0) as total FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')"
         ).fetchone()["total"]
         open_trades = conn.execute(
             "SELECT market_id, direction, shares, entry_price FROM paper_trades WHERE status='open'"
@@ -206,7 +207,7 @@ def get_state() -> dict[str, Any]:
 
     with _get_conn() as conn:
         closed_trades = conn.execute(
-            "SELECT status FROM paper_trades WHERE status != 'open'"
+            "SELECT status FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')"
         ).fetchall()
         open_positions = conn.execute(
             "SELECT COUNT(*) as cnt FROM paper_trades WHERE status='open'"

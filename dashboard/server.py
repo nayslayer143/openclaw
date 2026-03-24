@@ -927,7 +927,7 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
         if ctx:
             starting = float(ctx[0])
 
-        closed_pnl = conn.execute("SELECT COALESCE(SUM(pnl), 0) as total FROM paper_trades WHERE status != 'open'").fetchone()[0]
+        closed_pnl = conn.execute("SELECT COALESCE(SUM(pnl), 0) as total FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')").fetchone()[0]
         open_trades = conn.execute("SELECT * FROM paper_trades WHERE status='open' ORDER BY opened_at DESC").fetchall()
 
         # Mark-to-market open positions
@@ -970,7 +970,7 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
             SELECT id, market_id, question, direction, strategy, entry_price,
                    exit_price, shares, amount_usd, pnl, status, confidence,
                    opened_at, closed_at
-            FROM paper_trades WHERE status != 'open'
+            FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')
             ORDER BY closed_at DESC LIMIT 50
         """).fetchall()
         closed_list = [dict(r) for r in recent_closed]
@@ -980,7 +980,7 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
         pnl_curve = [{"date": r["date"], "balance": r["balance"], "roi_pct": r["roi_pct"], "win_rate": r["win_rate"]} for r in daily_pnl]
 
         # 4. Win/loss stats
-        all_closed = conn.execute("SELECT status, strategy, pnl FROM paper_trades WHERE status != 'open'").fetchall()
+        all_closed = conn.execute("SELECT status, strategy, pnl FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')").fetchall()
         total_closed = len(all_closed)
         wins = sum(1 for t in all_closed if t["status"] == "closed_win")
         win_rate = wins / total_closed if total_closed > 0 else 0
@@ -1200,7 +1200,7 @@ def _rivalclaw_state(conn):
     if ctx:
         starting = float(ctx[0])
 
-    closed_pnl = conn.execute("SELECT COALESCE(SUM(pnl), 0) FROM paper_trades WHERE status != 'open'").fetchone()[0]
+    closed_pnl = conn.execute("SELECT COALESCE(SUM(pnl), 0) FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')").fetchone()[0]
     open_trades = conn.execute("SELECT * FROM paper_trades WHERE status='open' ORDER BY opened_at DESC").fetchall()
 
     unrealized = 0.0
@@ -1230,7 +1230,7 @@ def _rivalclaw_state(conn):
     balance = starting + closed_pnl + unrealized
 
     recent = conn.execute(
-        "SELECT * FROM paper_trades WHERE status != 'open' ORDER BY closed_at DESC LIMIT 20"
+        "SELECT * FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired') ORDER BY closed_at DESC LIMIT 20"
     ).fetchall()
     recent_list = [{
         "market_id": r["market_id"], "direction": r["direction"],
@@ -1240,7 +1240,7 @@ def _rivalclaw_state(conn):
         "opened_at": r["opened_at"], "closed_at": r["closed_at"],
     } for r in recent]
 
-    all_closed = conn.execute("SELECT status, pnl FROM paper_trades WHERE status != 'open'").fetchall()
+    all_closed = conn.execute("SELECT status, pnl FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')").fetchall()
     total_closed = len(all_closed)
     wins = sum(1 for t in all_closed if t["status"] == "closed_win")
 
@@ -1509,6 +1509,216 @@ async def terminal_packet_preview(user: str = Depends(get_current_user)):
             except Exception: pass
     if not event: return {"packet": None, "note": "No events available"}
     return {"packet": _build_packet(event)}
+
+
+# ── GitHub Intel ──────────────────────────────────────────────────────────────
+INTEL_DIR        = OPENCLAW_ROOT / "autoresearch" / "github-intel"
+INTEL_RECS       = INTEL_DIR / "recommendations.json"
+INTEL_CRAWL_SCRIPT = OPENCLAW_ROOT / "scripts" / "github-intel-cron.sh"
+
+def _read_intel_recs() -> dict:
+    if INTEL_RECS.exists():
+        try:
+            return json.loads(INTEL_RECS.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return {"crawl_date": "", "analyzed_at": "", "model": "", "total_analyzed": 0, "recommendations": []}
+
+def _write_intel_recs(data: dict):
+    INTEL_DIR.mkdir(parents=True, exist_ok=True)
+    INTEL_RECS.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+@app.get("/api/intel")
+async def intel_list(user: str = Depends(get_current_user)):
+    """Latest recommendations sorted by integration_value."""
+    data = _read_intel_recs()
+    recs = data.get("recommendations", [])
+    recs.sort(key=lambda r: r.get("integration_value", 0), reverse=True)
+    return {
+        "crawl_date": data.get("crawl_date", ""),
+        "analyzed_at": data.get("analyzed_at", ""),
+        "model": data.get("model", ""),
+        "total_analyzed": data.get("total_analyzed", 0),
+        "recommendations": recs,
+    }
+
+@app.get("/api/intel/history")
+async def intel_history(user: str = Depends(get_current_user)):
+    """List past crawl dates from archived files."""
+    history = []
+    if INTEL_DIR.exists():
+        for f in sorted(INTEL_DIR.glob("recommendations*.json"), key=lambda p: p.stat().st_mtime, reverse=True):
+            try:
+                d = json.loads(f.read_text(encoding="utf-8"))
+                history.append({
+                    "file": f.name,
+                    "crawl_date": d.get("crawl_date", ""),
+                    "analyzed_at": d.get("analyzed_at", ""),
+                    "count": d.get("total_analyzed", 0),
+                })
+            except Exception:
+                pass
+    return history
+
+@app.get("/api/intel/repo/{rec_id}")
+async def intel_repo_detail(rec_id: str, user: str = Depends(get_current_user)):
+    """Full detail for one recommendation."""
+    data = _read_intel_recs()
+    for rec in data.get("recommendations", []):
+        if rec.get("id") == rec_id:
+            return rec
+    raise HTTPException(404, "Recommendation not found")
+
+@app.post("/api/intel/approve")
+async def intel_approve(request: Request, user: str = Depends(get_current_user)):
+    """Approve recommendation and dispatch to queue."""
+    body = await request.json()
+    rec_id = body.get("id", "")
+    targets = body.get("targets", [])
+    notes = body.get("notes", "")
+
+    valid_targets = {"clawmpson", "arbclaw", "rivalclaw"}
+    targets = [t for t in targets if t in valid_targets]
+    if not targets:
+        raise HTTPException(400, "At least one target bot required")
+
+    data = _read_intel_recs()
+    rec = None
+    for r in data.get("recommendations", []):
+        if r.get("id") == rec_id:
+            rec = r
+            break
+    if not rec:
+        raise HTTPException(404, "Recommendation not found")
+
+    # Update recommendation
+    task_id = f"intel-{str(uuid.uuid4())[:8]}"
+    rec["status"] = "approved"
+    rec["approved_for"] = targets
+    rec["approved_at"] = datetime.now().isoformat()
+    rec["task_id"] = task_id
+    _write_intel_recs(data)
+
+    # Create task in pending.json
+    task = {
+        "id": task_id,
+        "type": "github-intel-integration",
+        "title": f"Integrate {rec.get('what_to_take', 'patterns')[:80]} from {rec.get('repo_name', 'unknown')}",
+        "description": f"LLM verdict: {rec.get('verdict', 'STUDY')}. {rec.get('what_to_take', '')} Risk: {rec.get('risk', 'none')}. {notes}".strip(),
+        "source_repo": rec.get("repo_url", ""),
+        "targets": targets,
+        "priority": "medium",
+        "status": "pending",
+        "created_at": datetime.now().isoformat(),
+        "approved_by": user,
+        "recommendation_id": rec_id,
+    }
+
+    pending = []
+    if PENDING_JSON.exists():
+        try:
+            pending = json.loads(PENDING_JSON.read_text(encoding="utf-8"))
+        except Exception:
+            pending = []
+    pending.append(task)
+    PENDING_JSON.write_text(json.dumps(pending, indent=2), encoding="utf-8")
+
+    return {"ok": True, "task_id": task_id, "targets": targets}
+
+@app.post("/api/intel/reject")
+async def intel_reject(request: Request, user: str = Depends(get_current_user)):
+    """Reject a recommendation."""
+    body = await request.json()
+    rec_id = body.get("id", "")
+    reason = body.get("reason", "")
+
+    data = _read_intel_recs()
+    for r in data.get("recommendations", []):
+        if r.get("id") == rec_id:
+            r["status"] = "rejected"
+            if reason:
+                r["reject_reason"] = reason
+            _write_intel_recs(data)
+            return {"ok": True}
+    raise HTTPException(404, "Recommendation not found")
+
+@app.post("/api/intel/bookmark")
+async def intel_bookmark(request: Request, user: str = Depends(get_current_user)):
+    """Bookmark for later review."""
+    body = await request.json()
+    rec_id = body.get("id", "")
+
+    data = _read_intel_recs()
+    for r in data.get("recommendations", []):
+        if r.get("id") == rec_id:
+            r["status"] = "bookmarked"
+            _write_intel_recs(data)
+            return {"ok": True}
+    raise HTTPException(404, "Recommendation not found")
+
+@app.post("/api/intel/run-crawl")
+async def intel_run_crawl(user: str = Depends(get_current_user)):
+    """Trigger crawl + analysis manually (fire-and-forget)."""
+    if not INTEL_CRAWL_SCRIPT.exists():
+        raise HTTPException(500, "Crawl script not found")
+    subprocess.Popen(
+        ["/bin/bash", str(INTEL_CRAWL_SCRIPT)],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        start_new_session=True,
+    )
+    return {"ok": True, "message": "Crawl started in background"}
+
+@app.get("/api/intel/stream")
+async def intel_stream(request: Request):
+    """SSE stream for new recommendations."""
+    token = request.cookies.get("oc_token") or request.query_params.get("token")
+    if not token or not verify_token(token):
+        if not is_localhost(request):
+            raise HTTPException(401, "Not authenticated")
+
+    async def event_gen():
+        last_mtime = 0.0
+        while True:
+            try:
+                if INTEL_RECS.exists():
+                    mtime = INTEL_RECS.stat().st_mtime
+                    if mtime != last_mtime:
+                        last_mtime = mtime
+                        data = _read_intel_recs()
+                        payload = json.dumps({
+                            "total": data.get("total_analyzed", 0),
+                            "pending": len([r for r in data.get("recommendations", []) if r.get("status") == "pending"]),
+                            "analyzed_at": data.get("analyzed_at", ""),
+                        })
+                        yield f"data: {payload}\n\n"
+                    else:
+                        yield ": heartbeat\n\n"
+                else:
+                    yield ": heartbeat\n\n"
+            except Exception as e:
+                yield f"data: {json.dumps({'error': str(e)})}\n\n"
+            await asyncio.sleep(5)
+
+    return StreamingResponse(event_gen(), media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+@app.get("/api/intel/stats")
+async def intel_stats(user: str = Depends(get_current_user)):
+    """Aggregate stats."""
+    data = _read_intel_recs()
+    recs = data.get("recommendations", [])
+    stats = {"total": len(recs), "pending": 0, "approved": 0, "rejected": 0, "bookmarked": 0, "integrate": 0, "study": 0, "skip": 0}
+    for r in recs:
+        s = r.get("status", "pending")
+        if s in stats:
+            stats[s] += 1
+        v = r.get("verdict", "").lower()
+        if v in stats:
+            stats[v] += 1
+    stats["crawl_date"] = data.get("crawl_date", "")
+    stats["analyzed_at"] = data.get("analyzed_at", "")
+    return stats
 
 
 @app.get("/{path:path}", response_class=HTMLResponse)
