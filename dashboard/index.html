@@ -1861,14 +1861,37 @@ body {
       @media (max-width:700px) { #heroGrid { grid-template-columns: 1fr !important; } }
     </style>
 
-    <!-- Compact stats row -->
-    <div class="trading-cards" style="grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:14px">
-      <div class="t-card"><div class="t-card-label">CLAWMPSON BAL</div><div class="t-card-sub" id="tRoi" style="margin:0">--</div></div>
-      <div class="t-card"><div class="t-card-label">OPEN</div><div class="t-card-sub" id="tPositions" style="margin:0">0</div></div>
-      <div class="t-card"><div class="t-card-label">WIN RATE</div><div class="t-card-sub" id="tWinRate" style="margin:0">0%</div></div>
-      <div class="t-card"><div class="t-card-label">UNREALIZED</div><div class="t-card-sub" id="tUnrealized" style="margin:0">$0</div></div>
-      <div class="t-card"><div class="t-card-label">PHANTOM WR</div><div class="t-card-sub" id="phWR2" style="margin:0">0%</div></div>
-      <div class="t-card"><div class="t-card-label">STATUS</div><div class="t-card-sub" id="tGradStatus" style="margin:0">TESTING</div></div>
+    <!-- Unified Trade Feed -->
+    <div class="t-section" style="margin-bottom:14px">
+      <div class="t-section-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>ALL OPEN TRADES <span id="ufCount" style="color:var(--grey2);font-size:0.44rem">0</span></span>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span style="font-size:0.40rem;color:var(--grey2);letter-spacing:1px">SORT:</span>
+          <select id="ufSort" style="background:var(--surface);color:var(--offwhite);border:1px solid var(--grey3);font-family:inherit;font-size:0.44rem;letter-spacing:1px;padding:2px 6px;cursor:pointer">
+            <option value="countdown">TIME LEFT</option>
+            <option value="bot">BOT</option>
+            <option value="pnl_desc">P&L HIGH→LOW</option>
+            <option value="pnl_asc">P&L LOW→HIGH</option>
+            <option value="size_desc">SIZE HIGH→LOW</option>
+            <option value="size_asc">SIZE LOW→HIGH</option>
+            <option value="entry_desc">ENTRY HIGH→LOW</option>
+            <option value="entry_asc">ENTRY LOW→HIGH</option>
+            <option value="confidence">CONFIDENCE</option>
+            <option value="newest">NEWEST FIRST</option>
+            <option value="oldest">OLDEST FIRST</option>
+          </select>
+        </div>
+      </div>
+      <div class="t-table-wrap" style="max-height:400px;overflow-y:auto">
+        <table class="t-table">
+          <thead><tr>
+            <th>BOT</th><th>MARKET</th><th>PLATFORM</th><th>DIR</th>
+            <th>ENTRY</th><th>CURRENT</th><th>P&L</th><th>SIZE</th>
+            <th>CONF</th><th>COUNTDOWN</th>
+          </tr></thead>
+          <tbody id="ufBody"></tbody>
+        </table>
+      </div>
     </div>
 
     <!-- Live Balance Chart -->
@@ -4535,6 +4558,9 @@ function renderTrading() {
     }
   }
 
+  // Unified Trade Feed — merge ALL open positions from all bots
+  buildUnifiedFeed(d)
+
   // Missed opportunities
   const missed = d.missed_opportunities || []
   const missedSection = document.getElementById('tMissedSection')
@@ -4841,21 +4867,152 @@ function renderPnlChart(curve) {
 }
 
 // ── Countdown timers ──────────────────────────────────────────────────
+// Bot color map
+const BOT_COLORS = {
+  'phantomclaw_fv': {name: 'PHANTOM', color: '#ff00c8'},
+  'calendarclaw': {name: 'CALENDAR', color: '#00c8ff'},
+  'newsclaw': {name: 'NEWS', color: '#ffc800'},
+  'sentimentclaw': {name: 'SENTIMENT', color: '#00ff88'},
+  'contrarian': {name: 'CLAWMPSON', color: '#e86800'},
+  'momentum': {name: 'CLAWMPSON', color: '#e86800'},
+  'news_catalyst': {name: 'CLAWMPSON', color: '#e86800'},
+  'hedged_bracket_main': {name: 'HEDGED', color: '#e86800'},
+  'hedged_bracket_hedge': {name: 'HEDGED', color: '#e86800'},
+  'fade_public': {name: 'HEDGED', color: '#e86800'},
+  'vol_straddle_yes': {name: 'HEDGED', color: '#e86800'},
+  'vol_straddle_no': {name: 'HEDGED', color: '#e86800'},
+  'cross_bracket_arb': {name: 'MATH', color: '#e86800'},
+  'expiry_convergence': {name: 'MATH', color: '#e86800'},
+  'correlation_arb': {name: 'MATH', color: '#e86800'},
+  'mean_reversion': {name: 'MATH', color: '#e86800'},
+  'fast_arb': {name: 'FAST', color: '#e86800'},
+  'fast_spot_lag': {name: 'FAST', color: '#e86800'},
+  'fast_15m_trend': {name: 'FAST', color: '#e86800'},
+  'arbclaw_single_venue': {name: 'ARBCLAW', color: '#00ff88'},
+  'crypto_spot_mean_rev': {name: 'CRYPTO', color: '#00e5ff'},
+  'crypto_spot_momentum': {name: 'CRYPTO', color: '#00e5ff'},
+}
+
+function getBotInfo(strategy) {
+  return BOT_COLORS[strategy] || {name: strategy.substring(0,10).toUpperCase(), color: 'var(--grey1)'}
+}
+
+function buildUnifiedFeed(d) {
+  const allTrades = []
+
+  // MiroFish/Clawmpson open positions
+  for (const p of (d.open_positions || [])) {
+    const bot = getBotInfo(p.strategy)
+    const mid = p.market_id || ''
+    let platform = 'POLY'
+    if (mid.startsWith('KX') || mid.startsWith('INX') || mid.startsWith('NAS')) platform = 'KALSHI'
+    else if (mid.startsWith('SPOT:')) platform = 'CRYPTO'
+    allTrades.push({
+      bot: bot.name, botColor: bot.color, strategy: p.strategy,
+      question: p.question || '', platform, direction: p.direction,
+      entry: p.entry_price || 0, current: p.current_price || p.entry_price || 0,
+      pnl: p.pnl || 0, pnlPct: p.pnl_pct || 0, size: p.amount_usd || 0,
+      confidence: p.confidence || 0, closeTime: p.close_time || '',
+      openedAt: p.opened_at || '',
+    })
+  }
+
+  // PhantomClaw positions
+  for (const p of ((d.phantom || {}).positions || [])) {
+    allTrades.push({
+      bot: 'PHANTOM', botColor: '#ff00c8', strategy: 'phantomclaw_fv',
+      question: p.question || '', platform: 'KALSHI', direction: p.direction,
+      entry: p.entry_price || 0, current: p.current_price || p.entry_price || 0,
+      pnl: p.pnl || 0, pnlPct: p.pnl_pct || 0, size: p.amount_usd || 0,
+      confidence: p.confidence || 0, closeTime: p.close_time || '',
+      openedAt: p.opened_at || '',
+    })
+  }
+
+  // Agent positions (calendar, news, sentiment)
+  for (const [name, cfg] of [['calendarclaw','#00c8ff'],['newsclaw','#ffc800'],['sentimentclaw','#00ff88']]) {
+    const ag = (d.agents || {})[name] || {}
+    for (const p of (ag.positions || [])) {
+      allTrades.push({
+        bot: name.replace('claw','').toUpperCase(), botColor: cfg,
+        strategy: name, question: p.question || '', platform: 'KALSHI',
+        direction: p.direction, entry: p.entry_price || 0, current: p.entry_price || 0,
+        pnl: p.pnl || 0, pnlPct: 0, size: p.amount_usd || 0,
+        confidence: p.confidence || 0, closeTime: p.close_time || '',
+        openedAt: p.opened_at || '',
+      })
+    }
+  }
+
+  // Sort
+  const sortKey = document.getElementById('ufSort').value
+  const sorters = {
+    countdown: (a, b) => {
+      const at = a.closeTime ? new Date(a.closeTime).getTime() : Infinity
+      const bt = b.closeTime ? new Date(b.closeTime).getTime() : Infinity
+      return at - bt
+    },
+    bot: (a, b) => a.bot.localeCompare(b.bot),
+    pnl_desc: (a, b) => b.pnl - a.pnl,
+    pnl_asc: (a, b) => a.pnl - b.pnl,
+    size_desc: (a, b) => b.size - a.size,
+    size_asc: (a, b) => a.size - b.size,
+    entry_desc: (a, b) => b.entry - a.entry,
+    entry_asc: (a, b) => a.entry - b.entry,
+    confidence: (a, b) => b.confidence - a.confidence,
+    newest: (a, b) => (b.openedAt || '').localeCompare(a.openedAt || ''),
+    oldest: (a, b) => (a.openedAt || '').localeCompare(b.openedAt || ''),
+  }
+  allTrades.sort(sorters[sortKey] || sorters.countdown)
+
+  // Render
+  document.getElementById('ufCount').textContent = allTrades.length
+  const body = document.getElementById('ufBody')
+  if (allTrades.length) {
+    body.innerHTML = allTrades.map(t => {
+      const pnlClass = t.pnl >= 0 ? 't-pnl-pos' : 't-pnl-neg'
+      return `<tr>
+        <td style="color:${t.botColor};font-weight:700;font-size:0.46rem;letter-spacing:1px">${t.bot}</td>
+        <td title="${t.strategy}">${t.question.substring(0,35)}</td>
+        <td style="font-size:0.42rem;color:var(--grey2)">${t.platform}</td>
+        <td>${t.direction}</td>
+        <td>${t.entry.toFixed(3)}</td>
+        <td>${t.current.toFixed(3)}</td>
+        <td class="${pnlClass}">${t.pnl >= 0 ? '+' : ''}$${t.pnl.toFixed(2)}</td>
+        <td>$${t.size.toFixed(0)}</td>
+        <td style="font-size:0.42rem;color:var(--grey2)">${(t.confidence*100).toFixed(0)}%</td>
+        <td class="t-countdown" data-close="${t.closeTime}">${formatCountdown(t.closeTime)}</td>
+      </tr>`
+    }).join('')
+  } else {
+    body.innerHTML = '<tr><td colspan="10" style="color:var(--grey2);text-align:center">no open trades across any bot</td></tr>'
+  }
+}
+
+// Re-sort when dropdown changes
+document.getElementById('ufSort')?.addEventListener('change', () => { if (tradingData) buildUnifiedFeed(tradingData) })
+
 function formatCountdown(closeTime) {
-  if (!closeTime) return '<span style="color:var(--grey2)">--:--</span>'
+  if (!closeTime) return '<span style="color:var(--grey2)">--:--:--</span>'
   const now = Date.now()
   const close = new Date(closeTime.replace('Z', '+00:00')).getTime()
   const diff = close - now
-  if (diff <= 0) return '<span style="color:var(--neon-red);font-weight:700">EXPIRED</span>'
-  const mins = Math.floor(diff / 60000)
-  const secs = Math.floor((diff % 60000) / 1000)
-  const hrs = Math.floor(mins / 60)
-  const days = Math.floor(hrs / 24)
-  if (days > 0) return `<span style="color:var(--grey1)">${days}d ${hrs%24}h</span>`
-  if (hrs > 0) return `<span style="color:var(--neon-cyan)">${hrs}h ${mins%60}m</span>`
-  if (mins > 5) return `<span style="color:var(--orange-hi)">${mins}m ${secs}s</span>`
-  // Under 5 min — urgent
-  return `<span style="color:var(--neon-red);font-weight:700;animation:countdown-flash 1s infinite">${mins}:${secs.toString().padStart(2,'0')}</span>`
+  if (diff <= 0) return '<span style="color:var(--neon-red);font-weight:700">00:00:00</span>'
+  const totalSecs = Math.floor(diff / 1000)
+  const hrs = Math.floor(totalSecs / 3600)
+  const mins = Math.floor((totalSecs % 3600) / 60)
+  const secs = totalSecs % 60
+  const hh = String(hrs).padStart(2, '0')
+  const mm = String(mins).padStart(2, '0')
+  const ss = String(secs).padStart(2, '0')
+  const timeStr = `${hh}:${mm}:${ss}`
+  // Color: red < 5min, orange < 1hr, cyan < 24hr, grey > 24hr
+  let color = 'var(--grey1)'
+  let extra = ''
+  if (hrs < 1 && mins < 5) { color = 'var(--neon-red)'; extra = 'font-weight:700;animation:countdown-flash 1s infinite;' }
+  else if (hrs < 1) { color = 'var(--orange-hi)' }
+  else if (hrs < 24) { color = 'var(--neon-cyan)' }
+  return `<span style="color:${color};font-variant-numeric:tabular-nums;${extra}">${timeStr}</span>`
 }
 
 // Tick every second to update countdowns live
