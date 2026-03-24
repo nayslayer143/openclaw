@@ -326,6 +326,17 @@ def run_loop():
     if not markets:
         print("[mirofish] No markets available (API down + cache stale). Skipping trades.")
     else:
+        # 1.5. Data quality check — filter out bad markets before trading
+        try:
+            import scripts.mirofish.data_quality as dq
+            quality_report = dq.validate_markets(markets)
+            if quality_report.alerts:
+                print(f"[mirofish] Data quality: {len(quality_report.alerts)} alerts, "
+                      f"{len(quality_report.markets_blocked)} blocked")
+            markets = dq.filter_tradeable(markets, quality_report)
+        except Exception as e:
+            print(f"[mirofish] Data quality check error: {e}")
+
         # 2. Get wallet state
         state = wallet.get_state()
         print(f"[mirofish] Wallet: ${state['balance']:.2f} | "

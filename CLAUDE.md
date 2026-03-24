@@ -87,10 +87,10 @@ Two parallel systems, five data feeds, SQLite-backed paper trading.
 | Component | What it does | Cron |
 |-----------|-------------|------|
 | `trading-bot.py` | Scans top 30 Polymarket markets, LLM edge analysis (qwen2.5:7b), auto-paper-trades | 3x daily |
-| Mirofish brain | 4 strategies (arb, price-lag, momentum, LLM), Kelly sizing, stop-loss/TP | Every 30 min |
+| Mirofish brain | 5 strategies (single-venue arb, cross-venue arb, price-lag, momentum, LLM), dynamic allocation, Kelly sizing, stop-loss/TP | Every 30 min |
 | Graduation engine | 5 criteria × 14 days before live trading unlocks | With each run |
 
-**Feeds:** Polymarket (gamma API) · Unusual Whales (options/dark pool/congressional/institutional) · Crucix OSINT (29 sources, 6 domains) · Spot prices (Binance + Coinbase) · Base protocol interface
+**Feeds:** Polymarket (gamma API) · Kalshi (REST v2 + RSA auth, demo mode) · Unusual Whales (options/dark pool/congressional/institutional) · Crucix OSINT (29 sources, 6 domains) · Spot prices (Binance + Coinbase) · Base protocol interface
 
 **Paper wallet rules:** 10% max position · -20% stop-loss · +50% take-profit · Kelly capped at 10%
 
@@ -98,7 +98,9 @@ Two parallel systems, five data feeds, SQLite-backed paper trading.
 
 **Live trading:** Requires Tier-3 confirmation via Telegram DM. Not yet active.
 
-**Trading gaps (next build targets):** Kalshi feed + MarketEvent schema · cross-venue arb detection · realistic execution sim (latency, slippage, partial fills) · edge capture rate + expected vs realized PnL · strategy tournament / capital allocator · backtesting framework
+**Completed (Phase 5A):** Kalshi feed + MarketEvent schema · cross-venue arb detection · realistic execution sim (latency, slippage, partial fills) · edge capture rate + expected vs realized PnL · strategy tournament / capital allocator · backtesting framework
+
+**Remaining gaps:** Kalshi demo account setup (needs Jordan) · LLM strategies in backtester (momentum/contrarian/news_catalyst replay) · live cross-venue price feed aggregation · graduation criteria update for multi-venue
 
 ---
 
