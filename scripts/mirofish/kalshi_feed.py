@@ -190,10 +190,43 @@ def _call_kalshi(method: str, path: str, params: dict | None = None) -> dict | N
         return None
 
 
+def _adapt_market_fields(m: dict) -> dict:
+    """
+    Adapt Kalshi API v2 field names to our internal format.
+    v2 uses _dollars suffix for prices and _fp suffix for volume.
+    """
+    def _dollars_to_cents(val):
+        """Convert dollar string like '0.4200' to cents int like 42."""
+        if val is None:
+            return None
+        try:
+            f = float(val)
+            if f > 0:
+                return int(round(f * 100))
+        except (ValueError, TypeError):
+            pass
+        return None
+
+    # Map v2 fields to our expected format
+    m.setdefault("yes_bid", _dollars_to_cents(m.get("yes_bid_dollars")))
+    m.setdefault("yes_ask", _dollars_to_cents(m.get("yes_ask_dollars")))
+    m.setdefault("no_bid", _dollars_to_cents(m.get("no_bid_dollars")))
+    m.setdefault("no_ask", _dollars_to_cents(m.get("no_ask_dollars")))
+    m.setdefault("last_price", _dollars_to_cents(m.get("last_price_dollars") or m.get("previous_price_dollars")))
+    m.setdefault("volume", float(m.get("volume_fp", 0) or 0))
+    m.setdefault("volume_24h", float(m.get("volume_24h_fp", 0) or 0))
+    m.setdefault("open_interest", float(m.get("open_interest_fp", 0) or 0))
+    m.setdefault("rules_primary", m.get("rules_primary", ""))
+    m.setdefault("category", m.get("category", ""))
+
+    return m
+
+
 def fetch_markets_page(cursor: str | None = None, status: str = "open") -> tuple[list[dict], str | None]:
     """
     Fetch one page of markets. Returns (markets_list, next_cursor).
     next_cursor is None when no more pages.
+    Filters out MVE combo markets and inactive zero-liquidity markets.
     """
     params: dict = {"limit": PAGE_LIMIT, "status": status}
     if cursor:
@@ -203,9 +236,17 @@ def fetch_markets_page(cursor: str | None = None, status: str = "open") -> tuple
     if data is None:
         return [], None
 
-    markets = data.get("markets", [])
+    raw_markets = data.get("markets", [])
+    # Adapt field names and filter out MVE combo markets (low quality noise)
+    markets = []
+    for m in raw_markets:
+        _adapt_market_fields(m)
+        # Skip MVE combo markets — they're multi-leg parlays with no liquidity
+        if m.get("mve_collection_ticker") or "KXMVE" in m.get("ticker", ""):
+            continue
+        markets.append(m)
+
     next_cursor = data.get("cursor")
-    # Kalshi returns empty string cursor when done
     if not next_cursor:
         next_cursor = None
 
@@ -224,9 +265,60 @@ def fetch_orderbook(ticker: str) -> dict | None:
 # Main feed functions (DataFeed protocol)
 # ---------------------------------------------------------------------------
 
+# Series tickers for markets we actually care about
+TARGET_SERIES = [
+    "KXBTC",       # Bitcoin price
+    "KXETH",       # Ethereum price
+    "KXINXSPX",    # S&P 500
+    "KXINXNDX",    # Nasdaq
+    "KXFEDRATE",   # Fed rate decisions
+    "KXCPI",       # CPI / inflation
+    "KXGDP",       # GDP
+    "KXJOBLESS",   # Jobless claims
+    "KXELECTION",  # Elections
+    "KXNEWPOPE",   # Pope
+    "KXTRUMP",     # Trump-related
+    "KXGOV",       # Government
+    "KXTARIFF",    # Tariffs
+    "KXNBA",       # NBA
+    "KXNFL",       # NFL
+    "KXMLB",       # MLB
+    "KXSOCCER",    # Soccer
+    "KXNCAA",      # NCAA
+    "KXWEATHER",   # Weather
+    "KXHURRICANE", # Hurricanes
+]
+
+
+def _fetch_event_markets(series_ticker: str) -> list[dict]:
+    """Fetch markets for a specific series by querying events first."""
+    data = _call_kalshi("GET", "/events", params={
+        "series_ticker": series_ticker, "status": "open", "limit": 10,
+    })
+    if not data:
+        return []
+
+    markets = []
+    for event in data.get("events", []):
+        evt_ticker = event.get("event_ticker", "")
+        if not evt_ticker:
+            continue
+        mdata = _call_kalshi("GET", "/markets", params={
+            "event_ticker": evt_ticker, "status": "open", "limit": 100,
+        })
+        if mdata:
+            for m in mdata.get("markets", []):
+                _adapt_market_fields(m)
+                if not m.get("mve_collection_ticker"):
+                    markets.append(m)
+
+    return markets
+
+
 def fetch(categories: list[str] | None = None, max_pages: int = 5) -> list[dict]:
     """
     Fetch active Kalshi markets, cache to DB. Returns list of market dicts.
+    Queries by series ticker to get real markets (skips MVE combo spam).
     Falls back to cached data if API is unavailable.
     """
     if _auth_headers("GET", "/markets") is None:
@@ -238,15 +330,16 @@ def fetch(categories: list[str] | None = None, max_pages: int = 5) -> list[dict]
 
     now = datetime.datetime.utcnow().isoformat()
     all_markets: list[dict] = []
-    cursor = None
+    seen_tickers: set[str] = set()
 
-    for _ in range(max_pages):
-        page, cursor = fetch_markets_page(cursor=cursor)
-        if not page:
-            break
-        all_markets.extend(page)
-        if cursor is None:
-            break
+    # Fetch by series to get real markets
+    for series in TARGET_SERIES:
+        series_markets = _fetch_event_markets(series)
+        for m in series_markets:
+            ticker = m.get("ticker", "")
+            if ticker and ticker not in seen_tickers:
+                seen_tickers.add(ticker)
+                all_markets.append(m)
 
     if not all_markets:
         print("[kalshi_feed] No markets from API — using cache")
