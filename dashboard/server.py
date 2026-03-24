@@ -838,6 +838,18 @@ async def manifest():
 async def login_page():
     return (Path(__file__).parent / "login.html").read_text()
 
+@app.get("/api/trading")
+async def get_trading(user: str = Depends(get_current_user)):
+    """Return trading bot data — signals, positions, P&L."""
+    trading_file = OPENCLAW_ROOT / "trading" / "dashboard.json"
+    if trading_file.exists():
+        try:
+            return json.loads(trading_file.read_text())
+        except Exception:
+            pass
+    return {"portfolio": {"open_positions": 0, "total_pnl": 0, "positions": []}, "recent_signals": [], "history": []}
+
+
 @app.get("/{path:path}", response_class=HTMLResponse)
 async def spa(path: str, request: Request):
     # Let API routes through
