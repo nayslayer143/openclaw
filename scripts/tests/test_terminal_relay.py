@@ -9,6 +9,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 _mod = importlib.import_module("terminal-relay")
 strip_ansi = _mod.strip_ansi
 redact_secrets = _mod.redact_secrets
+detect_event_type = _mod.detect_event_type
+extract_summary = _mod.extract_summary
 
 
 class TestStripAnsi:
@@ -71,9 +73,56 @@ class TestRedactSecrets:
 
 class TestDetectEventType:
     """Terminal output event classification."""
-    pass
+
+    def test_detects_traceback(self):
+        output = "Traceback (most recent call last):\n  File 'x.py'\nValueError: bad"
+        assert detect_event_type(output) == "error"
+
+    def test_detects_error_prefix(self):
+        assert detect_event_type("Error: connection refused") == "error"
+
+    def test_detects_build_failure_syntax(self):
+        assert detect_event_type("SyntaxError: invalid syntax") == "build_failure"
+
+    def test_detects_build_failure_import(self):
+        assert detect_event_type("ModuleNotFoundError: No module named 'foo'") == "build_failure"
+
+    def test_detects_test_failure_pytest(self):
+        output = "FAILED tests/test_foo.py::test_bar - AssertionError"
+        assert detect_event_type(output) == "test_failure"
+
+    def test_detects_test_failure_jest(self):
+        assert detect_event_type("Tests:  2 failed, 3 passed") == "test_failure"
+
+    def test_returns_none_for_clean_output(self):
+        assert detect_event_type("Successfully installed package-1.0") is None
+
+    def test_build_failure_takes_priority_over_error(self):
+        output = "Error: SyntaxError: unexpected EOF"
+        assert detect_event_type(output) == "build_failure"
+
+    def test_test_failure_takes_priority_over_error(self):
+        output = "FAILED test_x.py\nAssertionError: 1 != 2"
+        assert detect_event_type(output) == "test_failure"
 
 
 class TestExtractSummary:
     """One-line summary extraction from output."""
-    pass
+
+    def test_extracts_error_line(self):
+        output = "running stuff\nmore stuff\nValueError: bad input"
+        result = extract_summary(output, "error")
+        assert "ValueError" in result
+
+    def test_extracts_test_failure_line(self):
+        output = "collecting...\nFAILED test_foo.py::test_bar"
+        result = extract_summary(output, "test_failure")
+        assert "FAILED" in result
+
+    def test_truncates_long_summaries(self):
+        output = "Error: " + "x" * 300
+        result = extract_summary(output, "error")
+        assert len(result) <= 200
+
+    def test_handles_empty_output(self):
+        assert extract_summary("", "error") == ""

@@ -74,3 +74,55 @@ def redact_secrets(text: str, env_values: list = None) -> str:
             if len(val) >= 8 and val in text:
                 text = text.replace(val, "[REDACTED]")
     return text
+
+
+# ── Event detection ──────────────────────────────────────────────────────────
+_ERROR_PATTERNS = [
+    re.compile(r"Traceback \(most recent call last\)", re.IGNORECASE),
+    re.compile(r"^Error:", re.MULTILINE),
+    re.compile(r"^error:", re.MULTILINE),
+    re.compile(r"FAILED"),
+    re.compile(r"Exception:"),
+]
+_TEST_FAILURE_PATTERNS = [
+    re.compile(r"FAIL(?:ED)?\s"),
+    re.compile(r"Assert(?:ion)?Error"),
+    re.compile(r"pytest.*failed", re.IGNORECASE),
+    re.compile(r"FAILURES"),
+    re.compile(r"Tests:\s+\d+\s+failed", re.IGNORECASE),
+]
+_BUILD_FAILURE_PATTERNS = [
+    re.compile(r"Build failed", re.IGNORECASE),
+    re.compile(r"SyntaxError:"),
+    re.compile(r"ModuleNotFoundError:"),
+    re.compile(r"ImportError:"),
+    re.compile(r"compil(?:ation|er)?\s+error", re.IGNORECASE),
+]
+
+
+def detect_event_type(output: str) -> str | None:
+    for p in _BUILD_FAILURE_PATTERNS:
+        if p.search(output):
+            return "build_failure"
+    for p in _TEST_FAILURE_PATTERNS:
+        if p.search(output):
+            return "test_failure"
+    for p in _ERROR_PATTERNS:
+        if p.search(output):
+            return "error"
+    return None
+
+
+def extract_summary(output: str, event_type: str) -> str:
+    lines = output.strip().splitlines()
+    if not lines:
+        return ""
+    if event_type in ("error", "build_failure"):
+        for line in reversed(lines):
+            if any(kw in line for kw in ("Error", "Exception", "FAILED", "failed")):
+                return line.strip()[:200]
+    if event_type == "test_failure":
+        for line in reversed(lines):
+            if any(kw in line for kw in ("FAIL", "assert", "Assert", "failed")):
+                return line.strip()[:200]
+    return lines[-1].strip()[:200]
