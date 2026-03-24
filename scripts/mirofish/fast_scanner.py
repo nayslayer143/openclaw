@@ -380,13 +380,53 @@ def run():
                     events_traded.add(event_ticker)
             break
 
+    # Resolve any expired Kalshi trades with actual results
+    resolved = _resolve_expired(conn)
     conn.close()
 
-    if trades_placed > 0:
-        print(f"[fast_scan] Placed {trades_placed} trades")
+    if trades_placed > 0 or resolved > 0:
+        print(f"[fast_scan] Placed {trades_placed} trades, resolved {resolved}")
         _notify_dashboard()
     else:
         print(f"[fast_scan] No edge found in {len(markets)} short-expiry markets")
+
+
+def _resolve_expired(conn) -> int:
+    """Check Kalshi API for resolution on open expired trades."""
+    try:
+        from scripts.mirofish.kalshi_feed import _call_kalshi
+    except ImportError:
+        return 0
+
+    open_kalshi = conn.execute(
+        "SELECT id, market_id, direction, entry_price, shares FROM paper_trades WHERE status='open' AND market_id LIKE 'KX%'"
+    ).fetchall()
+
+    resolved = 0
+    for t in open_kalshi:
+        data = _call_kalshi("GET", f"/markets/{t['market_id']}")
+        if not data:
+            continue
+        m = data.get("market", data)
+        result = m.get("result", "")
+        if not result:
+            continue
+
+        we_bet = t["direction"].lower()
+        we_won = (result == "yes" and we_bet == "yes") or (result == "no" and we_bet == "no")
+        exit_price = 1.0 if we_won else 0.0
+        pnl = t["shares"] * (exit_price - t["entry_price"])
+        status = "closed_win" if we_won else "closed_loss"
+
+        conn.execute("UPDATE paper_trades SET exit_price=?, pnl=?, status=?, closed_at=? WHERE id=?",
+                     (exit_price, pnl, status, datetime.datetime.utcnow().isoformat(), t["id"]))
+        sign = "+" if pnl >= 0 else ""
+        print(f"[fast_scan] Resolved: {t['market_id'][:30]} → {status} {sign}${pnl:.2f}")
+        resolved += 1
+
+    if resolved:
+        conn.commit()
+    return resolved
 
 
 def _place_trade(conn, market_id, question, direction, entry_price, amount, shares, edge, strategy):
