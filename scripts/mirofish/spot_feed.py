@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Spot price feed — fetches BTC/ETH from Binance + Coinbase public APIs.
-Averages prices from both exchanges. Caches to spot_prices SQLite table.
+Spot price feed — fetches BTC/ETH from Binance.US + Coinbase + Kraken public APIs.
+Averages prices from available exchanges. Caches to spot_prices SQLite table.
+
+Exchange priority: Binance.US (US-compliant) > Coinbase > Kraken (backup).
+Binance global (api.binance.com) is geo-blocked in the US — we use api.binance.us.
 
 Duck-type compatible with DataFeed protocol (base_feed.py).
 isinstance(this_module, DataFeed) will return False.
@@ -20,12 +23,14 @@ SPOT_TIMEOUT = int(os.environ.get("SPOT_TIMEOUT", "10"))
 
 _ASSETS = {
     "BTC": {
-        "binance": "https://api.binance.com/api/v3/ticker/price?symbol=BTCUSDT",
+        "binance_us": "https://api.binance.us/api/v3/ticker/price?symbol=BTCUSDT",
         "coinbase": "https://api.coinbase.com/v2/prices/BTC-USD/spot",
+        "kraken": "https://api.kraken.com/0/public/Ticker?pair=XBTUSD",
     },
     "ETH": {
-        "binance": "https://api.binance.com/api/v3/ticker/price?symbol=ETHUSDT",
+        "binance_us": "https://api.binance.us/api/v3/ticker/price?symbol=ETHUSDT",
         "coinbase": "https://api.coinbase.com/v2/prices/ETH-USD/spot",
+        "kraken": "https://api.kraken.com/0/public/Ticker?pair=ETHUSD",
     },
 }
 
@@ -44,13 +49,13 @@ def _now_iso() -> str:
     return datetime.datetime.utcnow().isoformat()
 
 
-def _fetch_binance(url: str) -> float | None:
+def _fetch_binance_us(url: str) -> float | None:
     try:
         resp = requests.get(url, timeout=SPOT_TIMEOUT)
         resp.raise_for_status()
         return float(resp.json().get("price", 0))
     except Exception as e:
-        print(f"[spot_feed] Binance error: {e}")
+        print(f"[spot_feed] Binance.US error: {e}")
         return None
 
 
@@ -64,25 +69,47 @@ def _fetch_coinbase(url: str) -> float | None:
         return None
 
 
+def _fetch_kraken(url: str) -> float | None:
+    try:
+        resp = requests.get(url, timeout=SPOT_TIMEOUT)
+        resp.raise_for_status()
+        data = resp.json()
+        if data.get("error"):
+            return None
+        # Kraken returns {"result": {"XXBTZUSD": {"c": ["70000.0", "0.1"]}}}
+        result = data.get("result", {})
+        for pair_data in result.values():
+            # "c" = last trade close [price, lot_volume]
+            close = pair_data.get("c", [])
+            if close:
+                return float(close[0])
+    except Exception as e:
+        print(f"[spot_feed] Kraken error: {e}")
+    return None
+
+
 def _fetch_spot(asset: str) -> dict | None:
-    """Fetch spot price for one asset, average Binance + Coinbase."""
+    """Fetch spot price for one asset, average across available exchanges."""
     urls = _ASSETS.get(asset)
     if not urls:
         return None
 
-    binance_price = _fetch_binance(urls["binance"])
+    binance_price = _fetch_binance_us(urls["binance_us"])
     coinbase_price = _fetch_coinbase(urls["coinbase"])
+    kraken_price = _fetch_kraken(urls["kraken"])
 
-    prices = [p for p in [binance_price, coinbase_price] if p and p > 0]
+    prices = [p for p in [binance_price, coinbase_price, kraken_price] if p and p > 0]
     if not prices:
         return None
 
     avg_price = sum(prices) / len(prices)
     parts = []
     if binance_price:
-        parts.append(f"binance=${binance_price:,.2f}")
+        parts.append(f"binance.us=${binance_price:,.2f}")
     if coinbase_price:
         parts.append(f"coinbase=${coinbase_price:,.2f}")
+    if kraken_price:
+        parts.append(f"kraken=${kraken_price:,.2f}")
 
     return {
         "source": "spot_prices",
