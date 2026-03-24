@@ -1732,39 +1732,88 @@ body {
       <div class="ticker-tape" id="tickerTape"></div>
     </div>
 
-    <div class="ideas-header">
+    <!-- ══ HERO: 3-Engine Trading Command Center ══ -->
+    <div class="ideas-header" style="margin-bottom:8px">
       <div>
         <div class="ideas-title" style="display:flex;align-items:center;gap:12px">
-          MIROFISH TRADING
+          TRADING COMMAND CENTER
           <span class="t-live-dot" id="tLiveDot"></span>
         </div>
-        <div class="ideas-subtitle">PAPER TRADING — POLYMARKET + KALSHI + CRYPTO SPOT</div>
+        <div class="ideas-subtitle">PHANTOMCLAW × RIVALCLAW × CLAWMPSON — LIVE PAPER TRADING</div>
       </div>
       <div id="tradingLastUpdate" style="font-size:0.50rem;color:var(--grey2);letter-spacing:1px;text-align:right"></div>
     </div>
 
-    <!-- Portfolio Overview Cards -->
-    <div class="trading-cards" id="tradingCards">
-      <div class="t-card">
-        <div class="t-card-label">BALANCE</div>
-        <div class="t-card-value" id="tBalance">$1,000.00</div>
-        <div class="t-card-sub" id="tRoi">0.00%</div>
+    <!-- 3-Engine Hero Grid -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px" id="heroGrid">
+
+      <!-- PhantomClaw -->
+      <div class="t-section" style="border-color:rgba(255,0,200,0.25);background:linear-gradient(135deg,rgba(15,0,20,0.95),rgba(5,0,10,0.98));margin-bottom:0">
+        <div class="t-section-title" style="color:#ff00c8;border-bottom-color:rgba(255,0,200,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
+          PHANTOMCLAW
+          <span class="t-live-dot" style="background:#ff00c8;box-shadow:0 0 6px #ff00c8;width:6px;height:6px"></span>
+        </div>
+        <div style="font-size:0.38rem;color:rgba(255,0,200,0.4);letter-spacing:1px;margin:-8px 0 8px 0">BS FAIR VALUE × CLAWMPSON ARCH · */2 CRON</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+          <div><div class="t-card-label">P&L</div><div class="t-card-value" id="phPnl" style="font-size:1rem">$0</div></div>
+          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="phWL" style="font-size:1rem">0/0</div></div>
+          <div><div class="t-card-label">OPEN</div><div class="t-card-value" id="phOpen" style="font-size:1rem;color:#ff00c8">0</div></div>
+        </div>
+        <div class="t-table-wrap" style="max-height:200px;overflow-y:auto">
+          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>P&L</th><th>RESOLVES</th></tr></thead>
+          <tbody id="phBody"></tbody></table>
+        </div>
       </div>
-      <div class="t-card">
-        <div class="t-card-label">OPEN / TOTAL</div>
-        <div class="t-card-value" id="tPositions">0 / 0</div>
-        <div class="t-card-sub" id="tUnrealized">$0.00 unrealized</div>
+
+      <!-- RivalClaw -->
+      <div class="t-section" style="border-color:rgba(180,140,255,0.25);background:linear-gradient(135deg,rgba(10,0,20,0.95),rgba(5,0,10,0.98));margin-bottom:0">
+        <div class="t-section-title" style="color:rgba(180,140,255,0.9);border-bottom-color:rgba(180,140,255,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
+          RIVALCLAW
+          <span class="t-live-dot" style="background:rgba(180,140,255,0.9);box-shadow:0 0 6px rgba(180,140,255,0.5);width:6px;height:6px"></span>
+        </div>
+        <div style="font-size:0.38rem;color:rgba(180,140,255,0.4);letter-spacing:1px;margin:-8px 0 8px 0">STANDALONE 8-STRATEGY QUANT · */2 CRON</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+          <div><div class="t-card-label">P&L</div><div class="t-card-value" id="rcPnl" style="font-size:1rem">--</div></div>
+          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="rcWL" style="font-size:1rem">--</div></div>
+          <div><div class="t-card-label">OPEN</div><div class="t-card-value" id="rcOpen" style="font-size:1rem;color:rgba(180,140,255,0.9)">--</div></div>
+        </div>
+        <div class="t-table-wrap" style="max-height:200px;overflow-y:auto">
+          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>P&L</th><th>LATENCY</th></tr></thead>
+          <tbody id="rcTradesBody"></tbody></table>
+        </div>
       </div>
-      <div class="t-card">
-        <div class="t-card-label">WIN / LOSS</div>
-        <div class="t-card-value" id="tWinLoss">0 / 0</div>
-        <div class="t-card-sub" id="tWinRate">0% win rate</div>
+
+      <!-- Clawmpson/MiroFish -->
+      <div class="t-section" style="border-color:rgba(232,104,0,0.25);background:linear-gradient(135deg,rgba(15,8,0,0.95),rgba(8,4,0,0.98));margin-bottom:0">
+        <div class="t-section-title" style="color:var(--orange-hi);border-bottom-color:rgba(232,104,0,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
+          CLAWMPSON
+          <span class="t-live-dot" style="background:var(--orange);box-shadow:0 0 6px var(--orange);width:6px;height:6px"></span>
+        </div>
+        <div style="font-size:0.38rem;color:rgba(232,104,0,0.4);letter-spacing:1px;margin:-8px 0 8px 0">LLM + MATH STRATEGIES · */30 CRON</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+          <div><div class="t-card-label">BALANCE</div><div class="t-card-value" id="tBalance" style="font-size:1rem">$1,000</div></div>
+          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="tWinLoss" style="font-size:1rem">0/0</div></div>
+          <div><div class="t-card-label">P&L</div><div class="t-card-value" id="tRealizedPnl" style="font-size:1rem">$0</div></div>
+        </div>
+        <div class="t-table-wrap" style="max-height:200px;overflow-y:auto">
+          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>STRAT</th><th>P&L</th><th>RESOLVES</th></tr></thead>
+          <tbody id="clawmpsonBody"></tbody></table>
+        </div>
       </div>
-      <div class="t-card">
-        <div class="t-card-label">REALIZED P&L</div>
-        <div class="t-card-value" id="tRealizedPnl">$0.00</div>
-        <div class="t-card-sub" id="tGradStatus">TESTING</div>
-      </div>
+
+    </div>
+    <style>
+      @media (max-width:1100px) { #heroGrid { grid-template-columns: 1fr !important; } }
+    </style>
+
+    <!-- Compact stats row -->
+    <div class="trading-cards" style="grid-template-columns:repeat(6,1fr);gap:8px;margin-bottom:14px">
+      <div class="t-card"><div class="t-card-label">CLAWMPSON BAL</div><div class="t-card-sub" id="tRoi" style="margin:0">--</div></div>
+      <div class="t-card"><div class="t-card-label">OPEN</div><div class="t-card-sub" id="tPositions" style="margin:0">0</div></div>
+      <div class="t-card"><div class="t-card-label">WIN RATE</div><div class="t-card-sub" id="tWinRate" style="margin:0">0%</div></div>
+      <div class="t-card"><div class="t-card-label">UNREALIZED</div><div class="t-card-sub" id="tUnrealized" style="margin:0">$0</div></div>
+      <div class="t-card"><div class="t-card-label">PHANTOM WR</div><div class="t-card-sub" id="phWR" style="margin:0">0%</div></div>
+      <div class="t-card"><div class="t-card-label">STATUS</div><div class="t-card-sub" id="tGradStatus" style="margin:0">TESTING</div></div>
     </div>
 
     <!-- Live Balance Chart -->
@@ -1772,43 +1821,6 @@ body {
       <div class="t-section-title" style="color:rgba(180,140,255,0.8);border-bottom-color:rgba(180,0,255,0.2)">LIVE CASH POSITION</div>
       <div class="t-chart-container" style="height:150px">
         <canvas id="liveBalanceChart" height="150"></canvas>
-      </div>
-    </div>
-
-    <!-- PhantomClaw: RivalClaw strategy inside Clawmpson -->
-    <div class="t-section" id="phantomSection" style="border-color:rgba(255,0,200,0.2);background:linear-gradient(135deg,rgba(10,0,15,0.95),rgba(5,0,10,0.98))">
-      <div class="t-section-title" style="color:#ff00c8;border-bottom-color:rgba(255,0,200,0.2);display:flex;align-items:center;gap:10px">
-        PHANTOMCLAW
-        <span class="t-live-dot" style="background:#ff00c8;box-shadow:0 0 6px #ff00c8"></span>
-        <span style="font-size:0.42rem;color:rgba(255,0,200,0.5);letter-spacing:2px;font-weight:400">RIVALCLAW STRATEGY × CLAWMPSON ARCHITECTURE</span>
-      </div>
-      <div class="trading-cards" style="grid-template-columns:repeat(5,1fr)">
-        <div class="t-card" style="border-color:rgba(255,0,200,0.15)">
-          <div class="t-card-label">P&L</div>
-          <div class="t-card-value" id="phPnl">$0.00</div>
-        </div>
-        <div class="t-card" style="border-color:rgba(255,0,200,0.15)">
-          <div class="t-card-label">WIN / LOSS</div>
-          <div class="t-card-value" id="phWL">0 / 0</div>
-        </div>
-        <div class="t-card" style="border-color:rgba(255,0,200,0.15)">
-          <div class="t-card-label">WIN RATE</div>
-          <div class="t-card-value" id="phWR">0%</div>
-        </div>
-        <div class="t-card" style="border-color:rgba(255,0,200,0.15)">
-          <div class="t-card-label">OPEN</div>
-          <div class="t-card-value" id="phOpen">0</div>
-        </div>
-        <div class="t-card" style="border-color:rgba(255,0,200,0.15)">
-          <div class="t-card-label">STRATEGY</div>
-          <div class="t-card-value" style="font-size:0.7rem;color:#ff00c8">BS FAIR VALUE</div>
-        </div>
-      </div>
-      <div class="t-table-wrap" style="margin-top:10px">
-        <table class="t-table">
-          <thead><tr><th>MARKET</th><th>DIR</th><th>ENTRY</th><th>CURRENT</th><th>P&L</th><th>SIZE</th><th>RESOLVES</th></tr></thead>
-          <tbody id="phBody"></tbody>
-        </table>
       </div>
     </div>
 
@@ -4373,16 +4385,15 @@ function renderTrading() {
     kalshiBody.innerHTML = '<tr><td colspan="4" style="color:var(--grey2);text-align:center">no Kalshi data — set API keys</td></tr>'
   }
 
-  // PhantomClaw section
+  // PhantomClaw hero card
   const ph = d.phantom || {}
   const phPnl = ph.pnl || 0
   document.getElementById('phPnl').textContent = (phPnl >= 0 ? '+' : '') + '$' + phPnl.toFixed(2)
   document.getElementById('phPnl').style.color = phPnl >= 0 ? '#00e5ff' : '#ff2d95'
-  document.getElementById('phWL').textContent = (ph.wins || 0) + ' / ' + (ph.losses || 0)
+  document.getElementById('phWL').textContent = (ph.wins || 0) + '/' + (ph.losses || 0)
   document.getElementById('phWL').style.color = (ph.wins || 0) >= (ph.losses || 0) ? '#00e5ff' : '#ff2d95'
-  document.getElementById('phWR').textContent = (ph.win_rate || 0).toFixed(0) + '%'
+  try { document.getElementById('phWR').textContent = (ph.win_rate || 0).toFixed(0) + '%' } catch(e){}
   document.getElementById('phOpen').textContent = ph.open || 0
-  document.getElementById('phOpen').style.color = '#ff00c8'
 
   const phBody = document.getElementById('phBody')
   const phPositions = ph.positions || []
@@ -4390,17 +4401,35 @@ function renderTrading() {
     phBody.innerHTML = phPositions.map(p => {
       const pnlClass = (p.pnl || 0) >= 0 ? 't-pnl-pos' : 't-pnl-neg'
       return `<tr>
-        <td title="${p.market_id}" style="color:rgba(255,0,200,0.8)">${(p.question || '').substring(0,45)}</td>
+        <td style="color:rgba(255,0,200,0.7)">${(p.question || '').substring(0,30)}</td>
         <td>${p.direction}</td>
-        <td>${(p.entry_price || 0).toFixed(3)}</td>
-        <td>${(p.current_price || 0).toFixed(3)}</td>
-        <td class="${pnlClass}">${(p.pnl||0) >= 0 ? '+' : ''}$${(p.pnl||0).toFixed(2)} (${(p.pnl_pct||0) >= 0 ? '+' : ''}${(p.pnl_pct||0).toFixed(0)}%)</td>
-        <td>$${(p.amount_usd || 0).toFixed(0)}</td>
+        <td class="${pnlClass}">${(p.pnl||0) >= 0 ? '+' : ''}$${(p.pnl||0).toFixed(2)}</td>
         <td class="t-countdown" data-close="${p.close_time || ''}">${formatCountdown(p.close_time)}</td>
       </tr>`
     }).join('')
   } else {
-    phBody.innerHTML = '<tr><td colspan="7" style="color:rgba(255,0,200,0.3);text-align:center">scanning for fair-value edge...</td></tr>'
+    phBody.innerHTML = '<tr><td colspan="4" style="color:rgba(255,0,200,0.3);text-align:center">scanning...</td></tr>'
+  }
+
+  // Clawmpson hero card — open positions + recent trades
+  const clawBody = document.getElementById('clawmpsonBody')
+  const clawOpen = d.open_positions || []
+  const clawRecent = d.recent_trades || []
+  const clawAll = [...clawOpen.map(p => ({...p, _status: 'OPEN'})), ...clawRecent.slice(0,5).map(t => ({...t, _status: t.status === 'closed_win' ? 'WIN' : 'LOSS'}))]
+  if (clawAll.length) {
+    clawBody.innerHTML = clawAll.slice(0,8).map(p => {
+      const pnl = p.pnl || 0
+      const cls = p._status === 'OPEN' ? 't-status-open' : (p._status === 'WIN' ? 't-pnl-pos' : 't-pnl-neg')
+      return `<tr>
+        <td style="color:var(--orange)">${(p.question || '').substring(0,25)}</td>
+        <td>${p.direction}</td>
+        <td>${p.strategy || ''}</td>
+        <td class="${cls}">${p._status === 'OPEN' ? 'OPEN' : (pnl >= 0 ? '+' : '') + '$' + pnl.toFixed(2)}</td>
+        <td class="t-countdown" data-close="${p.close_time || ''}">${formatCountdown(p.close_time)}</td>
+      </tr>`
+    }).join('')
+  } else {
+    clawBody.innerHTML = '<tr><td colspan="5" style="color:var(--grey2);text-align:center">awaiting trades...</td></tr>'
   }
 
   // Missed opportunities
@@ -4477,14 +4506,25 @@ function renderExperiment(d) {
     balEl.textContent = '$' + w.balance.toFixed(2)
     balEl.style.color = w.balance >= w.starting_balance ? 'var(--neon-green)' : 'var(--neon-red)'
 
-    const pnlEl = document.getElementById('rcPnl')
-    pnlEl.textContent = (w.total_pnl >= 0 ? '+' : '') + '$' + w.total_pnl.toFixed(2)
-    pnlEl.style.color = w.total_pnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
+    // Update BOTH hero grid and experiment panel
+    document.querySelectorAll('#rcPnl').forEach(el => {
+      el.textContent = (w.total_pnl >= 0 ? '+' : '') + '$' + w.total_pnl.toFixed(2)
+      el.style.color = w.total_pnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
+    })
+    document.querySelectorAll('#rcOpen').forEach(el => {
+      el.textContent = w.open_positions
+    })
+    const rcWLel = document.getElementById('rcWL')
+    if (rcWLel) {
+      const rcWins = w.win_count || 0
+      const rcLosses = w.total_trades - rcWins
+      rcWLel.textContent = rcWins + '/' + rcLosses
+      rcWLel.style.color = rcWins >= rcLosses ? 'var(--neon-green)' : 'var(--neon-red)'
+    }
 
-    document.getElementById('rcWinRate').textContent = w.win_rate + '%'
-    document.getElementById('rcTrades').textContent = w.total_trades
-    document.getElementById('rcOpen').textContent = w.open_positions
-    document.getElementById('rcLatency').textContent = w.avg_latency_ms.toFixed(0) + 'ms'
+    try { document.getElementById('rcWinRate').textContent = w.win_rate + '%' } catch(e){}
+    try { document.getElementById('rcTrades').textContent = w.total_trades } catch(e){}
+    try { document.getElementById('rcLatency').textContent = w.avg_latency_ms.toFixed(0) + 'ms' } catch(e){}
 
     const body = document.getElementById('rcTradesBody')
     const rows = [...(rc.open_positions || []).map(p => ({
