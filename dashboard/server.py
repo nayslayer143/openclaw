@@ -1120,9 +1120,40 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
                 "positions": phantom_positions,
             }
         except Exception as phantom_err:
-            import traceback
             phantom_stats["error"] = str(phantom_err)
-            traceback.print_exc()
+
+        # 10b. Per-agent stats for CalendarClaw, NewsClaw, SentimentClaw
+        agent_stats = {}
+        for agent_name in ("calendarclaw", "newsclaw", "sentimentclaw"):
+            try:
+                ac = conn.execute("""
+                    SELECT COUNT(*) as n,
+                           SUM(CASE WHEN status='closed_win' THEN 1 ELSE 0 END) as w,
+                           COALESCE(SUM(pnl), 0) as p
+                    FROM paper_trades WHERE strategy=? AND status IN ('closed_win','closed_loss','expired')
+                """, (agent_name,)).fetchone()
+                ao = conn.execute("""
+                    SELECT id, market_id, question, direction, entry_price, amount_usd, opened_at
+                    FROM paper_trades WHERE strategy=? AND status='open' ORDER BY opened_at DESC
+                """, (agent_name,)).fetchall()
+                positions = []
+                for po in ao:
+                    pd = dict(po)
+                    km = conn.execute("SELECT close_time FROM kalshi_markets WHERE ticker=? ORDER BY fetched_at DESC LIMIT 1", (po["market_id"],)).fetchone()
+                    pd["close_time"] = km["close_time"] if km and km["close_time"] else None
+                    pd["pnl"] = 0
+                    positions.append(pd)
+                n = ac["n"] or 0
+                w = ac["w"] or 0
+                agent_stats[agent_name] = {
+                    "trades": n, "wins": w, "losses": n - w,
+                    "pnl": round(ac["p"] or 0, 2),
+                    "open": len(ao),
+                    "win_rate": round(w / n * 100, 1) if n > 0 else 0,
+                    "positions": positions,
+                }
+            except Exception:
+                agent_stats[agent_name] = {"trades": 0, "wins": 0, "losses": 0, "pnl": 0, "open": 0, "win_rate": 0, "positions": []}
 
         # 11. Missed opportunities summary
         missed_summary = []
@@ -1160,6 +1191,7 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
             "kalshi": kalshi_list,
             "cross_venue_arb": xv_arb,
             "phantom": phantom_stats,
+            "agents": agent_stats,
             "missed_opportunities": missed_summary,
         }
     finally:
@@ -1566,6 +1598,7 @@ async def terminal_packet_preview(user: str = Depends(get_current_user)):
 # ── GitHub Intel ──────────────────────────────────────────────────────────────
 INTEL_DIR        = OPENCLAW_ROOT / "autoresearch" / "github-intel"
 INTEL_RECS       = INTEL_DIR / "recommendations.json"
+INTEL_ARCHIVE    = INTEL_DIR / "archive.json"
 INTEL_CRAWL_SCRIPT = OPENCLAW_ROOT / "scripts" / "github-intel-cron.sh"
 
 def _read_intel_recs() -> dict:
@@ -1580,12 +1613,47 @@ def _write_intel_recs(data: dict):
     INTEL_DIR.mkdir(parents=True, exist_ok=True)
     INTEL_RECS.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
+def _read_intel_archive() -> list:
+    """Read the rejection/review archive. Repos are NEVER deleted — rejected ones live here."""
+    if INTEL_ARCHIVE.exists():
+        try:
+            return json.loads(INTEL_ARCHIVE.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return []
+
+def _write_intel_archive(archive: list):
+    INTEL_DIR.mkdir(parents=True, exist_ok=True)
+    INTEL_ARCHIVE.write_text(json.dumps(archive, indent=2), encoding="utf-8")
+
 @app.get("/api/intel")
-async def intel_list(user: str = Depends(get_current_user)):
-    """Latest recommendations sorted by integration_value."""
+async def intel_list(sort: str = "composite", user: str = Depends(get_current_user)):
+    """Latest recommendations with flexible sorting.
+    Sort options: composite, integration_value, signal_score, complexity, stars,
+                  clawmpson_relevance, arbclaw_relevance, rivalclaw_relevance, recency, value_per_complexity
+    """
     data = _read_intel_recs()
     recs = data.get("recommendations", [])
-    recs.sort(key=lambda r: r.get("integration_value", 0), reverse=True)
+    sort_desc = True
+    if sort == "composite":
+        # Weighted composite: integration_value*3 + signal_score*2 + max_relevance - complexity*0.5
+        def composite(r):
+            max_rel = max(r.get("clawmpson_relevance", 0), r.get("arbclaw_relevance", 0), r.get("rivalclaw_relevance", 0))
+            return r.get("integration_value", 0) * 3 + r.get("signal_score", 0) * 2 + max_rel - r.get("complexity", 0) * 0.5
+        recs.sort(key=composite, reverse=True)
+    elif sort == "value_per_complexity":
+        # Best bang for buck: high value, low complexity
+        recs.sort(key=lambda r: (r.get("integration_value", 0) / max(r.get("complexity", 1), 1)), reverse=True)
+    elif sort == "complexity":
+        # Low complexity first (easiest to integrate)
+        recs.sort(key=lambda r: r.get("complexity", 10))
+        sort_desc = False
+    elif sort == "recency":
+        recs.sort(key=lambda r: r.get("last_updated", "") or "", reverse=True)
+    elif sort in ("integration_value", "signal_score", "stars", "clawmpson_relevance", "arbclaw_relevance", "rivalclaw_relevance"):
+        recs.sort(key=lambda r: r.get(sort, 0), reverse=True)
+    else:
+        recs.sort(key=lambda r: r.get("integration_value", 0), reverse=True)
     return {
         "crawl_date": data.get("crawl_date", ""),
         "analyzed_at": data.get("analyzed_at", ""),
@@ -1679,7 +1747,7 @@ async def intel_approve(request: Request, user: str = Depends(get_current_user))
 
 @app.post("/api/intel/reject")
 async def intel_reject(request: Request, user: str = Depends(get_current_user)):
-    """Reject a recommendation."""
+    """Reject a recommendation — marks as rejected AND copies to archive. Repos are NEVER deleted."""
     body = await request.json()
     rec_id = body.get("id", "")
     reason = body.get("reason", "")
@@ -1688,11 +1756,30 @@ async def intel_reject(request: Request, user: str = Depends(get_current_user)):
     for r in data.get("recommendations", []):
         if r.get("id") == rec_id:
             r["status"] = "rejected"
+            r["rejected_at"] = datetime.now().isoformat()
+            r["rejected_by"] = user
             if reason:
                 r["reject_reason"] = reason
             _write_intel_recs(data)
+            # Also copy to archive (repos are NEVER deleted, even on reject)
+            archive = _read_intel_archive()
+            # Avoid duplicates in archive by ID
+            if not any(a.get("id") == rec_id for a in archive):
+                archive.append({**r, "archived_at": datetime.now().isoformat()})
+            else:
+                # Update existing archive entry
+                for i, a in enumerate(archive):
+                    if a.get("id") == rec_id:
+                        archive[i] = {**r, "archived_at": datetime.now().isoformat()}
+                        break
+            _write_intel_archive(archive)
             return {"ok": True}
     raise HTTPException(404, "Recommendation not found")
+
+@app.get("/api/intel/archive")
+async def intel_archive_list(user: str = Depends(get_current_user)):
+    """View all archived (rejected) repos — nothing is ever deleted."""
+    return _read_intel_archive()
 
 @app.post("/api/intel/bookmark")
 async def intel_bookmark(request: Request, user: str = Depends(get_current_user)):
@@ -1760,7 +1847,10 @@ async def intel_stats(user: str = Depends(get_current_user)):
     """Aggregate stats."""
     data = _read_intel_recs()
     recs = data.get("recommendations", [])
-    stats = {"total": len(recs), "pending": 0, "approved": 0, "rejected": 0, "bookmarked": 0, "integrate": 0, "study": 0, "skip": 0}
+    archive = _read_intel_archive()
+    stats = {"total": len(recs), "total_library": data.get("total_library", len(recs)),
+             "pending": 0, "approved": 0, "rejected": 0, "bookmarked": 0,
+             "integrate": 0, "study": 0, "skip": 0, "archived": len(archive)}
     for r in recs:
         s = r.get("status", "pending")
         if s in stats:

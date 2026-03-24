@@ -1744,8 +1744,8 @@ body {
       <div id="tradingLastUpdate" style="font-size:0.50rem;color:var(--grey2);letter-spacing:1px;text-align:right"></div>
     </div>
 
-    <!-- 4-Engine Hero Grid -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:14px" id="heroGrid">
+    <!-- 6-Agent Hero Grid: 3×2 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px" id="heroGrid">
 
       <!-- PhantomClaw -->
       <div class="t-section" style="border-color:rgba(255,0,200,0.25);background:linear-gradient(135deg,rgba(15,0,20,0.95),rgba(5,0,10,0.98));margin-bottom:0">
@@ -1801,28 +1801,64 @@ body {
         </div>
       </div>
 
-      <!-- ArbClaw -->
+      <!-- CalendarClaw -->
+      <div class="t-section" style="border-color:rgba(0,200,255,0.25);background:linear-gradient(135deg,rgba(0,8,15,0.95),rgba(0,4,10,0.98));margin-bottom:0">
+        <div class="t-section-title" style="color:#00c8ff;border-bottom-color:rgba(0,200,255,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
+          CALENDARCLAW
+          <span class="t-live-dot" style="background:#00c8ff;box-shadow:0 0 6px #00c8ff;width:6px;height:6px"></span>
+        </div>
+        <div style="font-size:0.38rem;color:rgba(0,200,255,0.4);letter-spacing:1px;margin:-8px 0 8px 0">EVENT TIMING · PRE/POST CATALYST · */5</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+          <div><div class="t-card-label">P&L</div><div class="t-card-value" id="calPnl" style="font-size:1rem">$0</div></div>
+          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="calWL" style="font-size:1rem">0/0</div></div>
+          <div><div class="t-card-label">OPEN</div><div class="t-card-value" id="calOpen" style="font-size:1rem;color:#00c8ff">0</div></div>
+        </div>
+        <div class="t-table-wrap" style="max-height:160px;overflow-y:auto">
+          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>P&L</th><th>RESOLVES</th></tr></thead>
+          <tbody id="calBody"><tr><td colspan="4" style="color:rgba(0,200,255,0.3);text-align:center">collecting event data...</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- NewsClaw -->
+      <div class="t-section" style="border-color:rgba(255,200,0,0.25);background:linear-gradient(135deg,rgba(15,10,0,0.95),rgba(10,5,0,0.98));margin-bottom:0">
+        <div class="t-section-title" style="color:#ffc800;border-bottom-color:rgba(255,200,0,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
+          NEWSCLAW
+          <span class="t-live-dot" style="background:#ffc800;box-shadow:0 0 6px #ffc800;width:6px;height:6px"></span>
+        </div>
+        <div style="font-size:0.38rem;color:rgba(255,200,0,0.4);letter-spacing:1px;margin:-8px 0 8px 0">BREAKING NEWS · RSS → MARKET · */5 LLM</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+          <div><div class="t-card-label">P&L</div><div class="t-card-value" id="newsPnl" style="font-size:1rem">$0</div></div>
+          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="newsWL" style="font-size:1rem">0/0</div></div>
+          <div><div class="t-card-label">OPEN</div><div class="t-card-value" id="newsOpen" style="font-size:1rem;color:#ffc800">0</div></div>
+        </div>
+        <div class="t-table-wrap" style="max-height:160px;overflow-y:auto">
+          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>P&L</th><th>RESOLVES</th></tr></thead>
+          <tbody id="newsBody"><tr><td colspan="4" style="color:rgba(255,200,0,0.3);text-align:center">scanning headlines...</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- SentimentClaw -->
       <div class="t-section" style="border-color:rgba(0,255,136,0.25);background:linear-gradient(135deg,rgba(0,10,5,0.95),rgba(0,5,2,0.98));margin-bottom:0">
         <div class="t-section-title" style="color:#00ff88;border-bottom-color:rgba(0,255,136,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
-          ARBCLAW
+          SENTIMENTCLAW
           <span class="t-live-dot" style="background:#00ff88;box-shadow:0 0 6px #00ff88;width:6px;height:6px"></span>
         </div>
-        <div style="font-size:0.38rem;color:rgba(0,255,136,0.4);letter-spacing:1px;margin:-8px 0 8px 0">PURE ARB · ASK PRICES · */5 CRON</div>
+        <div style="font-size:0.38rem;color:rgba(0,255,136,0.4);letter-spacing:1px;margin:-8px 0 8px 0">ATTENTION GAP · VOLUME SPIKE · */5</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
-          <div><div class="t-card-label">P&L</div><div class="t-card-value" id="acPnlHero" style="font-size:1rem">$0</div></div>
-          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="acWLHero" style="font-size:1rem">0/0</div></div>
-          <div><div class="t-card-label">OPEN</div><div class="t-card-value" id="acOpenHero" style="font-size:1rem;color:#00ff88">0</div></div>
+          <div><div class="t-card-label">P&L</div><div class="t-card-value" id="sentPnl" style="font-size:1rem">$0</div></div>
+          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="sentWL" style="font-size:1rem">0/0</div></div>
+          <div><div class="t-card-label">OPEN</div><div class="t-card-value" id="sentOpen" style="font-size:1rem;color:#00ff88">0</div></div>
         </div>
-        <div class="t-table-wrap" style="max-height:200px;overflow-y:auto">
-          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>P&L</th><th>STATUS</th></tr></thead>
-          <tbody id="acHeroBody"><tr><td colspan="4" style="color:rgba(0,255,136,0.3);text-align:center">no true arbs (markets efficient)</td></tr></tbody></table>
+        <div class="t-table-wrap" style="max-height:160px;overflow-y:auto">
+          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>P&L</th><th>RESOLVES</th></tr></thead>
+          <tbody id="sentBody"><tr><td colspan="4" style="color:rgba(0,255,136,0.3);text-align:center">building baseline...</td></tr></tbody></table>
         </div>
       </div>
 
     </div>
     <style>
-      @media (max-width:1400px) { #heroGrid { grid-template-columns: 1fr 1fr !important; } }
-      @media (max-width:800px) { #heroGrid { grid-template-columns: 1fr !important; } }
+      @media (max-width:1100px) { #heroGrid { grid-template-columns: 1fr 1fr !important; } }
+      @media (max-width:700px) { #heroGrid { grid-template-columns: 1fr !important; } }
     </style>
 
     <!-- Compact stats row -->
@@ -2074,11 +2110,12 @@ body {
       <!-- Filter/Sort Bar -->
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
         <select class="intel-filter-select" id="intelFilterStatus" onchange="renderIntelCards()">
-          <option value="all">All</option>
-          <option value="pending">Pending</option>
+          <option value="all">All Active</option>
+          <option value="pending">Pending Review</option>
           <option value="approved">Approved</option>
-          <option value="rejected">Rejected</option>
+          <option value="rejected">Rejected (Archived)</option>
           <option value="bookmarked">Bookmarked</option>
+          <option value="all_including_rejected">Everything (incl. rejected)</option>
         </select>
         <select class="intel-filter-select" id="intelFilterVerdict" onchange="renderIntelCards()">
           <option value="all">All Verdicts</option>
@@ -2087,10 +2124,15 @@ body {
           <option value="SKIP">SKIP</option>
         </select>
         <select class="intel-filter-select" id="intelSortBy" onchange="renderIntelCards()">
+          <option value="composite">★ Best Overall (Recommended)</option>
+          <option value="value_per_complexity">Easy Wins (Value/Complexity)</option>
           <option value="integration_value">Integration Value</option>
           <option value="signal_score">Signal Score</option>
-          <option value="complexity">Complexity</option>
+          <option value="complexity_asc">Easiest First</option>
           <option value="stars">Stars</option>
+          <option value="clawmpson_relevance">Clawmpson Relevance</option>
+          <option value="arbclaw_relevance">ArbClaw Relevance</option>
+          <option value="rivalclaw_relevance">RivalClaw Relevance</option>
         </select>
         <select class="intel-filter-select" id="intelFilterLang" onchange="renderIntelCards()">
           <option value="all">All Languages</option>
@@ -4451,6 +4493,48 @@ function renderTrading() {
     clawBody.innerHTML = '<tr><td colspan="5" style="color:var(--grey2);text-align:center">awaiting trades...</td></tr>'
   }
 
+  // New agents: CalendarClaw, NewsClaw, SentimentClaw
+  const agentConfigs = [
+    {name: 'calendarclaw', pnl: 'calPnl', wl: 'calWL', open: 'calOpen', body: 'calBody', color: '#00c8ff'},
+    {name: 'newsclaw', pnl: 'newsPnl', wl: 'newsWL', open: 'newsOpen', body: 'newsBody', color: '#ffc800'},
+    {name: 'sentimentclaw', pnl: 'sentPnl', wl: 'sentWL', open: 'sentOpen', body: 'sentBody', color: '#00ff88'},
+  ]
+  const agents = d.agents || {}
+  for (const cfg of agentConfigs) {
+    const ag = agents[cfg.name] || {}
+    const agPnl = ag.pnl || 0
+    const agEl = document.getElementById(cfg.pnl)
+    if (agEl) {
+      agEl.textContent = (agPnl >= 0 ? '+' : '') + '$' + agPnl.toFixed(2)
+      agEl.style.color = agPnl >= 0 ? cfg.color : '#ff2d95'
+    }
+    const wlEl = document.getElementById(cfg.wl)
+    if (wlEl) {
+      wlEl.textContent = (ag.wins || 0) + '/' + (ag.losses || 0)
+      wlEl.style.color = (ag.wins || 0) >= (ag.losses || 0) ? cfg.color : '#ff2d95'
+    }
+    const oEl = document.getElementById(cfg.open)
+    if (oEl) {
+      oEl.textContent = ag.open || 0
+      oEl.style.color = cfg.color
+    }
+    const bEl = document.getElementById(cfg.body)
+    if (bEl) {
+      const pos = ag.positions || []
+      if (pos.length) {
+        bEl.innerHTML = pos.map(p => `<tr>
+          <td style="color:${cfg.color}80">${(p.question || '').substring(0,30)}</td>
+          <td>${p.direction}</td>
+          <td>${(p.pnl||0) >= 0 ? '+' : ''}$${(p.pnl||0).toFixed(2)}</td>
+          <td class="t-countdown" data-close="${p.close_time || ''}">${formatCountdown(p.close_time)}</td>
+        </tr>`).join('')
+      } else {
+        const msgs = {calendarclaw: 'scanning events...', newsclaw: 'scanning headlines...', sentimentclaw: 'building baseline...'}
+        bEl.innerHTML = `<tr><td colspan="4" style="color:${cfg.color}40;text-align:center">${msgs[cfg.name] || 'waiting...'}</td></tr>`
+      }
+    }
+  }
+
   // Missed opportunities
   const missed = d.missed_opportunities || []
   const missedSection = document.getElementById('tMissedSection')
@@ -5224,12 +5308,30 @@ function renderIntelCards() {
   let recs = [...(intelData.recommendations || [])]
 
   // Filter
-  if (statusFilter !== 'all') recs = recs.filter(r => r.status === statusFilter)
+  if (statusFilter === 'all') {
+    // "All Active" hides rejected by default — they're archived, not deleted
+    recs = recs.filter(r => r.status !== 'rejected')
+  } else if (statusFilter === 'all_including_rejected') {
+    // Show everything
+  } else {
+    recs = recs.filter(r => r.status === statusFilter)
+  }
   if (verdictFilter !== 'all') recs = recs.filter(r => r.verdict === verdictFilter)
   if (langFilter !== 'all') recs = recs.filter(r => r.language === langFilter)
 
   // Sort
-  recs.sort((a, b) => (b[sortBy] || 0) - (a[sortBy] || 0))
+  if (sortBy === 'composite') {
+    recs.sort((a, b) => {
+      const sc = r => (r.integration_value||0)*3 + (r.signal_score||0)*2 + Math.max(r.clawmpson_relevance||0, r.arbclaw_relevance||0, r.rivalclaw_relevance||0) - (r.complexity||0)*0.5
+      return sc(b) - sc(a)
+    })
+  } else if (sortBy === 'value_per_complexity') {
+    recs.sort((a, b) => ((b.integration_value||0)/Math.max(b.complexity||1,1)) - ((a.integration_value||0)/Math.max(a.complexity||1,1)))
+  } else if (sortBy === 'complexity_asc') {
+    recs.sort((a, b) => (a.complexity||10) - (b.complexity||10))
+  } else {
+    recs.sort((a, b) => (b[sortBy] || 0) - (a[sortBy] || 0))
+  }
 
   if (recs.length === 0) {
     container.innerHTML = '<div class="empty"><span class="empty-char">⌬</span>no recommendations match filters</div>'
