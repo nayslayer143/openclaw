@@ -557,6 +557,75 @@ body {
 }
 @media (max-width:1100px) { .cols-3 { grid-template-columns: 1fr; } }
 
+/* ── Trading Dashboard ─────────────────────────────────────────── */
+.trading-cards {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+  margin-bottom: 20px;
+}
+@media (max-width:900px) { .trading-cards { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width:500px) { .trading-cards { grid-template-columns: 1fr; } }
+.t-card {
+  background: var(--surface); border: 1px solid var(--border);
+  padding: 16px 18px; border-radius: 2px;
+}
+.t-card-label {
+  font-size: 0.48rem; letter-spacing: 3px; color: var(--grey2);
+  margin-bottom: 6px;
+}
+.t-card-value {
+  font-size: 1.3rem; font-weight: 900; color: var(--orange-hi);
+  letter-spacing: 1px;
+}
+.t-card-sub {
+  font-size: 0.52rem; color: var(--grey1); margin-top: 4px; letter-spacing: 1px;
+}
+.t-section {
+  background: var(--surface); border: 1px solid var(--border);
+  padding: 16px 18px; border-radius: 2px; margin-bottom: 14px;
+}
+.t-section-title {
+  font-size: 0.52rem; letter-spacing: 3px; color: var(--orange);
+  margin-bottom: 12px; padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.t-table-wrap { overflow-x: auto; }
+.t-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 0.56rem; letter-spacing: 0.5px;
+}
+.t-table th {
+  text-align: left; padding: 6px 10px; color: var(--grey2);
+  font-weight: 600; letter-spacing: 2px; font-size: 0.46rem;
+  border-bottom: 1px solid var(--grey3);
+}
+.t-table td {
+  padding: 7px 10px; border-bottom: 1px solid rgba(255,255,255,0.03);
+  color: var(--offwhite);
+}
+.t-table tr:hover td { background: rgba(232,104,0,0.04); }
+.t-pnl-pos { color: var(--neon-green); }
+.t-pnl-neg { color: var(--neon-red); }
+.t-status-win { color: var(--neon-green); font-weight: 600; }
+.t-status-loss { color: var(--neon-red); font-weight: 600; }
+.t-status-open { color: var(--neon-cyan); }
+.t-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+@media (max-width:900px) { .t-two-col { grid-template-columns: 1fr; } }
+.t-gates { display: flex; gap: 10px; flex-wrap: wrap; }
+.t-gate {
+  font-size: 0.50rem; letter-spacing: 1px; padding: 5px 12px;
+  border: 1px solid var(--grey3); border-radius: 2px;
+  color: var(--grey2);
+}
+.t-gate.pass { border-color: var(--neon-green); color: var(--neon-green); }
+.t-gate.fail { border-color: var(--neon-red); color: var(--neon-red); }
+.t-chart-container {
+  position: relative; height: 180px; background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border); border-radius: 2px; overflow: hidden;
+}
+.t-feed-count {
+  font-size: 0.44rem; color: var(--grey2); margin-left: 6px;
+}
+
 /* ── Ideas Lab Page ───────────────────────────────────────────── */
 .page { display: none; }
 .page.active { display: block; }
@@ -1217,6 +1286,7 @@ body {
     <button class="nav-tab" id="tabIdeas" onclick="showPage('ideas')">◉ IDEAS LAB</button>
     <button class="nav-tab" id="tabProjects" onclick="showPage('projects')">◎ PROJECTS</button>
     <button class="nav-tab" id="tabAgents" onclick="showPage('agents')">⬡ AGENTS</button>
+    <button class="nav-tab" id="tabTrading" onclick="showPage('trading')">$ TRADING</button>
   </div>
   <div class="nav-right">
     <button class="clawmpson-btn" id="clawmpsonBtn" onclick="toggleClawmpson()">◈ CLAWMPSON MODE</button>
@@ -1437,6 +1507,149 @@ body {
 
   </div><!-- /pageAgents -->
 
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- TRADING PAGE                                                  -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div class="page" id="pageTrading">
+
+    <div class="ideas-header">
+      <div>
+        <div class="ideas-title">MIROFISH TRADING</div>
+        <div class="ideas-subtitle">PAPER TRADING DASHBOARD — POLYMARKET + KALSHI</div>
+      </div>
+      <div id="tradingLastUpdate" style="font-size:0.50rem;color:var(--grey2);letter-spacing:1px;text-align:right"></div>
+    </div>
+
+    <!-- Portfolio Overview Cards -->
+    <div class="trading-cards" id="tradingCards">
+      <div class="t-card">
+        <div class="t-card-label">BALANCE</div>
+        <div class="t-card-value" id="tBalance">$1,000.00</div>
+        <div class="t-card-sub" id="tRoi">0.00%</div>
+      </div>
+      <div class="t-card">
+        <div class="t-card-label">POSITIONS</div>
+        <div class="t-card-value" id="tPositions">0</div>
+        <div class="t-card-sub" id="tUnrealized">$0.00 unrealized</div>
+      </div>
+      <div class="t-card">
+        <div class="t-card-label">WIN RATE</div>
+        <div class="t-card-value" id="tWinRate">0%</div>
+        <div class="t-card-sub" id="tTotalTrades">0 trades</div>
+      </div>
+      <div class="t-card">
+        <div class="t-card-label">GRADUATION</div>
+        <div class="t-card-value" id="tGradStatus">TESTING</div>
+        <div class="t-card-sub" id="tGradDetail">awaiting 14d history</div>
+      </div>
+    </div>
+
+    <!-- Graduation Gates -->
+    <div class="t-section">
+      <div class="t-section-title">GRADUATION GATES</div>
+      <div class="t-gates" id="tGates">
+        <span class="t-gate" id="gateRoi">7d ROI > 0%</span>
+        <span class="t-gate" id="gateWin">Win > 55%</span>
+        <span class="t-gate" id="gateSharpe">Sharpe > 1.0</span>
+        <span class="t-gate" id="gateDD">DD < 25%</span>
+      </div>
+    </div>
+
+    <!-- P&L Chart -->
+    <div class="t-section">
+      <div class="t-section-title">EQUITY CURVE</div>
+      <div class="t-chart-container">
+        <canvas id="pnlChart" height="180"></canvas>
+      </div>
+    </div>
+
+    <!-- Strategy Tournament -->
+    <div class="t-section">
+      <div class="t-section-title">STRATEGY TOURNAMENT</div>
+      <div class="t-table-wrap">
+        <table class="t-table" id="tStrategyTable">
+          <thead>
+            <tr><th>STRATEGY</th><th>W/L</th><th>WIN %</th><th>PnL</th><th>ALLOC</th></tr>
+          </thead>
+          <tbody id="tStrategyBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Open Positions -->
+    <div class="t-section">
+      <div class="t-section-title">OPEN POSITIONS</div>
+      <div class="t-table-wrap">
+        <table class="t-table" id="tOpenTable">
+          <thead>
+            <tr><th>MARKET</th><th>DIR</th><th>STRATEGY</th><th>ENTRY</th><th>CURRENT</th><th>PnL</th><th>SIZE</th></tr>
+          </thead>
+          <tbody id="tOpenBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Two Column: Recent Trades + Markets -->
+    <div class="t-two-col">
+      <div class="t-section" style="flex:1">
+        <div class="t-section-title">RECENT TRADES</div>
+        <div class="t-table-wrap" style="max-height:400px;overflow-y:auto">
+          <table class="t-table">
+            <thead>
+              <tr><th>MARKET</th><th>DIR</th><th>STRAT</th><th>PnL</th><th>STATUS</th></tr>
+            </thead>
+            <tbody id="tRecentBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="t-section" style="flex:1">
+        <div class="t-section-title">CROSS-VENUE ARB</div>
+        <div class="t-table-wrap" style="max-height:400px;overflow-y:auto">
+          <table class="t-table">
+            <thead>
+              <tr><th>PAIR</th><th>BUY</th><th>SELL</th><th>SPREAD</th><th>EDGE</th></tr>
+            </thead>
+            <tbody id="tArbBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Two Column: Polymarket + Kalshi Feeds -->
+    <div class="t-two-col">
+      <div class="t-section" style="flex:1">
+        <div class="t-section-title">POLYMARKET <span class="t-feed-count" id="polyCount">0</span></div>
+        <div class="t-table-wrap" style="max-height:350px;overflow-y:auto">
+          <table class="t-table">
+            <thead><tr><th>MARKET</th><th>YES</th><th>NO</th><th>VOL</th></tr></thead>
+            <tbody id="tPolyBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="t-section" style="flex:1">
+        <div class="t-section-title">KALSHI <span class="t-feed-count" id="kalshiCount">0</span></div>
+        <div class="t-table-wrap" style="max-height:350px;overflow-y:auto">
+          <table class="t-table">
+            <thead><tr><th>MARKET</th><th>BID</th><th>ASK</th><th>VOL</th></tr></thead>
+            <tbody id="tKalshiBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Missed Opportunities -->
+    <div class="t-section" id="tMissedSection" style="display:none">
+      <div class="t-section-title">MISSED OPPORTUNITIES</div>
+      <div class="t-table-wrap">
+        <table class="t-table">
+          <thead><tr><th>STRATEGY</th><th>MISSED</th><th>WOULD WON</th><th>CF PnL</th></tr></thead>
+          <tbody id="tMissedBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /pageTrading -->
+
 </div>
 
 <!-- Edit Project Modal -->
@@ -1608,6 +1821,10 @@ function showPage(page) {
     document.getElementById('pageAgents').classList.add('active')
     document.getElementById('tabAgents').classList.add('active')
     loadAgents()
+  } else if (page === 'trading') {
+    document.getElementById('pageTrading').classList.add('active')
+    document.getElementById('tabTrading').classList.add('active')
+    loadTrading()
   } else {
     document.getElementById('pageDashboard').classList.add('active')
     document.getElementById('tabDashboard').classList.add('active')
@@ -3495,6 +3712,289 @@ async function submitNote(ideaId) {
     }, 100)
   } catch(e) { toast('Failed to add note', '💀') }
 }
+
+// ══════════════════════════════════════════════════════════════════
+// TRADING DASHBOARD
+// ══════════════════════════════════════════════════════════════════
+
+let tradingData = null
+let pnlChartInstance = null
+
+async function loadTrading() {
+  try {
+    const r = await fetch('/api/trading/dashboard')
+    if (!r.ok) throw new Error('failed')
+    tradingData = await r.json()
+    renderTrading()
+  } catch(e) {
+    console.error('Trading load error:', e)
+  }
+}
+
+function renderTrading() {
+  const d = tradingData
+  if (!d) return
+
+  // Update time
+  document.getElementById('tradingLastUpdate').textContent = new Date().toLocaleTimeString()
+
+  // Portfolio cards
+  const w = d.wallet
+  document.getElementById('tBalance').textContent = '$' + w.balance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})
+  const roiEl = document.getElementById('tRoi')
+  roiEl.textContent = (w.roi_pct >= 0 ? '+' : '') + w.roi_pct.toFixed(2) + '%'
+  roiEl.style.color = w.roi_pct >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
+
+  document.getElementById('tPositions').textContent = w.open_positions
+  const urEl = document.getElementById('tUnrealized')
+  urEl.textContent = (w.unrealized_pnl >= 0 ? '+' : '') + '$' + w.unrealized_pnl.toFixed(2) + ' unrealized'
+  urEl.style.color = w.unrealized_pnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
+
+  document.getElementById('tWinRate').textContent = w.win_rate.toFixed(0) + '%'
+  document.getElementById('tTotalTrades').textContent = w.total_trades + ' trades'
+
+  // Graduation
+  const g = d.graduation
+  if (g.all_pass) {
+    document.getElementById('tGradStatus').textContent = 'READY'
+    document.getElementById('tGradStatus').style.color = 'var(--neon-green)'
+    document.getElementById('tGradDetail').textContent = 'all gates passed'
+  } else if (g.has_min_history) {
+    document.getElementById('tGradStatus').textContent = 'TESTING'
+    document.getElementById('tGradDetail').textContent = 'some gates failing'
+  } else {
+    document.getElementById('tGradStatus').textContent = 'COLLECTING'
+    document.getElementById('tGradDetail').textContent = 'need 14d history'
+  }
+
+  // Gates
+  const gates = [
+    ['gateRoi', g.roi_7d_pass], ['gateWin', g.win_rate_pass],
+    ['gateSharpe', g.sharpe_pass], ['gateDD', g.drawdown_pass]
+  ]
+  gates.forEach(([id, pass]) => {
+    const el = document.getElementById(id)
+    el.className = 't-gate ' + (g.has_min_history ? (pass ? 'pass' : 'fail') : '')
+  })
+
+  // P&L Chart (simple canvas line chart — no external libs)
+  renderPnlChart(d.pnl_curve)
+
+  // Strategy table
+  const stratBody = document.getElementById('tStrategyBody')
+  const strats = d.strategy_breakdown || []
+  if (strats.length) {
+    stratBody.innerHTML = strats.map(s => {
+      const pnlClass = s.pnl >= 0 ? 't-pnl-pos' : 't-pnl-neg'
+      const tourney = (d.tournament || []).find(t => t.strategy === s.strategy)
+      const alloc = tourney ? (tourney.allocation_pct * 100).toFixed(0) + '%' : '-'
+      return `<tr>
+        <td style="color:var(--orange)">${s.strategy}</td>
+        <td>${s.wins}/${s.losses}</td>
+        <td>${s.win_rate.toFixed(0)}%</td>
+        <td class="${pnlClass}">${s.pnl >= 0 ? '+' : ''}$${s.pnl.toFixed(2)}</td>
+        <td>${alloc}</td>
+      </tr>`
+    }).join('')
+  } else {
+    stratBody.innerHTML = '<tr><td colspan="5" style="color:var(--grey2);text-align:center">no trades yet</td></tr>'
+  }
+
+  // Open positions
+  const openBody = document.getElementById('tOpenBody')
+  if (d.open_positions.length) {
+    openBody.innerHTML = d.open_positions.map(p => {
+      const pnlClass = p.pnl >= 0 ? 't-pnl-pos' : 't-pnl-neg'
+      return `<tr>
+        <td title="${p.market_id}">${p.question}</td>
+        <td>${p.direction}</td>
+        <td>${p.strategy}</td>
+        <td>${p.entry_price.toFixed(3)}</td>
+        <td>${p.current_price.toFixed(3)}</td>
+        <td class="${pnlClass}">${p.pnl >= 0 ? '+' : ''}$${p.pnl.toFixed(2)} (${p.pnl_pct >= 0 ? '+' : ''}${p.pnl_pct}%)</td>
+        <td>$${p.amount_usd.toFixed(0)}</td>
+      </tr>`
+    }).join('')
+  } else {
+    openBody.innerHTML = '<tr><td colspan="7" style="color:var(--grey2);text-align:center">no open positions</td></tr>'
+  }
+
+  // Recent trades
+  const recentBody = document.getElementById('tRecentBody')
+  const recent = d.recent_trades || []
+  if (recent.length) {
+    recentBody.innerHTML = recent.slice(0, 25).map(t => {
+      const pnl = t.pnl || 0
+      const pnlClass = pnl >= 0 ? 't-pnl-pos' : 't-pnl-neg'
+      const statusClass = t.status === 'closed_win' ? 't-status-win' : (t.status === 'closed_loss' ? 't-status-loss' : '')
+      const statusLabel = t.status === 'closed_win' ? 'WIN' : (t.status === 'closed_loss' ? 'LOSS' : t.status.toUpperCase())
+      return `<tr>
+        <td title="${t.market_id}">${(t.question || '').substring(0, 40)}</td>
+        <td>${t.direction}</td>
+        <td>${t.strategy}</td>
+        <td class="${pnlClass}">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)}</td>
+        <td class="${statusClass}">${statusLabel}</td>
+      </tr>`
+    }).join('')
+  } else {
+    recentBody.innerHTML = '<tr><td colspan="5" style="color:var(--grey2);text-align:center">no closed trades</td></tr>'
+  }
+
+  // Cross-venue arb
+  const arbBody = document.getElementById('tArbBody')
+  const arb = d.cross_venue_arb || []
+  if (arb.length) {
+    arbBody.innerHTML = arb.slice(0, 10).map(a => `<tr>
+      <td>${a.pair_id || '-'}</td>
+      <td>${a.buy_venue} @${(a.buy_price || 0).toFixed(3)}</td>
+      <td>${a.sell_venue} @${(a.sell_price || 0).toFixed(3)}</td>
+      <td>${(a.spread || 0).toFixed(3)}</td>
+      <td class="t-pnl-pos">${(a.estimated_edge || 0).toFixed(3)}</td>
+    </tr>`).join('')
+  } else {
+    arbBody.innerHTML = '<tr><td colspan="5" style="color:var(--grey2);text-align:center">no arb opportunities detected</td></tr>'
+  }
+
+  // Polymarket feed
+  const polyBody = document.getElementById('tPolyBody')
+  const poly = d.polymarket || []
+  document.getElementById('polyCount').textContent = poly.length
+  polyBody.innerHTML = poly.slice(0, 20).map(m => `<tr>
+    <td title="${m.market_id}">${(m.question || '').substring(0, 50)}</td>
+    <td>${(m.yes_price || 0).toFixed(2)}</td>
+    <td>${(m.no_price || 0).toFixed(2)}</td>
+    <td>$${((m.volume || 0) / 1000).toFixed(0)}k</td>
+  </tr>`).join('')
+
+  // Kalshi feed
+  const kalshiBody = document.getElementById('tKalshiBody')
+  const kalshi = d.kalshi || []
+  document.getElementById('kalshiCount').textContent = kalshi.length
+  if (kalshi.length) {
+    kalshiBody.innerHTML = kalshi.slice(0, 20).map(m => `<tr>
+      <td title="${m.ticker}">${(m.title || '').substring(0, 50)}</td>
+      <td>${m.yes_bid != null ? m.yes_bid.toFixed(2) : '-'}</td>
+      <td>${m.yes_ask != null ? m.yes_ask.toFixed(2) : '-'}</td>
+      <td>${((m.volume_24h || 0) / 1000).toFixed(0)}k</td>
+    </tr>`).join('')
+  } else {
+    kalshiBody.innerHTML = '<tr><td colspan="4" style="color:var(--grey2);text-align:center">no Kalshi data — set API keys</td></tr>'
+  }
+
+  // Missed opportunities
+  const missed = d.missed_opportunities || []
+  const missedSection = document.getElementById('tMissedSection')
+  if (missed.length) {
+    missedSection.style.display = 'block'
+    document.getElementById('tMissedBody').innerHTML = missed.map(m => {
+      const cfClass = m.total_cf_pnl >= 0 ? 't-pnl-pos' : 't-pnl-neg'
+      return `<tr>
+        <td>${m.strategy}</td>
+        <td>${m.total}</td>
+        <td>${m.would_win || 0}</td>
+        <td class="${cfClass}">${m.total_cf_pnl >= 0 ? '+' : ''}$${m.total_cf_pnl.toFixed(2)}</td>
+      </tr>`
+    }).join('')
+  }
+}
+
+function renderPnlChart(curve) {
+  const canvas = document.getElementById('pnlChart')
+  if (!canvas) return
+  const ctx = canvas.getContext('2d')
+  const rect = canvas.parentElement.getBoundingClientRect()
+  canvas.width = rect.width
+  canvas.height = 180
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+  if (!curve || curve.length < 2) {
+    ctx.fillStyle = 'rgba(150,145,135,0.3)'
+    ctx.font = '11px monospace'
+    ctx.textAlign = 'center'
+    ctx.fillText('awaiting daily snapshots...', canvas.width / 2, 90)
+    return
+  }
+
+  const balances = curve.map(c => c.balance)
+  const minB = Math.min(...balances) * 0.995
+  const maxB = Math.max(...balances) * 1.005
+  const range = maxB - minB || 1
+  const pad = {top: 20, bottom: 30, left: 60, right: 20}
+  const w = canvas.width - pad.left - pad.right
+  const h = canvas.height - pad.top - pad.bottom
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)'
+  ctx.lineWidth = 1
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + (h / 4) * i
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + w, y); ctx.stroke()
+    const val = maxB - (range / 4) * i
+    ctx.fillStyle = 'rgba(150,145,135,0.4)'
+    ctx.font = '9px monospace'
+    ctx.textAlign = 'right'
+    ctx.fillText('$' + val.toFixed(0), pad.left - 6, y + 3)
+  }
+
+  // Starting balance reference line
+  const startY = pad.top + h - ((1000 - minB) / range) * h
+  ctx.strokeStyle = 'rgba(255,255,255,0.1)'
+  ctx.setLineDash([4, 4])
+  ctx.beginPath(); ctx.moveTo(pad.left, startY); ctx.lineTo(pad.left + w, startY); ctx.stroke()
+  ctx.setLineDash([])
+
+  // Equity curve
+  ctx.beginPath()
+  curve.forEach((c, i) => {
+    const x = pad.left + (i / (curve.length - 1)) * w
+    const y = pad.top + h - ((c.balance - minB) / range) * h
+    if (i === 0) ctx.moveTo(x, y)
+    else ctx.lineTo(x, y)
+  })
+  ctx.strokeStyle = '#e86800'
+  ctx.lineWidth = 2
+  ctx.stroke()
+
+  // Fill under curve
+  const lastX = pad.left + w
+  const lastY = pad.top + h - ((curve[curve.length-1].balance - minB) / range) * h
+  ctx.lineTo(lastX, pad.top + h)
+  ctx.lineTo(pad.left, pad.top + h)
+  ctx.closePath()
+  const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + h)
+  grad.addColorStop(0, 'rgba(232,104,0,0.15)')
+  grad.addColorStop(1, 'rgba(232,104,0,0.01)')
+  ctx.fillStyle = grad
+  ctx.fill()
+
+  // Date labels
+  ctx.fillStyle = 'rgba(150,145,135,0.4)'
+  ctx.font = '8px monospace'
+  ctx.textAlign = 'center'
+  const step = Math.max(1, Math.floor(curve.length / 6))
+  for (let i = 0; i < curve.length; i += step) {
+    const x = pad.left + (i / (curve.length - 1)) * w
+    const label = curve[i].date.substring(5) // MM-DD
+    ctx.fillText(label, x, pad.top + h + 14)
+  }
+
+  // Current balance dot
+  ctx.beginPath()
+  ctx.arc(lastX, lastY, 4, 0, Math.PI * 2)
+  ctx.fillStyle = '#ff7c1a'
+  ctx.fill()
+  ctx.strokeStyle = 'rgba(255,124,26,0.5)'
+  ctx.lineWidth = 6
+  ctx.stroke()
+}
+
+// Auto-refresh trading data every 60s when on the tab
+setInterval(() => {
+  if (document.getElementById('pageTrading').classList.contains('active')) {
+    loadTrading()
+  }
+}, 60000)
 
 </script>
 </body>

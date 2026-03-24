@@ -850,6 +850,208 @@ async def get_trading(user: str = Depends(get_current_user)):
     return {"portfolio": {"open_positions": 0, "total_pnl": 0, "positions": []}, "recent_signals": [], "history": []}
 
 
+# ── Trading Dashboard (comprehensive) ────────────────────────────────────────
+import sqlite3
+
+def _trading_db():
+    db_path = Path.home() / ".openclaw" / "clawmson.db"
+    if not db_path.exists():
+        return None
+    conn = sqlite3.connect(str(db_path))
+    conn.row_factory = sqlite3.Row
+    return conn
+
+@app.get("/api/trading/dashboard")
+async def get_trading_dashboard(user: str = Depends(get_current_user)):
+    """Comprehensive trading dashboard data for the TRADING tab."""
+    conn = _trading_db()
+    if not conn:
+        return {"error": "Database not found"}
+    try:
+        # 1. Wallet state
+        starting = 1000.0
+        ctx = conn.execute("SELECT value FROM context WHERE chat_id='mirofish' AND key='starting_balance'").fetchone()
+        if ctx:
+            starting = float(ctx[0])
+
+        closed_pnl = conn.execute("SELECT COALESCE(SUM(pnl), 0) as total FROM paper_trades WHERE status != 'open'").fetchone()[0]
+        open_trades = conn.execute("SELECT * FROM paper_trades WHERE status='open' ORDER BY opened_at DESC").fetchall()
+
+        # Mark-to-market open positions
+        unrealized = 0.0
+        open_list = []
+        for t in open_trades:
+            latest = conn.execute("SELECT yes_price, no_price FROM market_data WHERE market_id=? ORDER BY fetched_at DESC LIMIT 1", (t["market_id"],)).fetchone()
+            current_price = t["entry_price"]
+            if latest:
+                current_price = latest["yes_price"] if t["direction"] == "YES" else latest["no_price"]
+                if current_price is None:
+                    current_price = t["entry_price"]
+            pnl = t["shares"] * (current_price - t["entry_price"])
+            pnl_pct = (pnl / t["amount_usd"] * 100) if t["amount_usd"] > 0 else 0
+            unrealized += pnl
+            open_list.append({
+                "id": t["id"], "market_id": t["market_id"],
+                "question": t["question"][:80], "direction": t["direction"],
+                "strategy": t["strategy"], "entry_price": t["entry_price"],
+                "current_price": current_price, "shares": t["shares"],
+                "amount_usd": t["amount_usd"], "pnl": round(pnl, 2),
+                "pnl_pct": round(pnl_pct, 1), "confidence": t["confidence"],
+                "opened_at": t["opened_at"],
+            })
+
+        balance = starting + closed_pnl + unrealized
+        roi_pct = ((balance - starting) / starting * 100) if starting > 0 else 0
+
+        # 2. Closed trades (recent 50)
+        recent_closed = conn.execute("""
+            SELECT id, market_id, question, direction, strategy, entry_price,
+                   exit_price, shares, amount_usd, pnl, status, confidence,
+                   opened_at, closed_at
+            FROM paper_trades WHERE status != 'open'
+            ORDER BY closed_at DESC LIMIT 50
+        """).fetchall()
+        closed_list = [dict(r) for r in recent_closed]
+
+        # 3. Daily P&L curve
+        daily_pnl = conn.execute("SELECT date, balance, roi_pct, win_rate FROM daily_pnl ORDER BY date ASC").fetchall()
+        pnl_curve = [{"date": r["date"], "balance": r["balance"], "roi_pct": r["roi_pct"], "win_rate": r["win_rate"]} for r in daily_pnl]
+
+        # 4. Win/loss stats
+        all_closed = conn.execute("SELECT status, strategy, pnl FROM paper_trades WHERE status != 'open'").fetchall()
+        total_closed = len(all_closed)
+        wins = sum(1 for t in all_closed if t["status"] == "closed_win")
+        win_rate = wins / total_closed if total_closed > 0 else 0
+
+        # Per-strategy breakdown
+        strat_map = {}
+        for t in all_closed:
+            s = t["strategy"]
+            if s not in strat_map:
+                strat_map[s] = {"wins": 0, "losses": 0, "pnl": 0}
+            if t["status"] == "closed_win":
+                strat_map[s]["wins"] += 1
+            else:
+                strat_map[s]["losses"] += 1
+            strat_map[s]["pnl"] += t["pnl"] or 0
+
+        strategy_breakdown = [
+            {"strategy": k, "wins": v["wins"], "losses": v["losses"],
+             "total": v["wins"] + v["losses"], "pnl": round(v["pnl"], 2),
+             "win_rate": round(v["wins"] / (v["wins"] + v["losses"]) * 100, 1) if (v["wins"] + v["losses"]) > 0 else 0}
+            for k, v in strat_map.items()
+        ]
+        strategy_breakdown.sort(key=lambda x: x["pnl"], reverse=True)
+
+        # 5. Strategy tournament (from strategy_stats)
+        tournament = []
+        try:
+            strat_stats = conn.execute("""
+                SELECT ss.* FROM strategy_stats ss
+                INNER JOIN (SELECT strategy, MAX(snapshot_date) as latest FROM strategy_stats GROUP BY strategy) l
+                ON ss.strategy = l.strategy AND ss.snapshot_date = l.latest
+            """).fetchall()
+            tournament = [dict(r) for r in strat_stats]
+        except Exception:
+            pass
+
+        # 6. Polymarket markets (latest)
+        poly_markets = conn.execute("""
+            SELECT md.market_id, md.question, md.category, md.yes_price, md.no_price, md.volume
+            FROM market_data md
+            INNER JOIN (SELECT market_id, MAX(fetched_at) as latest FROM market_data GROUP BY market_id) l
+            ON md.market_id = l.market_id AND md.fetched_at = l.latest
+            ORDER BY md.volume DESC LIMIT 30
+        """).fetchall()
+        poly_list = [dict(r) for r in poly_markets]
+
+        # 7. Kalshi markets (latest)
+        kalshi_list = []
+        try:
+            kalshi_markets = conn.execute("""
+                SELECT km.ticker, km.title, km.category, km.yes_bid, km.yes_ask,
+                       km.no_bid, km.no_ask, km.last_price, km.volume_24h, km.status
+                FROM kalshi_markets km
+                INNER JOIN (SELECT ticker, MAX(fetched_at) as latest FROM kalshi_markets GROUP BY ticker) l
+                ON km.ticker = l.ticker AND km.fetched_at = l.latest
+                ORDER BY km.volume_24h DESC LIMIT 30
+            """).fetchall()
+            kalshi_list = [dict(r) for r in kalshi_markets]
+        except Exception:
+            pass
+
+        # 8. Cross-venue arb trades
+        xv_arb = []
+        try:
+            xv_rows = conn.execute("SELECT * FROM cross_venue_arb_trades ORDER BY detected_at DESC LIMIT 20").fetchall()
+            xv_arb = [dict(r) for r in xv_rows]
+        except Exception:
+            pass
+
+        # 9. Graduation status
+        from statistics import mean, stdev
+        grad = {"has_min_history": False, "roi_7d_pass": False, "win_rate_pass": False, "sharpe_pass": False, "drawdown_pass": False, "all_pass": False}
+        if len(daily_pnl) >= 14:
+            grad["has_min_history"] = True
+            last7 = [r["roi_pct"] for r in daily_pnl[-7:] if r["roi_pct"] is not None]
+            grad["roi_7d_pass"] = sum(last7) > 0
+            grad["win_rate_pass"] = win_rate >= 0.55
+            returns = [r["roi_pct"] for r in daily_pnl if r["roi_pct"] is not None]
+            if len(returns) >= 14:
+                s = stdev(returns)
+                sharpe = mean(returns) / s if s > 0 else 0
+                grad["sharpe_pass"] = sharpe >= 1.0
+            balances = [r["balance"] for r in daily_pnl]
+            peak = balances[0]
+            max_dd = 0
+            for b_val in balances:
+                peak = max(peak, b_val)
+                dd = (peak - b_val) / peak if peak > 0 else 0
+                max_dd = max(max_dd, dd)
+            grad["drawdown_pass"] = max_dd < 0.25
+            grad["all_pass"] = all([grad["roi_7d_pass"], grad["win_rate_pass"], grad["sharpe_pass"], grad["drawdown_pass"]])
+
+        # 10. Missed opportunities summary
+        missed_summary = []
+        try:
+            missed = conn.execute("""
+                SELECT strategy, COUNT(*) as total,
+                       SUM(CASE WHEN counterfactual_pnl > 0 THEN 1 ELSE 0 END) as would_win,
+                       COALESCE(SUM(counterfactual_pnl), 0) as total_cf_pnl
+                FROM missed_opportunities WHERE status='resolved'
+                GROUP BY strategy
+            """).fetchall()
+            missed_summary = [dict(r) for r in missed]
+        except Exception:
+            pass
+
+        return {
+            "wallet": {
+                "balance": round(balance, 2),
+                "starting_balance": starting,
+                "roi_pct": round(roi_pct, 2),
+                "unrealized_pnl": round(unrealized, 2),
+                "realized_pnl": round(closed_pnl, 2),
+                "total_trades": total_closed,
+                "wins": wins,
+                "win_rate": round(win_rate * 100, 1),
+                "open_positions": len(open_list),
+            },
+            "graduation": grad,
+            "open_positions": open_list,
+            "recent_trades": closed_list,
+            "pnl_curve": pnl_curve,
+            "strategy_breakdown": strategy_breakdown,
+            "tournament": tournament,
+            "polymarket": poly_list,
+            "kalshi": kalshi_list,
+            "cross_venue_arb": xv_arb,
+            "missed_opportunities": missed_summary,
+        }
+    finally:
+        conn.close()
+
+
 @app.get("/{path:path}", response_class=HTMLResponse)
 async def spa(path: str, request: Request):
     # Let API routes through
