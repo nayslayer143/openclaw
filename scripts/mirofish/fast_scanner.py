@@ -46,7 +46,7 @@ MIN_EDGE = float(os.environ.get("FAST_SCAN_MIN_EDGE", "0.04"))
 POSITION_PCT = float(os.environ.get("FAST_SCAN_POSITION_PCT", "0.05"))
 MAX_POSITION_PCT = float(os.environ.get("MIROFISH_MAX_POSITION_PCT", "0.10"))
 ARB_THRESHOLD = 0.03
-MAX_TRADES_PER_RUN = int(os.environ.get("FAST_SCAN_MAX_TRADES", "5"))
+MAX_TRADES_PER_RUN = int(os.environ.get("FAST_SCAN_MAX_TRADES", "10"))
 MAX_PER_EVENT = int(os.environ.get("FAST_SCAN_MAX_PER_EVENT", "1"))  # 1 bracket per event
 
 # Crypto assets we can price-check against spot

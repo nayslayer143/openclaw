@@ -25,7 +25,7 @@ from typing import Any
 # Config
 # ---------------------------------------------------------------------------
 
-ROLLING_WINDOW_DAYS = int(os.environ.get("MIROFISH_ROLLING_WINDOW", "14"))
+ROLLING_WINDOW_DAYS = int(os.environ.get("MIROFISH_ROLLING_WINDOW", "7"))
 MIN_TRADES_FOR_STATS = int(os.environ.get("MIROFISH_MIN_TRADES_STATS", "5"))
 
 ALL_STRATEGIES = [

@@ -331,7 +331,7 @@ class PromotionStatus:
 
 # Promotion criteria
 PROMOTION_CRITERIA = {
-    "min_days": 14,
+    "min_days": 7,
     "min_trades": 20,
     "min_win_rate": 0.50,
     "min_sharpe": 0.5,

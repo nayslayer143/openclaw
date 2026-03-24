@@ -518,6 +518,7 @@ def analyze(
     # Sort by expiry: markets resolving soonest first (prefer fast feedback)
     import datetime as _dt
     _now = _dt.datetime.utcnow()
+    _max_hours = 7 * 24  # only trade markets resolving within 7 days
     def _hours_to_expiry(m):
         ed = m.get("end_date") or m.get("close_time") or ""
         if not ed:
@@ -528,6 +529,8 @@ def analyze(
         except (ValueError, TypeError):
             return 999999
 
+    # Filter out markets resolving beyond 7 days — dead capital during testing phase
+    non_arb = [m for m in non_arb if _hours_to_expiry(m) <= _max_hours]
     non_arb_sorted = sorted(non_arb, key=_hours_to_expiry)
 
     open_positions = wallet.get("open_positions", 0)
