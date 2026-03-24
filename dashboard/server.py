@@ -1073,7 +1073,58 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
             grad["drawdown_pass"] = max_dd < 0.25
             grad["all_pass"] = all([grad["roi_7d_pass"], grad["win_rate_pass"], grad["sharpe_pass"], grad["drawdown_pass"]])
 
-        # 10. Missed opportunities summary
+        # 10. PhantomClaw stats (RivalClaw strategy running inside Clawmpson)
+        phantom_stats = {"trades": 0, "wins": 0, "losses": 0, "pnl": 0, "open": 0, "positions": []}
+        try:
+            phantom_closed = conn.execute("""
+                SELECT COUNT(*) as n,
+                       SUM(CASE WHEN status='closed_win' THEN 1 ELSE 0 END) as w,
+                       COALESCE(SUM(pnl), 0) as p
+                FROM paper_trades WHERE strategy LIKE 'phantomclaw%' AND status IN ('closed_win','closed_loss','expired')
+            """).fetchone()
+            phantom_open = conn.execute("""
+                SELECT id, market_id, question, direction, entry_price, amount_usd, confidence, opened_at, strategy
+                FROM paper_trades WHERE strategy LIKE 'phantomclaw%' AND status='open'
+                ORDER BY opened_at DESC
+            """).fetchall()
+            # Get close_time for each
+            phantom_positions = []
+            for po in phantom_open:
+                pdict = dict(po)
+                km = conn.execute("SELECT close_time FROM kalshi_markets WHERE ticker=? ORDER BY fetched_at DESC LIMIT 1", (po["market_id"],)).fetchone()
+                pdict["close_time"] = km["close_time"] if km and km["close_time"] else None
+                # Mark to market
+                latest_k = conn.execute("SELECT yes_bid, no_bid FROM kalshi_markets WHERE ticker=? ORDER BY fetched_at DESC LIMIT 1", (po["market_id"],)).fetchone()
+                ep = po["entry_price"] or 0.01
+                cp = ep  # default
+                if latest_k:
+                    raw_cp = latest_k["yes_bid"] if po["direction"] == "YES" else latest_k["no_bid"]
+                    if raw_cp is not None:
+                        cp = raw_cp / 100.0 if raw_cp > 1 else raw_cp
+                pdict["current_price"] = cp
+                pdict["pnl"] = round((cp - ep) * (po["amount_usd"] / ep) if ep > 0 else 0, 2)
+                amt = po["amount_usd"] or 1
+                pdict["pnl_pct"] = round(pdict["pnl"] / amt * 100, 1) if amt > 0 else 0
+                phantom_positions.append(pdict)
+
+            pc_n = phantom_closed["n"] or 0
+            pc_w = phantom_closed["w"] or 0
+            pc_p = phantom_closed["p"] or 0
+            phantom_stats = {
+                "trades": pc_n,
+                "wins": pc_w,
+                "losses": pc_n - pc_w,
+                "pnl": round(pc_p, 2),
+                "open": len(phantom_open),
+                "win_rate": round(pc_w / pc_n * 100, 1) if pc_n > 0 else 0,
+                "positions": phantom_positions,
+            }
+        except Exception as phantom_err:
+            import traceback
+            phantom_stats["error"] = str(phantom_err)
+            traceback.print_exc()
+
+        # 11. Missed opportunities summary
         missed_summary = []
         try:
             missed = conn.execute("""
@@ -1108,6 +1159,7 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
             "polymarket": poly_list,
             "kalshi": kalshi_list,
             "cross_venue_arb": xv_arb,
+            "phantom": phantom_stats,
             "missed_opportunities": missed_summary,
         }
     finally:
