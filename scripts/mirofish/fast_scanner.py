@@ -241,6 +241,7 @@ def run():
         open_questions = set()
 
     trades_placed = 0
+    new_trade_ids: set[int] = set()  # track IDs placed this run
     events_traded: set[str] = set()  # limit 1 bracket per event
 
     def _g(row, key, default=None):
@@ -302,8 +303,9 @@ def run():
                 if entry > 0 and entry < 1:
                     amount = min(POSITION_PCT * balance, MAX_POSITION_PCT * balance)
                     shares = amount / entry
-                    _place_trade(conn, ticker, title_str, direction,
+                    _tid = _place_trade(conn, ticker, title_str, direction,
                                  entry, amount, shares, gap, "fast_arb")
+                    if _tid: new_trade_ids.add(_tid)
                     trades_placed += 1
                     open_ids.add(ticker)
                     open_questions.add(question_prefix)
@@ -341,8 +343,9 @@ def run():
                                 if entry >= MIN_ENTRY_PRICE and entry < 0.95 and edge > 0.001:
                                     amount = min(POSITION_PCT * balance, MAX_POSITION_PCT * balance)
                                     shares = amount / entry
-                                    _place_trade(conn, ticker, title_str, direction,
+                                    _tid = _place_trade(conn, ticker, title_str, direction,
                                                  entry, amount, shares, edge, "fast_15m_trend")
+                                    if _tid: new_trade_ids.add(_tid)
                                     trades_placed += 1
                                     open_ids.add(ticker)
                                     open_questions.add(question_prefix)
@@ -409,8 +412,9 @@ def run():
             if entry >= MIN_ENTRY_PRICE and entry < 0.95 and edge > MIN_EDGE:
                 amount = min(POSITION_PCT * balance, MAX_POSITION_PCT * balance)
                 shares = amount / entry
-                _place_trade(conn, ticker, title_str, direction,
+                _tid = _place_trade(conn, ticker, title_str, direction,
                              entry, amount, shares, edge, "fast_spot_lag")
+                if _tid: new_trade_ids.add(_tid)
                 trades_placed += 1
                 open_ids.add(ticker)
                 open_questions.add(question_prefix)
@@ -418,7 +422,7 @@ def run():
             break
 
     # Resolve any expired Kalshi trades with actual results
-    resolved = _resolve_expired(conn)
+    resolved = _resolve_expired(conn, skip_ids=new_trade_ids)
     conn.close()
 
     if trades_placed > 0 or resolved > 0:
@@ -428,16 +432,20 @@ def run():
         print(f"[fast_scan] No edge found in {len(markets)} short-expiry markets")
 
 
-def _resolve_expired(conn) -> int:
-    """Check Kalshi API for resolution on open expired trades."""
+def _resolve_expired(conn, skip_ids: set | None = None) -> int:
+    """Check Kalshi API for resolution on open expired trades. Skips trades just placed this run."""
     try:
         from scripts.mirofish.kalshi_feed import _call_kalshi
     except ImportError:
         return 0
 
+    if skip_ids is None:
+        skip_ids = set()
+
     open_kalshi = conn.execute(
         "SELECT id, market_id, direction, entry_price, shares FROM paper_trades WHERE status='open' AND market_id LIKE 'KX%'"
     ).fetchall()
+    open_kalshi = [t for t in open_kalshi if t["id"] not in skip_ids]
 
     resolved = 0
     for t in open_kalshi:
@@ -466,11 +474,11 @@ def _resolve_expired(conn) -> int:
     return resolved
 
 
-def _place_trade(conn, market_id, question, direction, entry_price, amount, shares, edge, strategy):
-    """Insert a paper trade directly (bypasses wallet for speed)."""
+def _place_trade(conn, market_id, question, direction, entry_price, amount, shares, edge, strategy) -> int | None:
+    """Insert a paper trade directly (bypasses wallet for speed). Returns trade ID."""
     ts = datetime.datetime.utcnow().isoformat()
     try:
-        conn.execute("""
+        cur = conn.execute("""
             INSERT INTO paper_trades
             (market_id, question, direction, shares, entry_price, amount_usd,
              status, confidence, reasoning, strategy, opened_at)
@@ -482,9 +490,12 @@ def _place_trade(conn, market_id, question, direction, entry_price, amount, shar
             strategy, ts,
         ))
         conn.commit()
+        trade_id = cur.lastrowid
         print(f"[fast_scan] {direction} ${amount:.0f} on '{question[:50]}' [{strategy}] edge={edge:.3f}")
+        return trade_id
     except Exception as e:
         print(f"[fast_scan] Trade error: {e}")
+        return None
 
 
 if __name__ == "__main__":
