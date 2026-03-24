@@ -383,7 +383,34 @@ def run_loop():
             print(f"[mirofish] Strategy tracker init: {e}")
             tracker = None
 
+        try:
+            import scripts.mirofish.security_auditor as auditor
+            import scripts.mirofish.missed_opportunities as missed_opps
+            missed_opps.migrate()
+        except Exception:
+            auditor = None
+            missed_opps = None
+
         for d in decisions:
+            # Pre-execution security audit
+            if auditor:
+                audit = auditor.audit_trade(
+                    d.market_id, d.direction, d.entry_price,
+                    d.amount_usd, state["balance"], d.strategy,
+                )
+                if not audit.approved:
+                    print(f"[mirofish] Audit blocked: {d.market_id} — {audit.reason}")
+                    if missed_opps:
+                        try:
+                            missed_opps.record_missed(
+                                d.market_id, d.direction, d.strategy,
+                                d.entry_price, d.confidence, d.amount_usd,
+                                f"audit:{audit.reason}", d.metadata,
+                            )
+                        except Exception:
+                            pass
+                    continue
+
             result = wallet.execute_trade(d)
             if result:
                 print(f"[mirofish] Executed: {d.direction} ${d.amount_usd:.0f} "
@@ -410,6 +437,15 @@ def run_loop():
                         print(f"[mirofish] Strategy track error: {e}")
             else:
                 print(f"[mirofish] Rejected: {d.market_id} (cap or kelly)")
+                if missed_opps:
+                    try:
+                        missed_opps.record_missed(
+                            d.market_id, d.direction, d.strategy,
+                            d.entry_price, d.confidence, d.amount_usd,
+                            "wallet_rejected", d.metadata,
+                        )
+                    except Exception:
+                        pass
 
     # 6. Check stops (always runs, even if API is down)
     try:
