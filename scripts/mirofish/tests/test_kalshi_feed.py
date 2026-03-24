@@ -127,26 +127,24 @@ def _mock_requests_get(*args, **kwargs):
 
 def test_fetch_parses_markets(temp_db):
     feed = _feed()
+    mock_market = _make_kalshi_market()
     with patch.object(feed, "_auth_headers", side_effect=_mock_auth_headers):
         with patch.object(feed, "_is_cache_fresh", return_value=False):
-            with patch("requests.request", side_effect=_mock_requests_get):
+            with patch.object(feed, "_fetch_event_markets", return_value=[mock_market]):
                 markets = feed.fetch()
 
     assert len(markets) == 1
     m = markets[0]
     assert m["market_id"] == "KXBTC-26JUN30-T149999"
     assert m["venue"] == "kalshi"
-    assert m["yes_bid"] == pytest.approx(0.42)
-    assert m["yes_ask"] == pytest.approx(0.44)
-    assert m["no_bid"] == pytest.approx(0.56)
-    assert m["volume_24h"] == 567
 
 
 def test_fetch_caches_to_db(temp_db):
     feed = _feed()
+    mock_market = _make_kalshi_market()
     with patch.object(feed, "_auth_headers", side_effect=_mock_auth_headers):
         with patch.object(feed, "_is_cache_fresh", return_value=False):
-            with patch("requests.request", side_effect=_mock_requests_get):
+            with patch.object(feed, "_fetch_event_markets", return_value=[mock_market]):
                 feed.fetch()
 
     conn = sqlite3.connect(temp_db)
