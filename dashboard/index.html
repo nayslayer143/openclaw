@@ -515,6 +515,60 @@ body {
   margin-top: 2px;
 }
 
+/* ── Terminal Watch ──────────────────────────────────────────────────────── */
+.tw-status { display:flex; align-items:center; gap:10px; padding:11px 18px; border-bottom:1px solid var(--grey3); }
+.tw-status-dot { width:8px; height:8px; border-radius:50%; background:var(--grey2); flex-shrink:0; }
+.tw-status-dot.watching { background:var(--neon-green); box-shadow:0 0 8px rgba(0,255,136,0.5); animation:tw-pulse 2s ease-in-out infinite; }
+.tw-status-dot.error { background:var(--neon-red); box-shadow:0 0 8px rgba(255,0,46,0.5); }
+@keyframes tw-pulse { 50% { box-shadow:0 0 14px rgba(0,255,136,0.7); } }
+.tw-session { font-size:0.60rem; color:var(--offwhite); letter-spacing:1px; }
+.tw-uptime { font-size:0.50rem; color:var(--grey2); margin-left:auto; }
+.tw-controls { display:flex; gap:6px; padding:8px 18px; border-bottom:1px solid var(--grey3); flex-wrap:wrap; }
+.tw-btn { font-size:0.50rem; letter-spacing:2px; padding:4px 12px; border:1px solid var(--border-mid); border-radius:1px; background:transparent; color:var(--orange); cursor:pointer; font-family:inherit; transition:all 0.2s; }
+.tw-btn:hover { background:var(--orange-dim); border-color:var(--orange); box-shadow:0 0 8px rgba(232,104,0,0.3); }
+.tw-btn.primary { border-color:var(--orange); }
+.tw-btn.primary:hover { background:var(--orange); color:#000; }
+.tw-btn.danger { border-color:rgba(255,0,46,0.3); color:var(--neon-red); }
+.tw-btn.danger:hover { background:rgba(255,0,46,0.1); }
+.tw-select { font-size:0.56rem; padding:4px 8px; background:var(--bg); border:1px solid var(--grey3); color:var(--offwhite); font-family:inherit; border-radius:1px; }
+.tw-select:focus { outline:none; border-color:var(--orange); }
+.tw-events { max-height:400px; overflow-y:auto; }
+.tw-events::-webkit-scrollbar { width:5px; }
+.tw-events::-webkit-scrollbar-track { background:rgba(255,255,255,0.02); }
+.tw-events::-webkit-scrollbar-thumb { background:rgba(232,104,0,0.25); border-radius:2px; }
+.tw-event { padding:10px 18px; border-bottom:1px solid rgba(255,255,255,0.04); cursor:pointer; position:relative; animation:entry-slide 0.45s ease-out; }
+.tw-event:hover { background:rgba(232,104,0,0.04); }
+.tw-event::after { content:''; position:absolute; left:0; top:0; bottom:0; width:2px; }
+.tw-event.ev-error::after { background:var(--neon-red); box-shadow:0 0 6px rgba(255,0,46,0.4); }
+.tw-event.ev-build_failure::after { background:var(--neon-red); }
+.tw-event.ev-test_failure::after { background:var(--orange); box-shadow:0 0 6px rgba(232,104,0,0.4); }
+.tw-event.ev-command_finished::after { background:var(--offwhite); }
+.tw-event.ev-stalled::after { background:var(--grey2); }
+.tw-event.ev-user_snapshot::after { background:var(--neon-cyan); }
+.tw-event-hdr { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.tw-event-type { font-size:0.50rem; letter-spacing:1.5px; padding:2px 8px; border:1px solid; border-radius:1px; }
+.tw-event-type.error,.tw-event-type.build_failure { border-color:rgba(255,0,46,0.4); color:var(--neon-red); }
+.tw-event-type.test_failure { border-color:rgba(232,104,0,0.4); color:var(--orange); }
+.tw-event-type.command_finished { border-color:rgba(240,236,228,0.2); color:var(--grey1); }
+.tw-event-type.stalled { border-color:rgba(102,99,96,0.4); color:var(--grey2); }
+.tw-event-type.user_snapshot { border-color:rgba(0,212,255,0.4); color:var(--neon-cyan); }
+.tw-event-ts { font-size:0.50rem; color:var(--grey2); }
+.tw-event-summary { font-size:0.60rem; color:var(--offwhite); margin-top:4px; }
+.tw-event-cmd { font-size:0.54rem; color:var(--grey1); margin-top:2px; }
+.tw-event-tail { display:none; margin-top:8px; padding:8px; background:var(--bg); border:1px solid var(--grey3); font-size:0.54rem; color:var(--grey1); white-space:pre-wrap; word-break:break-all; max-height:200px; overflow-y:auto; }
+.tw-event.expanded .tw-event-tail { display:block; }
+.tw-packet { padding:12px 18px; border-top:1px solid var(--grey3); }
+.tw-packet-btns { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+.tw-packet-input { width:100%; padding:6px 10px; background:var(--bg); border:1px solid var(--grey3); color:var(--offwhite); font-family:inherit; font-size:0.56rem; border-radius:1px; margin-top:8px; box-sizing:border-box; }
+.tw-packet-input:focus { outline:none; border-color:var(--orange); }
+.tw-packet-preview { margin-top:8px; padding:8px; background:var(--bg); border:1px solid var(--grey3); font-size:0.50rem; color:var(--grey1); white-space:pre-wrap; max-height:250px; overflow-y:auto; display:none; }
+.tw-toggles { display:flex; gap:14px; padding:8px 18px; border-top:1px solid var(--grey3); flex-wrap:wrap; }
+.tw-toggle { display:flex; align-items:center; gap:4px; font-size:0.50rem; color:var(--grey2); cursor:pointer; }
+.tw-toggle input { accent-color:var(--orange); }
+.tw-explain { padding:12px 18px; border-top:1px solid var(--grey3); text-align:center; }
+.tw-explain-btn { font-size:0.56rem; letter-spacing:2px; padding:8px 24px; border:1px solid var(--orange); border-radius:1px; background:var(--orange-dim); color:var(--orange-hi); cursor:pointer; font-family:inherit; transition:all 0.2s; }
+.tw-explain-btn:hover { background:var(--orange); color:#000; box-shadow:0 0 18px rgba(232,104,0,0.5); }
+
 /* ── Nav tabs ──────────────────────────────────────────────────── */
 .nav-tabs {
   display: flex; gap: 2px; margin-left: 24px;
@@ -1348,6 +1402,7 @@ body {
     <button class="nav-tab" id="tabProjects" onclick="showPage('projects')">◎ PROJECTS</button>
     <button class="nav-tab" id="tabAgents" onclick="showPage('agents')">⬡ AGENTS</button>
     <button class="nav-tab" id="tabTrading" onclick="showPage('trading')">$ TRADING</button>
+    <button class="nav-tab" id="tabTerminal" onclick="showPage('terminal')">⊡ TERMINAL</button>
   </div>
   <div class="nav-right">
     <button class="clawmpson-btn" id="clawmpsonBtn" onclick="toggleClawmpson()">◈ CLAWMPSON MODE</button>
@@ -1727,6 +1782,51 @@ body {
 
   </div><!-- /pageTrading -->
 
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- TERMINAL WATCH PAGE                                           -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div class="page" id="pageTerminal">
+    <div class="panel" style="max-width:900px;margin:0 auto;">
+      <div class="tw-status" id="twStatus">
+        <span class="tw-status-dot" id="twDot"></span>
+        <span class="tw-session" id="twSession">OFF</span>
+        <span class="tw-uptime" id="twUptime"></span>
+      </div>
+      <div class="tw-controls">
+        <select class="tw-select" id="twSessionPicker"><option value="">— select session —</option></select>
+        <button class="tw-btn primary" onclick="twStart()">START</button>
+        <button class="tw-btn danger" onclick="twStop()">STOP</button>
+        <button class="tw-btn" onclick="twSnapshot()">SNAPSHOT</button>
+      </div>
+      <div class="panel-hdr">
+        <span class="panel-hdr-title">Event Feed</span>
+        <span class="panel-hdr-count" id="twEventCount">0</span>
+      </div>
+      <div class="tw-events" id="twEvents">
+        <div class="empty"><span class="empty-char">📡</span>no events yet — attach to a tmux session</div>
+      </div>
+      <div class="tw-packet">
+        <div class="tw-packet-btns">
+          <button class="tw-btn" onclick="twPreviewPacket()">PREVIEW PACKET</button>
+          <button class="tw-btn" onclick="twCopyPacket('chatgpt')">COPY FOR CHATGPT</button>
+          <button class="tw-btn" onclick="twCopyPacket('claude')">COPY FOR CLAUDE</button>
+          <button class="tw-btn" onclick="twCopyPacket('both')">COPY FOR BOTH</button>
+        </div>
+        <input class="tw-packet-input" id="twQuestion" placeholder="Add your question (optional)..." />
+        <div class="tw-packet-preview" id="twPacketPreview"></div>
+      </div>
+      <div class="tw-toggles">
+        <label class="tw-toggle"><input type="checkbox" id="twAutoSnap" /> Auto-snapshot on error</label>
+        <label class="tw-toggle"><input type="checkbox" id="twIncludeDiff" checked /> Include git diff</label>
+        <label class="tw-toggle"><input type="checkbox" id="twIncludeHistory" checked /> Include command history</label>
+        <label class="tw-toggle"><input type="checkbox" id="twErrorsOnly" /> Errors only</label>
+      </div>
+      <div class="tw-explain">
+        <button class="tw-explain-btn" onclick="twExplain()">⚡ EXPLAIN WHAT JUST HAPPENED</button>
+      </div>
+    </div>
+  </div><!-- /pageTerminal -->
+
 </div>
 
 <!-- Edit Project Modal -->
@@ -1902,6 +2002,12 @@ function showPage(page) {
     document.getElementById('pageTrading').classList.add('active')
     document.getElementById('tabTrading').classList.add('active')
     loadTrading()
+  } else if (page === 'terminal') {
+    document.getElementById('pageTerminal').classList.add('active')
+    document.getElementById('tabTerminal').classList.add('active')
+    twLoadSessions()
+    twLoadEvents()
+    twLoadStatus().then(() => { if (twState.running) twConnectSSE() })
   } else {
     document.getElementById('pageDashboard').classList.add('active')
     document.getElementById('tabDashboard').classList.add('active')
@@ -4337,6 +4443,182 @@ function connectTradingSSE() {
   }
 }
 connectTradingSSE()
+
+// ── Terminal Watch ─────────────────────────────────────────────────────────
+const twState = { running: false, session: '', pane: '', startTime: null, events: [], uptimeInterval: null, sse: null }
+
+async function twLoadSessions() {
+  try {
+    const r = await fetch('/api/terminal/sessions')
+    const d = await r.json()
+    const sel = document.getElementById('twSessionPicker')
+    sel.innerHTML = '<option value="">— select session —</option>'
+    for (const s of d.sessions || []) {
+      for (const p of s.panes || []) {
+        const val = `${s.name}:${p.index}`
+        const label = `${s.name}:${p.index} (${p.command})`
+        sel.innerHTML += `<option value="${val}">${label}</option>`
+      }
+    }
+  } catch(e) { console.error('[tw] sessions', e) }
+}
+
+async function twLoadEvents() {
+  try {
+    const errOnly = document.getElementById('twErrorsOnly')?.checked
+    const r = await fetch(`/api/terminal/events?n=20${errOnly ? '&errors_only=true' : ''}`)
+    const d = await r.json()
+    twState.events = d.events || []
+    twRenderEvents()
+  } catch(e) { console.error('[tw] events', e) }
+}
+
+async function twLoadStatus() {
+  try {
+    const r = await fetch('/api/terminal/status')
+    const d = await r.json()
+    twState.running = d.running
+    twUpdateStatusUI(d)
+  } catch(e) {}
+}
+
+async function twStart() {
+  const val = document.getElementById('twSessionPicker').value
+  if (!val) { toast('Select a session first'); return }
+  const [session, pane] = val.split(':')
+  try {
+    const r = await fetch('/api/terminal/start', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ session, pane })
+    })
+    const d = await r.json()
+    if (d.status === 'started' || d.status === 'already_running') {
+      twState.running = true; twState.session = session; twState.pane = pane
+      twState.startTime = Date.now()
+      twStartUptime(); twConnectSSE(); twUpdateStatusUI(d)
+      toast('Relay started')
+    }
+  } catch(e) { toast('Failed to start relay') }
+}
+
+async function twStop() {
+  try {
+    await fetch('/api/terminal/stop', { method: 'POST' })
+    twState.running = false; twState.session = ''; twState.startTime = null
+    if (twState.uptimeInterval) clearInterval(twState.uptimeInterval)
+    if (twState.sse) { twState.sse.close(); twState.sse = null }
+    twUpdateStatusUI({ running: false })
+    toast('Relay stopped')
+  } catch(e) { toast('Failed to stop relay') }
+}
+
+async function twSnapshot() {
+  try {
+    await fetch('/api/terminal/snapshot', { method: 'POST' })
+    toast('Snapshot taken'); twLoadEvents()
+  } catch(e) { toast('Snapshot failed — is relay running?') }
+}
+
+function twUpdateStatusUI(d) {
+  const dot = document.getElementById('twDot')
+  const label = document.getElementById('twSession')
+  dot.className = 'tw-status-dot' + (d.running ? ' watching' : '')
+  label.textContent = d.running ? `WATCHING ${twState.session}:${twState.pane}` : 'OFF'
+}
+
+function twRenderEvents() {
+  const el = document.getElementById('twEvents')
+  const count = document.getElementById('twEventCount')
+  count.textContent = twState.events.length
+  if (!twState.events.length) {
+    el.innerHTML = '<div class="empty"><span class="empty-char">📡</span>no events yet — attach to a tmux session</div>'
+    return
+  }
+  el.innerHTML = twState.events.map(ev => {
+    const ts = new Date(ev.timestamp).toLocaleTimeString()
+    const tail = (ev.output_tail || []).join('\n')
+    return `<div class="tw-event ev-${ev.event_type}" onclick="this.classList.toggle('expanded')">
+      <div class="tw-event-hdr">
+        <span class="tw-event-type ${ev.event_type}">${(ev.event_type||'').toUpperCase()}</span>
+        <span class="tw-event-ts">${ts}</span>
+      </div>
+      ${ev.summary ? `<div class="tw-event-summary">${esc(ev.summary)}</div>` : ''}
+      ${ev.command ? `<div class="tw-event-cmd">$ ${esc(ev.command)}</div>` : ''}
+      ${tail ? `<div class="tw-event-tail">${esc(tail)}</div>` : ''}
+    </div>`
+  }).join('')
+}
+
+function twConnectSSE() {
+  if (twState.sse) twState.sse.close()
+  const tkn = getCookie('oc_token')
+  twState.sse = new EventSource(`/api/terminal/stream?token=${tkn}`)
+  twState.sse.onmessage = (e) => {
+    try {
+      const d = JSON.parse(e.data)
+      if (d.events) {
+        for (const ev of d.events) {
+          twState.events.unshift(ev)
+          if (document.getElementById('twAutoSnap')?.checked &&
+              ['error','build_failure','test_failure'].includes(ev.event_type)) {
+            twSnapshot()
+          }
+        }
+        twState.events = twState.events.slice(0, 50)
+        twRenderEvents()
+      }
+    } catch(_) {}
+  }
+  twState.sse.onerror = () => { twState.sse.close(); setTimeout(twConnectSSE, 5000) }
+}
+
+async function twPreviewPacket() {
+  try {
+    const r = await fetch('/api/terminal/packet/preview')
+    const d = await r.json()
+    const el = document.getElementById('twPacketPreview')
+    el.textContent = d.packet ? JSON.stringify(d.packet, null, 2) : 'No events available'
+    el.style.display = 'block'
+  } catch(e) { toast('Failed to load packet preview') }
+}
+
+async function twCopyPacket(target) {
+  try {
+    const r = await fetch('/api/terminal/packet', {
+      method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({})
+    })
+    const packet = await r.json()
+    const q = document.getElementById('twQuestion').value.trim()
+    if (q) packet.question = q
+    let text = ''
+    if (target === 'chatgpt') text = 'Analyze this terminal output:\n\n' + JSON.stringify(packet, null, 2)
+    else if (target === 'claude') text = 'Here is terminal context from my development session. Analyze the output and suggest next steps:\n\n' + JSON.stringify(packet, null, 2)
+    else text = 'Terminal analysis packet — paste into ChatGPT or Claude:\n\n' + JSON.stringify(packet, null, 2)
+    await navigator.clipboard.writeText(text)
+    toast('Copied to clipboard')
+  } catch(e) { toast('Copy failed — try again') }
+}
+
+async function twExplain() {
+  try {
+    const r = await fetch('/api/terminal/packet', {
+      method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({})
+    })
+    const packet = await r.json()
+    packet.question = 'Explain what just happened in this terminal session. What failed, why, and what should I do next?'
+    await navigator.clipboard.writeText(JSON.stringify(packet, null, 2))
+    toast('Explanation packet copied — paste into ChatGPT or Claude')
+  } catch(e) { toast('No events to explain') }
+}
+
+function twStartUptime() {
+  if (twState.uptimeInterval) clearInterval(twState.uptimeInterval)
+  twState.uptimeInterval = setInterval(() => {
+    if (!twState.startTime) return
+    const secs = Math.floor((Date.now() - twState.startTime) / 1000)
+    document.getElementById('twUptime').textContent = `${Math.floor(secs/60)}m ${secs%60}s`
+  }, 1000)
+}
 
 </script>
 </body>
