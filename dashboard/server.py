@@ -1026,13 +1026,13 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
         # 9. Graduation status
         from statistics import mean, stdev
         grad = {"has_min_history": False, "roi_7d_pass": False, "win_rate_pass": False, "sharpe_pass": False, "drawdown_pass": False, "all_pass": False}
-        if len(daily_pnl) >= 14:
+        if len(daily_pnl) >= 7:
             grad["has_min_history"] = True
             last7 = [r["roi_pct"] for r in daily_pnl[-7:] if r["roi_pct"] is not None]
             grad["roi_7d_pass"] = sum(last7) > 0
             grad["win_rate_pass"] = win_rate >= 0.55
             returns = [r["roi_pct"] for r in daily_pnl if r["roi_pct"] is not None]
-            if len(returns) >= 14:
+            if len(returns) >= 7:
                 s = stdev(returns)
                 sharpe = mean(returns) / s if s > 0 else 0
                 grad["sharpe_pass"] = sharpe >= 1.0

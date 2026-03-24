@@ -14,7 +14,7 @@ from typing import Any
 STOP_LOSS_PCT    = float(os.environ.get("MIROFISH_STOP_LOSS_PCT",    "0.20"))
 TAKE_PROFIT_PCT  = float(os.environ.get("MIROFISH_TAKE_PROFIT_PCT",  "0.50"))
 MAX_POSITION_PCT = float(os.environ.get("MIROFISH_MAX_POSITION_PCT", "0.10"))
-MIN_HISTORY_DAYS = int(os.environ.get("MIROFISH_MIN_HISTORY_DAYS", "14"))
+MIN_HISTORY_DAYS = int(os.environ.get("MIROFISH_MIN_HISTORY_DAYS", "7"))
 
 # Execution simulation parameters
 SLIPPAGE_BPS     = float(os.environ.get("MIROFISH_SLIPPAGE_BPS",     "50"))   # 50 bps = 0.5%

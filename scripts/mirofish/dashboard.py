@@ -12,7 +12,7 @@ from typing import Any
 
 REPORTS_DIR = Path(os.environ.get("MIROFISH_REPORTS_DIR",
                                    Path.home() / "openclaw" / "mirofish" / "reports"))
-MIN_HISTORY_DAYS = int(os.environ.get("MIROFISH_MIN_HISTORY_DAYS", "14"))
+MIN_HISTORY_DAYS = int(os.environ.get("MIROFISH_MIN_HISTORY_DAYS", "7"))
 
 WIN_RATE_THRESHOLD  = 0.55
 SHARPE_THRESHOLD    = 1.0
@@ -219,7 +219,7 @@ def generate_report(period: str = "daily") -> Path:
                      f"**Max drawdown:** {state['max_drawdown']*100:.1f}%\n")
 
     lines.append("\n## Graduation Status\n")
-    lines.append(f"- Min history (14d): {'✓' if grad['criteria']['min_history'] else '✗'} "
+    lines.append(f"- Min history (7d): {'✓' if grad['criteria']['min_history'] else '✗'} "
                  f"({grad['history_days']} days)\n")
     lines.append(f"- ROI 7d > 0%: {'✓' if grad['criteria']['roi_7d_positive'] else '✗'} "
                  f"({grad['roi_7d']*100:.2f}%)\n")

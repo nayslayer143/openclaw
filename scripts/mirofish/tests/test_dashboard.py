@@ -61,9 +61,9 @@ def _insert_closed_trades(db_path: str, statuses: list[str]):
 # ── Test 1: Graduation requires minimum history ─────────────────────────────
 
 def test_graduation_requires_minimum_history(temp_db):
-    """13 daily rows + all profitable — still not ready due to < 14 days history."""
-    # 13 days of positive ROI
-    rows = [(f"2026-01-{i+1:02d}", 1000.0 + i * 10, 0.01) for i in range(13)]
+    """5 daily rows + all profitable — still not ready due to < 7 days history."""
+    # 5 days of positive ROI
+    rows = [(f"2026-01-{i+1:02d}", 1000.0 + i * 10, 0.01) for i in range(5)]
     _insert_daily_pnl(temp_db, rows)
     # All wins to satisfy win rate
     _insert_closed_trades(temp_db, ["closed_win"] * 20)
@@ -73,7 +73,7 @@ def test_graduation_requires_minimum_history(temp_db):
 
     assert result["ready"] is False
     assert result["has_minimum_history"] is False
-    assert result["history_days"] == 13
+    assert result["history_days"] == 5
 
 
 # ── Test 2: Graduation passes all criteria ──────────────────────────────────
