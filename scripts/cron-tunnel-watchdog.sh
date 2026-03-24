@@ -15,6 +15,15 @@ if ! pgrep -f "cloudflared tunnel.*run" > /dev/null; then
   echo "[$(date)] Tunnel restarted" >> "$HOME/openclaw/logs/watchdog.log"
 fi
 
+# Terminal relay — clean up stale PID if process is dead
+RELAY_PID="$HOME/openclaw/logs/terminal-relay.pid"
+if [ -f "$RELAY_PID" ]; then
+  if ! kill -0 "$(cat "$RELAY_PID")" 2>/dev/null; then
+    echo "[$(date)] terminal-relay stale PID — cleaning up" >> "$HOME/openclaw/logs/watchdog.log"
+    rm -f "$RELAY_PID"
+  fi
+fi
+
 # Dispatcher — PID-file guarded (prevents duplicate instances)
 DISP_PID="$HOME/openclaw/.dispatcher.pid"
 if [[ -f "$DISP_PID" ]] && kill -0 "$(cat "$DISP_PID")" 2>/dev/null; then
