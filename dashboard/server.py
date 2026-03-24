@@ -52,6 +52,7 @@ JWT_EXPIRE  = 60 * 24 * 7  # 7 days
 PUBLIC_URL  = os.environ.get("DASHBOARD_PUBLIC_URL", "http://localhost:7080")
 OAUTH_CALLBACK = f"{PUBLIC_URL}/auth/github/callback"
 ACCESS_TOKEN   = os.environ.get("DASHBOARD_ACCESS_TOKEN", "")
+DASH_PASSWORD  = os.environ.get("DASHBOARD_PASSWORD", "")
 
 # ── App ───────────────────────────────────────────────────────────────────────
 app = FastAPI(title="OpenClaw Dashboard")
@@ -91,6 +92,18 @@ async def token_login(t: str, response: Response):
     """Token-based login: /auth/token?t=ACCESS_TOKEN — sets JWT cookie and redirects home."""
     if not ACCESS_TOKEN or t != ACCESS_TOKEN:
         raise HTTPException(403, "Invalid access token")
+    jwt_token = make_token("nayslayer")
+    response = RedirectResponse("/", status_code=302)
+    response.set_cookie("oc_token", jwt_token, max_age=JWT_EXPIRE * 60, httponly=True, samesite="lax")
+    return response
+
+@app.post("/auth/password")
+async def password_login(request: Request):
+    """Password login — checks DASHBOARD_PASSWORD, sets JWT cookie."""
+    form = await request.form()
+    pw = form.get("password", "")
+    if not DASH_PASSWORD or pw != DASH_PASSWORD:
+        return RedirectResponse("/login?error=Wrong+password", status_code=302)
     jwt_token = make_token("nayslayer")
     response = RedirectResponse("/", status_code=302)
     response.set_cookie("oc_token", jwt_token, max_age=JWT_EXPIRE * 60, httponly=True, samesite="lax")
