@@ -32,6 +32,127 @@ def _get_conn() -> sqlite3.Connection:
     return conn
 
 
+CIRCUIT_BREAKER_PCT = float(os.environ.get("MIROFISH_CIRCUIT_BREAKER_PCT", "0.05"))  # pause at 5% of starting
+WALLET_RESET_AMOUNT = float(os.environ.get("MIROFISH_WALLET_RESET", "1000.0"))
+
+
+def check_circuit_breaker() -> dict | None:
+    """
+    Check if wallet has hit the floor. Returns None if OK,
+    or a dict with diagnosis + reset info if triggered.
+    """
+    state = get_state()
+    floor = state["starting_balance"] * CIRCUIT_BREAKER_PCT
+
+    if state["balance"] > floor:
+        return None
+
+    # Circuit breaker triggered — analyze what went wrong
+    with _get_conn() as conn:
+        # Get strategy breakdown
+        strats = conn.execute("""
+            SELECT strategy, COUNT(*) as n,
+                   SUM(CASE WHEN status='closed_win' THEN 1 ELSE 0 END) as wins,
+                   ROUND(SUM(pnl), 2) as total_pnl,
+                   ROUND(AVG(entry_price), 4) as avg_entry
+            FROM paper_trades WHERE status != 'open'
+            GROUP BY strategy ORDER BY total_pnl ASC
+        """).fetchall()
+
+        # Get worst trades
+        worst = conn.execute("""
+            SELECT market_id, question, strategy, entry_price, pnl
+            FROM paper_trades WHERE status != 'open'
+            ORDER BY pnl ASC LIMIT 5
+        """).fetchall()
+
+    diagnosis = {
+        "triggered": True,
+        "balance": state["balance"],
+        "floor": floor,
+        "total_trades": state["total_trades"],
+        "win_rate": state["win_rate"],
+        "strategies": [dict(s) for s in strats],
+        "worst_trades": [dict(w) for w in worst],
+        "recommendation": _generate_recommendation(strats),
+    }
+
+    print(f"\n{'='*60}")
+    print(f"CIRCUIT BREAKER TRIGGERED — Balance ${state['balance']:.2f} < floor ${floor:.2f}")
+    print(f"{'='*60}")
+    print(f"Win rate: {state['win_rate']:.0%} | Total trades: {state['total_trades']}")
+    print(f"\nStrategy breakdown:")
+    for s in strats:
+        print(f"  {s['strategy']:20s} {s['n']:3d} trades, {s['wins']} wins, PnL: ${s['total_pnl']}")
+    print(f"\nWorst trades:")
+    for w in worst:
+        print(f"  ${w['pnl']:>8.2f}  {w['strategy']:15s}  {w['question'][:50]}")
+    print(f"\nRecommendation: {diagnosis['recommendation']}")
+    print(f"{'='*60}\n")
+
+    return diagnosis
+
+
+def _generate_recommendation(strats) -> str:
+    """Generate a plain-English recommendation based on what failed."""
+    if not strats:
+        return "No trades executed. Check market connectivity."
+
+    worst_strat = strats[0]  # sorted by PnL ascending
+    recs = []
+
+    for s in strats:
+        name = s["strategy"]
+        wins = s["wins"]
+        total = s["n"]
+        wr = wins / total if total > 0 else 0
+        pnl = s["total_pnl"]
+
+        if pnl < -100 and wr < 0.2:
+            recs.append(f"DISABLE {name} — {wr:.0%} win rate, ${pnl} lost")
+        elif s["avg_entry"] and s["avg_entry"] < 0.05:
+            recs.append(f"DISABLE {name} — betting on penny contracts (avg entry ${s['avg_entry']:.3f})")
+        elif wr < 0.4:
+            recs.append(f"REDUCE {name} allocation — {wr:.0%} win rate")
+
+    if not recs:
+        recs.append("All strategies underperforming. Consider tightening entry criteria.")
+
+    return " | ".join(recs)
+
+
+def reset_wallet(new_balance: float = WALLET_RESET_AMOUNT) -> dict:
+    """
+    Reset the paper wallet: close all open positions, archive old trades,
+    set new starting balance. Returns summary of what was reset.
+    """
+    now = datetime.datetime.utcnow().isoformat()
+    with _get_conn() as conn:
+        # Close all open positions at entry price (flat)
+        open_count = conn.execute(
+            "SELECT COUNT(*) as n FROM paper_trades WHERE status='open'"
+        ).fetchone()["n"]
+        conn.execute("""
+            UPDATE paper_trades SET status='reset', pnl=0, exit_price=entry_price,
+            closed_at=? WHERE status='open'
+        """, (now,))
+
+        # Update starting balance
+        conn.execute("""
+            INSERT OR REPLACE INTO context (chat_id, key, value)
+            VALUES ('mirofish', 'starting_balance', ?)
+        """, (str(new_balance),))
+
+        # Record the reset event
+        conn.execute("""
+            INSERT INTO context (chat_id, key, value)
+            VALUES ('mirofish', ?, ?)
+        """, (f"wallet_reset_{now}", f"Reset to ${new_balance:.2f}, closed {open_count} positions"))
+
+    print(f"[wallet] Reset to ${new_balance:.2f} — closed {open_count} open positions")
+    return {"new_balance": new_balance, "closed_positions": open_count, "reset_at": now}
+
+
 def _get_starting_balance() -> float:
     with _get_conn() as conn:
         row = conn.execute(
