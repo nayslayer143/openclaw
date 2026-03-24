@@ -625,6 +625,58 @@ body {
 .t-feed-count {
   font-size: 0.44rem; color: var(--grey2); margin-left: 6px;
 }
+/* ── Ticker Tape ──────────────────────────────────────────────── */
+.ticker-wrap {
+  overflow: hidden; width: 100%;
+  background: rgba(0,0,0,0.6);
+  border: 1px solid var(--border);
+  border-radius: 2px;
+  margin-bottom: 14px;
+  position: relative;
+}
+.ticker-wrap::before, .ticker-wrap::after {
+  content: ''; position: absolute; top: 0; bottom: 0; width: 40px; z-index: 2;
+  pointer-events: none;
+}
+.ticker-wrap::before { left: 0; background: linear-gradient(90deg, rgba(6,6,6,1), transparent); }
+.ticker-wrap::after { right: 0; background: linear-gradient(270deg, rgba(6,6,6,1), transparent); }
+.ticker-tape {
+  display: flex; gap: 0;
+  animation: ticker-scroll 30s linear infinite;
+  white-space: nowrap;
+  padding: 8px 0;
+}
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.tick-item {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 0 18px;
+  font-size: 0.52rem; letter-spacing: 0.5px;
+  border-right: 1px solid rgba(255,255,255,0.05);
+}
+.tick-symbol { color: var(--orange-hi); font-weight: 700; letter-spacing: 1px; }
+.tick-price { color: var(--offwhite); }
+.tick-change-up { color: var(--neon-green); }
+.tick-change-down { color: var(--neon-red); }
+.tick-trade { font-weight: 600; }
+.tick-win { color: var(--neon-green); font-weight: 700; }
+.tick-loss { color: var(--neon-red); font-weight: 700; }
+.tick-pending { color: var(--neon-cyan); }
+.tick-sep { color: var(--grey3); padding: 0 4px; }
+/* Live dot */
+.t-live-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--neon-green);
+  box-shadow: 0 0 6px var(--neon-green), 0 0 12px rgba(0,255,136,0.3);
+  animation: live-pulse 2s ease-in-out infinite;
+  display: inline-block;
+}
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
 
 /* ── Ideas Lab Page ───────────────────────────────────────────── */
 .page { display: none; }
@@ -1512,10 +1564,18 @@ body {
   <!-- ══════════════════════════════════════════════════════════════ -->
   <div class="page" id="pageTrading">
 
+    <!-- Scrolling Ticker Tape -->
+    <div class="ticker-wrap">
+      <div class="ticker-tape" id="tickerTape"></div>
+    </div>
+
     <div class="ideas-header">
       <div>
-        <div class="ideas-title">MIROFISH TRADING</div>
-        <div class="ideas-subtitle">PAPER TRADING DASHBOARD — POLYMARKET + KALSHI</div>
+        <div class="ideas-title" style="display:flex;align-items:center;gap:12px">
+          MIROFISH TRADING
+          <span class="t-live-dot" id="tLiveDot"></span>
+        </div>
+        <div class="ideas-subtitle">PAPER TRADING — POLYMARKET + KALSHI + CRYPTO SPOT</div>
       </div>
       <div id="tradingLastUpdate" style="font-size:0.50rem;color:var(--grey2);letter-spacing:1px;text-align:right"></div>
     </div>
@@ -3743,8 +3803,11 @@ function renderTrading() {
   const d = tradingData
   if (!d) return
 
-  // Update time
+  // Update time + live dot pulse
   document.getElementById('tradingLastUpdate').textContent = 'LIVE ' + new Date().toLocaleTimeString()
+
+  // Build ticker tape
+  buildTickerTape(d)
 
   // Portfolio cards
   const w = d.wallet
@@ -3929,6 +3992,62 @@ function renderTrading() {
       </tr>`
     }).join('')
   }
+}
+
+function buildTickerTape(d) {
+  const tape = document.getElementById('tickerTape')
+  if (!tape) return
+
+  const items = []
+
+  // Balance
+  const w = d.wallet
+  const balColor = w.roi_pct >= 0 ? 'tick-change-up' : 'tick-change-down'
+  items.push(`<span class="tick-item"><span class="tick-symbol">PORTFOLIO</span><span class="tick-price">$${w.balance.toFixed(2)}</span><span class="${balColor}">${w.roi_pct >= 0 ? '+' : ''}${w.roi_pct.toFixed(2)}%</span></span>`)
+
+  // W/L
+  const wins = w.wins || 0
+  const losses = w.total_trades - wins
+  items.push(`<span class="tick-item"><span class="tick-symbol">W/L</span><span class="tick-win">${wins}W</span><span class="tick-loss">${losses}L</span><span class="tick-price">${w.win_rate.toFixed(0)}%</span></span>`)
+
+  // Open positions as live entries
+  for (const p of (d.open_positions || []).slice(0, 6)) {
+    const pnlClass = p.pnl >= 0 ? 'tick-change-up' : 'tick-change-down'
+    const arrow = p.pnl >= 0 ? '\u25B2' : '\u25BC'
+    const sym = p.question.substring(0, 20).toUpperCase()
+    items.push(`<span class="tick-item"><span class="tick-pending">${p.direction}</span><span class="tick-symbol">${sym}</span><span class="tick-price">${p.entry_price.toFixed(3)}</span><span class="${pnlClass}">${arrow} ${p.pnl >= 0 ? '+' : ''}$${p.pnl.toFixed(2)}</span></span>`)
+  }
+
+  // Recent closed trades
+  for (const t of (d.recent_trades || []).slice(0, 8)) {
+    const pnl = t.pnl || 0
+    const cls = t.status === 'closed_win' ? 'tick-win' : 'tick-loss'
+    const label = t.status === 'closed_win' ? 'WIN' : 'LOSS'
+    const sym = (t.question || '').substring(0, 18).toUpperCase()
+    items.push(`<span class="tick-item"><span class="${cls}">${label}</span><span class="tick-symbol">${sym}</span><span class="${cls}">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)}</span></span>`)
+  }
+
+  // Top Polymarket markets
+  for (const m of (d.polymarket || []).slice(0, 5)) {
+    const q = (m.question || '').substring(0, 22)
+    items.push(`<span class="tick-item"><span class="tick-symbol">${q}</span><span class="tick-change-up">Y:${(m.yes_price||0).toFixed(2)}</span><span class="tick-change-down">N:${(m.no_price||0).toFixed(2)}</span></span>`)
+  }
+
+  // Top Kalshi
+  for (const m of (d.kalshi || []).slice(0, 5)) {
+    const q = (m.title || '').substring(0, 22)
+    const bid = m.yes_bid != null ? m.yes_bid.toFixed(2) : '-'
+    items.push(`<span class="tick-item"><span class="tick-symbol">${q}</span><span class="tick-price">BID:${bid}</span></span>`)
+  }
+
+  // Duplicate for seamless loop
+  const html = items.join('') + items.join('')
+  tape.innerHTML = html
+
+  // Adjust speed based on content width
+  const totalWidth = tape.scrollWidth / 2
+  const speed = Math.max(20, totalWidth / 50) // ~50px/sec
+  tape.style.animationDuration = speed + 's'
 }
 
 function renderPnlChart(curve) {
