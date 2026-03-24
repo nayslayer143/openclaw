@@ -23,6 +23,27 @@ PRICE_LAG_MIN_EDGE = float(os.environ.get("PRICE_LAG_MIN_EDGE", "0.05"))
 PRICE_LAG_LATENCY_PENALTY = float(os.environ.get("PRICE_LAG_LATENCY_PENALTY", "0.005"))
 PRICE_LAG_MAX_HORIZON = int(os.environ.get("PRICE_LAG_MAX_HORIZON", "180"))
 CROSS_VENUE_POSITION_PCT = float(os.environ.get("CROSS_VENUE_POSITION_PCT", "0.05"))
+USE_DYNAMIC_ALLOCATION = os.environ.get("MIROFISH_DYNAMIC_ALLOC", "1") == "1"
+
+
+def _get_allocation(strategy: str) -> float:
+    """Get dynamic allocation for a strategy, falling back to fixed sizing."""
+    if not USE_DYNAMIC_ALLOCATION:
+        if strategy in ("arbitrage", "cross_venue_arb"):
+            return ARB_POSITION_PCT
+        return MAX_POSITION_PCT
+
+    try:
+        from scripts.mirofish.strategy_tracker import get_strategy_allocation
+        allocs = get_strategy_allocation()
+        alloc = allocs.get(strategy, 0.0)
+        # Scale allocation to position size (tournament gives 0-1 share,
+        # multiply by max position to get actual sizing)
+        return max(0.01, min(MAX_POSITION_PCT, alloc * MAX_POSITION_PCT * 2))
+    except Exception:
+        if strategy in ("arbitrage", "cross_venue_arb"):
+            return ARB_POSITION_PCT
+        return MAX_POSITION_PCT
 
 
 @dataclass
@@ -439,10 +460,11 @@ def analyze(
 
     # Step 1: Single-venue arbitrage fast-path
     arb_market_ids = set()
+    arb_alloc = _get_allocation("arbitrage")
     for market in markets:
         arb = _check_arbitrage(market)
         if arb:
-            arb.amount_usd = ARB_POSITION_PCT * balance
+            arb.amount_usd = arb_alloc * balance
             arb.shares = arb.amount_usd / arb.entry_price if arb.entry_price > 0 else 0
             decisions.append(arb)
             arb_market_ids.add(market["market_id"])

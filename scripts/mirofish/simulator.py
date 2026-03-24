@@ -363,7 +363,15 @@ def run_loop():
         )
         print(f"[mirofish] Brain returned {len(decisions)} trade decisions")
 
-        # 5. Execute trades
+        # 5. Execute trades + track strategy performance
+        try:
+            import scripts.mirofish.strategy_tracker as tracker
+            tracker.migrate()
+            tracker.sync_from_paper_trades()
+        except Exception as e:
+            print(f"[mirofish] Strategy tracker init: {e}")
+            tracker = None
+
         for d in decisions:
             result = wallet.execute_trade(d)
             if result:
@@ -373,6 +381,22 @@ def run_loop():
                     _log_price_lag_trade(d)
                 elif d.strategy == "cross_venue_arb" and d.metadata:
                     _log_cross_venue_arb_trade(d)
+                # Record in strategy tracker
+                if tracker:
+                    try:
+                        tracker.record_trade_open(
+                            trade_id=result["id"],
+                            strategy=d.strategy,
+                            market_id=d.market_id,
+                            direction=d.direction,
+                            entry_price=d.entry_price,
+                            expected_edge=d.confidence,
+                            amount_usd=result["amount_usd"],
+                            confidence=d.confidence,
+                            metadata=d.metadata,
+                        )
+                    except Exception as e:
+                        print(f"[mirofish] Strategy track error: {e}")
             else:
                 print(f"[mirofish] Rejected: {d.market_id} (cap or kelly)")
 
@@ -384,13 +408,30 @@ def run_loop():
             sign = "+" if (c["pnl"] or 0) >= 0 else ""
             print(f"[mirofish] Stop closed: {c['market_id']} → {c['status']} "
                   f"{sign}${c['pnl']:.2f}")
+            # Record closure in strategy tracker
+            if tracker:
+                try:
+                    tracker.record_trade_close(
+                        trade_id=c["id"],
+                        exit_price=c["exit_price"],
+                        realized_pnl=c["pnl"],
+                        status=c["status"],
+                    )
+                except Exception:
+                    pass
     except Exception as exc:
         print(f"[mirofish] Stop check failed: {exc}")
 
-    # 7. Daily snapshot (first run of the day only)
+    # 7. Daily snapshot + strategy stats (first run of the day only)
     snapshotted = dash.maybe_snapshot(chat_id_for_notify=os.environ.get("JORDAN_TELEGRAM_CHAT_ID") or None)
     if snapshotted:
         print("[mirofish] Daily snapshot written and digest sent")
+        if tracker:
+            try:
+                tracker.snapshot_stats()
+                print("[mirofish] Strategy stats snapshot written")
+            except Exception as e:
+                print(f"[mirofish] Strategy snapshot error: {e}")
 
     print(f"[mirofish] Run complete — {datetime.datetime.utcnow().isoformat()}")
 
