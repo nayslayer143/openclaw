@@ -114,6 +114,48 @@ CREATE TABLE IF NOT EXISTS spot_prices (
 CREATE INDEX IF NOT EXISTS idx_spot_prices_ticker_time
     ON spot_prices(ticker, fetched_at);
 
+CREATE TABLE IF NOT EXISTS kalshi_markets (
+    ticker        TEXT NOT NULL,
+    event_ticker  TEXT,
+    title         TEXT,
+    category      TEXT,
+    yes_bid       REAL,
+    yes_ask       REAL,
+    no_bid        REAL,
+    no_ask        REAL,
+    last_price    REAL,
+    volume        REAL,
+    volume_24h    REAL,
+    open_interest REAL,
+    status        TEXT,
+    close_time    TEXT,
+    rules_primary TEXT,
+    strike_type   TEXT,
+    cap_strike    REAL,
+    floor_strike  REAL,
+    fetched_at    TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS cross_venue_arb_trades (
+    id              INTEGER PRIMARY KEY,
+    pair_id         TEXT NOT NULL,
+    buy_venue       TEXT NOT NULL,
+    sell_venue      TEXT NOT NULL,
+    buy_market_id   TEXT NOT NULL,
+    sell_market_id  TEXT NOT NULL,
+    buy_price       REAL NOT NULL,
+    sell_price      REAL NOT NULL,
+    spread          REAL NOT NULL,
+    estimated_edge  REAL NOT NULL,
+    match_confidence REAL NOT NULL,
+    direction       TEXT NOT NULL,
+    amount_usd      REAL NOT NULL,
+    entry_price     REAL NOT NULL,
+    detected_at     TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_xv_arb_pair_time
+    ON cross_venue_arb_trades(pair_id, detected_at);
+
 CREATE TABLE IF NOT EXISTS price_lag_trades (
     id              INTEGER PRIMARY KEY,
     market_id       TEXT NOT NULL,
@@ -178,6 +220,91 @@ def _log_price_lag_trade(decision) -> None:
         print(f"[mirofish] Price-lag tracking error: {e}")
 
 
+def _log_cross_venue_arb_trade(decision) -> None:
+    """Write cross-venue arb tracking row from decision.metadata."""
+    m = decision.metadata
+    if not m:
+        return
+    try:
+        with _get_conn() as conn:
+            conn.execute("""
+                INSERT INTO cross_venue_arb_trades
+                (pair_id, buy_venue, sell_venue, buy_market_id, sell_market_id,
+                 buy_price, sell_price, spread, estimated_edge, match_confidence,
+                 direction, amount_usd, entry_price, detected_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                m.get("pair_id", ""),
+                m.get("buy_venue", ""),
+                m.get("sell_venue", ""),
+                decision.market_id,
+                "",  # sell leg market_id — single-leg paper trade
+                m.get("buy_price", 0),
+                m.get("sell_price", 0),
+                m.get("spread", 0),
+                m.get("estimated_edge", 0),
+                m.get("match_confidence", 0),
+                decision.direction,
+                decision.amount_usd,
+                decision.entry_price,
+                datetime.datetime.utcnow().isoformat(),
+            ))
+    except Exception as e:
+        print(f"[mirofish] Cross-venue arb tracking error: {e}")
+
+
+def _normalize_polymarket_events(markets: list[dict]) -> list:
+    """Convert raw Polymarket market dicts to MarketEvent objects."""
+    try:
+        from scripts.mirofish.market_event import MarketEventNormalizer
+    except ImportError:
+        return []
+
+    events = []
+    for m in markets:
+        try:
+            # polymarket_feed returns flat dicts; normalizer expects gamma API format
+            # Rebuild the gamma-like payload from our flat dict
+            raw = {
+                "conditionId": m.get("market_id", ""),
+                "question": m.get("question", ""),
+                "category": m.get("category", ""),
+                "volume": m.get("volume", 0),
+                "endDate": m.get("end_date"),
+                "active": True,
+                "closed": False,
+                "outcomePrices": [str(m.get("yes_price", 0)), str(m.get("no_price", 0))],
+                "outcomes": ["Yes", "No"],
+            }
+            events.append(MarketEventNormalizer.normalize_polymarket(raw))
+        except Exception:
+            pass
+    return events
+
+
+def _fetch_kalshi_events() -> list:
+    """Fetch Kalshi markets and normalize to MarketEvent objects."""
+    try:
+        import scripts.mirofish.kalshi_feed as kalshi_feed
+        from scripts.mirofish.market_event import MarketEventNormalizer
+    except ImportError:
+        return []
+
+    raw_markets = kalshi_feed.fetch()
+    if not raw_markets:
+        return []
+
+    events = []
+    for m in raw_markets:
+        try:
+            events.append(MarketEventNormalizer.normalize_kalshi(m))
+        except Exception:
+            pass
+
+    print(f"[mirofish] Kalshi: {len(events)} markets normalized")
+    return events
+
+
 def run_loop():
     """Full simulation loop: fetch → analyze → trade → stops → snapshot."""
     import scripts.mirofish.polymarket_feed as feed
@@ -187,8 +314,15 @@ def run_loop():
 
     print(f"[mirofish] Run loop starting — {datetime.datetime.utcnow().isoformat()}")
 
-    # 1. Fetch market data
+    # 1. Fetch market data (Polymarket + Kalshi)
     markets = feed.fetch_markets()
+    kalshi_events = _fetch_kalshi_events()
+    polymarket_events = _normalize_polymarket_events(markets) if markets else []
+
+    if kalshi_events:
+        print(f"[mirofish] Cross-venue: {len(polymarket_events)} Polymarket + "
+              f"{len(kalshi_events)} Kalshi events for matching")
+
     if not markets:
         print("[mirofish] No markets available (API down + cache stale). Skipping trades.")
     else:
@@ -219,10 +353,14 @@ def run_loop():
             print(f"[mirofish] Spot prices: " +
                   ", ".join(f"{k}=${v:,.0f}" for k, v in spot_dict.items()))
 
-        # 4. Analyze markets
-        decisions = brain.analyze(markets, state, signals=all_signals or None, spot_prices=spot_dict or None)
-        # Note: empty list collapses to None intentionally.
-        # analyze() branches on `if signals:` so both None and [] skip injection.
+        # 4. Analyze markets (now with cross-venue data)
+        decisions = brain.analyze(
+            markets, state,
+            signals=all_signals or None,
+            spot_prices=spot_dict or None,
+            polymarket_events=polymarket_events or None,
+            kalshi_events=kalshi_events or None,
+        )
         print(f"[mirofish] Brain returned {len(decisions)} trade decisions")
 
         # 5. Execute trades
@@ -233,6 +371,8 @@ def run_loop():
                       f"on '{d.question[:50]}' [{d.strategy}]")
                 if d.strategy == "price_lag_arb" and d.metadata:
                     _log_price_lag_trade(d)
+                elif d.strategy == "cross_venue_arb" and d.metadata:
+                    _log_cross_venue_arb_trade(d)
             else:
                 print(f"[mirofish] Rejected: {d.market_id} (cap or kelly)")
 

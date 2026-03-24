@@ -16,6 +16,12 @@ TAKE_PROFIT_PCT  = float(os.environ.get("MIROFISH_TAKE_PROFIT_PCT",  "0.50"))
 MAX_POSITION_PCT = float(os.environ.get("MIROFISH_MAX_POSITION_PCT", "0.10"))
 MIN_HISTORY_DAYS = int(os.environ.get("MIROFISH_MIN_HISTORY_DAYS", "14"))
 
+# Execution simulation parameters
+SLIPPAGE_BPS     = float(os.environ.get("MIROFISH_SLIPPAGE_BPS",     "50"))   # 50 bps = 0.5%
+LATENCY_PENALTY  = float(os.environ.get("MIROFISH_LATENCY_PENALTY",  "0.002")) # 0.2% stale price risk
+FILL_RATE_MIN    = float(os.environ.get("MIROFISH_FILL_RATE_MIN",    "0.80"))  # min 80% fill
+EXECUTION_SIM    = os.environ.get("MIROFISH_EXECUTION_SIM", "1") == "1"        # on by default
+
 
 def _get_conn() -> sqlite3.Connection:
     db_path = Path(os.environ.get("CLAWMSON_DB_PATH", Path.home() / ".openclaw" / "clawmson.db"))
@@ -121,17 +127,93 @@ def get_state() -> dict[str, Any]:
     }
 
 
+def _simulate_execution(
+    entry_price: float,
+    amount_usd: float,
+    shares: float,
+    direction: str,
+) -> tuple[float, float, float, dict]:
+    """
+    Apply execution simulation: slippage, latency penalty, partial fills.
+    Returns (adjusted_price, adjusted_amount, adjusted_shares, sim_metadata).
+    """
+    import random
+
+    ideal_price = entry_price
+    ideal_amount = amount_usd
+    ideal_shares = shares
+
+    # 1. Slippage: move price against us
+    slippage_pct = SLIPPAGE_BPS / 10000.0
+    # Buying YES → price moves up; Buying NO → price moves up
+    slippage_amount = ideal_price * slippage_pct
+    adjusted_price = ideal_price + slippage_amount
+
+    # Clamp to valid range
+    adjusted_price = max(0.01, min(0.99, adjusted_price))
+
+    # 2. Latency penalty: additional adverse price movement
+    latency_move = ideal_price * LATENCY_PENALTY
+    adjusted_price = min(0.99, adjusted_price + latency_move)
+
+    # 3. Partial fill: random fill between FILL_RATE_MIN and 1.0
+    fill_rate = random.uniform(FILL_RATE_MIN, 1.0)
+    adjusted_amount = ideal_amount * fill_rate
+    adjusted_shares = adjusted_amount / adjusted_price if adjusted_price > 0 else 0
+
+    sim_metadata = {
+        "ideal_price": ideal_price,
+        "adjusted_price": adjusted_price,
+        "slippage_bps": SLIPPAGE_BPS,
+        "latency_penalty": LATENCY_PENALTY,
+        "fill_rate": fill_rate,
+        "ideal_amount": ideal_amount,
+        "adjusted_amount": adjusted_amount,
+        "price_impact_pct": ((adjusted_price - ideal_price) / ideal_price * 100)
+                            if ideal_price > 0 else 0,
+    }
+
+    return adjusted_price, adjusted_amount, adjusted_shares, sim_metadata
+
+
 def execute_trade(decision: Any) -> dict | None:
     """
-    Execute a paper trade. Returns trade dict or None if rejected.
+    Execute a paper trade with optional execution simulation.
+    Returns trade dict or None if rejected.
     Rejects if: amount_usd > 10% of balance.
     Manual /bet trades: pass decision with strategy='manual', confidence=1.0.
+
+    When MIROFISH_EXECUTION_SIM=1 (default), applies:
+    - Slippage (default 50bps / 0.5%)
+    - Latency penalty (default 0.2%)
+    - Partial fills (80-100% fill rate)
     """
     state = get_state()
     cap = state["balance"] * MAX_POSITION_PCT
 
     if decision.amount_usd > cap:
         return None  # position cap breached
+
+    entry_price = decision.entry_price
+    amount_usd = decision.amount_usd
+    shares = decision.shares
+    sim_metadata = None
+
+    if EXECUTION_SIM:
+        entry_price, amount_usd, shares, sim_metadata = _simulate_execution(
+            entry_price, amount_usd, shares, decision.direction,
+        )
+        # Re-check cap after simulation adjustments
+        if amount_usd > cap:
+            return None
+
+    # Build reasoning with sim info
+    reasoning = getattr(decision, "reasoning", "manual via /bet")
+    if sim_metadata:
+        reasoning += (
+            f" [sim: price {sim_metadata['ideal_price']:.3f}→{sim_metadata['adjusted_price']:.3f}, "
+            f"fill {sim_metadata['fill_rate']:.0%}]"
+        )
 
     ts = datetime.datetime.utcnow().isoformat()
     with _get_conn() as conn:
@@ -142,16 +224,22 @@ def execute_trade(decision: Any) -> dict | None:
             VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?)
         """, (
             decision.market_id, decision.question, decision.direction,
-            decision.shares, decision.entry_price, decision.amount_usd,
+            shares, entry_price, amount_usd,
             getattr(decision, "confidence", 1.0),
-            getattr(decision, "reasoning", "manual via /bet"),
+            reasoning,
             getattr(decision, "strategy", "manual"),
             ts,
         ))
         trade_id = cur.lastrowid
 
-    return {"id": trade_id, "status": "open", "amount_usd": decision.amount_usd,
-            "market_id": decision.market_id, "direction": decision.direction}
+    result = {
+        "id": trade_id, "status": "open", "amount_usd": amount_usd,
+        "market_id": decision.market_id, "direction": decision.direction,
+    }
+    if sim_metadata:
+        result["execution_sim"] = sim_metadata
+
+    return result
 
 
 def check_stops(current_prices: dict[str, dict]) -> list[dict]:

@@ -22,6 +22,7 @@ ARB_POSITION_PCT = 0.05  # Fixed 5% of portfolio for arb trades
 PRICE_LAG_MIN_EDGE = float(os.environ.get("PRICE_LAG_MIN_EDGE", "0.05"))
 PRICE_LAG_LATENCY_PENALTY = float(os.environ.get("PRICE_LAG_LATENCY_PENALTY", "0.005"))
 PRICE_LAG_MAX_HORIZON = int(os.environ.get("PRICE_LAG_MAX_HORIZON", "180"))
+CROSS_VENUE_POSITION_PCT = float(os.environ.get("CROSS_VENUE_POSITION_PCT", "0.05"))
 
 
 @dataclass
@@ -94,6 +95,69 @@ def _check_arbitrage(market: dict) -> TradeDecision | None:
         entry_price=entry_price,
         shares=0.0,
     )
+
+
+# ── Cross-venue arb ───────────────────────────────────────────────────────
+
+def _check_cross_venue_arb(
+    polymarket_events: list,
+    kalshi_events: list,
+    balance: float,
+) -> list[TradeDecision]:
+    """
+    Cross-venue arbitrage: find price divergences between Polymarket and Kalshi
+    on the same underlying question, validated by resolution compatibility.
+    Returns TradeDecision list (buy-side leg only — paper wallet is single-venue).
+    """
+    if not polymarket_events or not kalshi_events:
+        return []
+
+    try:
+        from scripts.mirofish.cross_venue_matcher import find_arbitrage_opportunities
+    except ImportError:
+        return []
+
+    opportunities = find_arbitrage_opportunities(polymarket_events, kalshi_events)
+    decisions = []
+
+    for opp in opportunities:
+        amount = CROSS_VENUE_POSITION_PCT * balance
+        # Paper trade the buy leg (cheaper YES side)
+        if opp.buy_venue == "polymarket":
+            market_id = opp.pair.left.market_id
+            question = opp.pair.left.question
+        else:
+            market_id = opp.pair.right.market_id
+            question = opp.pair.right.question
+
+        decisions.append(TradeDecision(
+            market_id=market_id,
+            question=question,
+            direction="YES",
+            confidence=min(opp.estimated_edge / 0.10, 1.0),
+            reasoning=(
+                f"Cross-venue arb: buy YES@{opp.buy_price:.3f} on {opp.buy_venue}, "
+                f"sell@{opp.sell_price:.3f} on {opp.sell_venue}, "
+                f"spread={opp.spread:.3f}, edge={opp.estimated_edge:.3f}"
+            ),
+            strategy="cross_venue_arb",
+            amount_usd=amount,
+            entry_price=opp.buy_price,
+            shares=amount / opp.buy_price if opp.buy_price > 0 else 0,
+            metadata={
+                "buy_venue": opp.buy_venue,
+                "sell_venue": opp.sell_venue,
+                "buy_price": opp.buy_price,
+                "sell_price": opp.sell_price,
+                "spread": opp.spread,
+                "estimated_edge": opp.estimated_edge,
+                "pair_id": opp.pair.pair_id,
+                "match_confidence": opp.pair.match_confidence,
+                "settlement_compatible": opp.resolution_compat.compatible,
+            },
+        ))
+
+    return decisions
 
 
 # ── Price-lag arb helpers ──────────────────────────────────────────────────
@@ -359,17 +423,21 @@ def analyze(
     wallet: dict[str, Any],
     signals: list[dict] | None = None,
     spot_prices: dict[str, float] | None = None,
+    polymarket_events: list | None = None,
+    kalshi_events: list | None = None,
 ) -> list[TradeDecision]:
     """
     Main entry point. Returns list of TradeDecisions sorted by confidence desc.
-    Step 1: Arbitrage fast-path (no Ollama).
+    Step 1: Single-venue arbitrage fast-path (no Ollama).
+    Step 1.25: Cross-venue arb (Polymarket vs Kalshi, resolution-validated).
+    Step 1.5: Price-lag arb (spot vs Polymarket dislocation).
     Step 2: Ollama analysis for momentum/contrarian/news_catalyst on remaining markets.
     Kelly ≤ 0 decisions are excluded before returning.
     """
     balance = wallet.get("balance", 1000.0)
     decisions: list[TradeDecision] = []
 
-    # Step 1: Arbitrage fast-path
+    # Step 1: Single-venue arbitrage fast-path
     arb_market_ids = set()
     for market in markets:
         arb = _check_arbitrage(market)
@@ -378,6 +446,14 @@ def analyze(
             arb.shares = arb.amount_usd / arb.entry_price if arb.entry_price > 0 else 0
             decisions.append(arb)
             arb_market_ids.add(market["market_id"])
+
+    # Step 1.25: Cross-venue arb (Polymarket vs Kalshi)
+    if polymarket_events and kalshi_events:
+        xv_decisions = _check_cross_venue_arb(polymarket_events, kalshi_events, balance)
+        for d in xv_decisions:
+            if d.market_id not in arb_market_ids:
+                decisions.append(d)
+                arb_market_ids.add(d.market_id)
 
     # Step 1.5: Price-lag arb (spot vs Polymarket dislocation)
     if spot_prices:
