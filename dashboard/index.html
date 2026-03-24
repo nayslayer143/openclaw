@@ -619,8 +619,17 @@ body {
 .t-gate.pass { border-color: var(--neon-green); color: var(--neon-green); }
 .t-gate.fail { border-color: var(--neon-red); color: var(--neon-red); }
 .t-chart-container {
-  position: relative; height: 180px; background: rgba(0,0,0,0.3);
-  border: 1px solid var(--border); border-radius: 2px; overflow: hidden;
+  position: relative; height: 180px;
+  background: linear-gradient(180deg, rgba(10,0,20,0.9) 0%, rgba(0,0,10,0.95) 100%);
+  border: 1px solid rgba(180,0,255,0.2); border-radius: 2px; overflow: hidden;
+}
+/* Scanline overlay on chart */
+.t-chart-container::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(180,0,255,0.03) 2px, rgba(180,0,255,0.03) 3px
+  );
 }
 .t-feed-count {
   font-size: 0.44rem; color: var(--grey2); margin-left: 6px;
@@ -1606,7 +1615,7 @@ body {
 
     <!-- Live Balance Chart -->
     <div class="t-section" id="tLiveChartSection">
-      <div class="t-section-title">LIVE CASH POSITION</div>
+      <div class="t-section-title" style="color:rgba(180,140,255,0.8);border-bottom-color:rgba(180,0,255,0.2)">LIVE CASH POSITION</div>
       <div class="t-chart-container" style="height:150px">
         <canvas id="liveBalanceChart" height="150"></canvas>
       </div>
@@ -4198,34 +4207,40 @@ function renderLiveBalanceChart() {
   const w = canvas.width - pad.left - pad.right
   const h = canvas.height - pad.top - pad.bottom
 
-  // Grid lines
-  ctx.strokeStyle = 'rgba(255,255,255,0.04)'
+  // Grid lines — vaporwave purple
+  ctx.strokeStyle = 'rgba(180,0,255,0.08)'
   ctx.lineWidth = 1
   for (let i = 0; i <= 5; i++) {
     const y = pad.top + (h / 5) * i
     ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + w, y); ctx.stroke()
     const val = maxB - (range / 5) * i
-    ctx.fillStyle = 'rgba(150,145,135,0.25)'
+    ctx.fillStyle = 'rgba(180,140,255,0.3)'
     ctx.font = '8px monospace'
     ctx.textAlign = 'right'
     ctx.fillText('$' + val.toFixed(0), pad.left - 6, y + 3)
   }
+  // Vertical grid
+  for (let i = 0; i <= 8; i++) {
+    const x = pad.left + (w / 8) * i
+    ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + h); ctx.stroke()
+  }
 
-  // Starting balance reference line ($1000)
+  // Starting balance reference line ($1000) — neon purple dashed
   const startY = pad.top + h - ((1000 - minB) / range) * h
-  ctx.strokeStyle = 'rgba(255,255,255,0.12)'
-  ctx.setLineDash([4, 4])
+  ctx.strokeStyle = 'rgba(180,0,255,0.25)'
+  ctx.setLineDash([6, 4])
   ctx.lineWidth = 1
   ctx.beginPath(); ctx.moveTo(pad.left, startY); ctx.lineTo(pad.left + w, startY); ctx.stroke()
   ctx.setLineDash([])
-  ctx.fillStyle = 'rgba(150,145,135,0.4)'
+  ctx.fillStyle = 'rgba(180,140,255,0.5)'
   ctx.font = '9px monospace'
   ctx.textAlign = 'left'
   ctx.fillText('START $1,000', pad.left + 4, startY - 5)
 
   const lastBal = balanceHistory[balanceHistory.length - 1].b
-  const lineColor = lastBal >= 1000 ? '#00ff88' : '#ff002e'
-  const glowColor = lastBal >= 1000 ? 'rgba(0,255,136,' : 'rgba(255,0,46,'
+  // Vaporwave palette: cyan when up, hot pink when down
+  const lineColor = lastBal >= 1000 ? '#00e5ff' : '#ff2d95'
+  const glowColor = lastBal >= 1000 ? 'rgba(0,229,255,' : 'rgba(255,45,149,'
 
   // Glow effect (wide semi-transparent line behind main)
   ctx.beginPath()
@@ -4270,7 +4285,7 @@ function renderLiveBalanceChart() {
     if (Math.abs(h2.b - prev.b) > 0.01) {
       const x = pad.left + (i / (balanceHistory.length - 1)) * w
       const y = pad.top + h - ((h2.b - minB) / range) * h
-      const dotColor = h2.b >= prev.b ? '#00ff88' : '#ff002e'
+      const dotColor = h2.b >= prev.b ? '#00e5ff' : '#ff2d95'
       ctx.beginPath()
       ctx.arc(x, y, 2.5, 0, Math.PI * 2)
       ctx.fillStyle = dotColor
