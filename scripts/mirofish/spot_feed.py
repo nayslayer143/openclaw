@@ -32,6 +32,25 @@ _ASSETS = {
         "coinbase": "https://api.coinbase.com/v2/prices/ETH-USD/spot",
         "kraken": "https://api.kraken.com/0/public/Ticker?pair=ETHUSD",
     },
+    "DOGE": {
+        "binance_us": "https://api.binance.us/api/v3/ticker/price?symbol=DOGEUSDT",
+        "coinbase": "https://api.coinbase.com/v2/prices/DOGE-USD/spot",
+        "kraken": "https://api.kraken.com/0/public/Ticker?pair=XDGUSD",
+    },
+    "BNB": {
+        "binance_us": "https://api.binance.us/api/v3/ticker/price?symbol=BNBUSDT",
+        "coinbase": "https://api.coinbase.com/v2/prices/BNB-USD/spot",
+    },
+    "ADA": {
+        "binance_us": "https://api.binance.us/api/v3/ticker/price?symbol=ADAUSDT",
+        "coinbase": "https://api.coinbase.com/v2/prices/ADA-USD/spot",
+        "kraken": "https://api.kraken.com/0/public/Ticker?pair=ADAUSD",
+    },
+    "BCH": {
+        "binance_us": "https://api.binance.us/api/v3/ticker/price?symbol=BCHUSDT",
+        "coinbase": "https://api.coinbase.com/v2/prices/BCH-USD/spot",
+        "kraken": "https://api.kraken.com/0/public/Ticker?pair=BCHUSD",
+    },
 }
 
 
@@ -94,9 +113,9 @@ def _fetch_spot(asset: str) -> dict | None:
     if not urls:
         return None
 
-    binance_price = _fetch_binance_us(urls["binance_us"])
-    coinbase_price = _fetch_coinbase(urls["coinbase"])
-    kraken_price = _fetch_kraken(urls["kraken"])
+    binance_price = _fetch_binance_us(urls["binance_us"]) if "binance_us" in urls else None
+    coinbase_price = _fetch_coinbase(urls["coinbase"]) if "coinbase" in urls else None
+    kraken_price = _fetch_kraken(urls["kraken"]) if "kraken" in urls else None
 
     prices = [p for p in [binance_price, coinbase_price, kraken_price] if p and p > 0]
     if not prices:

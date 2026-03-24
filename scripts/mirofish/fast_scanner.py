@@ -74,16 +74,88 @@ def _notify_dashboard():
         pass
 
 
+def _fetch_fresh_short_markets():
+    """Fetch 15-min and hourly markets directly from Kalshi API (skip cache)."""
+    try:
+        from scripts.mirofish.kalshi_feed import _call_kalshi, _adapt_market_fields, _ensure_table, _get_conn as _kget_conn
+
+        short_series = ["KXDOGE15M", "KXADA15M", "KXBNB15M", "KXBCH15M",
+                         "INXI", "NASDAQ100I", "KXUSDJPYH"]
+        markets = []
+        now_iso = datetime.datetime.utcnow().isoformat()
+
+        for series in short_series:
+            data = _call_kalshi("GET", "/events", params={
+                "series_ticker": series, "status": "open", "limit": 5,
+            })
+            if not data:
+                continue
+            for event in data.get("events", []):
+                evt_ticker = event.get("event_ticker", "")
+                if not evt_ticker:
+                    continue
+                mdata = _call_kalshi("GET", "/markets", params={
+                    "event_ticker": evt_ticker, "status": "open", "limit": 50,
+                })
+                if not mdata:
+                    continue
+                for m in mdata.get("markets", []):
+                    _adapt_market_fields(m)
+                    if not m.get("mve_collection_ticker"):
+                        markets.append(m)
+
+        # Cache to DB for stop-check later
+        if markets:
+            with _kget_conn() as conn:
+                _ensure_table(conn)
+                for m in markets:
+                    try:
+                        conn.execute("""
+                            INSERT OR REPLACE INTO kalshi_markets
+                            (ticker, event_ticker, title, category, yes_bid, yes_ask,
+                             no_bid, no_ask, last_price, volume, volume_24h, open_interest,
+                             status, close_time, rules_primary, strike_type, cap_strike,
+                             floor_strike, fetched_at)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        """, (
+                            m.get("ticker", ""), m.get("event_ticker", ""),
+                            m.get("title", ""), (m.get("category") or "").lower(),
+                            m.get("yes_bid"), m.get("yes_ask"),
+                            m.get("no_bid"), m.get("no_ask"),
+                            m.get("last_price"),
+                            float(m.get("volume", 0) or 0),
+                            float(m.get("volume_24h", 0) or 0),
+                            float(m.get("open_interest", 0) or 0),
+                            m.get("status", ""),
+                            m.get("close_time") or m.get("expiration_time", ""),
+                            m.get("rules_primary", ""),
+                            m.get("strike_type", ""),
+                            m.get("cap_strike"), m.get("floor_strike"),
+                            now_iso,
+                        ))
+                    except Exception:
+                        pass
+
+        print(f"[fast_scan] Fetched {len(markets)} fresh short-term markets")
+        return markets
+    except Exception as e:
+        print(f"[fast_scan] Fresh fetch error: {e}")
+        return []
+
+
 def run():
     """Fast scan: find short-expiry Kalshi markets with spot-price edge."""
     now = datetime.datetime.utcnow()
     max_close = (now + datetime.timedelta(hours=MAX_EXPIRY_HOURS)).isoformat()
 
+    # Fetch fresh 15-min/hourly markets directly from API
+    fresh = _fetch_fresh_short_markets()
+
     conn = _get_conn()
 
-    # Get latest Kalshi markets expiring soon
+    # Also grab any cached short-expiry markets
     try:
-        markets = conn.execute("""
+        cached = conn.execute("""
             SELECT km.* FROM kalshi_markets km
             INNER JOIN (
                 SELECT ticker, MAX(fetched_at) AS latest
@@ -92,10 +164,22 @@ def run():
             WHERE km.close_time != '' AND km.close_time < ?
             AND (km.yes_bid > 0 OR km.yes_ask > 0)
         """, (max_close,)).fetchall()
-    except Exception as e:
-        print(f"[fast_scan] DB error: {e}")
-        conn.close()
-        return
+    except Exception:
+        cached = []
+
+    # Merge: use fresh data (dicts) + cached (rows), dedup by ticker
+    seen = set()
+    markets = []
+    for m in fresh:
+        t = m.get("ticker", "")
+        if t and t not in seen:
+            seen.add(t)
+            markets.append(m)
+    for m in cached:
+        t = m["ticker"]
+        if t not in seen:
+            seen.add(t)
+            markets.append(m)
 
     if not markets:
         print(f"[fast_scan] No markets expiring within {MAX_EXPIRY_HOURS}h")
@@ -145,23 +229,32 @@ def run():
     trades_placed = 0
     events_traded: set[str] = set()  # limit 1 bracket per event
 
+    def _g(row, key, default=None):
+        """Get field from dict or sqlite3.Row."""
+        try:
+            v = row[key] if not isinstance(row, dict) else row.get(key, default)
+            return v if v is not None else default
+        except (KeyError, IndexError):
+            return default
+
     for m in markets:
         if trades_placed >= MAX_TRADES_PER_RUN:
             break
 
-        # Skip if already traded this event (avoid spamming every bracket)
-        event_ticker = m["event_ticker"] if m["event_ticker"] else m["ticker"][:20]
-        if event_ticker in events_traded:
-            continue
-        ticker = m["ticker"]
-        if ticker in open_ids:
+        ticker = _g(m, "ticker", "")
+        if not ticker or ticker in open_ids:
             continue
 
-        yes_bid = m["yes_bid"] or 0
-        yes_ask = m["yes_ask"] or 0
-        no_bid = m["no_bid"] or 0
-        no_ask = m["no_ask"] or 0
-        title_str = m["title"] or ticker
+        # Skip if already traded this event (avoid spamming every bracket)
+        event_ticker = _g(m, "event_ticker") or ticker[:20]
+        if event_ticker in events_traded:
+            continue
+
+        yes_bid = _g(m, "yes_bid", 0) or 0
+        yes_ask = _g(m, "yes_ask", 0) or 0
+        no_bid = _g(m, "no_bid", 0) or 0
+        no_ask = _g(m, "no_ask", 0) or 0
+        title_str = _g(m, "title") or ticker
 
         # Skip if no real prices
         if yes_bid <= 0 and yes_ask <= 0:
@@ -190,8 +283,49 @@ def run():
                     events_traded.add(event_ticker)
                     continue
 
-        # Strategy 2: Price-lag vs spot (for crypto markets)
+        # Strategy 2a: 15-min directional markets ("price up in next 15 min?")
         title = title_str.lower()
+        if "price up" in title or "price down" in title:
+            # Use recent spot trend to predict direction
+            for asset, prefixes in CRYPTO_TICKERS.items():
+                if not any(ticker.startswith(p) for p in prefixes):
+                    continue
+                if asset not in spot:
+                    continue
+
+                # Check recent price history for momentum
+                try:
+                    prices_rows = conn.execute("""
+                        SELECT amount_usd FROM spot_prices
+                        WHERE ticker = ? ORDER BY fetched_at DESC LIMIT 3
+                    """, (f"SPOT:{asset}",)).fetchall()
+                    if len(prices_rows) >= 2:
+                        latest = prices_rows[0][0] or prices_rows[0]["amount_usd"]
+                        prev = prices_rows[1][0] or prices_rows[1]["amount_usd"]
+                        if latest and prev and prev > 0:
+                            trend_pct = (latest - prev) / prev
+                            if abs(trend_pct) > 0.001:  # any detectable trend
+                                if "price up" in title:
+                                    direction = "YES" if trend_pct > 0 else "NO"
+                                else:
+                                    direction = "YES" if trend_pct < 0 else "NO"
+                                entry = yes_p if direction == "YES" else no_p
+                                if entry > 0 and entry < 1:
+                                    amount = min(POSITION_PCT * balance, MAX_POSITION_PCT * balance)
+                                    shares = amount / entry
+                                    _place_trade(conn, ticker, title_str, direction,
+                                                 entry, amount, shares, abs(trend_pct), "fast_15m_trend")
+                                    trades_placed += 1
+                                    open_ids.add(ticker)
+                                    events_traded.add(event_ticker)
+                except Exception:
+                    pass
+                break
+            if ticker in open_ids:
+                continue
+
+        # Strategy 2b: Price-lag vs spot (for crypto bracket markets)
+        import re
         for asset, prefixes in CRYPTO_TICKERS.items():
             if not any(ticker.startswith(p) for p in prefixes):
                 continue
@@ -199,8 +333,6 @@ def run():
                 continue
 
             spot_price = spot[asset]
-            # Parse threshold from title (e.g. "Bitcoin above $70,500?")
-            import re
             threshold_match = re.search(r'\$?([\d,]+(?:\.\d+)?)', title_str)
             if not threshold_match:
                 continue
