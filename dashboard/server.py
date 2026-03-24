@@ -3,7 +3,7 @@
 OpenClaw Dashboard — FastAPI backend
 Real-time task monitor with GitHub OAuth
 """
-import os, json, asyncio, secrets, time, hashlib, subprocess, re, uuid, base64
+import os, json, asyncio, secrets, time, hashlib, subprocess, re, uuid, base64, signal, sys
 from pathlib import Path
 from typing import AsyncGenerator, Optional
 from datetime import datetime, timedelta
@@ -53,6 +53,11 @@ PUBLIC_URL  = os.environ.get("DASHBOARD_PUBLIC_URL", "http://localhost:7080")
 OAUTH_CALLBACK = f"{PUBLIC_URL}/auth/github/callback"
 ACCESS_TOKEN   = os.environ.get("DASHBOARD_ACCESS_TOKEN", "")
 DASH_PASSWORD  = os.environ.get("DASHBOARD_PASSWORD", "")
+
+# Terminal Watch
+TERMINAL_RELAY = OPENCLAW_ROOT / "scripts" / "terminal-relay.py"
+TERMINAL_LOG   = LOGS_DIR / "terminal-watch.jsonl"
+TERMINAL_PID   = LOGS_DIR / "terminal-relay.pid"
 
 # ── App ───────────────────────────────────────────────────────────────────────
 app = FastAPI(title="OpenClaw Dashboard")
@@ -1098,6 +1103,217 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
         }
     finally:
         conn.close()
+
+
+# ── Terminal Watch ────────────────────────────────────────────────────────────
+
+@app.get("/api/terminal/sessions")
+async def terminal_sessions(user: str = Depends(get_current_user)):
+    """List available tmux sessions and panes."""
+    try:
+        r = subprocess.run(["tmux", "list-sessions", "-F", "#{session_name}:#{session_windows}"],
+                          capture_output=True, text=True, timeout=3)
+        if r.returncode != 0:
+            return {"sessions": []}
+        sessions = []
+        for line in r.stdout.strip().splitlines():
+            if ":" not in line: continue
+            name, windows = line.rsplit(":", 1)
+            pr = subprocess.run(["tmux", "list-panes", "-t", name, "-F",
+                "#{pane_index}:#{pane_id}:#{pane_current_command}:#{pane_current_path}"],
+                capture_output=True, text=True, timeout=3)
+            panes = []
+            if pr.returncode == 0:
+                for pl in pr.stdout.strip().splitlines():
+                    parts = pl.split(":", 3)
+                    if len(parts) >= 4:
+                        panes.append({"index": int(parts[0]), "id": parts[1],
+                                      "command": parts[2], "cwd": parts[3]})
+            sessions.append({"name": name, "windows": int(windows), "panes": panes})
+        return {"sessions": sessions}
+    except Exception:
+        return {"sessions": []}
+
+@app.post("/api/terminal/start")
+async def terminal_start(request: Request, user: str = Depends(get_current_user)):
+    """Start relay on a tmux session/pane."""
+    data = await request.json()
+    session = data.get("session")
+    if not session: raise HTTPException(400, "Missing 'session'")
+    pane = data.get("pane")
+    if TERMINAL_PID.exists():
+        try:
+            pid = int(TERMINAL_PID.read_text().strip())
+            os.kill(pid, 0)
+            return {"status": "already_running", "pid": pid}
+        except (ProcessLookupError, ValueError):
+            TERMINAL_PID.unlink(missing_ok=True)
+    cmd = [sys.executable, str(TERMINAL_RELAY), "--session", session]
+    if pane is not None: cmd.extend(["--pane", str(pane)])
+    subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    for _ in range(10):
+        time.sleep(0.2)
+        if TERMINAL_PID.exists():
+            return {"status": "started", "pid": int(TERMINAL_PID.read_text().strip()),
+                    "session": session, "pane": pane}
+    return {"status": "started", "session": session, "pane": pane}
+
+@app.post("/api/terminal/stop")
+async def terminal_stop(user: str = Depends(get_current_user)):
+    """Stop the relay."""
+    if not TERMINAL_PID.exists(): return {"status": "not_running"}
+    try:
+        pid = int(TERMINAL_PID.read_text().strip())
+        os.kill(pid, signal.SIGTERM)
+        TERMINAL_PID.unlink(missing_ok=True)
+        return {"status": "stopped", "pid": pid}
+    except ProcessLookupError:
+        TERMINAL_PID.unlink(missing_ok=True)
+        return {"status": "not_running", "note": "stale PID cleaned"}
+
+@app.get("/api/terminal/status")
+async def terminal_status(user: str = Depends(get_current_user)):
+    """Relay status check."""
+    running, pid = False, None
+    if TERMINAL_PID.exists():
+        try:
+            pid = int(TERMINAL_PID.read_text().strip())
+            os.kill(pid, 0); running = True
+        except (ProcessLookupError, ValueError):
+            TERMINAL_PID.unlink(missing_ok=True); pid = None
+    event_count = sum(1 for _ in open(TERMINAL_LOG)) if TERMINAL_LOG.exists() else 0
+    return {"running": running, "pid": pid, "event_count": event_count}
+
+@app.get("/api/terminal/events")
+async def terminal_events(n: int = 20, errors_only: bool = False,
+                          user: str = Depends(get_current_user)):
+    """Last N events from JSONL log."""
+    if not TERMINAL_LOG.exists(): return {"events": []}
+    events = []
+    for line in reversed(TERMINAL_LOG.read_text().strip().splitlines()):
+        try:
+            ev = json.loads(line)
+            if errors_only and ev.get("event_type") not in ("error", "build_failure", "test_failure"):
+                continue
+            events.append(ev)
+            if len(events) >= n: break
+        except Exception: pass
+    return {"events": events}
+
+@app.get("/api/terminal/stream")
+async def terminal_stream(request: Request):
+    """SSE stream of new terminal events."""
+    token = request.cookies.get("oc_token") or request.query_params.get("token")
+    if not token or not verify_token(token):
+        if not is_localhost(request): raise HTTPException(401, "Not authenticated")
+    async def event_gen():
+        last_count = sum(1 for _ in open(TERMINAL_LOG)) if TERMINAL_LOG.exists() else 0
+        while True:
+            if await request.is_disconnected(): break
+            try:
+                if TERMINAL_LOG.exists():
+                    lines = TERMINAL_LOG.read_text().strip().splitlines()
+                    if len(lines) > last_count:
+                        new_events = []
+                        for line in lines[last_count:]:
+                            try: new_events.append(json.loads(line))
+                            except Exception: pass
+                        if new_events:
+                            yield f"data: {json.dumps({'events': new_events})}\n\n"
+                        last_count = len(lines)
+                    else:
+                        yield ": heartbeat\n\n"
+                else:
+                    yield ": heartbeat\n\n"
+            except Exception:
+                yield ": heartbeat\n\n"
+            await asyncio.sleep(2)
+    return StreamingResponse(event_gen(), media_type="text/event-stream",
+                            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+@app.post("/api/terminal/snapshot")
+async def terminal_snapshot(user: str = Depends(get_current_user)):
+    """Trigger manual snapshot."""
+    if not TERMINAL_PID.exists(): raise HTTPException(400, "Relay not running")
+    try:
+        pid = int(TERMINAL_PID.read_text().strip()); os.kill(pid, 0)
+    except (ProcessLookupError, ValueError):
+        raise HTTPException(400, "Relay not running")
+    trigger = LOGS_DIR / "terminal-snapshot-trigger"
+    trigger.write_text(datetime.now().isoformat())
+    pre_count = sum(1 for _ in open(TERMINAL_LOG)) if TERMINAL_LOG.exists() else 0
+    for _ in range(15):
+        time.sleep(0.2)
+        if TERMINAL_LOG.exists() and sum(1 for _ in open(TERMINAL_LOG)) > pre_count:
+            return json.loads(TERMINAL_LOG.read_text().strip().splitlines()[-1])
+    return {"status": "snapshot_requested", "note": "check events shortly"}
+
+def _build_packet(event=None):
+    cwd = event.get("cwd", str(OPENCLAW_ROOT)) if event else str(OPENCLAW_ROOT)
+    recent = []
+    if TERMINAL_LOG.exists():
+        for line in reversed(TERMINAL_LOG.read_text().strip().splitlines()[-20:]):
+            try:
+                ev = json.loads(line)
+                if ev.get("command"): recent.append(ev["command"])
+                if len(recent) >= 5: break
+            except Exception: pass
+    try:
+        br = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"],
+                           capture_output=True, text=True, cwd=cwd, timeout=3)
+        branch = br.stdout.strip() if br.returncode == 0 else "unknown"
+    except Exception: branch = "unknown"
+    try:
+        dr = subprocess.run(["git", "diff", "--stat"], capture_output=True, text=True, cwd=cwd, timeout=5)
+        diff_stat = dr.stdout.strip() if dr.returncode == 0 else ""
+    except Exception: diff_stat = ""
+    try:
+        fr = subprocess.run(["git", "diff", "--name-only"], capture_output=True, text=True, cwd=cwd, timeout=5)
+        changed = [f for f in fr.stdout.strip().splitlines() if f] if fr.returncode == 0 else []
+    except Exception: changed = []
+    return {
+        "context": {"repo": Path(cwd).name, "branch": branch, "cwd": cwd,
+                    "session": event.get("session", "") if event else "",
+                    "recent_commands": recent, "git_diff_stat": diff_stat, "changed_files": changed},
+        "event": {"type": event.get("event_type", "") if event else "",
+                 "command": event.get("command", "") if event else "",
+                 "exit_code": event.get("exit_code") if event else None,
+                 "output_tail": event.get("output_tail", []) if event else [],
+                 "duration_ms": event.get("duration_ms") if event else None},
+        "question": "Explain what failed and suggest a fix."
+    }
+
+@app.post("/api/terminal/packet")
+async def terminal_packet(request: Request, user: str = Depends(get_current_user)):
+    """Build analysis packet from last or specified event."""
+    data = await request.json() if request.headers.get("content-type") == "application/json" else {}
+    event = None
+    if TERMINAL_LOG.exists():
+        lines = TERMINAL_LOG.read_text().strip().splitlines()
+        event_id = data.get("event_id")
+        if event_id:
+            for line in reversed(lines):
+                try:
+                    ev = json.loads(line)
+                    if ev.get("timestamp") == event_id: event = ev; break
+                except Exception: pass
+        elif lines:
+            try: event = json.loads(lines[-1])
+            except Exception: pass
+    if not event: raise HTTPException(404, "No events found")
+    return _build_packet(event)
+
+@app.get("/api/terminal/packet/preview")
+async def terminal_packet_preview(user: str = Depends(get_current_user)):
+    """Preview packet from most recent event."""
+    event = None
+    if TERMINAL_LOG.exists():
+        lines = TERMINAL_LOG.read_text().strip().splitlines()
+        if lines:
+            try: event = json.loads(lines[-1])
+            except Exception: pass
+    if not event: return {"packet": None, "note": "No events available"}
+    return {"packet": _build_packet(event)}
 
 
 @app.get("/{path:path}", response_class=HTMLResponse)
