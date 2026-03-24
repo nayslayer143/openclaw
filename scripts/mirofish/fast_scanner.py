@@ -248,11 +248,13 @@ def run():
         if not ticker or ticker in open_ids:
             continue
 
+        title_str = _g(m, "title") or ticker
+
         # Skip if already traded this event or similar question
         event_ticker = _g(m, "event_ticker") or ticker[:20]
         if event_ticker in events_traded:
             continue
-        question_prefix = (title_str or "")[:30]
+        question_prefix = title_str[:30]
         if question_prefix in open_questions:
             continue
 
@@ -260,7 +262,6 @@ def run():
         yes_ask = _g(m, "yes_ask", 0) or 0
         no_bid = _g(m, "no_bid", 0) or 0
         no_ask = _g(m, "no_ask", 0) or 0
-        title_str = _g(m, "title") or ticker
 
         # Skip if no real prices
         if yes_bid <= 0 and yes_ask <= 0:
@@ -325,11 +326,12 @@ def run():
                                 else:
                                     direction = "YES" if trend_pct < 0 else "NO"
                                 entry = yes_p if direction == "YES" else no_p
-                                if entry > 0 and entry < 1:
+                                edge = min(abs(trend_pct), 0.10)  # cap edge at 10%
+                                if entry >= MIN_ENTRY_PRICE and entry < 0.95 and edge > 0.001:
                                     amount = min(POSITION_PCT * balance, MAX_POSITION_PCT * balance)
                                     shares = amount / entry
                                     _place_trade(conn, ticker, title_str, direction,
-                                                 entry, amount, shares, abs(trend_pct), "fast_15m_trend")
+                                                 entry, amount, shares, edge, "fast_15m_trend")
                                     trades_placed += 1
                                     open_ids.add(ticker)
                                     open_questions.add(question_prefix)
@@ -340,7 +342,8 @@ def run():
             if ticker in open_ids:
                 continue
 
-        # Strategy 2b: Price-lag vs spot (for crypto bracket markets)
+        # Strategy 2b: Price-lag vs spot (for crypto bracket/threshold markets)
+        # Parse what the market is asking and compare to spot price
         import re
         for asset, prefixes in CRYPTO_TICKERS.items():
             if not any(ticker.startswith(p) for p in prefixes):
@@ -349,6 +352,9 @@ def run():
                 continue
 
             spot_price = spot[asset]
+            title_lower = title_str.lower()
+
+            # Parse threshold from title
             threshold_match = re.search(r'\$?([\d,]+(?:\.\d+)?)', title_str)
             if not threshold_match:
                 continue
@@ -357,27 +363,47 @@ def run():
             except ValueError:
                 continue
 
-            # Is spot clearly above or below the threshold?
-            distance_pct = abs(spot_price - threshold) / spot_price if spot_price > 0 else 0
+            # Skip if threshold is wildly different from spot (extreme longshot)
+            distance_pct = abs(spot_price - threshold) / spot_price if spot_price > 0 else 999
+            if distance_pct > 0.10:
+                # More than 10% away from spot — too speculative for short-term
+                continue
 
-            if distance_pct > MIN_EDGE:
-                if spot_price > threshold:
-                    # Spot above threshold → YES more likely
+            # Determine direction based on question semantics + spot vs threshold
+            # "above X" / "over X" → YES if spot > threshold
+            # "below X" / "under X" → YES if spot < threshold
+            # "range" with threshold → check if spot is in range
+            if "above" in title_lower or "over" in title_lower or ("-T" in ticker):
+                # Threshold contract: resolves YES if price > threshold
+                if spot_price > threshold * 1.01:
                     direction = "YES"
-                    entry = yes_p if yes_p > 0 else 0.5
-                else:
+                elif spot_price < threshold * 0.99:
                     direction = "NO"
-                    entry = no_p if no_p > 0 else 0.5
+                else:
+                    continue  # too close to call
+            elif "below" in title_lower or "under" in title_lower:
+                if spot_price < threshold * 0.99:
+                    direction = "YES"
+                elif spot_price > threshold * 1.01:
+                    direction = "NO"
+                else:
+                    continue
+            else:
+                continue  # can't parse direction
 
-                if entry > 0 and entry < 1:
-                    amount = min(POSITION_PCT * balance, MAX_POSITION_PCT * balance)
-                    shares = amount / entry
-                    _place_trade(conn, ticker, title_str, direction,
-                                 entry, amount, shares, distance_pct, "fast_spot_lag")
-                    trades_placed += 1
-                    open_ids.add(ticker)
-                    open_questions.add(question_prefix)
-                    events_traded.add(event_ticker)
+            entry = yes_p if direction == "YES" else no_p
+            edge = distance_pct
+
+            # Only trade if entry price reflects actual edge (not 1-cent longshots)
+            if entry >= MIN_ENTRY_PRICE and entry < 0.95 and edge > MIN_EDGE:
+                amount = min(POSITION_PCT * balance, MAX_POSITION_PCT * balance)
+                shares = amount / entry
+                _place_trade(conn, ticker, title_str, direction,
+                             entry, amount, shares, edge, "fast_spot_lag")
+                trades_placed += 1
+                open_ids.add(ticker)
+                open_questions.add(question_prefix)
+                events_traded.add(event_ticker)
             break
 
     # Resolve any expired Kalshi trades with actual results
