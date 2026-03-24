@@ -7,7 +7,7 @@ Lobster runs deterministic workflows. Agents route tasks. Jordan approves via Te
 **Verticals:** Trading & arbitrage · Software/app development · Agentic business ops · Marketing & growth · Content & research pipelines. Optimize across the system, not locally within one vertical.
 
 **Strategy doc:** `~/openclaw/openclaw-v4.1-strategy.md`
-**Current phase:** Phase 4 (active 2026-03-20) — trading infrastructure live
+**Current phase:** Phase 5 COMPLETE (2026-03-23) — full trading intelligence stack
 **Last updated:** 2026-03-23
 
 ---
@@ -98,9 +98,9 @@ Two parallel systems, five data feeds, SQLite-backed paper trading.
 
 **Live trading:** Requires Tier-3 confirmation via Telegram DM. Not yet active.
 
-**Completed (Phase 5A):** Kalshi feed + MarketEvent schema · cross-venue arb detection · realistic execution sim (latency, slippage, partial fills) · edge capture rate + expected vs realized PnL · strategy tournament / capital allocator · backtesting framework
+**Phase 5 COMPLETE:** All 6 sub-phases (5A-5F) delivered. 180 tests, 20+ modules.
 
-**Remaining gaps:** Kalshi demo account setup (needs Jordan) · LLM strategies in backtester (momentum/contrarian/news_catalyst replay) · live cross-venue price feed aggregation · graduation criteria update for multi-venue
+**To activate Kalshi live data:** Create demo account at demo.kalshi.co → set KALSHI_API_KEY_ID + KALSHI_PRIVATE_KEY_PATH in .env
 
 ---
 
