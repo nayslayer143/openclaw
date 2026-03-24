@@ -221,6 +221,58 @@ def _log_price_lag_trade(decision) -> None:
         print(f"[mirofish] Price-lag tracking error: {e}")
 
 
+def _resolve_kalshi_trades():
+    """Check Kalshi API for resolution results on expired open trades."""
+    try:
+        from scripts.mirofish.kalshi_feed import _call_kalshi
+    except ImportError:
+        return
+
+    conn = _get_conn()
+    now = datetime.datetime.utcnow()
+
+    open_trades = conn.execute("""
+        SELECT pt.id, pt.market_id, pt.direction, pt.entry_price, pt.shares, pt.amount_usd
+        FROM paper_trades pt
+        WHERE pt.status = 'open' AND pt.market_id LIKE 'KX%'
+    """).fetchall()
+
+    closed_count = 0
+    for t in open_trades:
+        data = _call_kalshi("GET", f"/markets/{t['market_id']}")
+        if not data:
+            continue
+        m = data.get("market", data)
+        result = m.get("result", "")
+        if not result:
+            continue
+
+        we_bet = t["direction"].lower()
+        we_won = (result == "yes" and we_bet == "yes") or (result == "no" and we_bet == "no")
+
+        if we_won:
+            exit_price = 1.0
+            pnl = t["shares"] * (1.0 - t["entry_price"])
+            status = "closed_win"
+        else:
+            exit_price = 0.0
+            pnl = t["shares"] * (0.0 - t["entry_price"])
+            status = "closed_loss"
+
+        conn.execute(
+            "UPDATE paper_trades SET exit_price=?, pnl=?, status=?, closed_at=? WHERE id=?",
+            (exit_price, pnl, status, now.isoformat(), t["id"]),
+        )
+        sign = "+" if pnl >= 0 else ""
+        print(f"[mirofish] Kalshi resolved: {t['market_id'][:30]} → {status} {sign}${pnl:.2f}")
+        closed_count += 1
+
+    if closed_count:
+        conn.commit()
+        _notify_dashboard()
+    conn.close()
+
+
 def _notify_dashboard():
     """Ping the dashboard to trigger SSE refresh."""
     try:
@@ -457,7 +509,13 @@ def run_loop():
                     except Exception:
                         pass
 
-    # 6. Check stops (always runs, even if API is down)
+    # 6. Check Kalshi resolutions for expired markets
+    try:
+        _resolve_kalshi_trades()
+    except Exception as exc:
+        print(f"[mirofish] Kalshi resolution check failed: {exc}")
+
+    # 6b. Check stops (always runs, even if API is down)
     try:
         current_prices = feed.get_latest_prices()
         closed = wallet.check_stops(current_prices)
