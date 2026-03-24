@@ -569,6 +569,99 @@ body {
 .tw-explain-btn { font-size:0.56rem; letter-spacing:2px; padding:8px 24px; border:1px solid var(--orange); border-radius:1px; background:var(--orange-dim); color:var(--orange-hi); cursor:pointer; font-family:inherit; transition:all 0.2s; }
 .tw-explain-btn:hover { background:var(--orange); color:#000; box-shadow:0 0 18px rgba(232,104,0,0.5); }
 
+/* ── Intel ──────────────────────────────────────────────────────── */
+.intel-stat {
+  display:flex; flex-direction:column; align-items:center;
+  padding:8px 16px; border:1px solid var(--border); border-radius:2px;
+  background:var(--surface); min-width:70px;
+}
+.intel-stat-num { font-size:1.1rem; font-weight:900; color:var(--orange-hi); }
+.intel-stat-label { font-size:0.42rem; letter-spacing:2px; color:var(--grey2); margin-top:2px; }
+.intel-filter-select {
+  font-size:0.5rem; letter-spacing:1px; padding:4px 10px;
+  border:1px solid var(--grey3); border-radius:1px;
+  background:var(--surface); color:var(--offwhite);
+  font-family:inherit; cursor:pointer;
+}
+.intel-card {
+  border:1px solid var(--border); border-radius:2px;
+  background:var(--surface); padding:14px 18px;
+  transition:border-color 0.2s;
+}
+.intel-card:hover { border-color:var(--border-mid); }
+.intel-card-top { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.intel-card-name {
+  font-size:0.7rem; font-weight:700; color:var(--white);
+  text-decoration:none; letter-spacing:0.5px;
+}
+.intel-card-name:hover { color:var(--orange-hi); }
+.intel-badge {
+  display:inline-block; font-size:0.42rem; letter-spacing:1.5px;
+  padding:2px 8px; border-radius:1px; font-weight:700;
+}
+.intel-badge-integrate { background:rgba(0,255,136,0.12); color:var(--neon-green); border:1px solid rgba(0,255,136,0.3); }
+.intel-badge-study { background:rgba(255,200,0,0.10); color:#ffc800; border:1px solid rgba(255,200,0,0.3); }
+.intel-badge-skip { background:rgba(100,100,100,0.12); color:var(--grey2); border:1px solid var(--grey3); }
+.intel-badge-val { background:var(--orange-dim); color:var(--orange-hi); border:1px solid var(--border-mid); }
+.intel-badge-cx { background:rgba(0,212,255,0.08); color:var(--neon-cyan); border:1px solid rgba(0,212,255,0.25); }
+.intel-badge-stars { background:rgba(255,255,255,0.04); color:var(--grey1); border:1px solid var(--grey3); }
+.intel-card-meta { font-size:0.46rem; color:var(--grey2); letter-spacing:1px; margin-top:6px; }
+.intel-card-insight { font-size:0.54rem; color:var(--offwhite); margin-top:8px; line-height:1.5; }
+.intel-relevance { display:flex; gap:14px; margin-top:8px; flex-wrap:wrap; }
+.intel-rel-item { font-size:0.44rem; letter-spacing:1px; color:var(--grey1); }
+.intel-rel-bar {
+  display:inline-block; height:8px; border-radius:1px;
+  background:var(--orange); vertical-align:middle; margin-left:4px;
+}
+.intel-rel-bar-bg {
+  display:inline-block; width:50px; height:8px; border-radius:1px;
+  background:var(--grey3); vertical-align:middle; position:relative;
+}
+.intel-card-actions { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+.intel-action-btn {
+  font-size:0.46rem; letter-spacing:1.5px; padding:4px 12px;
+  border:1px solid var(--grey3); border-radius:1px;
+  background:transparent; color:var(--grey1);
+  cursor:pointer; font-family:inherit; transition:all 0.2s;
+}
+.intel-action-btn:hover { color:var(--orange-hi); border-color:var(--orange); }
+.intel-action-btn.approve { border-color:rgba(0,255,136,0.3); color:var(--neon-green); }
+.intel-action-btn.approve:hover { background:rgba(0,255,136,0.12); }
+.intel-action-btn.reject { border-color:rgba(255,0,46,0.3); color:var(--neon-red); }
+.intel-action-btn.reject:hover { background:rgba(255,0,46,0.08); }
+.intel-risk { font-size:0.46rem; color:var(--neon-red); margin-top:6px; opacity:0.7; }
+.intel-readme-toggle {
+  font-size:0.42rem; color:var(--grey2); cursor:pointer; letter-spacing:1px;
+  margin-top:4px; user-select:none;
+}
+.intel-readme-toggle:hover { color:var(--orange); }
+.intel-readme-snippet {
+  font-size:0.46rem; color:var(--grey2); margin-top:4px; line-height:1.5;
+  max-height:0; overflow:hidden; transition:max-height 0.3s;
+}
+.intel-readme-snippet.open { max-height:200px; }
+.intel-target-label {
+  display:block; font-size:0.56rem; letter-spacing:1px; color:var(--offwhite);
+  padding:6px 0; cursor:pointer; font-family:inherit;
+}
+.intel-target-label input { margin-right:8px; accent-color:var(--orange); }
+.intel-approved-card {
+  border:1px solid rgba(0,255,136,0.15); border-radius:2px;
+  background:var(--surface); padding:10px 14px;
+}
+.intel-bot-tag {
+  display:inline-block; font-size:0.4rem; letter-spacing:1.5px;
+  padding:1px 7px; border-radius:1px; margin-left:4px;
+  background:var(--orange-dim); color:var(--orange); border:1px solid var(--border);
+}
+.intel-status-badge {
+  display:inline-block; font-size:0.4rem; letter-spacing:1.5px;
+  padding:2px 8px; border-radius:1px; margin-left:6px;
+}
+.intel-status-approved { background:rgba(0,255,136,0.10); color:var(--neon-green); }
+.intel-status-rejected { background:rgba(255,0,46,0.08); color:var(--neon-red); }
+.intel-status-bookmarked { background:rgba(0,212,255,0.08); color:var(--neon-cyan); }
+
 /* ── Nav tabs ──────────────────────────────────────────────────── */
 .nav-tabs {
   display: flex; gap: 2px; margin-left: 24px;
@@ -1408,6 +1501,7 @@ body {
     <button class="nav-tab" id="tabAgents" onclick="showPage('agents')">⬡ AGENTS</button>
     <button class="nav-tab" id="tabTrading" onclick="showPage('trading')">$ TRADING</button>
     <button class="nav-tab" id="tabTerminal" onclick="showPage('terminal')">⊡ TERMINAL</button>
+    <button class="nav-tab" id="tabIntel" onclick="showPage('intel')">⌬ INTEL</button>
   </div>
   <div class="nav-right">
     <button class="clawmpson-btn" id="clawmpsonBtn" onclick="toggleClawmpson()">◈ CLAWMPSON MODE</button>
@@ -1681,6 +1775,43 @@ body {
       </div>
     </div>
 
+    <!-- PhantomClaw: RivalClaw strategy inside Clawmpson -->
+    <div class="t-section" id="phantomSection" style="border-color:rgba(255,0,200,0.2);background:linear-gradient(135deg,rgba(10,0,15,0.95),rgba(5,0,10,0.98))">
+      <div class="t-section-title" style="color:#ff00c8;border-bottom-color:rgba(255,0,200,0.2);display:flex;align-items:center;gap:10px">
+        PHANTOMCLAW
+        <span class="t-live-dot" style="background:#ff00c8;box-shadow:0 0 6px #ff00c8"></span>
+        <span style="font-size:0.42rem;color:rgba(255,0,200,0.5);letter-spacing:2px;font-weight:400">RIVALCLAW STRATEGY × CLAWMPSON ARCHITECTURE</span>
+      </div>
+      <div class="trading-cards" style="grid-template-columns:repeat(5,1fr)">
+        <div class="t-card" style="border-color:rgba(255,0,200,0.15)">
+          <div class="t-card-label">P&L</div>
+          <div class="t-card-value" id="phPnl">$0.00</div>
+        </div>
+        <div class="t-card" style="border-color:rgba(255,0,200,0.15)">
+          <div class="t-card-label">WIN / LOSS</div>
+          <div class="t-card-value" id="phWL">0 / 0</div>
+        </div>
+        <div class="t-card" style="border-color:rgba(255,0,200,0.15)">
+          <div class="t-card-label">WIN RATE</div>
+          <div class="t-card-value" id="phWR">0%</div>
+        </div>
+        <div class="t-card" style="border-color:rgba(255,0,200,0.15)">
+          <div class="t-card-label">OPEN</div>
+          <div class="t-card-value" id="phOpen">0</div>
+        </div>
+        <div class="t-card" style="border-color:rgba(255,0,200,0.15)">
+          <div class="t-card-label">STRATEGY</div>
+          <div class="t-card-value" style="font-size:0.7rem;color:#ff00c8">BS FAIR VALUE</div>
+        </div>
+      </div>
+      <div class="t-table-wrap" style="margin-top:10px">
+        <table class="t-table">
+          <thead><tr><th>MARKET</th><th>DIR</th><th>ENTRY</th><th>CURRENT</th><th>P&L</th><th>SIZE</th><th>RESOLVES</th></tr></thead>
+          <tbody id="phBody"></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- Graduation Gates -->
     <div class="t-section">
       <div class="t-section-title">GRADUATION GATES</div>
@@ -1893,6 +2024,83 @@ body {
     </div>
   </div><!-- /pageTerminal -->
 
+  <!-- ═══════════════════════ INTEL PAGE ═══════════════════════ -->
+  <div class="page" id="pageIntel">
+    <div style="max-width:1100px;margin:0 auto;">
+
+      <!-- Stats Bar -->
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px;align-items:center;">
+        <div class="intel-stat" id="intelStatTotal"><span class="intel-stat-num">0</span><span class="intel-stat-label">CRAWLED</span></div>
+        <div class="intel-stat" id="intelStatPending"><span class="intel-stat-num" id="intelPendingNum">0</span><span class="intel-stat-label">PENDING</span></div>
+        <div class="intel-stat" id="intelStatApproved"><span class="intel-stat-num">0</span><span class="intel-stat-label">APPROVED</span></div>
+        <div class="intel-stat" id="intelStatRejected"><span class="intel-stat-num">0</span><span class="intel-stat-label">REJECTED</span></div>
+        <div style="flex:1;text-align:right;">
+          <span style="font-size:0.5rem;color:var(--grey2);letter-spacing:1px;" id="intelLastCrawl">LAST CRAWL: —</span>
+        </div>
+        <button class="tw-btn primary" onclick="intelRunCrawl()" id="intelCrawlBtn" style="font-size:0.5rem;padding:5px 14px;">RUN CRAWL NOW</button>
+      </div>
+
+      <!-- Filter/Sort Bar -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
+        <select class="intel-filter-select" id="intelFilterStatus" onchange="renderIntelCards()">
+          <option value="all">All</option>
+          <option value="pending">Pending</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected</option>
+          <option value="bookmarked">Bookmarked</option>
+        </select>
+        <select class="intel-filter-select" id="intelFilterVerdict" onchange="renderIntelCards()">
+          <option value="all">All Verdicts</option>
+          <option value="INTEGRATE">INTEGRATE</option>
+          <option value="STUDY">STUDY</option>
+          <option value="SKIP">SKIP</option>
+        </select>
+        <select class="intel-filter-select" id="intelSortBy" onchange="renderIntelCards()">
+          <option value="integration_value">Integration Value</option>
+          <option value="signal_score">Signal Score</option>
+          <option value="complexity">Complexity</option>
+          <option value="stars">Stars</option>
+        </select>
+        <select class="intel-filter-select" id="intelFilterLang" onchange="renderIntelCards()">
+          <option value="all">All Languages</option>
+        </select>
+      </div>
+
+      <!-- Recommendation Cards -->
+      <div id="intelCards" style="display:flex;flex-direction:column;gap:10px;">
+        <div class="empty"><span class="empty-char">⌬</span>no recommendations yet — run a crawl</div>
+      </div>
+
+      <!-- Approved Items Section -->
+      <div id="intelApprovedSection" style="margin-top:28px;display:none;">
+        <div class="panel-hdr"><span class="panel-hdr-title">APPROVED & DISPATCHED</span></div>
+        <div id="intelApprovedList" style="display:flex;flex-direction:column;gap:8px;margin-top:10px;"></div>
+      </div>
+
+    </div>
+  </div><!-- /pageIntel -->
+
+  <!-- Intel Approve Modal -->
+  <div class="modal-overlay" id="intelApproveModal" onclick="if(event.target===this)this.classList.remove('active')">
+    <div class="modal-box" style="max-width:420px;">
+      <div class="modal-title">DEPLOY TO BOTS</div>
+      <input type="hidden" id="intelApproveId">
+      <div style="margin:14px 0;">
+        <label class="intel-target-label"><input type="checkbox" id="intelTargetClawmpson" value="clawmpson" checked> Clawmpson <span style="color:var(--grey2);font-size:0.5rem;">(main system)</span></label>
+        <label class="intel-target-label"><input type="checkbox" id="intelTargetArbclaw" value="arbclaw"> ArbClaw <span style="color:var(--grey2);font-size:0.5rem;">(lean arb)</span></label>
+        <label class="intel-target-label"><input type="checkbox" id="intelTargetRivalclaw" value="rivalclaw"> RivalClaw <span style="color:var(--grey2);font-size:0.5rem;">(rival instance)</span></label>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Notes (optional)</label>
+        <input class="modal-input" id="intelApproveNotes" placeholder="Integration notes...">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="tw-btn primary" onclick="intelConfirmApprove()" style="flex:1;">CONFIRM & DISPATCH</button>
+        <button class="tw-btn" onclick="document.getElementById('intelApproveModal').classList.remove('active')" style="flex:0;">CANCEL</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <!-- Edit Project Modal -->
@@ -2075,6 +2283,10 @@ function showPage(page) {
     twLoadSessions()
     twLoadEvents()
     twLoadStatus().then(() => { if (twState.running) twConnectSSE() })
+  } else if (page === 'intel') {
+    document.getElementById('pageIntel').classList.add('active')
+    document.getElementById('tabIntel').classList.add('active')
+    loadIntel()
   } else {
     document.getElementById('pageDashboard').classList.add('active')
     document.getElementById('tabDashboard').classList.add('active')
@@ -4161,6 +4373,36 @@ function renderTrading() {
     kalshiBody.innerHTML = '<tr><td colspan="4" style="color:var(--grey2);text-align:center">no Kalshi data — set API keys</td></tr>'
   }
 
+  // PhantomClaw section
+  const ph = d.phantom || {}
+  const phPnl = ph.pnl || 0
+  document.getElementById('phPnl').textContent = (phPnl >= 0 ? '+' : '') + '$' + phPnl.toFixed(2)
+  document.getElementById('phPnl').style.color = phPnl >= 0 ? '#00e5ff' : '#ff2d95'
+  document.getElementById('phWL').textContent = (ph.wins || 0) + ' / ' + (ph.losses || 0)
+  document.getElementById('phWL').style.color = (ph.wins || 0) >= (ph.losses || 0) ? '#00e5ff' : '#ff2d95'
+  document.getElementById('phWR').textContent = (ph.win_rate || 0).toFixed(0) + '%'
+  document.getElementById('phOpen').textContent = ph.open || 0
+  document.getElementById('phOpen').style.color = '#ff00c8'
+
+  const phBody = document.getElementById('phBody')
+  const phPositions = ph.positions || []
+  if (phPositions.length) {
+    phBody.innerHTML = phPositions.map(p => {
+      const pnlClass = (p.pnl || 0) >= 0 ? 't-pnl-pos' : 't-pnl-neg'
+      return `<tr>
+        <td title="${p.market_id}" style="color:rgba(255,0,200,0.8)">${(p.question || '').substring(0,45)}</td>
+        <td>${p.direction}</td>
+        <td>${(p.entry_price || 0).toFixed(3)}</td>
+        <td>${(p.current_price || 0).toFixed(3)}</td>
+        <td class="${pnlClass}">${(p.pnl||0) >= 0 ? '+' : ''}$${(p.pnl||0).toFixed(2)} (${(p.pnl_pct||0) >= 0 ? '+' : ''}${(p.pnl_pct||0).toFixed(0)}%)</td>
+        <td>$${(p.amount_usd || 0).toFixed(0)}</td>
+        <td class="t-countdown" data-close="${p.close_time || ''}">${formatCountdown(p.close_time)}</td>
+      </tr>`
+    }).join('')
+  } else {
+    phBody.innerHTML = '<tr><td colspan="7" style="color:rgba(255,0,200,0.3);text-align:center">scanning for fair-value edge...</td></tr>'
+  }
+
   // Missed opportunities
   const missed = d.missed_opportunities || []
   const missedSection = document.getElementById('tMissedSection')
@@ -4816,6 +5058,259 @@ function twStartUptime() {
     const secs = Math.floor((Date.now() - twState.startTime) / 1000)
     document.getElementById('twUptime').textContent = `${Math.floor(secs/60)}m ${secs%60}s`
   }, 1000)
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INTEL
+// ══════════════════════════════════════════════════════════════════
+let intelData = { recommendations: [] }
+let intelSSE = null
+
+async function loadIntel() {
+  try {
+    const [recsRes, statsRes] = await Promise.all([
+      fetch('/api/intel'),
+      fetch('/api/intel/stats'),
+    ])
+    if (recsRes.ok) intelData = await recsRes.json()
+    if (statsRes.ok) {
+      const s = await statsRes.json()
+      updateIntelStats(s)
+    }
+    populateIntelLangFilter()
+    renderIntelCards()
+    if (!intelSSE) intelConnectSSE()
+  } catch (e) {
+    console.error('Intel load error:', e)
+  }
+}
+
+async function refreshIntelData() {
+  try {
+    const [recsRes, statsRes] = await Promise.all([
+      fetch('/api/intel'),
+      fetch('/api/intel/stats'),
+    ])
+    if (recsRes.ok) intelData = await recsRes.json()
+    if (statsRes.ok) updateIntelStats(await statsRes.json())
+    populateIntelLangFilter()
+    renderIntelCards()
+  } catch (e) {}
+}
+
+function updateIntelStats(s) {
+  const statEls = document.querySelectorAll('#pageIntel .intel-stat')
+  if (statEls[0]) statEls[0].querySelector('.intel-stat-num').textContent = s.total || 0
+  if (statEls[1]) {
+    const num = statEls[1].querySelector('.intel-stat-num')
+    num.textContent = s.pending || 0
+    num.style.color = s.pending > 0 ? 'var(--neon-green)' : 'var(--orange-hi)'
+  }
+  if (statEls[2]) statEls[2].querySelector('.intel-stat-num').textContent = s.approved || 0
+  if (statEls[3]) statEls[3].querySelector('.intel-stat-num').textContent = s.rejected || 0
+  const lc = document.getElementById('intelLastCrawl')
+  if (lc && s.analyzed_at) {
+    const d = new Date(s.analyzed_at)
+    lc.textContent = `LAST CRAWL: ${d.toLocaleDateString()} ${d.toLocaleTimeString()}`
+  }
+}
+
+function populateIntelLangFilter() {
+  const sel = document.getElementById('intelFilterLang')
+  const langs = new Set()
+  for (const r of intelData.recommendations || []) {
+    if (r.language && r.language !== 'Unknown') langs.add(r.language)
+  }
+  sel.innerHTML = '<option value="all">All Languages</option>'
+  for (const l of [...langs].sort()) {
+    sel.innerHTML += `<option value="${l}">${l}</option>`
+  }
+}
+
+function renderIntelCards() {
+  const container = document.getElementById('intelCards')
+  const statusFilter = document.getElementById('intelFilterStatus').value
+  const verdictFilter = document.getElementById('intelFilterVerdict').value
+  const sortBy = document.getElementById('intelSortBy').value
+  const langFilter = document.getElementById('intelFilterLang').value
+
+  let recs = [...(intelData.recommendations || [])]
+
+  // Filter
+  if (statusFilter !== 'all') recs = recs.filter(r => r.status === statusFilter)
+  if (verdictFilter !== 'all') recs = recs.filter(r => r.verdict === verdictFilter)
+  if (langFilter !== 'all') recs = recs.filter(r => r.language === langFilter)
+
+  // Sort
+  recs.sort((a, b) => (b[sortBy] || 0) - (a[sortBy] || 0))
+
+  if (recs.length === 0) {
+    container.innerHTML = '<div class="empty"><span class="empty-char">⌬</span>no recommendations match filters</div>'
+    return
+  }
+
+  container.innerHTML = recs.map(r => renderIntelCard(r)).join('')
+
+  // Show approved section
+  const approved = (intelData.recommendations || []).filter(r => r.status === 'approved')
+  const approvedSection = document.getElementById('intelApprovedSection')
+  const approvedList = document.getElementById('intelApprovedList')
+  if (approved.length > 0) {
+    approvedSection.style.display = 'block'
+    approvedList.innerHTML = approved.map(r => `
+      <div class="intel-approved-card">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <a href="${esc(r.repo_url)}" target="_blank" class="intel-card-name" style="font-size:0.56rem;">${esc(r.repo_name)}</a>
+          ${(r.approved_for || []).map(t => `<span class="intel-bot-tag">${esc(t.toUpperCase())}</span>`).join('')}
+          <span class="intel-status-badge intel-status-approved">${r.task_id ? 'QUEUED' : 'APPROVED'}</span>
+        </div>
+        <div style="font-size:0.44rem;color:var(--grey2);margin-top:4px;">${esc(r.what_to_take || '')}</div>
+      </div>
+    `).join('')
+  } else {
+    approvedSection.style.display = 'none'
+  }
+}
+
+function renderIntelCard(r) {
+  const verdictClass = r.verdict === 'INTEGRATE' ? 'integrate' : r.verdict === 'STUDY' ? 'study' : 'skip'
+  const statusBadge = r.status !== 'pending' ? `<span class="intel-status-badge intel-status-${r.status}">${r.status.toUpperCase()}</span>` : ''
+
+  function relBar(val) {
+    const pct = Math.max(0, Math.min(100, (val || 0) * 10))
+    return `<span class="intel-rel-bar-bg"><span class="intel-rel-bar" style="width:${pct}%;display:block;height:100%;"></span></span> ${val || 0}/10`
+  }
+
+  const isPending = r.status === 'pending'
+  const actions = isPending ? `
+    <button class="intel-action-btn approve" onclick="intelShowApprove('${r.id}')">APPROVE</button>
+    <button class="intel-action-btn reject" onclick="intelReject('${r.id}')">REJECT</button>
+    <button class="intel-action-btn" onclick="intelBookmark('${r.id}')">BOOKMARK</button>
+  ` : ''
+
+  return `
+  <div class="intel-card" id="intel-card-${r.id}">
+    <div class="intel-card-top">
+      <a href="${esc(r.repo_url)}" target="_blank" class="intel-card-name">${esc(r.repo_name)}</a>
+      <span class="intel-badge intel-badge-${verdictClass}">${r.verdict}</span>
+      <span class="intel-badge intel-badge-val">VAL ${r.integration_value}</span>
+      <span class="intel-badge intel-badge-cx">CX ${r.complexity}</span>
+      <span class="intel-badge intel-badge-stars">★ ${(r.stars || 0).toLocaleString()}</span>
+      ${statusBadge}
+    </div>
+    <div class="intel-card-meta">${esc(r.language || 'Unknown')} · signal ${(r.signal_score || 0).toFixed(3)}</div>
+    <div class="intel-card-insight">${esc(r.what_to_take || 'No analysis available')}</div>
+    <div class="intel-relevance">
+      <span class="intel-rel-item">CLAWMPSON ${relBar(r.clawmpson_relevance)}</span>
+      <span class="intel-rel-item">ARBCLAW ${relBar(r.arbclaw_relevance)}</span>
+      <span class="intel-rel-item">RIVALCLAW ${relBar(r.rivalclaw_relevance)}</span>
+    </div>
+    ${r.risk && r.risk !== 'analysis_failed' ? `<div class="intel-risk">⚠ ${esc(r.risk)}</div>` : ''}
+    ${r.readme_snippet ? `
+      <div class="intel-readme-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▸ README snippet</div>
+      <div class="intel-readme-snippet">${esc(r.readme_snippet)}</div>
+    ` : ''}
+    <div class="intel-card-actions">
+      ${actions}
+      <a href="${esc(r.repo_url)}" target="_blank" class="intel-action-btn" style="text-decoration:none;">VIEW ON GITHUB</a>
+    </div>
+  </div>`
+}
+
+function esc(s) {
+  if (!s) return ''
+  const d = document.createElement('div')
+  d.textContent = String(s)
+  return d.innerHTML
+}
+
+function intelShowApprove(id) {
+  document.getElementById('intelApproveId').value = id
+  document.getElementById('intelApproveNotes').value = ''
+  document.getElementById('intelTargetClawmpson').checked = true
+  document.getElementById('intelTargetArbclaw').checked = false
+  document.getElementById('intelTargetRivalclaw').checked = false
+  document.getElementById('intelApproveModal').classList.add('active')
+}
+
+async function intelConfirmApprove() {
+  const id = document.getElementById('intelApproveId').value
+  const targets = []
+  if (document.getElementById('intelTargetClawmpson').checked) targets.push('clawmpson')
+  if (document.getElementById('intelTargetArbclaw').checked) targets.push('arbclaw')
+  if (document.getElementById('intelTargetRivalclaw').checked) targets.push('rivalclaw')
+  const notes = document.getElementById('intelApproveNotes').value
+
+  if (targets.length === 0) { alert('Select at least one target bot'); return }
+
+  try {
+    const r = await fetch('/api/intel/approve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, targets, notes }),
+    })
+    if (r.ok) {
+      document.getElementById('intelApproveModal').classList.remove('active')
+      loadIntel()
+    } else {
+      const e = await r.json()
+      alert(e.detail || 'Approve failed')
+    }
+  } catch (e) { alert('Network error') }
+}
+
+async function intelReject(id) {
+  try {
+    const r = await fetch('/api/intel/reject', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+    if (r.ok) loadIntel()
+  } catch (e) { console.error(e) }
+}
+
+async function intelBookmark(id) {
+  try {
+    const r = await fetch('/api/intel/bookmark', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+    if (r.ok) loadIntel()
+  } catch (e) { console.error(e) }
+}
+
+async function intelRunCrawl() {
+  const btn = document.getElementById('intelCrawlBtn')
+  btn.textContent = 'CRAWLING...'
+  btn.disabled = true
+  try {
+    await fetch('/api/intel/run-crawl', { method: 'POST' })
+    btn.textContent = 'CRAWL STARTED'
+    setTimeout(() => { btn.textContent = 'RUN CRAWL NOW'; btn.disabled = false }, 5000)
+  } catch (e) {
+    btn.textContent = 'ERROR'
+    setTimeout(() => { btn.textContent = 'RUN CRAWL NOW'; btn.disabled = false }, 3000)
+  }
+}
+
+function intelConnectSSE() {
+  if (intelSSE) { intelSSE.close(); intelSSE = null }
+  intelSSE = new EventSource('/api/intel/stream')
+  intelSSE.onmessage = (e) => {
+    try {
+      const d = JSON.parse(e.data)
+      if (d.pending !== undefined) {
+        updateIntelStats({ total: d.total, pending: d.pending, analyzed_at: d.analyzed_at })
+        refreshIntelData()
+      }
+    } catch (err) {}
+  }
+  intelSSE.onerror = () => {
+    if (intelSSE) { intelSSE.close(); intelSSE = null }
+    setTimeout(intelConnectSSE, 10000)
+  }
 }
 
 </script>
