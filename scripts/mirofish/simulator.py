@@ -375,6 +375,14 @@ def run_loop():
 
     print(f"[mirofish] Run loop starting — {datetime.datetime.utcnow().isoformat()}")
 
+    # 0. Circuit breaker check
+    breaker = wallet.check_circuit_breaker()
+    if breaker:
+        print("[mirofish] Circuit breaker active — resetting wallet")
+        wallet.reset_wallet()
+        _notify_dashboard()
+        return
+
     # 1. Fetch market data (Polymarket + Kalshi)
     markets = feed.fetch_markets()
     kalshi_events = _fetch_kalshi_events()

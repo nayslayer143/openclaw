@@ -147,6 +147,17 @@ def _fetch_fresh_short_markets():
 
 def run():
     """Fast scan: find short-expiry Kalshi markets with spot-price edge."""
+    # Circuit breaker check
+    try:
+        from scripts.mirofish.paper_wallet import check_circuit_breaker, reset_wallet
+        breaker = check_circuit_breaker()
+        if breaker:
+            print("[fast_scan] Circuit breaker — wallet depleted, resetting")
+            reset_wallet()
+            _notify_dashboard()
+            return
+    except Exception:
+        pass
     now = datetime.datetime.utcnow()
     max_close = (now + datetime.timedelta(hours=MAX_EXPIRY_HOURS)).isoformat()
 
