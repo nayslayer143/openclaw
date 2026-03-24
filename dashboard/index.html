@@ -1555,11 +1555,11 @@ body {
       </div>
     </div>
 
-    <!-- P&L Chart -->
-    <div class="t-section">
+    <!-- P&L Chart (hidden when no data) -->
+    <div class="t-section" id="tEquitySection" style="display:none">
       <div class="t-section-title">EQUITY CURVE</div>
       <div class="t-chart-container">
-        <canvas id="pnlChart" height="180"></canvas>
+        <canvas id="pnlChart" height="140"></canvas>
       </div>
     </div>
 
@@ -1582,7 +1582,7 @@ body {
       <div class="t-table-wrap">
         <table class="t-table" id="tOpenTable">
           <thead>
-            <tr><th>MARKET</th><th>DIR</th><th>STRATEGY</th><th>ENTRY</th><th>CURRENT</th><th>PnL</th><th>SIZE</th></tr>
+            <tr><th>MARKET</th><th>PLATFORM</th><th>DIR</th><th>STRATEGY</th><th>ENTRY</th><th>CURRENT</th><th>PnL</th><th>SIZE</th></tr>
           </thead>
           <tbody id="tOpenBody"></tbody>
         </table>
@@ -3777,8 +3777,14 @@ function renderTrading() {
     el.className = 't-gate ' + (g.has_min_history ? (pass ? 'pass' : 'fail') : '')
   })
 
-  // P&L Chart (simple canvas line chart — no external libs)
-  renderPnlChart(d.pnl_curve)
+  // P&L Chart — only show when we have data
+  const equitySection = document.getElementById('tEquitySection')
+  if (d.pnl_curve && d.pnl_curve.length >= 2) {
+    equitySection.style.display = 'block'
+    renderPnlChart(d.pnl_curve)
+  } else {
+    equitySection.style.display = 'none'
+  }
 
   // Strategy table
   const stratBody = document.getElementById('tStrategyBody')
@@ -3805,8 +3811,14 @@ function renderTrading() {
   if (d.open_positions.length) {
     openBody.innerHTML = d.open_positions.map(p => {
       const pnlClass = p.pnl >= 0 ? 't-pnl-pos' : 't-pnl-neg'
+      let platform = 'polymarket'
+      const mid = p.market_id || ''
+      if (mid.startsWith('KX') || mid.startsWith('INX') || mid.startsWith('NAS')) platform = 'kalshi'
+      else if (mid.startsWith('SPOT:')) platform = 'crypto'
+      const platColor = platform === 'kalshi' ? 'var(--neon-cyan)' : (platform === 'crypto' ? 'var(--neon-green)' : 'var(--orange)')
       return `<tr>
         <td title="${p.market_id}">${p.question}</td>
+        <td style="color:${platColor};font-weight:600;font-size:0.48rem;letter-spacing:1px">${platform.toUpperCase()}</td>
         <td>${p.direction}</td>
         <td>${p.strategy}</td>
         <td>${p.entry_price.toFixed(3)}</td>
@@ -3816,7 +3828,7 @@ function renderTrading() {
       </tr>`
     }).join('')
   } else {
-    openBody.innerHTML = '<tr><td colspan="7" style="color:var(--grey2);text-align:center">no open positions</td></tr>'
+    openBody.innerHTML = '<tr><td colspan="8" style="color:var(--grey2);text-align:center">no open positions</td></tr>'
   }
 
   // Recent trades
