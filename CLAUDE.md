@@ -4,9 +4,11 @@ OpenClaw is the operator shell for Jordan's web-based businesses running on an M
 Claude Code is the build plane. Local Ollama models handle all inference at zero API cost.
 Lobster runs deterministic workflows. Agents route tasks. Jordan approves via Telegram DM.
 
+**Verticals:** Trading & arbitrage · Software/app development · Agentic business ops · Marketing & growth · Content & research pipelines. Optimize across the system, not locally within one vertical.
+
 **Strategy doc:** `~/openclaw/openclaw-v4.1-strategy.md`
-**Current phase:** Phase 4 (active 2026-03-20)
-**Last updated:** 2026-03-20
+**Current phase:** Phase 4 (active 2026-03-20) — trading infrastructure live
+**Last updated:** 2026-03-23
 
 ---
 
@@ -21,20 +23,41 @@ Lobster runs deterministic workflows. Agents route tasks. Jordan approves via Te
 ├── openclaw-v4.1-strategy.md    ← full strategy + phase steps
 ├── startup.sh                   ← cold-start script
 ├── .env                         ← secrets (never commit)
-├── agents/configs/              ← AGENT_CONFIG.md per agent [Phase 1]
-├── lobster-workflows/           ← Lobster YAML + bridge scripts
+├── agents/configs/              ← 13 agent configs (orchestrator, trader, build, ops, research, etc.)
+├── scripts/                     ← operational scripts
+│   ├── trading-bot.py           ← simple Polymarket scanner + paper trader [Phase 4]
+│   └── mirofish/                ← advanced trading brain (10 modules + 9 test files)
+│       ├── trading_brain.py     ← 4 strategies: arb, price-lag, momentum, LLM
+│       ├── paper_wallet.py      ← SQLite-backed wallet w/ stop-loss & take-profit
+│       ├── polymarket_feed.py   ← gamma API + SQLite cache
+│       ├── unusual_whales_feed.py ← options flow, dark pool, congressional, institutional
+│       ├── crucix_feed.py       ← 29 OSINT sources across 6 domains
+│       ├── spot_feed.py         ← Binance + Coinbase crypto prices
+│       ├── simulator.py         ← cron orchestrator (every 30 min)
+│       ├── dashboard.py         ← graduation criteria engine
+│       ├── base_feed.py         ← DataFeed protocol interface
+│       └── tests/               ← 9 test files (all major components)
+├── trading/                     ← live paper trading state [Phase 4]
+│   ├── signals.json             ← signal history
+│   ├── positions.json           ← open paper positions
+│   └── dashboard.json           ← aggregated portfolio for web UI
+├── dashboard/                   ← FastAPI server (36KB) + web UI
+├── lobster-workflows/           ← 14 Lobster YAML + bridge scripts
 ├── repo-queue/                  ← pending.md + evaluated.md
 ├── build-results/               ← task output contracts (JSON)
 ├── outputs/                     ← scout reports + deliverables
 ├── memory/                      ← MEMORY.md + IDLE_LOG.md
 ├── benchmark/                   ← bakeoff results
 ├── improvements/                ← proposals + postmortems
-├── mirofish/                    ← simulation engine [Phase 3]
-├── autoresearch/                ← multi-domain research engine (market-intel, content, academic, competitive, meta)
+├── mirofish/                    ← simulation engine + market reports [Phase 3]
+├── autoresearch/                ← multi-domain research (market-intel, content, academic, competitive, meta)
 ├── logs/                        ← per-agent .jsonl logs
 ├── queue/                       ← pending.json + completed.json
 └── .skills/superpowers/         ← obra/superpowers skills
 ```
+
+> **Database:** `~/.openclaw/clawmson.db` (SQLite) — 8 tables: market_data, paper_trades,
+> daily_pnl, uw_signals, crucix_signals, spot_prices, price_lag_trades, context
 
 ---
 
@@ -42,7 +65,9 @@ Lobster runs deterministic workflows. Agents route tasks. Jordan approves via Te
 
 | Want to... | Go here |
 |------------|---------|
-| Change or inspect agent behavior | `agents/CONTEXT.md` |
+| Work on trading strategies or feeds | `scripts/mirofish/` (brain) or `scripts/trading-bot.py` (scanner) |
+| Check paper trading state or P&L | `trading/dashboard.json` or `paper_wallet.py → get_state()` |
+| Change or inspect agent behavior | `agents/CONTEXT.md` (13 configs) |
 | Create or modify a Lobster workflow | `lobster-workflows/CONTEXT.md` |
 | Triage or select queued work | `repo-queue/CONTEXT.md` |
 | Build or patch code in a repo | repo's `build/CONTEXT.md` |
@@ -52,6 +77,34 @@ Lobster runs deterministic workflows. Agents route tasks. Jordan approves via Te
 | Draft a system improvement or postmortem | `improvements/CONTEXT.md` |
 | Run any kind of research task | `autoresearch/CONTEXT.md` |
 | Route any task you're unsure about | `CONTEXT.md` (this folder) |
+
+---
+
+## Trading Infrastructure (Phase 4 — active)
+
+Two parallel systems, five data feeds, SQLite-backed paper trading.
+
+| Component | What it does | Cron |
+|-----------|-------------|------|
+| `trading-bot.py` | Scans top 30 Polymarket markets, LLM edge analysis (qwen2.5:7b), auto-paper-trades | 3x daily |
+| Mirofish brain | 4 strategies (arb, price-lag, momentum, LLM), Kelly sizing, stop-loss/TP | Every 30 min |
+| Graduation engine | 5 criteria × 14 days before live trading unlocks | With each run |
+
+**Feeds:** Polymarket (gamma API) · Unusual Whales (options/dark pool/congressional/institutional) · Crucix OSINT (29 sources, 6 domains) · Spot prices (Binance + Coinbase) · Base protocol interface
+
+**Paper wallet rules:** 10% max position · -20% stop-loss · +50% take-profit · Kelly capped at 10%
+
+**Graduation gates (all must pass 14 consecutive days):** 7d ROI > 0% · Win rate > 55% · Sharpe > 1.0 · Drawdown < 25%
+
+**Live trading:** Requires Tier-3 confirmation via Telegram DM. Not yet active.
+
+**Trading gaps (next build targets):** Kalshi feed + MarketEvent schema · cross-venue arb detection · realistic execution sim (latency, slippage, partial fills) · edge capture rate + expected vs realized PnL · strategy tournament / capital allocator · backtesting framework
+
+---
+
+## DO NOT REBUILD
+
+Unless Jordan explicitly says otherwise, never recreate: Polymarket feed · paper wallet · trading brain (4 strategies) · graduation engine · dashboard server · Telegram bot · agent configs (13) · Lobster workflows (14) · memory/queue/build pipeline · UW feed · Crucix feed · spot feed · cron automation. **Always extend, integrate, or patch.**
 
 ---
 
@@ -68,19 +121,9 @@ If you need upstream context, load only the specific artifact referenced in the 
 
 ## Naming Conventions
 
-| Content type | Pattern | Example |
-|-------------|---------|---------|
-| Task packet | `task-[slug]-[date].md` | `task-auth-fix-2026-03-19.md` |
-| Build plan | `plan-[slug].md` | `plan-auth-fix.md` |
-| Build result | `result-[slug].md` | `result-auth-fix.md` |
-| Output contract | `[task-id].json` | `build-1742300000.json` |
-| Scout report | `[source]-scout-[date].md` | `bookmark-scout-2026-03-19.md` |
-| Agent config | `[role].md` | `orchestrator.md` |
-| Bakeoff result | `bakeoff-[date].md` | `bakeoff-2026-03-19.md` |
-| Lobster workflow | `[name].lobster` | `debug-and-fix.lobster` |
-| Research brief | `[domain]-[slug]-[date].md` | `market-polymarket-2026-03-19.md` |
-| Research paper | `[domain]-[slug]-[date].md` | `academic-llm-agents-2026-03-19.md` |
-| Research dataset | `[domain]-[slug]-[date].json` | `competitive-nfc-cards-2026-03-19.json` |
+**Pattern:** `[type]-[slug]-[date].[ext]` — e.g. `task-auth-fix-2026-03-19.md`, `bakeoff-2026-03-19.md`
+**Types:** task, plan, result, scout, bakeoff, research brief/paper/dataset
+**Agent configs:** `[role].md` · **Workflows:** `[name].lobster` · **Contracts:** `[task-id].json`
 
 ---
 
@@ -94,6 +137,8 @@ If you need upstream context, load only the specific artifact referenced in the 
 - Scout reports → `outputs/` (unprocessed until Intel Scan picks them up)
 - Research outputs → `autoresearch/outputs/{briefs,papers,datasets}/[domain]-[slug]-[date].[ext]`
 - Improvement proposals → `improvements/` (never self-applied)
+- Trading state → `trading/` (signals.json, positions.json, dashboard.json)
+- Trading data → `clawmson.db` (8 tables — never export raw DB)
 - Secrets → `.env` only (never committed, never logged)
 
 ---
@@ -140,6 +185,12 @@ If you need upstream context, load only the specific artifact referenced in the 
 | A — Default | Daily operations | OpenClaw + Lobster + Claude Code + Ollama |
 | B — Ticket-Factory | 10+ issue backlog | Mode A + OpenHands (sandboxed, Phase 4) |
 | C — Simple/Reset | Stack net-negative | Aider + Ollama + minimal OpenClaw only |
+
+---
+
+## System Philosophy
+
+Build systems, not scripts · Extend existing modules, don't replace · Prefer execution quality over theoretical edge · Prefer modularity over cleverness · Prefer persistence and iteration over one-shot success
 
 ---
 
