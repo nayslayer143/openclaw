@@ -20,9 +20,10 @@ REFERENCE_INGEST = "REFERENCE_INGEST"
 STATUS_QUERY     = "STATUS_QUERY"
 DIRECT_COMMAND   = "DIRECT_COMMAND"
 UNCLEAR          = "UNCLEAR"
+BROWSER_TASK     = "BROWSER_TASK"
 
 _VALID_INTENTS = {CONVERSATION, BUILD_TASK, REFERENCE_INGEST, STATUS_QUERY,
-                  DIRECT_COMMAND, UNCLEAR}
+                  DIRECT_COMMAND, UNCLEAR, BROWSER_TASK}
 
 # ── Config ───────────────────────────────────────────────────────────────────
 
@@ -50,6 +51,7 @@ Intent definitions:
 - STATUS_QUERY: user is asking specifically about BUILD status, task queue, or pipeline progress. Keywords: "!status", "build status", "queue", "what's in the queue", "is the build done"
 - DIRECT_COMMAND: user wants a system command run (disk space, memory, uptime, ollama status, etc.)
 - CONVERSATION: general chat, casual questions, greetings, banter, business questions, opinions, or anything that doesn't fit the other categories. THIS IS THE DEFAULT. When in doubt, use CONVERSATION.
+- BROWSER_TASK: user wants to open a URL in a browser, take a screenshot, or interact with a website. Must mention browsing, visiting, screenshotting a URL, or checking a website. Keywords: "browse", "screenshot of", "go to http", "visit http", "open the website", "check the site", "what does X look like".
 - UNCLEAR: message is genuinely too ambiguous to classify AND could be a build task — needs a follow-up question. Do NOT use UNCLEAR for casual messages.
 
 IMPORTANT: Most messages are CONVERSATION. Only use BUILD_TASK, STATUS_QUERY, etc. when the intent is unambiguous. Casual questions like "yo", "what's up", "have we made any money yet?", "how's the project going?", "what do you think about X?" are ALL CONVERSATION — not STATUS_QUERY.
@@ -126,6 +128,21 @@ def classify_intent_llm(text: str, history=None) -> dict:
 
 # ── Regex fallback classifier ────────────────────────────────────────────────
 
+_BROWSER_PREFIXES = (
+    "/browse ",
+    "/screenshot ",
+    "browse https://",
+    "browse http://",
+    "screenshot of https://",
+    "screenshot of http://",
+    "go to https://",
+    "go to http://",
+    "visit https://",
+    "visit http://",
+    "open https://",
+    "open http://",
+)
+
 _BUILD_STARTS = (
     "build ", "deploy ", "fix the ", "push ", "implement ",
     "refactor ", "add a test", "write a script", "write a function",
@@ -179,6 +196,12 @@ def _classify_regex(text: str) -> dict:
         for trigger in SAFE_COMMANDS:
             if trigger in lower:
                 intent, action = DIRECT_COMMAND, "run"
+                break
+
+    if intent == CONVERSATION:
+        for prefix in _BROWSER_PREFIXES:
+            if lower.startswith(prefix):
+                intent, action = BROWSER_TASK, "browse"
                 break
 
     if intent == CONVERSATION:

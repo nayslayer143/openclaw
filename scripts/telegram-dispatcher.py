@@ -718,6 +718,78 @@ def handle_search(chat_id: str, query: str):
     send(chat_id, fts.format_results(results))
 
 
+def handle_browse(chat_id: str, url: str):
+    """Open URL, extract text, send summary to user."""
+    import sys as _sys
+    _sys.path.insert(0, str(_SCRIPTS_DIR))
+    try:
+        from browser.browser_tools import browser_open
+    except ImportError as e:
+        send(chat_id, f"Browser module not available: {e}")
+        return
+
+    if not url.startswith("http"):
+        send(chat_id, "Usage: /browse <url> — URL must start with http:// or https://")
+        return
+
+    send(chat_id, f"Opening {url}...")
+    send_typing(chat_id)
+
+    result = browser_open(url, extract="dom")
+    if not result["ok"]:
+        send(chat_id, f"Browse failed: {result['error']}")
+        return
+
+    title = result.get("title", "No title")
+    content = result.get("content", "")[:2000]
+    links = result.get("links", [])[:5]
+    link_lines = "\n".join(f"  • {l['text'][:50]}: {l['href']}" for l in links if l.get("href"))
+
+    reply = f"{title}\n{url}\n\n{content}"
+    if link_lines:
+        reply += f"\n\nLinks:\n{link_lines}"
+    send(chat_id, reply)
+
+
+def handle_screenshot_url(chat_id: str, url: str):
+    """Take screenshot of URL and send as photo."""
+    import sys as _sys, os as _os, tempfile
+    _sys.path.insert(0, str(_SCRIPTS_DIR))
+    try:
+        from browser.browser_tools import browser_screenshot
+    except ImportError as e:
+        send(chat_id, f"Browser module not available: {e}")
+        return
+
+    if not url.startswith("http"):
+        send(chat_id, "Usage: /screenshot <url>")
+        return
+
+    send(chat_id, f"Taking screenshot of {url}...")
+    send_typing(chat_id)
+
+    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
+        tmp_path = tmp.name
+
+    result = browser_screenshot(url, save_path=tmp_path)
+    if not result["ok"]:
+        send(chat_id, f"Screenshot failed: {result['error']}")
+        return
+
+    try:
+        with open(tmp_path, "rb") as f:
+            requests.post(
+                f"{API}/sendPhoto",
+                data={"chat_id": chat_id, "caption": url[:200]},
+                files={"photo": f},
+                timeout=30,
+            )
+    except Exception as e:
+        send(chat_id, f"Screenshot taken but send failed: {e}")
+    finally:
+        _os.unlink(tmp_path)
+
+
 # ── Direct command execution ──────────────────────────────────────────────────
 
 def handle_direct_command(chat_id: str, text: str):
@@ -926,6 +998,20 @@ def handle_message(msg: dict):
             else:
                 handle_search(chat_id, query)
             return
+        if lower.startswith("/browse ") or lower == "/browse":
+            url = text[len("/browse"):].strip()
+            if not url:
+                send(chat_id, "Usage: /browse <url>")
+            else:
+                threading.Thread(target=handle_browse, args=(chat_id, url), daemon=True).start()
+            return
+        if lower.startswith("/screenshot ") or lower == "/screenshot":
+            url = text[len("/screenshot"):].strip()
+            if not url:
+                send(chat_id, "Usage: /screenshot <url>")
+            else:
+                threading.Thread(target=handle_screenshot_url, args=(chat_id, url), daemon=True).start()
+            return
         if lower == "/memory-stats":
             handle_memory_stats(chat_id)
             return
@@ -1103,6 +1189,16 @@ def handle_message(msg: dict):
 
     if intent == intents.DIRECT_COMMAND:
         handle_direct_command(chat_id, effective_text)
+        return
+
+    if intent == intents.BROWSER_TASK:
+        url_list = result.get("attachments", [])
+        target = result.get("target", "")
+        url = url_list[0] if url_list else (target if target and target.startswith("http") else None)
+        if url:
+            threading.Thread(target=handle_browse, args=(chat_id, url), daemon=True).start()
+        else:
+            send(chat_id, "I can browse websites for you — what URL should I visit?")
         return
 
     if intent == intents.REFERENCE_INGEST:
