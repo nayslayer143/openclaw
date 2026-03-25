@@ -1172,15 +1172,18 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
                 n = ac["n"] or 0
                 w = ac["w"] or 0
                 realized = ac["p"] or 0
+                total_pnl = round(realized + agent_unrealized, 2)
                 agent_stats[agent_name] = {
                     "trades": n, "wins": w, "losses": n - w,
-                    "pnl": round(realized + agent_unrealized, 2),
+                    "pnl": total_pnl,
+                    "balance": round(1000.0 + total_pnl, 2),
+                    "starting_balance": 1000.0,
                     "open": len(ao),
                     "win_rate": round(w / n * 100, 1) if n > 0 else 0,
                     "positions": positions,
                 }
             except Exception:
-                agent_stats[agent_name] = {"trades": 0, "wins": 0, "losses": 0, "pnl": 0, "open": 0, "win_rate": 0, "positions": []}
+                agent_stats[agent_name] = {"trades": 0, "wins": 0, "losses": 0, "pnl": 0, "balance": 1000.0, "starting_balance": 1000.0, "open": 0, "win_rate": 0, "positions": []}
 
         # 10c. RivalClaw open positions (separate DB) for unified feed
         rivalclaw_positions = []
