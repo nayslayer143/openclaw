@@ -25,7 +25,7 @@ IDEAS_DIR      = OPENCLAW_ROOT / "ideas"
 IDEAS_MEDIA    = IDEAS_DIR / "media"
 PROJECTS_FILE  = OPENCLAW_ROOT / "projects" / "projects.json"
 CHATGPT_REPORTS_DIR = OPENCLAW_ROOT / "outputs" / "chatgpt-reports"
-REPO_MAN_API = os.environ.get("REPO_MAN_API", "https://research.asdfghjk.lol")
+REPO_MAN_API = os.environ.get("REPO_MAN_API", "http://127.0.0.1:8765")
 
 ENV_FILE = OPENCLAW_ROOT / ".env"
 def load_env():
@@ -2399,7 +2399,8 @@ async def chatgpt_analyze(request: Request, user: str = Depends(get_current_user
         body = await request.json()
     except Exception:
         pass
-    item_limit = body.get("item_limit", 20)
+    item_limit = body.get("item_limit", 1000)
+    batch_size = body.get("batch_size", 25)
 
     # 1. Fetch completed items from Repo Man
     try:
@@ -2428,12 +2429,12 @@ async def chatgpt_analyze(request: Request, user: str = Depends(get_current_user
                     key_ideas = [str(k)[:60] for k in a["key_ideas"][:3]]
         routing = item.get("openclaw_routing") or {}
         return {
-            "id": item.get("id", "unknown"),
-            "title": item.get("title", "Untitled")[:100],
-            "url": item.get("raw_input", ""),
-            "source": item.get("source_type", "unknown"),
-            "novelty": round(item.get("novelty_score", 0), 2),
-            "action": item.get("action_recommendation", ""),
+            "id": item.get("id") or "unknown",
+            "title": (item.get("title") or "Untitled")[:100],
+            "url": item.get("raw_input") or "",
+            "source": item.get("source_type") or "unknown",
+            "novelty": round(item.get("novelty_score") or 0, 2),
+            "action": item.get("action_recommendation") or "",
             "analysis": analysis,
             "ideas": key_ideas,
             "target": routing.get("recommended_instance", ""),
@@ -2442,136 +2443,147 @@ async def chatgpt_analyze(request: Request, user: str = Depends(get_current_user
 
     digested = [_extract_item(i) for i in items]
 
-    # Cluster by source type to reduce redundancy
-    clusters = {}
-    for d in digested:
-        key = d["source"]
-        clusters.setdefault(key, []).append(d)
-
-    # Build compressed prompt
-    item_blocks = []
+    # Build per-item blocks with links
     input_items_summary = []
-    for source_type, cluster in clusters.items():
-        if len(cluster) > 3:
-            # Summarize cluster: keep top 3 by novelty, note the rest
-            cluster.sort(key=lambda x: x["novelty"], reverse=True)
-            top = cluster[:3]
-            rest_count = len(cluster) - 3
-            for d in top:
-                item_blocks.append(
-                    f"[{d['id']}] {d['title']} | novelty={d['novelty']} | {d['action']}\n"
-                    f"  LINK: {d['url']}\n"
-                    f"  {d['analysis']}\n  Ideas: {', '.join(d['ideas'])}\n  → {d['target']} ({d['route_reason']})"
-                )
-            if rest_count:
-                # Still include links for omitted items so GPT can investigate
-                rest_links = [f"  - {d['url']}" for d in cluster[3:] if d.get("url")]
-                omit_block = f"(+{rest_count} more {source_type} items, lower novelty)"
-                if rest_links:
-                    omit_block += "\n  Links:\n" + "\n".join(rest_links)
-                item_blocks.append(omit_block)
-            for d in cluster:
-                input_items_summary.append({
-                    "id": d["id"], "title": d["title"], "url": d["url"],
-                    "source_type": d["source"], "novelty_score": d["novelty"],
-                    "action_recommendation": d["action"],
-                })
-        else:
-            for d in cluster:
-                item_blocks.append(
-                    f"[{d['id']}] {d['title']} | novelty={d['novelty']} | {d['action']}\n"
-                    f"  LINK: {d['url']}\n"
-                    f"  {d['analysis']}\n  Ideas: {', '.join(d['ideas'])}\n  → {d['target']} ({d['route_reason']})"
-                )
-                input_items_summary.append({
-                    "id": d["id"], "title": d["title"], "url": d["url"],
-                    "source_type": d["source"], "novelty_score": d["novelty"],
-                    "action_recommendation": d["action"],
-                })
+    for d in digested:
+        input_items_summary.append({
+            "id": d["id"], "title": d["title"], "url": d["url"],
+            "source_type": d["source"], "novelty_score": d["novelty"],
+            "action_recommendation": d["action"],
+        })
 
-    user_message = (
-        f"Analyze these {len(items)} research items ({len(clusters)} source types) "
-        f"and provide strategic recommendations:\n\n"
-        + "\n\n".join(item_blocks)
-    )
+    def _build_item_block(d):
+        return (
+            f"[{d['id']}] {d['title']} | novelty={d['novelty']} | {d['action']}\n"
+            f"  LINK: {d['url']}\n"
+            f"  {d['analysis']}\n  Ideas: {', '.join(d['ideas'])}\n  → {d['target']} ({d['route_reason']})"
+        )
 
-    # Log prompt size for observability
-    prompt_chars = len(_CHATGPT_SYSTEM_PROMPT) + len(user_message)
-    est_tokens = prompt_chars // 4
+    # 3. Process in batches — each batch gets its own GPT call
     import logging
-    logging.getLogger("dashboard").info(
-        f"ChatGPT analyze: {len(items)} items → {len(item_blocks)} blocks, "
-        f"~{est_tokens} input tokens, {prompt_chars} chars"
-    )
+    log = logging.getLogger("dashboard")
+    model = os.environ.get("CHATGPT_RESEARCH_MODEL", "gpt-4o-mini")
+    max_tokens = int(os.environ.get("CHATGPT_RESEARCH_MAX_TOKENS", "2048"))
 
-    # 3. Call OpenAI API (with retry for 429 rate limits)
-    oai_data = None
-    last_err = None
-    for attempt in range(3):
-        try:
-            async with httpx.AsyncClient(timeout=90) as client:
-                oai_resp = await client.post(
-                    "https://api.openai.com/v1/chat/completions",
-                    headers={
-                        "Authorization": f"Bearer {openai_key}",
-                        "Content-Type": "application/json",
-                    },
-                    json={
-                        "model": os.environ.get("CHATGPT_RESEARCH_MODEL", "gpt-4o"),
-                        "max_tokens": int(os.environ.get("CHATGPT_RESEARCH_MAX_TOKENS", "2048")),
-                        "temperature": 0.3,
-                        "response_format": {"type": "json_object"},
-                        "messages": [
-                            {"role": "system", "content": _CHATGPT_SYSTEM_PROMPT},
-                            {"role": "user", "content": user_message},
-                        ],
-                    },
-                )
-                if oai_resp.status_code == 429 and attempt < 2:
-                    wait = int(oai_resp.headers.get("retry-after", 20 * (attempt + 1)))
-                    await asyncio.sleep(wait)
-                    continue
-                oai_resp.raise_for_status()
-                oai_data = oai_resp.json()
-                break
-        except Exception as exc:
-            last_err = exc
-            if attempt < 2:
-                await asyncio.sleep(10 * (attempt + 1))
+    # Sort by novelty descending so highest-signal items are in batch 1
+    digested.sort(key=lambda x: x["novelty"], reverse=True)
+
+    batches = [digested[i:i + batch_size] for i in range(0, len(digested), batch_size)]
+    all_recs = []
+    all_summaries = []
+    all_meta = []
+    total_tokens = 0
+    batch_errors = []
+
+    log.info(f"ChatGPT analyze: {len(items)} items → {len(batches)} batches of ≤{batch_size}")
+
+    for batch_idx, batch in enumerate(batches):
+        # Build prompt for this batch
+        item_blocks = [_build_item_block(d) for d in batch]
+        user_message = (
+            f"Batch {batch_idx + 1}/{len(batches)}: Analyze these {len(batch)} research items "
+            f"and provide strategic recommendations:\n\n"
+            + "\n\n".join(item_blocks)
+        )
+
+        prompt_chars = len(_CHATGPT_SYSTEM_PROMPT) + len(user_message)
+        log.info(f"  Batch {batch_idx + 1}: {len(batch)} items, ~{prompt_chars // 4} tokens")
+
+        # Call OpenAI with retry
+        oai_data = None
+        for attempt in range(3):
+            try:
+                async with httpx.AsyncClient(timeout=120) as client:
+                    oai_resp = await client.post(
+                        "https://api.openai.com/v1/chat/completions",
+                        headers={
+                            "Authorization": f"Bearer {openai_key}",
+                            "Content-Type": "application/json",
+                        },
+                        json={
+                            "model": model,
+                            "max_tokens": max_tokens,
+                            "temperature": 0.3,
+                            "response_format": {"type": "json_object"},
+                            "messages": [
+                                {"role": "system", "content": _CHATGPT_SYSTEM_PROMPT},
+                                {"role": "user", "content": user_message},
+                            ],
+                        },
+                    )
+                    if oai_resp.status_code == 429 and attempt < 2:
+                        raw_wait = oai_resp.headers.get("retry-after", "")
+                        wait = max(int(raw_wait) if raw_wait.isdigit() else 0, 30 * (attempt + 1))
+                        log.warning(f"  Batch {batch_idx + 1}: rate limited, waiting {wait}s")
+                        await asyncio.sleep(wait)
+                        continue
+                    oai_resp.raise_for_status()
+                    oai_data = oai_resp.json()
+                    break
+            except Exception as exc:
+                if attempt < 2:
+                    await asyncio.sleep(10 * (attempt + 1))
+                else:
+                    batch_errors.append(f"Batch {batch_idx + 1}: {exc}")
+                continue
+
+        if not oai_data:
             continue
-    if oai_data is None:
-        raise HTTPException(502, f"OpenAI API call failed after 3 attempts: {last_err}")
 
-    # 4. Parse response
-    tokens_used = oai_data.get("usage", {}).get("total_tokens", 0)
-    raw_content = oai_data["choices"][0]["message"]["content"]
-    try:
-        parsed = json.loads(raw_content)
-    except json.JSONDecodeError:
-        raise HTTPException(502, "OpenAI returned invalid JSON")
+        total_tokens += oai_data.get("usage", {}).get("total_tokens", 0)
 
-    # 5. Build report
+        try:
+            parsed = json.loads(oai_data["choices"][0]["message"]["content"])
+        except (json.JSONDecodeError, KeyError):
+            batch_errors.append(f"Batch {batch_idx + 1}: invalid JSON response")
+            continue
+
+        # Collect results
+        batch_recs = parsed.get("recommendations", [])
+        for rec in batch_recs:
+            rec.setdefault("deployed", False)
+            rec.setdefault("deployed_at", None)
+            rec.setdefault("task_id", None)
+            rec.setdefault("risk_notes", None)
+            rec["_batch"] = batch_idx + 1
+        all_recs.extend(batch_recs)
+
+        if parsed.get("executive_summary"):
+            all_summaries.append(parsed["executive_summary"])
+        if parsed.get("meta_observations"):
+            all_meta.append(parsed["meta_observations"])
+
+        log.info(f"  Batch {batch_idx + 1}: {len(batch_recs)} recommendations")
+
+        # Pause between batches to respect Tier 1 rate limits (~30K TPM)
+        if batch_idx < len(batches) - 1:
+            await asyncio.sleep(15)
+
+    if not all_recs and not all_summaries:
+        detail = f"All {len(batches)} batches failed"
+        if batch_errors:
+            detail += f": {batch_errors[0]}"
+        raise HTTPException(502, detail)
+
+    # 5. Consolidate into one report
+    # Sort recommendations by confidence descending
+    all_recs.sort(key=lambda r: r.get("confidence", 0), reverse=True)
+
     now = datetime.now()
     report_id = f"rpt-{now.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:4]}"
-
-    # Ensure recommendations have all required fields
-    recs = parsed.get("recommendations", [])
-    for rec in recs:
-        rec.setdefault("deployed", False)
-        rec.setdefault("deployed_at", None)
-        rec.setdefault("task_id", None)
-        rec.setdefault("risk_notes", None)
 
     report = {
         "id": report_id,
         "created_at": now.isoformat(),
-        "model": os.environ.get("CHATGPT_RESEARCH_MODEL", "gpt-4o"),
-        "tokens_used": tokens_used,
+        "model": model,
+        "tokens_used": total_tokens,
         "item_count": len(items),
+        "batch_count": len(batches),
         "input_items": input_items_summary,
-        "executive_summary": parsed.get("executive_summary", ""),
-        "recommendations": recs,
-        "meta_observations": parsed.get("meta_observations", ""),
+        "executive_summary": " | ".join(str(s) if not isinstance(s, list) else "; ".join(str(x) for x in s) for s in all_summaries) if all_summaries else "",
+        "recommendations": all_recs,
+        "meta_observations": " | ".join(str(s) if not isinstance(s, list) else "; ".join(str(x) for x in s) for s in all_meta) if all_meta else "",
+        "batch_errors": batch_errors,
         "status": "complete",
     }
 

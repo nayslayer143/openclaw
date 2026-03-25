@@ -6224,14 +6224,14 @@ async function chatgptAnalyze() {
   const status = document.getElementById('chatgptToolbarStatus')
   btn.disabled = true
   btn.textContent = '⟳ ANALYZING...'
-  status.textContent = 'Fetching items + calling GPT-4o...'
+  status.textContent = 'Fetching all items + sending to GPT-4o-mini in batches (this takes a few minutes)...'
   status.style.color = 'var(--neon-cyan,#00d4ff)'
 
   try {
     const r = await fetch('/api/chatgpt/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ item_limit: 20 })
+      body: JSON.stringify({ item_limit: 1000, batch_size: 25 })
     })
     if (r.ok) {
       const report = await r.json()
@@ -6353,8 +6353,9 @@ function chatgptRenderReport(report) {
   container.innerHTML = deployAllBar
     + '<div class="gpt-exec-summary">' + _esc(report.executive_summary) + '</div>'
     + '<div style="font-size:0.44rem;color:var(--grey2);letter-spacing:1px;margin-bottom:12px;">'
-    + report.recommendations.length + ' RECOMMENDATIONS \u00b7 ' + report.item_count + ' ITEMS ANALYZED \u00b7 '
-    + new Date(report.created_at).toLocaleString() + ' \u00b7 ' + _esc(report.model) + ' \u00b7 ' + report.tokens_used + ' tokens</div>'
+    + report.recommendations.length + ' RECOMMENDATIONS \u00b7 ' + report.item_count + ' ITEMS ANALYZED'
+    + (report.batch_count ? ' \u00b7 ' + report.batch_count + ' BATCHES' : '')
+    + ' \u00b7 ' + new Date(report.created_at).toLocaleString() + ' \u00b7 ' + _esc(report.model) + ' \u00b7 ' + report.tokens_used + ' tokens</div>'
     + recsHtml
     + (report.meta_observations
       ? '<div style="margin-top:20px;padding:12px 16px;border:1px solid var(--border);border-radius:2px;">'
