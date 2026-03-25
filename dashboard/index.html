@@ -771,6 +771,47 @@ body {
 }
 .gpt-action-plan.open { max-height:400px; overflow-y:auto; }
 
+/* ── Claude Reports ──────────────────────────────────────────── */
+.claude-rec-card {
+  border:1px solid var(--border); border-radius:2px;
+  background:var(--surface); padding:14px 18px; margin-bottom:10px;
+  position:relative;
+}
+.claude-rec-card.agree { border-left:3px solid var(--neon-green); }
+.claude-rec-card.disagree { border-left:3px solid var(--neon-red); }
+.claude-verdict { font-size:0.42rem; letter-spacing:1.5px; font-weight:700; }
+.claude-verdict.agree { color:var(--neon-green); }
+.claude-verdict.disagree { color:var(--neon-red); }
+.claude-notes { font-size:0.46rem; color:var(--grey1); margin-top:6px; line-height:1.5; }
+.claude-type-badge {
+  display:inline-block; font-size:0.36rem; letter-spacing:1.5px; padding:2px 8px;
+  border-radius:1px; border:1px solid var(--neon-cyan); color:var(--neon-cyan);
+}
+.claude-staging-badge {
+  display:inline-block; font-size:0.36rem; letter-spacing:1.5px; padding:2px 8px;
+  border-radius:1px; border:1px solid;
+}
+.claude-staging-badge.immediate { border-color:var(--neon-green); color:var(--neon-green); }
+.claude-staging-badge.this-week { border-color:var(--neon-cyan); color:var(--neon-cyan); }
+.claude-staging-badge.next-week { border-color:var(--orange); color:var(--orange); }
+.claude-staging-badge.backlog { border-color:var(--grey2); color:var(--grey2); }
+.claude-staging-badge.maybe { border-color:var(--grey3); color:var(--grey3); }
+.claude-staging-badge.reject { border-color:var(--neon-red); color:var(--neon-red); }
+.claude-status-select {
+  font-size:0.42rem; padding:2px 8px; background:#111; border:1px solid var(--border);
+  color:var(--grey1); font-family:inherit; cursor:pointer; border-radius:1px;
+}
+.claude-rank { font-size:0.70rem; color:var(--orange); font-weight:700; margin-right:10px; min-width:24px; text-align:center; }
+.claude-exec-review {
+  font-size:0.50rem; color:var(--grey1); line-height:1.6;
+  padding:12px 16px; border-left:2px solid var(--neon-cyan);
+  background:rgba(0,212,255,0.04); margin-bottom:16px;
+}
+.claude-section {
+  margin-top:16px; padding:12px 16px; border:1px solid var(--border); border-radius:2px;
+}
+.claude-section-title { font-size:0.46rem; letter-spacing:2px; color:var(--neon-cyan); margin-bottom:8px; }
+
 /* ── Signal Tabs ──────────────────────────────────────────────── */
 .signal-tabs {
   display:flex; gap:0; overflow-x:auto; margin-bottom:14px;
@@ -2518,6 +2559,7 @@ function showPage(page) {
     document.getElementById('repoManFrame').src = 'https://research.asdfghjk.lol/embed'
     pollResearchBadge()
     chatgptRefreshReports()
+    claudeRefreshReports()
   } else {
     document.getElementById('pageDashboard').classList.add('active')
     document.getElementById('tabDashboard').classList.add('active')
@@ -6212,10 +6254,14 @@ function switchResearchTab(tab) {
   if (tab === 'inbox') {
     const el = document.getElementById('researchSubInbox')
     el.classList.add('active'); el.style.display = 'flex'
-  } else {
+  } else if (tab === 'reports') {
     const el = document.getElementById('researchSubReports')
     el.classList.add('active'); el.style.display = 'flex'
     chatgptRefreshReports()
+  } else if (tab === 'claude') {
+    const el = document.getElementById('researchSubClaude')
+    el.classList.add('active'); el.style.display = 'flex'
+    claudeRefreshReports()
   }
 }
 
@@ -6435,6 +6481,169 @@ async function chatgptDeployAll(reportId) {
   if (btn) { btn.disabled = false; btn.textContent = '\u26a1 DEPLOY ALL' }
 }
 
+// ══════════════════════════════════════════════════════════════════
+// CLAUDE REPORTS — reviews ChatGPT recommendations
+// ══════════════════════════════════════════════════════════════════
+let claudeReportsCache = []
+let claudeCurrentReport = null
+
+async function claudeRefreshReports() {
+  try {
+    const r = await fetch('/api/claude/reports')
+    if (!r.ok) return
+    const data = await r.json()
+    claudeReportsCache = data.reports
+    if (!claudeCurrentReport) claudeRenderReportList()
+    var badge = document.getElementById('claudeReportsBadge')
+    if (badge) {
+      if (data.reports.length > 0) { badge.textContent = data.reports.length; badge.style.display = 'inline-block' }
+      else { badge.style.display = 'none' }
+    }
+  } catch(e) {}
+}
+
+function claudeRenderReportList() {
+  claudeCurrentReport = null
+  var c = document.getElementById('claudeReportsList')
+  if (!claudeReportsCache.length) {
+    c.innerHTML = '<div style="text-align:center;padding:60px 20px;"><span style="font-size:1.5rem;display:block;margin-bottom:8px;">\u25c8</span><span style="font-size:0.56rem;color:var(--grey2);letter-spacing:1px;">NO CLAUDE REPORTS YET</span><br><span style="color:var(--grey3);font-size:0.44rem;letter-spacing:1px;">Claude auto-reviews ChatGPT reports when they complete</span></div>'
+    return
+  }
+  c.innerHTML = claudeReportsCache.map(function(r) {
+    return '<div class="gpt-report-card" onclick="claudeLoadReport(\'' + _esc(r.id) + '\')">'
+      + '<div class="gpt-report-card-title" style="color:var(--neon-cyan);">\u25c8 ' + _esc(r.id) + '</div>'
+      + '<div class="gpt-report-card-meta">'
+      + new Date(r.created_at).toLocaleString() + ' \u00b7 ' + r.recommendation_count + ' reviews'
+      + ' \u00b7 from ' + _esc(r.chatgpt_report_id || '?')
+      + '</div></div>'
+  }).join('')
+}
+
+async function claudeLoadReport(reportId) {
+  var c = document.getElementById('claudeReportsList')
+  c.innerHTML = '<div style="text-align:center;padding:40px;font-size:0.5rem;color:var(--grey2);letter-spacing:1px;">\u231b LOADING...</div>'
+  try {
+    var r = await fetch('/api/claude/reports/' + reportId)
+    if (r.ok) { claudeRenderReport(await r.json()) }
+    else { c.innerHTML = '<div style="text-align:center;padding:40px;color:var(--neon-red);">Failed to load</div>' }
+  } catch(e) { c.innerHTML = '<div style="text-align:center;padding:40px;color:var(--neon-red);">Network error</div>' }
+}
+
+function claudeRenderReport(report) {
+  claudeCurrentReport = report
+  var c = document.getElementById('claudeReportsList')
+
+  var backBtn = '<div style="margin-bottom:14px;"><button onclick="claudeRenderReportList()" style="font-size:0.42rem;padding:3px 10px;border:1px solid var(--border);background:transparent;color:var(--grey2);cursor:pointer;font-family:inherit;border-radius:1px;">\u2190 BACK TO LIST</button></div>'
+
+  // Staging summary
+  var stageCounts = {immediate:0, this_week:0, next_week:0, backlog:0, maybe:0, reject:0}
+  report.recommendations.forEach(function(r) { var s = r.staging || 'backlog'; if (stageCounts[s] !== undefined) stageCounts[s]++; else stageCounts.backlog++ })
+  var agreeCount = report.recommendations.filter(function(r) { return r.agree }).length
+  var disagreeCount = report.recommendations.length - agreeCount
+
+  var summaryBar = '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px;font-size:0.42rem;letter-spacing:1px;">'
+    + '<span style="color:var(--neon-green);">\u2713 AGREE: ' + agreeCount + '</span>'
+    + '<span style="color:var(--neon-red);">\u2717 DISAGREE: ' + disagreeCount + '</span>'
+    + '<span style="color:var(--grey2);">|</span>'
+    + (stageCounts.immediate ? '<span style="color:var(--neon-green);">IMMEDIATE: ' + stageCounts.immediate + '</span>' : '')
+    + (stageCounts.this_week ? '<span style="color:var(--neon-cyan);">THIS WEEK: ' + stageCounts.this_week + '</span>' : '')
+    + (stageCounts.next_week ? '<span style="color:var(--orange);">NEXT WEEK: ' + stageCounts.next_week + '</span>' : '')
+    + (stageCounts.backlog ? '<span style="color:var(--grey2);">BACKLOG: ' + stageCounts.backlog + '</span>' : '')
+    + (stageCounts.maybe ? '<span style="color:var(--grey3);">MAYBE: ' + stageCounts.maybe + '</span>' : '')
+    + (stageCounts.reject ? '<span style="color:var(--neon-red);">REJECT: ' + stageCounts.reject + '</span>' : '')
+    + '</div>'
+
+  var recsHtml = report.recommendations.map(function(rec, i) {
+    var agreeClass = rec.agree ? 'agree' : 'disagree'
+    var stagingClass = (rec.staging || 'backlog').replace('_', '-')
+    var statusOpts = ['pending','in_progress','deployed','skipped'].map(function(s) {
+      return '<option value="' + s + '"' + (rec.status === s ? ' selected' : '') + '>' + s.toUpperCase().replace('_',' ') + '</option>'
+    }).join('')
+
+    var riskColor = rec.stability_risk === 'high' ? 'var(--neon-red)' : rec.stability_risk === 'medium' ? 'var(--orange)' : 'var(--grey2)'
+
+    return '<div class="claude-rec-card ' + agreeClass + '">'
+      + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
+      + '<span class="claude-rank">#' + rec.priority_rank + '</span>'
+      + '<span class="claude-verdict ' + agreeClass + '">' + (rec.agree ? '\u2713 AGREE' : '\u2717 DISAGREE') + '</span>'
+      + '<span class="gpt-rec-title">' + _esc(rec.chatgpt_title) + '</span>'
+      + '</div>'
+      + '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;">'
+      + '<span class="claude-type-badge">' + _esc(rec.integration_type || 'skip') + '</span>'
+      + '<span class="claude-staging-badge ' + stagingClass + '">' + _esc((rec.staging || 'backlog').toUpperCase().replace('_',' ')) + '</span>'
+      + '<span class="gpt-rec-target">\u2192 ' + _esc(rec.target_instance || rec.chatgpt_target) + '</span>'
+      + '<span style="color:' + riskColor + ';font-size:0.40rem;letter-spacing:1px;">STABILITY: ' + _esc((rec.stability_risk || 'low').toUpperCase()) + '</span>'
+      + (rec.estimated_effort ? '<span style="color:var(--grey2);font-size:0.40rem;">\u231b ' + rec.estimated_effort + 'h</span>' : '')
+      + '</div>'
+      + '<div class="claude-notes">' + _esc(rec.claude_notes) + '</div>'
+      + (rec.source_links && rec.source_links.length ? '<div style="margin-top:6px;font-size:0.42rem;">' + rec.source_links.map(function(l){ return '<a href="' + _esc(l) + '" target="_blank" rel="noopener" style="color:var(--neon-cyan);text-decoration:none;margin-right:10px;letter-spacing:0.5px;">\u2197 ' + _esc(l.replace(/https?:\/\/(www\.)?/,'').split('/').slice(0,2).join('/')) + '</a>' }).join('') + '</div>' : '')
+      + (rec.implementation_notes ? '<div class="intel-readme-toggle" onclick="this.nextElementSibling.classList.toggle(\'open\')" style="margin-top:8px;">\u25b8 Implementation Notes</div><div class="gpt-action-plan">' + _esc(rec.implementation_notes) + '</div>' : '')
+      + (rec.dependencies && rec.dependencies.length ? '<div style="margin-top:4px;font-size:0.40rem;color:var(--grey3);letter-spacing:1px;">DEPENDS ON: #' + rec.dependencies.join(', #') + '</div>' : '')
+      + '<div style="margin-top:8px;display:flex;gap:8px;align-items:center;">'
+      + '<span style="font-size:0.40rem;color:var(--grey3);letter-spacing:1px;">STATUS:</span>'
+      + '<select class="claude-status-select" onchange="claudeUpdateStatus(\'' + _esc(report.id) + '\',' + i + ',this.value)">' + statusOpts + '</select>'
+      + '</div>'
+      + '</div>'
+  }).join('')
+
+  c.innerHTML = backBtn + summaryBar
+    + '<div class="claude-exec-review">' + _esc(report.executive_review) + '</div>'
+    + '<div style="font-size:0.44rem;color:var(--grey2);letter-spacing:1px;margin-bottom:12px;">'
+    + report.recommendation_count + ' REVIEWS \u00b7 ' + new Date(report.created_at).toLocaleString()
+    + ' \u00b7 ' + _esc(report.model) + ' \u00b7 ' + (report.tokens_used || 0) + ' tokens'
+    + ' \u00b7 from ' + _esc(report.chatgpt_report_id) + '</div>'
+    + recsHtml
+    + (report.staging_plan ? '<div class="claude-section"><div class="claude-section-title">STAGING PLAN</div><div style="font-size:0.46rem;color:var(--grey1);line-height:1.5;">' + _esc(report.staging_plan) + '</div></div>' : '')
+    + (report.missed_opportunities ? '<div class="claude-section"><div class="claude-section-title">MISSED OPPORTUNITIES</div><div style="font-size:0.46rem;color:var(--grey1);line-height:1.5;">' + _esc(report.missed_opportunities) + '</div></div>' : '')
+    + (report.warnings ? '<div class="claude-section"><div class="claude-section-title" style="color:var(--neon-red);">WARNINGS</div><div style="font-size:0.46rem;color:var(--grey1);line-height:1.5;">' + _esc(report.warnings) + '</div></div>' : '')
+}
+
+async function claudeUpdateStatus(reportId, recIndex, newStatus) {
+  try {
+    await fetch('/api/claude/update-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ report_id: reportId, rec_index: recIndex, status: newStatus })
+    })
+  } catch(e) {}
+}
+
+// Poll for Claude report completion (called after ChatGPT auto-triggers Claude)
+function claudePollForNew() {
+  var _cpi = setInterval(async function() {
+    try {
+      var r = await fetch('/api/claude/reports')
+      if (!r.ok) return
+      var data = await r.json()
+      var badge = document.getElementById('claudeReportsBadge')
+      if (badge && data.reports.length > 0) {
+        badge.textContent = data.reports.length
+        badge.style.display = 'inline-block'
+      }
+      // Check if any are newly complete
+      var running = false
+      for (var rpt of data.reports) {
+        try {
+          var sr = await fetch('/api/claude/status/' + rpt.id)
+          var sd = await sr.json()
+          if (sd.status === 'running') { running = true; break }
+        } catch(e) {}
+      }
+      if (!running && data.reports.length > (claudeReportsCache || []).length) {
+        claudeReportsCache = data.reports
+        clearInterval(_cpi)
+      }
+    } catch(e) {}
+  }, 10000)
+}
+
+// Start polling for Claude reports when ChatGPT finishes
+var _origSwitchResearch = switchResearchTab
+switchResearchTab = function(tab) {
+  _origSwitchResearch(tab)
+  if (tab === 'reports') claudePollForNew()
+}
+
 </script>
 
 <!-- RESEARCH PAGE — toolbar + sub-tabs + content areas -->
@@ -6453,6 +6662,7 @@ async function chatgptDeployAll(reportId) {
   <div class="research-subtabs">
     <button class="research-subtab active" data-rtab="inbox" onclick="switchResearchTab('inbox')">RESEARCH INBOX</button>
     <button class="research-subtab" data-rtab="reports" onclick="switchResearchTab('reports')">CHATGPT REPORTS<span id="chatgptReportsBadge" style="display:none;margin-left:5px;background:rgba(232,104,0,0.15);color:var(--orange);border-radius:8px;padding:1px 6px;font-size:0.34rem;font-weight:700;"></span></button>
+    <button class="research-subtab" data-rtab="claude" onclick="switchResearchTab('claude')">CLAUDE REPORTS<span id="claudeReportsBadge" style="display:none;margin-left:5px;background:rgba(0,212,255,0.15);color:var(--neon-cyan);border-radius:8px;padding:1px 6px;font-size:0.34rem;font-weight:700;"></span></button>
   </div>
 
   <!-- Sub-tab content: Research Inbox (existing) -->
@@ -6480,10 +6690,17 @@ async function chatgptDeployAll(reportId) {
     <iframe id="repoManFrame" src="" style="flex:1;width:100%;border:none;background:#0d0d0d;" allow="clipboard-write" title="Repo Man Research Feed"></iframe>
   </div>
 
-  <!-- Sub-tab content: ChatGPT Reports (new) -->
+  <!-- Sub-tab content: ChatGPT Reports -->
   <div class="research-subcontent" id="researchSubReports">
     <div class="gpt-report-list" id="chatgptReportsList">
       <div class="empty" style="text-align:center;padding:60px 20px;"><span class="empty-char" style="font-size:1.5rem;display:block;margin-bottom:8px;">⚡</span><span style="font-size:0.56rem;color:var(--grey2);letter-spacing:1px;">NO REPORTS YET</span><br><span style="color:var(--grey3);font-size:0.44rem;letter-spacing:1px;">click SEND TO CHATGPT to analyze research</span></div>
+    </div>
+  </div>
+
+  <!-- Sub-tab content: Claude Reports -->
+  <div class="research-subcontent" id="researchSubClaude">
+    <div class="gpt-report-list" id="claudeReportsList">
+      <div style="text-align:center;padding:60px 20px;"><span style="font-size:1.5rem;display:block;margin-bottom:8px;">◈</span><span style="font-size:0.56rem;color:var(--grey2);letter-spacing:1px;">NO CLAUDE REPORTS YET</span><br><span style="color:var(--grey3);font-size:0.44rem;letter-spacing:1px;">Claude auto-reviews ChatGPT reports when they complete</span></div>
     </div>
   </div>
 

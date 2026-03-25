@@ -2400,6 +2400,13 @@ async def _run_chatgpt_analysis(report_id: str, item_limit: int, batch_size: int
     try:
         await _do_chatgpt_analysis(report_id, item_limit, batch_size, openai_key, log)
         _ANALYZE_STATUS[report_id] = {"status": "complete", "report_id": report_id}
+        # Auto-trigger Claude review
+        anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
+        if anthropic_key:
+            now = datetime.now()
+            claude_id = f"claude-{now.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:4]}"
+            log.info(f"Auto-triggering Claude review: {claude_id} for {report_id}")
+            asyncio.create_task(_run_claude_analysis(claude_id, report_id))
     except Exception as exc:
         log.error(f"ChatGPT analysis failed: {exc}")
         _ANALYZE_STATUS[report_id] = {"status": "error", "error": str(exc)}
@@ -2738,6 +2745,395 @@ async def chatgpt_deploy_all(request: Request, user: str = Depends(get_current_u
     report_file.write_text(json.dumps(report, indent=2), encoding="utf-8")
 
     return {"ok": True, "task_ids": task_ids, "deployed_count": len(task_ids)}
+
+
+# ══════════════════════════════════════════════════════════════════
+# CLAUDE ANALYSIS — Reviews ChatGPT recommendations with deep context
+# ══════════════════════════════════════════════════════════════════
+
+CLAUDE_REPORTS_DIR = OPENCLAW_ROOT / "outputs" / "claude-reports"
+
+_CLAUDE_SYSTEM_PROMPT = """You are Claude, the build-plane intelligence for the OpenClaw ecosystem. You are reviewing a strategic analysis report produced by ChatGPT (GPT-4o-mini) which analyzed research items from Repo Man.
+
+YOUR JOB: Decide what actually gets built, where, when, and in what form. You are the last gate before integration work begins.
+
+THE THREE OPENCLAW INSTANCES:
+
+1. **Clawmpson** (~/openclaw/) — Primary instance. Full business OS. 4 trading strategies (arb, price-lag, momentum, LLM), 5 data feeds (Polymarket, Kalshi, Unusual Whales, Crucix OSINT, spot prices), graduation engine (14 days, Sharpe >1.0, win rate >55%), 13 agents, 14 Lobster workflows, FastAPI dashboard. Phase 5 complete.
+   GOALS: Broad coverage, multi-vertical optimization, agentic orchestration. Risk-averse graduation system.
+
+2. **RivalClaw** (~/rivalclaw/) — Lean mechanical arb instance. 8-strategy quant engine + hedge engine, self-tuner, Polymarket + Kalshi + CoinGecko feeds. Own SQLite DB. Daily parameter optimization.
+   GOALS: Narrow execution excellence. Speed over breadth. Prove mechanical systems beat integrated ones.
+
+3. **QuantumentalClaw** (~/quantumentalclaw/) — Signal fusion engine. 5 signal types (quant, narrative, event, EDGAR, asymmetry). Async single-process, 5-min cycles, learning loop. Max 5 concurrent trades, -3% daily circuit breaker.
+   GOALS: Find asymmetric opportunities. At least 2 signals must agree. Quality over quantity.
+
+CONSTRAINTS (from CONSTRAINTS.md):
+- Max 2 levels of recursive agent calls
+- Feature branches only, never edit main directly
+- Tier 1 (auto), Tier 2 (hold for approval), Tier 3 (explicit confirm)
+- $10/day hard cap on external API costs
+
+INTEGRATION TYPES you can recommend:
+- **skill**: A new Claude Code skill file (.md) that adds a capability
+- **claude_md**: Addition to an instance's CLAUDE.md (new instructions, context, or rules)
+- **strategy**: A new trading strategy module for mirofish/scripts
+- **feed**: A new data feed integration
+- **architecture**: Structural change to an instance's codebase
+- **training_data**: Research/data to be ingested into the learning pipeline
+- **config**: Parameter tuning or configuration change
+- **monitoring**: New monitoring, alerting, or observability addition
+- **skip**: Do not integrate — not worth the complexity cost
+
+STAGING TIERS:
+- **immediate**: Safe, low-risk, high-value. Do it now.
+- **this_week**: Needs a bit of planning but should happen soon.
+- **next_week**: Good idea but needs more research or a dependency first.
+- **backlog**: Valuable but not urgent. Queue for later.
+- **maybe**: Uncertain value or high risk. Park it for reconsideration.
+- **reject**: Not worth it. Explain why.
+
+For EACH ChatGPT recommendation, provide:
+- agree: true/false (do you agree with ChatGPT's recommendation?)
+- claude_notes: Your analysis — why you agree/disagree, what ChatGPT missed
+- integration_type: One of the types above
+- target_instance: clawmpson, rivalclaw, quantumentalclaw, or multiple
+- staging: One of the staging tiers above
+- priority_rank: Integer 1-N (1 = highest priority across the full report)
+- dependencies: List of other recommendations that must happen first (by index)
+- estimated_effort: hours (rough estimate)
+- stability_risk: low/medium/high (risk of destabilizing the target instance)
+- implementation_notes: Specific technical guidance for the developer
+
+Also provide:
+- executive_review: Your overall assessment of ChatGPT's analysis (2-3 sentences)
+- missed_opportunities: Anything the research items suggest that ChatGPT didn't recommend
+- staging_plan: A brief paragraph on the optimal integration sequence
+- warnings: Any concerns about overloading the system
+
+Respond ONLY with valid JSON. No markdown fences."""
+
+_CLAUDE_STATUS = {}
+
+
+async def _run_claude_analysis(claude_report_id: str, chatgpt_report_id: str):
+    """Background worker: review ChatGPT report with Claude."""
+    import logging
+    log = logging.getLogger("dashboard")
+    anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
+    _CLAUDE_STATUS[claude_report_id] = {"status": "running", "progress": "Loading ChatGPT report..."}
+
+    try:
+        await _do_claude_analysis(claude_report_id, chatgpt_report_id, anthropic_key, log)
+        _CLAUDE_STATUS[claude_report_id] = {"status": "complete", "report_id": claude_report_id}
+    except Exception as exc:
+        log.error(f"Claude analysis failed: {exc}")
+        _CLAUDE_STATUS[claude_report_id] = {"status": "error", "error": str(exc)}
+
+
+async def _do_claude_analysis(claude_report_id: str, chatgpt_report_id: str, anthropic_key: str, log):
+    """Core Claude analysis logic."""
+    # 1. Load ChatGPT report
+    chatgpt_file = CHATGPT_REPORTS_DIR / f"{chatgpt_report_id}.json"
+    if not chatgpt_file.exists():
+        raise RuntimeError(f"ChatGPT report not found: {chatgpt_report_id}")
+    chatgpt_report = json.loads(chatgpt_file.read_text(encoding="utf-8"))
+
+    recs = chatgpt_report.get("recommendations", [])
+    if not recs:
+        raise RuntimeError("ChatGPT report has no recommendations")
+
+    _CLAUDE_STATUS[claude_report_id]["progress"] = f"Preparing {len(recs)} recommendations for Claude..."
+
+    # 2. Build the user message with full context + all links
+    rec_blocks = []
+    for i, rec in enumerate(recs):
+        links = rec.get("source_links", [])
+        link_str = "\n    ".join(links) if links else "none"
+        rec_blocks.append(
+            f"[REC {i}] {rec.get('title', '?')}\n"
+            f"  ChatGPT confidence: {rec.get('confidence', 0)}\n"
+            f"  Category: {rec.get('category', '?')}\n"
+            f"  Urgency: {rec.get('urgency', '?')}\n"
+            f"  Target: {rec.get('recommended_target', '?')} ({rec.get('recommended_target_name', '')})\n"
+            f"  Risk: {rec.get('risk', '?')}\n"
+            f"  Summary: {rec.get('summary', '')}\n"
+            f"  Action plan: {rec.get('action_plan', '')[:300]}\n"
+            f"  Source links:\n    {link_str}"
+        )
+
+    # Include input items with links for Claude's reference
+    input_links = []
+    for item in chatgpt_report.get("input_items", [])[:50]:
+        url = item.get("url", "")
+        if url:
+            input_links.append(f"  - {url} ({item.get('title', '?')[:60]})")
+
+    user_message = (
+        f"ChatGPT analyzed {chatgpt_report.get('item_count', 0)} research items and produced "
+        f"{len(recs)} recommendations. Review each one.\n\n"
+        f"ChatGPT executive summary: {chatgpt_report.get('executive_summary', '')[:500]}\n\n"
+        f"ChatGPT meta observations: {chatgpt_report.get('meta_observations', '')[:500]}\n\n"
+        f"=== RECOMMENDATIONS TO REVIEW ===\n\n"
+        + "\n\n".join(rec_blocks)
+        + (f"\n\n=== SOURCE LINKS (for reference) ===\n" + "\n".join(input_links[:100]) if input_links else "")
+    )
+
+    # 3. Batch if needed (Claude has 200K context, but let's be safe)
+    # Most reports will fit in one call. Only batch if >50 recs.
+    batch_size = 50
+    batches = [recs[i:i + batch_size] for i in range(0, len(recs), batch_size)]
+
+    if len(batches) == 1:
+        # Single call
+        _CLAUDE_STATUS[claude_report_id]["progress"] = f"Claude reviewing {len(recs)} recommendations..."
+
+        parsed = await _call_claude_api(anthropic_key, user_message, log)
+        all_reviews = parsed.get("reviews", parsed.get("recommendations", []))
+        executive_review = str(parsed.get("executive_review", ""))
+        missed = parsed.get("missed_opportunities", "")
+        staging_plan = str(parsed.get("staging_plan", ""))
+        warnings = str(parsed.get("warnings", ""))
+        tokens_used = parsed.get("_tokens", 0)
+    else:
+        # Multiple batches (rare — only if >50 recs)
+        all_reviews = []
+        executive_reviews = []
+        all_missed = []
+        all_staging = []
+        all_warnings = []
+        tokens_used = 0
+
+        for bi, batch in enumerate(batches):
+            _CLAUDE_STATUS[claude_report_id]["progress"] = f"Claude batch {bi+1}/{len(batches)}..."
+            batch_msg = (
+                f"Batch {bi+1}/{len(batches)}: Review these {len(batch)} recommendations "
+                f"(indices {bi*batch_size} to {bi*batch_size+len(batch)-1}).\n\n"
+                + "\n\n".join(rec_blocks[bi*batch_size:bi*batch_size+len(batch)])
+            )
+            parsed = await _call_claude_api(anthropic_key, batch_msg, log)
+            reviews = parsed.get("reviews", parsed.get("recommendations", []))
+            all_reviews.extend(reviews)
+            if parsed.get("executive_review"):
+                executive_reviews.append(str(parsed["executive_review"]))
+            if parsed.get("missed_opportunities"):
+                all_missed.append(str(parsed["missed_opportunities"]))
+            if parsed.get("staging_plan"):
+                all_staging.append(str(parsed["staging_plan"]))
+            if parsed.get("warnings"):
+                all_warnings.append(str(parsed["warnings"]))
+            tokens_used += parsed.get("_tokens", 0)
+            if bi < len(batches) - 1:
+                await asyncio.sleep(5)
+
+        executive_review = " | ".join(executive_reviews)
+        missed = " | ".join(all_missed)
+        staging_plan = " | ".join(all_staging)
+        warnings = " | ".join(all_warnings)
+
+    # 4. Merge Claude's reviews with ChatGPT's recommendations
+    merged_recs = []
+    for i, rec in enumerate(recs):
+        review = all_reviews[i] if i < len(all_reviews) else {}
+        merged = {
+            "chatgpt_title": rec.get("title", ""),
+            "chatgpt_summary": rec.get("summary", ""),
+            "chatgpt_confidence": rec.get("confidence", 0),
+            "chatgpt_category": rec.get("category", ""),
+            "chatgpt_urgency": rec.get("urgency", ""),
+            "chatgpt_target": rec.get("recommended_target", ""),
+            "chatgpt_risk": rec.get("risk", ""),
+            "source_links": rec.get("source_links", []),
+            "action_plan": rec.get("action_plan", ""),
+            # Claude's assessment
+            "agree": review.get("agree", True),
+            "claude_notes": review.get("claude_notes", ""),
+            "integration_type": review.get("integration_type", "skip"),
+            "target_instance": review.get("target_instance", rec.get("recommended_target", "")),
+            "staging": review.get("staging", "backlog"),
+            "priority_rank": review.get("priority_rank", 999),
+            "dependencies": review.get("dependencies", []),
+            "estimated_effort": review.get("estimated_effort", 0),
+            "stability_risk": review.get("stability_risk", "low"),
+            "implementation_notes": review.get("implementation_notes", ""),
+            # Status tracking
+            "status": "pending",  # pending, in_progress, deployed, skipped
+            "deployed_at": None,
+            "task_id": None,
+        }
+        merged_recs.append(merged)
+
+    # Sort by priority_rank
+    merged_recs.sort(key=lambda r: r.get("priority_rank", 999))
+
+    # 5. Save report
+    report = {
+        "id": claude_report_id,
+        "chatgpt_report_id": chatgpt_report_id,
+        "created_at": datetime.now().isoformat(),
+        "model": "claude-sonnet-4-20250514",
+        "tokens_used": tokens_used,
+        "recommendation_count": len(merged_recs),
+        "executive_review": executive_review,
+        "missed_opportunities": str(missed) if not isinstance(missed, str) else missed,
+        "staging_plan": staging_plan,
+        "warnings": warnings,
+        "recommendations": merged_recs,
+        "status": "complete",
+    }
+    CLAUDE_REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    (CLAUDE_REPORTS_DIR / f"{claude_report_id}.json").write_text(
+        json.dumps(report, indent=2), encoding="utf-8"
+    )
+    log.info(f"Claude report saved: {claude_report_id}, {len(merged_recs)} reviews, {tokens_used} tokens")
+
+
+async def _call_claude_api(anthropic_key: str, user_message: str, log) -> dict:
+    """Call Anthropic API and return parsed JSON."""
+    model = os.environ.get("CLAUDE_REVIEW_MODEL", "claude-sonnet-4-20250514")
+    max_tokens = int(os.environ.get("CLAUDE_REVIEW_MAX_TOKENS", "4096"))
+
+    for attempt in range(3):
+        try:
+            async with httpx.AsyncClient(timeout=180) as client:
+                resp = await client.post(
+                    "https://api.anthropic.com/v1/messages",
+                    headers={
+                        "x-api-key": anthropic_key,
+                        "anthropic-version": "2023-06-01",
+                        "content-type": "application/json",
+                    },
+                    json={
+                        "model": model,
+                        "max_tokens": max_tokens,
+                        "messages": [{"role": "user", "content": user_message}],
+                        "system": _CLAUDE_SYSTEM_PROMPT,
+                    },
+                )
+                if resp.status_code == 429 and attempt < 2:
+                    wait = 30 * (attempt + 1)
+                    log.warning(f"  Claude rate limited, waiting {wait}s")
+                    await asyncio.sleep(wait)
+                    continue
+                resp.raise_for_status()
+                data = resp.json()
+                break
+        except Exception as exc:
+            if attempt < 2:
+                await asyncio.sleep(10 * (attempt + 1))
+            else:
+                raise RuntimeError(f"Claude API failed after 3 attempts: {exc}")
+
+    # Parse response
+    content = data.get("content", [{}])[0].get("text", "")
+    tokens = data.get("usage", {}).get("input_tokens", 0) + data.get("usage", {}).get("output_tokens", 0)
+
+    # Try to extract JSON from content (Claude sometimes wraps in markdown)
+    content = content.strip()
+    if content.startswith("```"):
+        content = content.split("\n", 1)[1] if "\n" in content else content[3:]
+        if content.endswith("```"):
+            content = content[:-3]
+        content = content.strip()
+
+    try:
+        parsed = json.loads(content)
+        parsed["_tokens"] = tokens
+        return parsed
+    except json.JSONDecodeError:
+        raise RuntimeError(f"Claude returned invalid JSON (first 200 chars): {content[:200]}")
+
+
+@app.post("/api/claude/analyze")
+async def claude_analyze(request: Request, user: str = Depends(get_current_user)):
+    """Kick off Claude review of a ChatGPT report."""
+    anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
+    if not anthropic_key:
+        raise HTTPException(500, "ANTHROPIC_API_KEY not configured")
+
+    body = await request.json()
+    chatgpt_report_id = body.get("chatgpt_report_id", "")
+    if not chatgpt_report_id:
+        raise HTTPException(400, "chatgpt_report_id required")
+
+    chatgpt_file = CHATGPT_REPORTS_DIR / f"{chatgpt_report_id}.json"
+    if not chatgpt_file.exists():
+        raise HTTPException(404, "ChatGPT report not found")
+
+    now = datetime.now()
+    claude_report_id = f"claude-{now.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:4]}"
+
+    asyncio.create_task(_run_claude_analysis(claude_report_id, chatgpt_report_id))
+    return {"ok": True, "report_id": claude_report_id, "status": "started"}
+
+
+@app.get("/api/claude/status/{report_id}")
+async def claude_status(report_id: str, user: str = Depends(get_current_user)):
+    """Poll for Claude analysis progress."""
+    if report_id in _CLAUDE_STATUS:
+        return _CLAUDE_STATUS[report_id]
+    report_file = CLAUDE_REPORTS_DIR / f"{report_id}.json"
+    if report_file.exists():
+        return {"status": "complete", "report_id": report_id}
+    return {"status": "unknown", "report_id": report_id}
+
+
+@app.get("/api/claude/reports")
+async def claude_list_reports(user: str = Depends(get_current_user)):
+    """List all Claude analysis reports."""
+    CLAUDE_REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    reports = []
+    for f in sorted(CLAUDE_REPORTS_DIR.glob("*.json"), reverse=True):
+        try:
+            data = json.loads(f.read_text(encoding="utf-8"))
+            reports.append({
+                "id": data["id"],
+                "chatgpt_report_id": data.get("chatgpt_report_id", ""),
+                "created_at": data["created_at"],
+                "recommendation_count": data.get("recommendation_count", 0),
+                "status": data.get("status", "complete"),
+            })
+        except Exception:
+            pass
+    return {"reports": reports}
+
+
+@app.get("/api/claude/reports/{report_id}")
+async def claude_get_report(report_id: str, user: str = Depends(get_current_user)):
+    """Return a full Claude analysis report."""
+    report_file = CLAUDE_REPORTS_DIR / f"{report_id}.json"
+    if not report_file.exists():
+        raise HTTPException(404, "Report not found")
+    return json.loads(report_file.read_text(encoding="utf-8"))
+
+
+@app.post("/api/claude/update-status")
+async def claude_update_rec_status(request: Request, user: str = Depends(get_current_user)):
+    """Update the status of a recommendation in a Claude report."""
+    body = await request.json()
+    report_id = body.get("report_id", "")
+    rec_index = body.get("rec_index", -1)
+    new_status = body.get("status", "")
+
+    valid_statuses = {"pending", "in_progress", "deployed", "skipped"}
+    if new_status not in valid_statuses:
+        raise HTTPException(400, f"Invalid status. Must be one of: {valid_statuses}")
+
+    report_file = CLAUDE_REPORTS_DIR / f"{report_id}.json"
+    if not report_file.exists():
+        raise HTTPException(404, "Report not found")
+
+    report = json.loads(report_file.read_text(encoding="utf-8"))
+    recs = report.get("recommendations", [])
+    if rec_index < 0 or rec_index >= len(recs):
+        raise HTTPException(400, "Invalid recommendation index")
+
+    recs[rec_index]["status"] = new_status
+    if new_status == "deployed":
+        recs[rec_index]["deployed_at"] = datetime.now().isoformat()
+
+    report_file.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    return {"ok": True}
 
 
 @app.get("/{path:path}")
