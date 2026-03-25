@@ -2113,6 +2113,7 @@ body {
           <span style="font-size:0.5rem;color:var(--grey2);letter-spacing:1px;" id="intelLastCrawl">LAST CRAWL: —</span>
         </div>
         <button class="tw-btn primary" onclick="intelRunCrawl()" id="intelCrawlBtn" style="font-size:0.5rem;padding:5px 14px;">RUN CRAWL NOW</button>
+        <button onclick="intelPushToRepoMan()" id="intelPushRepoManBtn" style="font-size:0.5rem;padding:5px 14px;background:transparent;border:1px solid var(--cyan,#00e5ff);color:var(--cyan,#00e5ff);font-family:inherit;cursor:pointer;letter-spacing:1px;transition:all 0.2s;" onmouseover="this.style.background='var(--cyan,#00e5ff)';this.style.color='#000'" onmouseout="this.style.background='transparent';this.style.color='var(--cyan,#00e5ff)'">→ PUSH TO REPO MAN</button>
       </div>
 
       <!-- Signal Platform Tabs -->
@@ -5780,6 +5781,81 @@ loadIntel = async function() {
   pollResearchBadge()
 }
 
+// ── RESEARCH TAB — manual input bucket ────────────────────────────────────
+async function rmBucketSubmit() {
+  const input = document.getElementById('rmBucketInput')
+  const btn   = document.getElementById('rmBucketBtn')
+  const status = document.getElementById('rmBucketStatus')
+  const text = (input.value || '').trim()
+  if (!text) return
+
+  btn.disabled = true
+  btn.textContent = 'QUEUING...'
+  status.textContent = ''
+
+  try {
+    const resp = await fetch('https://research.asdfghjk.lol/api/run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ inputs: text, notes: 'manual — gonzoclaw bucket' })
+    })
+    const data = await resp.json()
+    if (resp.ok) {
+      status.style.color = 'var(--cyan,#00e5ff)'
+      status.textContent = `✓ ${data.item_count} item${data.item_count!==1?'s':''} queued`
+      input.value = ''
+      // Reload iframe so inbox refreshes
+      setTimeout(() => {
+        const frame = document.getElementById('repoManFrame')
+        if (frame.src) frame.src = frame.src
+      }, 3000)
+    } else {
+      status.style.color = '#ff4444'
+      status.textContent = data.detail || 'error'
+    }
+  } catch(e) {
+    status.style.color = '#ff4444'
+    status.textContent = 'Repo Man unreachable'
+  }
+
+  btn.disabled = false
+  btn.textContent = 'RUN REPO MAN'
+}
+
+// ── INTEL PAGE — push scraped intel to Repo Man ────────────────────────────
+async function intelPushToRepoMan() {
+  const btn = document.getElementById('intelPushRepoManBtn')
+  btn.disabled = true
+  btn.textContent = 'PUSHING...'
+
+  try {
+    const resp = await fetch('https://research.asdfghjk.lol/api/push-openclaw-intel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    })
+    const data = await resp.json()
+    if (resp.ok) {
+      btn.textContent = `✓ ${data.queued} PUSHED`
+      btn.style.borderColor = 'var(--cyan,#00e5ff)'
+      btn.style.color = 'var(--cyan,#00e5ff)'
+      setTimeout(() => {
+        btn.textContent = '→ PUSH TO REPO MAN'
+        btn.style.borderColor = ''
+        btn.style.color = ''
+        btn.disabled = false
+      }, 4000)
+    } else {
+      btn.textContent = 'ERROR'
+      btn.style.borderColor = '#ff4444'
+      btn.style.color = '#ff4444'
+      setTimeout(() => { btn.textContent = '→ PUSH TO REPO MAN'; btn.disabled = false }, 3000)
+    }
+  } catch(e) {
+    btn.textContent = 'UNREACHABLE'
+    setTimeout(() => { btn.textContent = '→ PUSH TO REPO MAN'; btn.disabled = false }, 3000)
+  }
+}
+
 // ── RESEARCH TAB — Repo Man embed ─────────────────────────────────────────
 function pollResearchBadge() {
   fetch('https://research.asdfghjk.lol/api/inbox')
@@ -5802,12 +5878,34 @@ setInterval(pollResearchBadge, 60000)
 
 </script>
 
-<!-- RESEARCH PAGE — Repo Man iframe -->
-<div class="page" id="pageResearch" style="height:calc(100vh - 60px);padding:0;">
+<!-- RESEARCH PAGE — input bucket + Repo Man iframe -->
+<div class="page" id="pageResearch" style="display:flex;flex-direction:column;height:calc(100vh - 60px);padding:0;">
+
+  <!-- Manual input bucket -->
+  <div id="rmBucket" style="background:#0d0d0d;border-bottom:1px solid #1e1e1e;padding:12px 16px;flex-shrink:0;">
+    <div style="display:flex;gap:10px;align-items:flex-start;max-width:1200px;margin:0 auto;">
+      <textarea
+        id="rmBucketInput"
+        placeholder="Drop URLs, links, notes — one per line or mixed. Repo Man will parse, fetch, and analyze everything."
+        style="flex:1;background:#111;border:1px solid #2a2a2a;color:#e0e0e0;font-family:inherit;font-size:0.7rem;padding:8px 10px;resize:vertical;min-height:52px;max-height:120px;border-radius:2px;outline:none;letter-spacing:0.3px;"
+        onkeydown="if(event.ctrlKey&&event.key==='Enter')rmBucketSubmit()"
+      ></textarea>
+      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+        <button onclick="rmBucketSubmit()" id="rmBucketBtn"
+          style="background:transparent;border:1px solid var(--cyan,#00e5ff);color:var(--cyan,#00e5ff);font-family:inherit;font-size:0.55rem;letter-spacing:1.5px;padding:6px 14px;cursor:pointer;white-space:nowrap;transition:all 0.2s;"
+          onmouseover="this.style.background='var(--cyan,#00e5ff)';this.style.color='#000'"
+          onmouseout="this.style.background='transparent';this.style.color='var(--cyan,#00e5ff)'"
+        >RUN REPO MAN</button>
+        <span id="rmBucketStatus" style="font-size:0.5rem;color:var(--grey2,#555);letter-spacing:1px;text-align:center;min-height:14px;"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Repo Man inbox iframe -->
   <iframe
     id="repoManFrame"
     src=""
-    style="width:100%;height:100%;border:none;background:#0d0d0d;"
+    style="flex:1;width:100%;border:none;background:#0d0d0d;"
     allow="clipboard-write"
     title="Repo Man Research Feed"
   ></iframe>

@@ -405,4 +405,120 @@ Add Strategy Lab cadence to existing cron or daily-update.sh:
 └── daily/
     └── strategy-lab-{date}.md   ← Phase 4: daily report output
 ```
+
+## 7 Mandates (weave these into the phases above, not as separate work)
+
+These are hardening requirements from the red-team checklist. Build them into the relevant phases, not as afterthoughts.
+
+### Mandate 1: Canonical Scoring Doctrine (Phase 1)
+Define ONE portfolio-level objective in event_logger.py that all layers share:
+```python
+# The canonical objective — every layer optimizes toward this
+CANONICAL_OBJECTIVE = "net_expectancy_after_costs"
+# Secondary constraints (not objectives):
+# - max_drawdown < 25%
+# - min_win_rate > 45%
+# - min_sharpe > 0.8
+# - complexity_penalty: simpler variant wins ties
+```
+The tuner, risk engine, lab, and governor must all score against this same objective. Do not let different layers optimize different metrics.
+
+### Mandate 2: Reason-for-Abstention Logging (Phase 1)
+Every no-trade must emit a decision event with action="abstain" and a classified reason:
+```python
+ABSTAIN_REASONS = [
+    "confidence_below_threshold",
+    "spread_too_wide",
+    "position_limit_reached",
+    "exposure_cap",
+    "cooldown_active",
+    "liquidity_too_low",
+    "conflicting_signal",
+    "regime_block",
+    "time_to_resolution_too_long",
+    "policy_block",
+]
+```
+Without this, the lab cannot learn from missed opportunities. This is non-negotiable.
+
+### Mandate 3: Regime-Conditional Scorecards (Phase 2)
+In diagnose.py, break down every strategy's metrics BY REGIME:
+```json
+{
+  "strategy": "momentum_v1.0",
+  "overall": {"win_rate": 0.58, "sharpe": 1.2, "pnl": 45.0},
+  "by_regime": {
+    "high_vol": {"win_rate": 0.62, "sharpe": 1.5, "pnl": 30.0, "trades": 18},
+    "low_vol": {"win_rate": 0.48, "sharpe": 0.6, "pnl": 15.0, "trades": 24},
+    "trending": {"win_rate": 0.71, "sharpe": 2.1, "pnl": 22.0, "trades": 8}
+  }
+}
+```
+Memory lessons must also be regime-tagged. "This mutation failed in low_vol" ≠ "this mutation always fails."
+
+### Mandate 4: Structural-Decay Detector (Phase 2)
+In diagnose.py, add a function that classifies underperformance:
+```python
+def classify_degradation(strategy_id: str, events: list) -> str:
+    """
+    Returns one of:
+    - "variance" — normal fluctuation, sample too small
+    - "temporary_drift" — recent regime unfavorable, may recover
+    - "parameter_drift" — tunable parameters are stale, self-tuner can fix
+    - "structural_decay" — edge is dying, strategy family may need retirement
+    - "data_issue" — missing/stale data causing false degradation signal
+    - "bug" — behavior doesn't match expected logic
+    """
+```
+The lab must not keep polishing a structurally dead strategy (zombie strategy polishing failure mode).
+
+### Mandate 5: Experiment Ledger as First-Class Object (Phase 1)
+The experiments/ledger.json from Phase 1 must be the single source of truth for ALL mutations. Every entry must have:
+- experiment_id, parent_version, candidate_version
+- hypothesis (structured, not prose)
+- mutation_type
+- data_window_train, data_window_test
+- evaluation_status (pending/running/complete)
+- key_metrics (baseline vs candidate)
+- verdict + reason
+- rollback_status
+- lesson (machine-readable)
+
+The governor, memory, and diagnostician all read/write from this ledger. Not separate stores.
+
+### Mandate 6: Autonomy Boundary Enforcement (Phase 3)
+In governor.py, explicitly define what the lab CAN and CANNOT change:
+```python
+LAB_CAN_CHANGE = [
+    "entry_threshold", "exit_threshold", "confidence_threshold",
+    "max_hold_hours", "min_resolution_hours", "min_liquidity",
+    "size_pct", "cooldown_minutes", "regime_filter",
+    "abstain_conditions", "strategy_status",
+]
+LAB_CANNOT_CHANGE = [
+    "max_position_pct",     # global 10% cap
+    "stop_loss_pct",        # global -20%
+    "take_profit_pct",      # global +50%
+    "kelly_cap",            # global Kelly ceiling
+    "starting_capital",     # wallet settings
+    "api_credentials",      # security
+    "cron_schedule",        # operational
+    "kill_switch",          # safety
+]
+```
+If any mutation attempts to touch a CANNOT_CHANGE parameter, reject immediately.
+
+### Mandate 7: Weekly Cemetery Review (Phase 4)
+In daily_report.py, add a weekly section (every Monday) that reviews:
+- All strategies currently in "degraded" or "retired" state
+- Recurring causes of death across strategy families
+- Whether any retired strategies should be reconsidered (regime changed, data expanded, or original failure analysis was inconclusive)
+- Whether complexity creep is happening (count of active variants vs 30 days ago)
+
+## Red-Team Reference
+
+The full red-team checklist with 16 sections, named failure modes, and go/no-go questions is at:
+~/openclaw/ideas/rivalclaw-redteam-checklist-2026-03-25.md
+
+Run it before the 30-day test begins. Run it weekly during. Every UNKNOWN is a risk.
 ```
