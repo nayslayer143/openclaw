@@ -24,12 +24,14 @@ def _load_env():
                 os.environ.setdefault(k.strip(), v.strip())
 
 # Config
-MAX_TRADES_PER_RUN = 25       # was 6
-POSITION_PCT = 0.03
-MIN_ENTRY = 0.03              # was 0.08
-MAX_ENTRY = 0.97              # was 0.92
-VOLUME_SPIKE_MULT = 1.2       # was 1.5 (easier to trigger)
-PRICE_STALE_THRESHOLD = 0.05  # was 0.02 (more permissive)
+from scripts.mirofish.bot_config import get_param as _p
+
+MAX_TRADES_PER_RUN    = _p("sentimentclaw", "MAX_TRADES_PER_RUN", 25)
+POSITION_PCT          = _p("sentimentclaw", "POSITION_PCT", 0.03)
+MIN_ENTRY             = _p("sentimentclaw", "MIN_ENTRY", 0.03)
+MAX_ENTRY             = _p("sentimentclaw", "MAX_ENTRY", 0.97)
+VOLUME_SPIKE_MULT     = _p("sentimentclaw", "VOLUME_SPIKE_MULT", 1.2)
+PRICE_STALE_THRESHOLD = 0.05  # not yet auto-tuned
 
 
 def _get_conn():
