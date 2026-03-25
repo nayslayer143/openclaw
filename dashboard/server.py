@@ -1131,7 +1131,7 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
 
         # 10b. Per-agent stats for CalendarClaw, NewsClaw, SentimentClaw
         agent_stats = {}
-        for agent_name in ("calendarclaw", "newsclaw", "sentimentclaw"):
+        for agent_name in ("calendarclaw", "newsclaw", "sentimentclaw", "dataharvester"):
             try:
                 ac = conn.execute("""
                     SELECT COUNT(*) as n,
