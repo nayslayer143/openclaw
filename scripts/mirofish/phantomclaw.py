@@ -60,16 +60,19 @@ KELLY_PROVEN = 1.0
 KELLY_NEW = 0.50
 MAX_TRADES_PER_RUN = 12
 SLIPPAGE_BPS = 30
-MIN_ENTRY = 0.05
+MIN_ENTRY = 0.55
 NO_STOP_LOSS_MINUTES = 60   # no stops on contracts expiring < 60 min
 
-# Price bucket multipliers (RivalClaw's key insight)
+# Price bucket multipliers (calibrated from 87 PhantomClaw trades)
+# 0.00-0.50: 0% to 31% win rate, -$795 total → AVOID
+# 0.70-0.85: 95% win rate, +$82 total → SWEET SPOT
+# 0.85-1.00: 83% win rate, -$23 total → OK but thin edge
 PRICE_BUCKET_MULT = {
-    "sweet_spot": 0.5,   # 0.10-0.30 entry — $101 avg profit
-    "ok_low": 0.8,       # <0.10 or 0.30-0.50
-    "dead_zone": 2.0,    # 0.50-0.70 — NEGATIVE EV, avoid
-    "ok_high": 1.0,      # 0.70-0.90
-    "expensive": 1.5,    # >0.90
+    "dead_zone": 2.0,    # <0.55 — NEGATIVE EV, skip
+    "ok_mid": 1.2,       # 0.55-0.70 — untested, cautious
+    "sweet_spot": 0.5,   # 0.70-0.85 — 95% win rate, best bucket
+    "ok_high": 1.0,      # 0.85-0.95 — 83% win rate, ok
+    "expensive": 1.5,    # >0.95 — tiny edge
 }
 
 # Realized volatility defaults (will be overwritten by spot data)
@@ -147,11 +150,10 @@ def _bs_fair_value_bracket(spot: float, floor_strike: float, cap_strike: float,
 
 
 def _price_bucket(entry: float) -> str:
-    if entry < 0.10: return "ok_low"
-    if entry < 0.30: return "sweet_spot"
-    if entry < 0.50: return "ok_low"
-    if entry < 0.70: return "dead_zone"
-    if entry < 0.90: return "ok_high"
+    if entry < 0.55: return "dead_zone"
+    if entry < 0.70: return "ok_mid"
+    if entry < 0.85: return "sweet_spot"
+    if entry < 0.95: return "ok_high"
     return "expensive"
 
 

@@ -4352,8 +4352,7 @@ function renderTrading() {
   const lossCount = (w.total_trades||0) - winCount
   const wlEl = document.getElementById('tWinLoss')
   if (wlEl) {
-    wlEl.textContent = winCount + ' / ' + lossCount
-    wlEl.style.color = winCount >= lossCount ? 'var(--neon-green)' : 'var(--neon-red)'
+    wlEl.innerHTML = `<span style="color:var(--neon-green)">${winCount}W</span> <span style="color:var(--neon-red)">${lossCount}L</span>`
   }
   const wrEl = document.getElementById('tWinRate')
   if (wrEl) wrEl.textContent = (w.win_rate||0).toFixed(0) + '% win rate'
@@ -4412,8 +4411,7 @@ function renderTrading() {
     }
     const phWLEl = document.getElementById('phWL')
     if (phWLEl) {
-      phWLEl.textContent = (ph.wins || 0) + '/' + (ph.losses || 0)
-      phWLEl.style.color = (ph.wins || 0) >= (ph.losses || 0) ? '#00e5ff' : '#ff2d95'
+      phWLEl.innerHTML = `<span style="color:#00e5ff">${ph.wins||0}W</span> <span style="color:#ff2d95">${ph.losses||0}L</span>`
     }
     document.querySelectorAll('#phWR, #phWR2').forEach(el => { el.textContent = (ph.win_rate || 0).toFixed(0) + '%' })
     const phOpenEl = document.getElementById('phOpen')
@@ -4490,8 +4488,7 @@ function renderTrading() {
     }
     const wlEl = document.getElementById(cfg.wl)
     if (wlEl) {
-      wlEl.textContent = (ag.wins || 0) + '/' + (ag.losses || 0)
-      wlEl.style.color = (ag.wins || 0) >= (ag.losses || 0) ? cfg.color : '#ff2d95'
+      wlEl.innerHTML = `<span style="color:${cfg.color}">${ag.wins||0}W</span> <span style="color:#ff2d95">${ag.losses||0}L</span>`
     }
     const oEl = document.getElementById(cfg.open)
     if (oEl) {
@@ -4534,8 +4531,8 @@ function renderTrading() {
     }
     const qcWLEl = document.getElementById('qcWL')
     if (qcWLEl) {
-      qcWLEl.textContent = (qcW.wins || 0) + '/' + ((qcW.total_trades || 0) - (qcW.wins || 0))
-      qcWLEl.style.color = (qcW.wins || 0) >= ((qcW.total_trades || 0) - (qcW.wins || 0)) ? '#00d4ff' : '#ff2d95'
+      const qcLosses = (qcW.total_trades || 0) - (qcW.wins || 0)
+      qcWLEl.innerHTML = `<span style="color:#00d4ff">${qcW.wins||0}W</span> <span style="color:#ff2d95">${qcLosses}L</span>`
     }
     const qcOpenEl = document.getElementById('qcOpen')
     if (qcOpenEl) qcOpenEl.textContent = qcW.open_positions || 0
@@ -4614,8 +4611,7 @@ function renderExperiment(d) {
       const rcWLel = document.getElementById('rcWL')
       if (rcWLel) {
         const rcWins = w.win_count || 0
-        rcWLel.textContent = rcWins + '/' + (w.total_trades - rcWins)
-        rcWLel.style.color = rcWins >= (w.total_trades - rcWins) ? 'var(--neon-green)' : 'var(--neon-red)'
+        rcWLel.innerHTML = `<span style="color:var(--neon-green)">${rcWins}W</span> <span style="color:var(--neon-red)">${w.total_trades - rcWins}L</span>`
       }
       // RivalClaw hero trade body
       const rcBody = document.getElementById('rcTradesBody')
