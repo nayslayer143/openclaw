@@ -6234,13 +6234,38 @@ async function chatgptAnalyze() {
       body: JSON.stringify({ item_limit: 1000, batch_size: 25 })
     })
     if (r.ok) {
-      const report = await r.json()
-      status.style.color = 'var(--neon-green,#00ff88)'
-      status.textContent = '\u2713 Report generated \u2014 ' + report.recommendations.length + ' recommendations'
-      switchResearchTab('reports')
-      chatgptRenderReport(report)
+      const data = await r.json()
+      var rid = data.report_id
+      status.textContent = 'Analysis started \u2014 polling for progress...'
+      // Poll for completion
+      var pollInterval = setInterval(async function() {
+        try {
+          var sr = await fetch('/api/chatgpt/status/' + rid)
+          if (!sr.ok) return
+          var sd = await sr.json()
+          if (sd.status === 'running') {
+            status.style.color = 'var(--neon-cyan,#00d4ff)'
+            status.textContent = sd.progress || 'Processing...'
+          } else if (sd.status === 'complete') {
+            clearInterval(pollInterval)
+            status.style.color = 'var(--neon-green,#00ff88)'
+            status.textContent = '\u2713 Report complete!'
+            btn.disabled = false
+            btn.textContent = '\u26a1 SEND TO CHATGPT'
+            switchResearchTab('reports')
+            chatgptLoadReport(rid)
+          } else if (sd.status === 'error') {
+            clearInterval(pollInterval)
+            status.style.color = 'var(--neon-red,#ff002e)'
+            status.textContent = 'Error: ' + (sd.error || 'unknown').substring(0, 100)
+            btn.disabled = false
+            btn.textContent = '\u26a1 SEND TO CHATGPT'
+          }
+        } catch(pe) {}
+      }, 3000)
+      return  // don't reset button — polling handles it
     } else {
-      const e = await r.json().catch(() => ({}))
+      const e = await r.json().catch(function() { return {} })
       status.style.color = 'var(--neon-red,#ff002e)'
       status.textContent = e.detail || 'Analysis failed'
     }

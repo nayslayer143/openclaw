@@ -2387,9 +2387,179 @@ Each recommendation MUST include:
 Respond ONLY with valid JSON. No markdown fences, no commentary outside the JSON."""
 
 
+_ANALYZE_STATUS = {}  # report_id -> {"status": "running"|"complete"|"error", "progress": "Batch 2/32", ...}
+
+
+async def _run_chatgpt_analysis(report_id: str, item_limit: int, batch_size: int, user: str):
+    """Background worker: fetch from Repo Man, batch through GPT, save report."""
+    import logging
+    log = logging.getLogger("dashboard")
+    openai_key = os.environ.get("OPENAI_API_KEY", "")
+    _ANALYZE_STATUS[report_id] = {"status": "running", "progress": "Fetching items from Repo Man..."}
+
+    try:
+        await _do_chatgpt_analysis(report_id, item_limit, batch_size, openai_key, log)
+        _ANALYZE_STATUS[report_id] = {"status": "complete", "report_id": report_id}
+    except Exception as exc:
+        log.error(f"ChatGPT analysis failed: {exc}")
+        _ANALYZE_STATUS[report_id] = {"status": "error", "error": str(exc)}
+
+
+async def _do_chatgpt_analysis(report_id: str, item_limit: int, batch_size: int, openai_key: str, log):
+    """Core analysis logic — called by background worker."""
+    # 1. Fetch
+    async with httpx.AsyncClient(timeout=30) as client:
+        resp = await client.get(f"{REPO_MAN_API}/api/inbox", params={"limit": item_limit})
+        resp.raise_for_status()
+        items = resp.json().get("items", [])
+    if not items:
+        raise RuntimeError("No completed research items to analyze")
+
+    _ANALYZE_STATUS[report_id]["progress"] = f"Predigesting {len(items)} items..."
+
+    # 2. Predigest
+    def _extract(item):
+        analysis, key_ideas = "", []
+        for k in ("claude_analysis", "openai_analysis", "ollama_analysis"):
+            a = item.get(k)
+            if a and isinstance(a, dict):
+                if not analysis and a.get("summary"):
+                    analysis = a["summary"][:250]
+                if not key_ideas and a.get("key_ideas"):
+                    key_ideas = [str(x)[:60] for x in a["key_ideas"][:3]]
+        routing = item.get("openclaw_routing") or {}
+        return {
+            "id": item.get("id") or "unknown",
+            "title": (item.get("title") or "Untitled")[:100],
+            "url": item.get("raw_input") or "",
+            "source": item.get("source_type") or "unknown",
+            "novelty": round(item.get("novelty_score") or 0, 2),
+            "action": item.get("action_recommendation") or "",
+            "analysis": analysis, "ideas": key_ideas,
+            "target": routing.get("recommended_instance", ""),
+            "route_reason": routing.get("reasoning", "")[:100],
+        }
+
+    digested = [_extract(i) for i in items]
+    digested.sort(key=lambda x: x["novelty"], reverse=True)
+
+    input_items_summary = [
+        {"id": d["id"], "title": d["title"], "url": d["url"],
+         "source_type": d["source"], "novelty_score": d["novelty"],
+         "action_recommendation": d["action"]}
+        for d in digested
+    ]
+
+    def _block(d):
+        return (
+            f"[{d['id']}] {d['title']} | novelty={d['novelty']} | {d['action']}\n"
+            f"  LINK: {d['url']}\n"
+            f"  {d['analysis']}\n  Ideas: {', '.join(d['ideas'])}\n  -> {d['target']} ({d['route_reason']})"
+        )
+
+    # 3. Batch through GPT
+    model = os.environ.get("CHATGPT_RESEARCH_MODEL", "gpt-4o-mini")
+    max_tokens = int(os.environ.get("CHATGPT_RESEARCH_MAX_TOKENS", "2048"))
+    batches = [digested[i:i + batch_size] for i in range(0, len(digested), batch_size)]
+    all_recs, all_summaries, all_meta, total_tokens, batch_errors = [], [], [], 0, []
+
+    log.info(f"ChatGPT analyze: {len(items)} items -> {len(batches)} batches of <={batch_size}")
+
+    for bi, batch in enumerate(batches):
+        _ANALYZE_STATUS[report_id]["progress"] = f"Batch {bi+1}/{len(batches)} ({len(batch)} items)..."
+
+        user_msg = (
+            f"Batch {bi+1}/{len(batches)}: Analyze these {len(batch)} research items "
+            f"and provide strategic recommendations:\n\n"
+            + "\n\n".join(_block(d) for d in batch)
+        )
+
+        oai_data = None
+        for attempt in range(3):
+            try:
+                async with httpx.AsyncClient(timeout=120) as client:
+                    oai_resp = await client.post(
+                        "https://api.openai.com/v1/chat/completions",
+                        headers={"Authorization": f"Bearer {openai_key}", "Content-Type": "application/json"},
+                        json={
+                            "model": model, "max_tokens": max_tokens, "temperature": 0.3,
+                            "response_format": {"type": "json_object"},
+                            "messages": [
+                                {"role": "system", "content": _CHATGPT_SYSTEM_PROMPT},
+                                {"role": "user", "content": user_msg},
+                            ],
+                        },
+                    )
+                    if oai_resp.status_code == 429 and attempt < 2:
+                        raw_wait = oai_resp.headers.get("retry-after", "")
+                        wait = max(int(raw_wait) if raw_wait.isdigit() else 0, 30 * (attempt + 1))
+                        _ANALYZE_STATUS[report_id]["progress"] = f"Batch {bi+1}: rate limited, retrying in {wait}s..."
+                        log.warning(f"  Batch {bi+1}: rate limited, waiting {wait}s")
+                        await asyncio.sleep(wait)
+                        continue
+                    oai_resp.raise_for_status()
+                    oai_data = oai_resp.json()
+                    break
+            except Exception as exc:
+                if attempt < 2:
+                    await asyncio.sleep(10 * (attempt + 1))
+                else:
+                    batch_errors.append(f"Batch {bi+1}: {exc}")
+                continue
+
+        if not oai_data:
+            continue
+
+        total_tokens += oai_data.get("usage", {}).get("total_tokens", 0)
+        try:
+            parsed = json.loads(oai_data["choices"][0]["message"]["content"])
+        except (json.JSONDecodeError, KeyError):
+            batch_errors.append(f"Batch {bi+1}: invalid JSON")
+            continue
+
+        recs = parsed.get("recommendations", [])
+        for rec in recs:
+            rec.setdefault("deployed", False)
+            rec.setdefault("deployed_at", None)
+            rec.setdefault("task_id", None)
+            rec.setdefault("risk_notes", None)
+            rec["_batch"] = bi + 1
+        all_recs.extend(recs)
+        if parsed.get("executive_summary"):
+            all_summaries.append(str(parsed["executive_summary"]))
+        if parsed.get("meta_observations"):
+            all_meta.append(str(parsed["meta_observations"]))
+
+        log.info(f"  Batch {bi+1}: {len(recs)} recs, {total_tokens} tokens so far")
+
+        if bi < len(batches) - 1:
+            await asyncio.sleep(15)
+
+    if not all_recs and not all_summaries:
+        raise RuntimeError(f"All {len(batches)} batches failed: {batch_errors[:3]}")
+
+    # 4. Save consolidated report
+    all_recs.sort(key=lambda r: r.get("confidence", 0), reverse=True)
+    report = {
+        "id": report_id,
+        "created_at": datetime.now().isoformat(),
+        "model": model, "tokens_used": total_tokens,
+        "item_count": len(items), "batch_count": len(batches),
+        "input_items": input_items_summary,
+        "executive_summary": " | ".join(all_summaries),
+        "recommendations": all_recs,
+        "meta_observations": " | ".join(all_meta),
+        "batch_errors": batch_errors,
+        "status": "complete",
+    }
+    CHATGPT_REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    (CHATGPT_REPORTS_DIR / f"{report_id}.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
+    log.info(f"ChatGPT report saved: {report_id}, {len(all_recs)} recs, {total_tokens} tokens")
+
+
 @app.post("/api/chatgpt/analyze")
 async def chatgpt_analyze(request: Request, user: str = Depends(get_current_user)):
-    """Fetch research from Repo Man, send to GPT-4o, save report."""
+    """Kick off analysis as background task, return report_id immediately."""
     openai_key = os.environ.get("OPENAI_API_KEY", "")
     if not openai_key:
         raise HTTPException(500, "OPENAI_API_KEY not configured")
@@ -2402,197 +2572,27 @@ async def chatgpt_analyze(request: Request, user: str = Depends(get_current_user
     item_limit = body.get("item_limit", 1000)
     batch_size = body.get("batch_size", 25)
 
-    # 1. Fetch completed items from Repo Man
-    try:
-        async with httpx.AsyncClient(timeout=30) as client:
-            resp = await client.get(f"{REPO_MAN_API}/api/inbox", params={"limit": item_limit})
-            resp.raise_for_status()
-            inbox = resp.json()
-    except Exception as exc:
-        raise HTTPException(502, f"Failed to fetch from Repo Man: {exc}")
-
-    items = inbox.get("items", [])
-    if not items:
-        raise HTTPException(400, "No completed research items to analyze")
-
-    # 2. Predigest: extract essentials, cluster similar items, compress
-    def _extract_item(item):
-        """Pull only the fields GPT needs, aggressively truncated."""
-        analysis = ""
-        key_ideas = []
-        for key in ("claude_analysis", "openai_analysis", "ollama_analysis"):
-            a = item.get(key)
-            if a and isinstance(a, dict):
-                if not analysis and a.get("summary"):
-                    analysis = a["summary"][:250]
-                if not key_ideas and a.get("key_ideas"):
-                    key_ideas = [str(k)[:60] for k in a["key_ideas"][:3]]
-        routing = item.get("openclaw_routing") or {}
-        return {
-            "id": item.get("id") or "unknown",
-            "title": (item.get("title") or "Untitled")[:100],
-            "url": item.get("raw_input") or "",
-            "source": item.get("source_type") or "unknown",
-            "novelty": round(item.get("novelty_score") or 0, 2),
-            "action": item.get("action_recommendation") or "",
-            "analysis": analysis,
-            "ideas": key_ideas,
-            "target": routing.get("recommended_instance", ""),
-            "route_reason": routing.get("reasoning", "")[:100],
-        }
-
-    digested = [_extract_item(i) for i in items]
-
-    # Build per-item blocks with links
-    input_items_summary = []
-    for d in digested:
-        input_items_summary.append({
-            "id": d["id"], "title": d["title"], "url": d["url"],
-            "source_type": d["source"], "novelty_score": d["novelty"],
-            "action_recommendation": d["action"],
-        })
-
-    def _build_item_block(d):
-        return (
-            f"[{d['id']}] {d['title']} | novelty={d['novelty']} | {d['action']}\n"
-            f"  LINK: {d['url']}\n"
-            f"  {d['analysis']}\n  Ideas: {', '.join(d['ideas'])}\n  → {d['target']} ({d['route_reason']})"
-        )
-
-    # 3. Process in batches — each batch gets its own GPT call
-    import logging
-    log = logging.getLogger("dashboard")
-    model = os.environ.get("CHATGPT_RESEARCH_MODEL", "gpt-4o-mini")
-    max_tokens = int(os.environ.get("CHATGPT_RESEARCH_MAX_TOKENS", "2048"))
-
-    # Sort by novelty descending so highest-signal items are in batch 1
-    digested.sort(key=lambda x: x["novelty"], reverse=True)
-
-    batches = [digested[i:i + batch_size] for i in range(0, len(digested), batch_size)]
-    all_recs = []
-    all_summaries = []
-    all_meta = []
-    total_tokens = 0
-    batch_errors = []
-
-    log.info(f"ChatGPT analyze: {len(items)} items → {len(batches)} batches of ≤{batch_size}")
-
-    for batch_idx, batch in enumerate(batches):
-        # Build prompt for this batch
-        item_blocks = [_build_item_block(d) for d in batch]
-        user_message = (
-            f"Batch {batch_idx + 1}/{len(batches)}: Analyze these {len(batch)} research items "
-            f"and provide strategic recommendations:\n\n"
-            + "\n\n".join(item_blocks)
-        )
-
-        prompt_chars = len(_CHATGPT_SYSTEM_PROMPT) + len(user_message)
-        log.info(f"  Batch {batch_idx + 1}: {len(batch)} items, ~{prompt_chars // 4} tokens")
-
-        # Call OpenAI with retry
-        oai_data = None
-        for attempt in range(3):
-            try:
-                async with httpx.AsyncClient(timeout=120) as client:
-                    oai_resp = await client.post(
-                        "https://api.openai.com/v1/chat/completions",
-                        headers={
-                            "Authorization": f"Bearer {openai_key}",
-                            "Content-Type": "application/json",
-                        },
-                        json={
-                            "model": model,
-                            "max_tokens": max_tokens,
-                            "temperature": 0.3,
-                            "response_format": {"type": "json_object"},
-                            "messages": [
-                                {"role": "system", "content": _CHATGPT_SYSTEM_PROMPT},
-                                {"role": "user", "content": user_message},
-                            ],
-                        },
-                    )
-                    if oai_resp.status_code == 429 and attempt < 2:
-                        raw_wait = oai_resp.headers.get("retry-after", "")
-                        wait = max(int(raw_wait) if raw_wait.isdigit() else 0, 30 * (attempt + 1))
-                        log.warning(f"  Batch {batch_idx + 1}: rate limited, waiting {wait}s")
-                        await asyncio.sleep(wait)
-                        continue
-                    oai_resp.raise_for_status()
-                    oai_data = oai_resp.json()
-                    break
-            except Exception as exc:
-                if attempt < 2:
-                    await asyncio.sleep(10 * (attempt + 1))
-                else:
-                    batch_errors.append(f"Batch {batch_idx + 1}: {exc}")
-                continue
-
-        if not oai_data:
-            continue
-
-        total_tokens += oai_data.get("usage", {}).get("total_tokens", 0)
-
-        try:
-            parsed = json.loads(oai_data["choices"][0]["message"]["content"])
-        except (json.JSONDecodeError, KeyError):
-            batch_errors.append(f"Batch {batch_idx + 1}: invalid JSON response")
-            continue
-
-        # Collect results
-        batch_recs = parsed.get("recommendations", [])
-        for rec in batch_recs:
-            rec.setdefault("deployed", False)
-            rec.setdefault("deployed_at", None)
-            rec.setdefault("task_id", None)
-            rec.setdefault("risk_notes", None)
-            rec["_batch"] = batch_idx + 1
-        all_recs.extend(batch_recs)
-
-        if parsed.get("executive_summary"):
-            all_summaries.append(parsed["executive_summary"])
-        if parsed.get("meta_observations"):
-            all_meta.append(parsed["meta_observations"])
-
-        log.info(f"  Batch {batch_idx + 1}: {len(batch_recs)} recommendations")
-
-        # Pause between batches to respect Tier 1 rate limits (~30K TPM)
-        if batch_idx < len(batches) - 1:
-            await asyncio.sleep(15)
-
-    if not all_recs and not all_summaries:
-        detail = f"All {len(batches)} batches failed"
-        if batch_errors:
-            detail += f": {batch_errors[0]}"
-        raise HTTPException(502, detail)
-
-    # 5. Consolidate into one report
-    # Sort recommendations by confidence descending
-    all_recs.sort(key=lambda r: r.get("confidence", 0), reverse=True)
-
     now = datetime.now()
     report_id = f"rpt-{now.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:4]}"
 
-    report = {
-        "id": report_id,
-        "created_at": now.isoformat(),
-        "model": model,
-        "tokens_used": total_tokens,
-        "item_count": len(items),
-        "batch_count": len(batches),
-        "input_items": input_items_summary,
-        "executive_summary": " | ".join(str(s) if not isinstance(s, list) else "; ".join(str(x) for x in s) for s in all_summaries) if all_summaries else "",
-        "recommendations": all_recs,
-        "meta_observations": " | ".join(str(s) if not isinstance(s, list) else "; ".join(str(x) for x in s) for s in all_meta) if all_meta else "",
-        "batch_errors": batch_errors,
-        "status": "complete",
-    }
+    asyncio.create_task(_run_chatgpt_analysis(report_id, item_limit, batch_size, user))
 
-    # 6. Save
-    CHATGPT_REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    return {"ok": True, "report_id": report_id, "status": "started", "message": "Analysis running in background"}
+
+
+@app.get("/api/chatgpt/status/{report_id}")
+async def chatgpt_status(report_id: str, user: str = Depends(get_current_user)):
+    """Poll for analysis progress."""
+    if report_id in _ANALYZE_STATUS:
+        return _ANALYZE_STATUS[report_id]
+    # Check if report file already exists (completed)
     report_file = CHATGPT_REPORTS_DIR / f"{report_id}.json"
-    report_file.write_text(json.dumps(report, indent=2), encoding="utf-8")
+    if report_file.exists():
+        return {"status": "complete", "report_id": report_id}
+    return {"status": "unknown", "report_id": report_id}
 
-    return report
+
+# (analysis logic is in _do_chatgpt_analysis above)
 
 
 @app.get("/api/chatgpt/reports")
