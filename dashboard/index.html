@@ -4270,11 +4270,11 @@ function renderTrading() {
   const d = tradingData
   if (!d) return
 
-  // Update time + live dot pulse
-  document.getElementById('tradingLastUpdate').textContent = 'LIVE ' + new Date().toLocaleTimeString()
+  // Update time
+  try { document.getElementById('tradingLastUpdate').textContent = 'LIVE ' + new Date().toLocaleTimeString() } catch(e){}
 
   // Build ticker tape
-  buildTickerTape(d)
+  try { buildTickerTape(d) } catch(e) { console.error('Ticker:', e) }
 
   // Portfolio cards
   const w = d.wallet
@@ -4315,19 +4315,23 @@ function renderTrading() {
     gradEl.style.color = 'var(--grey2)'
   }
 
-  // Live balance chart — seed from trade history, then track live
-  seedBalanceHistory(d)
-  trackBalance(w.balance)
+  // Live balance chart
+  try {
+    seedBalanceHistory(d)
+    trackBalance(w.balance)
+  } catch(e) { console.error('Balance chart:', e) }
 
   // Gates
-  const gates = [
-    ['gateRoi', g.roi_7d_pass], ['gateWin', g.win_rate_pass],
-    ['gateSharpe', g.sharpe_pass], ['gateDD', g.drawdown_pass]
-  ]
-  gates.forEach(([id, pass]) => {
-    const el = document.getElementById(id)
-    el.className = 't-gate ' + (g.has_min_history ? (pass ? 'pass' : 'fail') : '')
-  })
+  try {
+    const gates = [
+      ['gateRoi', g.roi_7d_pass], ['gateWin', g.win_rate_pass],
+      ['gateSharpe', g.sharpe_pass], ['gateDD', g.drawdown_pass]
+    ]
+    gates.forEach(([id, pass]) => {
+      const el = document.getElementById(id)
+      if (el) el.className = 't-gate ' + (g.has_min_history ? (pass ? 'pass' : 'fail') : '')
+    })
+  } catch(e) { console.error('Gates:', e) }
 
   // PhantomClaw hero card
   try {
@@ -4364,7 +4368,11 @@ function renderTrading() {
         phBody.innerHTML = '<tr><td colspan="4" style="color:rgba(255,0,200,0.3);text-align:center">scanning...</td></tr>'
       }
     }
-  } catch(e) { console.error('PhantomClaw render:', e) }
+  } catch(e) {
+    console.error('PhantomClaw render:', e)
+    const phErrBody = document.getElementById('phBody')
+    if (phErrBody) phErrBody.innerHTML = `<tr><td colspan="4" style="color:red">JS ERROR: ${e.message}</td></tr>`
+  }
 
   // Clawmpson hero card (try/catch isolated)
   try {
@@ -4389,7 +4397,11 @@ function renderTrading() {
     clawBody.innerHTML = '<tr><td colspan="5" style="color:var(--grey2);text-align:center">awaiting trades...</td></tr>'
   }
 
-  } catch(e) { console.error('Clawmpson render:', e) }
+  } catch(e) {
+    console.error('Clawmpson render:', e)
+    const clErrBody = document.getElementById('clawmpsonBody')
+    if (clErrBody) clErrBody.innerHTML = `<tr><td colspan="5" style="color:red">JS ERROR: ${e.message}</td></tr>`
+  }
 
   // New agents: CalendarClaw, NewsClaw, SentimentClaw
   const agentConfigs = [
@@ -4434,7 +4446,11 @@ function renderTrading() {
   }
 
   // Unified Trade Feed — merge ALL open positions from all bots
-  try { buildUnifiedFeed(d) } catch(e) { console.error('UnifiedFeed render:', e) }
+  try { buildUnifiedFeed(d) } catch(e) {
+    console.error('UnifiedFeed render:', e)
+    const ufErrBody = document.getElementById('ufBody')
+    if (ufErrBody) ufErrBody.innerHTML = `<tr><td colspan="10" style="color:red">FEED ERROR: ${e.message}</td></tr>`
+  }
 
   // Missed opportunities
   const missed = d.missed_opportunities || []
