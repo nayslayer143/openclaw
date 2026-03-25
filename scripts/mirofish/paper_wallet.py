@@ -18,6 +18,9 @@ MIN_HISTORY_DAYS = int(os.environ.get("MIROFISH_MIN_HISTORY_DAYS", "7"))
 
 # Execution simulation parameters
 SLIPPAGE_BPS     = float(os.environ.get("MIROFISH_SLIPPAGE_BPS",     "50"))   # 50 bps = 0.5%
+
+# Sub-agent strategies excluded from Clawmpson's wallet (each has its own $1000)
+_SUBAGENT_STRATEGIES = ("phantomclaw_fv", "calendarclaw", "newsclaw", "sentimentclaw", "dataharvester")
 LATENCY_PENALTY  = float(os.environ.get("MIROFISH_LATENCY_PENALTY",  "0.002")) # 0.2% stale price risk
 FILL_RATE_MIN    = float(os.environ.get("MIROFISH_FILL_RATE_MIN",    "0.80"))  # min 80% fill
 EXECUTION_SIM    = os.environ.get("MIROFISH_EXECUTION_SIM", "1") == "1"        # on by default
@@ -180,11 +183,13 @@ def _compute_balance(starting: float, prices: dict[str, dict]) -> float:
     with _get_conn() as conn:
         # Includes closed_win, closed_loss, and expired — all have their final pnl stored at close time
         # Only count active trades (not reset rounds)
+        # Clawmpson wallet: exclude sub-agent trades (each has its own wallet)
+        excl = ",".join(f"'{s}'" for s in _SUBAGENT_STRATEGIES)
         closed = conn.execute(
-            "SELECT COALESCE(SUM(pnl), 0) as total FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')"
+            f"SELECT COALESCE(SUM(pnl), 0) as total FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired') AND strategy NOT IN ({excl})"
         ).fetchone()["total"]
         open_trades = conn.execute(
-            "SELECT market_id, direction, shares, entry_price FROM paper_trades WHERE status='open'"
+            f"SELECT market_id, direction, shares, entry_price FROM paper_trades WHERE status='open' AND strategy NOT IN ({excl})"
         ).fetchall()
 
     unrealized = 0.0
@@ -206,11 +211,12 @@ def get_state() -> dict[str, Any]:
     balance = _compute_balance(starting, prices)
 
     with _get_conn() as conn:
+        excl = ",".join(f"'{s}'" for s in _SUBAGENT_STRATEGIES)
         closed_trades = conn.execute(
-            "SELECT status FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')"
+            f"SELECT status FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired') AND strategy NOT IN ({excl})"
         ).fetchall()
         open_positions = conn.execute(
-            "SELECT COUNT(*) as cnt FROM paper_trades WHERE status='open'"
+            f"SELECT COUNT(*) as cnt FROM paper_trades WHERE status='open' AND strategy NOT IN ({excl})"
         ).fetchone()["cnt"]
         daily_rows = conn.execute(
             "SELECT balance, roi_pct FROM daily_pnl ORDER BY date ASC"
