@@ -1,0 +1,2469 @@
+{
+  "platform": "facebook",
+  "crawl_id": "facebook-20260325033615",
+  "crawled_at": "2026-03-25T03:36:26.241356",
+  "signals": [
+    {
+      "id": "5e46260576e97704",
+      "type": "strategy",
+      "source_url": "https://www.cnbc.com/2026/03/24/trump-iran-war-negotiations.html",
+      "source_author": "www.cnbc.com",
+      "title": "U.S. sent Iran 15-point plan to end war, report says; Trump says 'in negotiations right now'",
+      "body": "\"Operation Epic Fury continues unabated\" to achieve President Donald Trump's military objectives, White House press secretary Karoline Leavitt said.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "realtime",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 22:54:07 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.235890+00:00"
+    },
+    {
+      "id": "4958f6cc8ffc1989",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/25/recession-odds-climb-on-wall-street-as-economy-shows-cracks-beneath-the-surface.html",
+      "source_author": "www.cnbc.com",
+      "title": "Recession odds climb on Wall Street as economy shows cracks beneath the surface",
+      "body": "Economists have pulled up their risk assessments of a contraction amid heightened uncertainty over geopolitical risk and a labor market slump.",
+      "ticker_or_market": "",
+      "direction": "bullish",
+      "confidence": 0.55,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss",
+        "fear"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "fear",
+        "created_at": "Wed, 25 Mar 2026 10:07:58 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.236017+00:00"
+    },
+    {
+      "id": "284a77d5b2177330",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/25/private-credit-defaults-loan-quality-debt-risk-systemic-ai-disruption.html",
+      "source_author": "www.cnbc.com",
+      "title": "Private credit\u2019s \u2018zero-loss fantasy\u2019 is coming to an end as defaults and fund exits rise",
+      "body": "Private credit is expected to see a surge in defaults as investors continue to pull money from the sector.",
+      "ticker_or_market": "",
+      "direction": "bearish",
+      "confidence": 0.55,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 09:51:07 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.236125+00:00"
+    },
+    {
+      "id": "b2a68c59002f8c76",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/24/meta-offers-stock-awards-options-for-executives-aggressive-timing.html",
+      "source_author": "www.cnbc.com",
+      "title": "Meta makes 'big bet' on top leaders with stock options as pressure builds to catch up in AI",
+      "body": "Meta is granting stock options to top executives as pressure on the company intensifies in the AI battle.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 09:56:39 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.236194+00:00"
+    },
+    {
+      "id": "98bc002da5e144de",
+      "type": "prediction",
+      "source_url": "https://www.cnbc.com/2026/03/24/openai-secures-an-extra-10-billion-in-record-funding-round-cfo-friar-says.html",
+      "source_author": "www.cnbc.com",
+      "title": "OpenAI raises additional money to bring record funding round to $120 billion, CFO tells Cramer",
+      "body": "The fresh capital brings OpenAI's historic fundraise to $120 billion, exceeding the ChatGPT creator's initial target of $100 billion.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 23:37:34 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.236258+00:00"
+    },
+    {
+      "id": "1eba7ac665b7a9dc",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/24/jury-reaches-verdict-in-meta-child-safety-trial-in-new-mexico.html",
+      "source_author": "www.cnbc.com",
+      "title": "Meta must pay $375 million for violating New Mexico law in child exploitation case, jury rules",
+      "body": "Jury reaches a verdict in New Mexico trial in which the state's attorney general alleged that Meta failed to safeguard its family of apps from child predators.",
+      "ticker_or_market": "",
+      "direction": "bearish",
+      "confidence": 0.55,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 03:57:01 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.236325+00:00"
+    },
+    {
+      "id": "e3f8c8140d9e9809",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/24/arm-stock-pops-haas-chip-cpu.html",
+      "source_author": "www.cnbc.com",
+      "title": "Arm stock pops 6% as CEO Haas issues $15 billion revenue expectation for new chip",
+      "body": "Arm unveiled its first in-house chip on Tuesday at an event in San Francisco, with Meta as the initial customer.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 09:54:47 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.236383+00:00"
+    },
+    {
+      "id": "5ea90808d4305d25",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/24/anthropic-lawsuit-pentagon-supply-chain-risk-claude.html",
+      "source_author": "www.cnbc.com",
+      "title": "Judge presses DOD on why Anthropic was blacklisted: 'That seems a pretty low bar'",
+      "body": "The Defense Department designated Anthropic as a risk to U.S. national security, the first time an American company had been hit with that designation.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 23:45:50 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.236444+00:00"
+    },
+    {
+      "id": "b9aa80ef5ed24f4a",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/25/pop-mart-labubu-sluggish-crybaby-monster-family-sales-.html",
+      "source_author": "www.cnbc.com",
+      "title": "Pop Mart shares plunge over 22% as concerns over sustainability of Labubu sales dwarf stellar results",
+      "body": "the Beijing-based toy maker posted annual revenue of 37.1 billion yuan ($5.4 billion) for 2025, up 185% from a year earlier, just shy of LSEG estimates of 38 billion yuan.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 08:58:30 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.236508+00:00"
+    },
+    {
+      "id": "3659e8b0b2982d29",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/25/pop-mart-labubu-global-expansion-ip-business-model-intellectual-property-strategy.html",
+      "source_author": "www.cnbc.com",
+      "title": "What comes after Labubu? Inside Pop Mart\u2019s next grow play",
+      "body": "Pop Mart is betting on films, theme parks and global expansion to turn Labubu into a lasting franchise, even as the initial craze fades.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 08:17:24 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.236576+00:00"
+    },
+    {
+      "id": "1f8fe96e255edec9",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/24/openai-shutters-short-form-video-app-sora-as-company-reels-in-costs.html",
+      "source_author": "www.cnbc.com",
+      "title": "OpenAI shutters short-form video app Sora as company reels in costs",
+      "body": "OpenAI said it's closing Sora, the short-form video app that went viral after its launch six months ago",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 22:06:01 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.236634+00:00"
+    },
+    {
+      "id": "976942a958e1be80",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/25/fertilizer-price-iran-war-food-security-inflation-urea-potash-nitrogen-farmers.html",
+      "source_author": "www.cnbc.com",
+      "title": "It\u2019s not just oil and gas. The Strait of Hormuz blockage is rattling another vital commodity",
+      "body": "\u201cI'm a lot more concerned about the current crisis than I was when Russia-Ukraine happened four years ago,\u201d one fund manager told CNBC.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 08:54:38 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.236780+00:00"
+    },
+    {
+      "id": "4be62e441b34a754",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/24/trump-emily-gregory-special-election-democrat-mar-a-lago.html",
+      "source_author": "www.cnbc.com",
+      "title": "Emily Gregory projected to win Florida special election to represent Trump, Mar-a-Lago",
+      "body": "President Donald Trump had endorsed fellow Republican Jon Maples in the special election against Emily Gregory, the Democratic nominee.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 03:16:52 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.236856+00:00"
+    },
+    {
+      "id": "551651f9bf1089fe",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/25/sk-hynix-confidential-us-listing-adr-ai-memory.html",
+      "source_author": "www.cnbc.com",
+      "title": "SK Hynix files confidentially for U.S. listing as it rides 'unprecedented growth' in memory market",
+      "body": "SK Hynix has made a confidential filing for a potential listing in the U.S. this year, as the company looks to expand production.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 03:48:51 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.236923+00:00"
+    },
+    {
+      "id": "59325b3a36c427e7",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/25/denmark-election-result-greenland-trump-mette-frederiksen.html",
+      "source_author": "www.cnbc.com",
+      "title": "Denmark\u2019s PM Frederiksen suffers election setback after standing up to Trump over Greenland",
+      "body": "Frederiksen had sought to capitalize on popular support after standing up to Trump's push to annex Greenland, a self-governing Danish territory.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.3,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 07:18:24 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.237000+00:00"
+    },
+    {
+      "id": "78dfed67ceabf08d",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/25/south-korea-iran-oil-shock-middle-east-conflict.html",
+      "source_author": "www.cnbc.com",
+      "title": "South Korea braces for 'worst-case scenarios' as Iran oil shock deepens",
+      "body": "South Korean Prime Minister Kim Min-seok warned the government must prepare for \"worst-case scenarios\" stemming from the Middle East conflict.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 09:38:43 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.237062+00:00"
+    },
+    {
+      "id": "beca03630183d738",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/24/home-depot-makes-another-pro-deal-plus-whats-behind-cornings-big-rally.html",
+      "source_author": "www.cnbc.com",
+      "title": "Home Depot makes another pro deal \u2014 plus, what's behind Corning's big rally",
+      "body": "Every weekday, the Investing Club releases the Homestretch; an actionable afternoon update just in time for the last hour of trading.",
+      "ticker_or_market": "",
+      "direction": "bullish",
+      "confidence": 0.55,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 18:55:17 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.237138+00:00"
+    },
+    {
+      "id": "5d625625dc9e896d",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/24/venezuela-oil-machado-maduro-trump.html",
+      "source_author": "www.cnbc.com",
+      "title": "Venezuela opposition leader Mar\u00eda Corina Machado calls for full privatization of oil industry",
+      "body": "Machado's remarks come as the oil industry remains hesitant to invest in Venezuela after the U.S. ousted former President Nicolas Maduro.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 23:34:47 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.237217+00:00"
+    },
+    {
+      "id": "a679e71cb26b77b8",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/25/asia-markets-today-nikkei-225-kospi-hang-seng-index.html",
+      "source_author": "www.cnbc.com",
+      "title": "Asia-Pacific stocks rise as Trump comments signal de-escalation in Iran conflict",
+      "body": "Trump said he decided to back off from his recent threat to order\u00a0strikes on Iranian energy infrastructure\u00a0\"based on the fact we're negotiating.\"",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 08:15:51 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.237284+00:00"
+    },
+    {
+      "id": "e6c4c7f10e0a6230",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/24/totalenergies-ceo-world-has-never-experienced-refining-margins-like-this-.html",
+      "source_author": "www.cnbc.com",
+      "title": "World has 'never experienced' soaring refining margins like this, TotalEnergies CEO tells CNBC",
+      "body": "TotalEnergies CEO Patrick Pouyann\u00e9 on the Iran war, the $1 billion deal with the White House, investment in the U.S., and more.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 19:28:56 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.237352+00:00"
+    },
+    {
+      "id": "0cdd7ad833d12e0d",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/24/trump-iran-war-pakistan-talks.html",
+      "source_author": "www.cnbc.com",
+      "title": "Pakistan offers to facilitate U.S.-Iran war talks as Trump and Tehran give mixed signals",
+      "body": "Trump said top U.S. negotiators and their Iranian counterparts have been engaged in \"very, very strong talks,\" but Tehran has denied that claim.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 18:26:00 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.237420+00:00"
+    },
+    {
+      "id": "a1392755f199abf8",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/24/iran-war-oil-strait-hormuz-kuwait-gulf.html",
+      "source_author": "www.cnbc.com",
+      "title": "Kuwait says Strait of Hormuz closure is beyond catastrophic, will trigger domino effect across global economy",
+      "body": "Iran is holding the world economy hostage by blockading the Strait of Hormuz, said Sheikh Nawaf al-Sabah, the CEO of Kuwait Petroleum Corp.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 20:24:42 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.237512+00:00"
+    },
+    {
+      "id": "40230b87e2ef14e9",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/24/jamie-dimon-iran-war-middle-east-peace-prospects-long-term.html",
+      "source_author": "www.cnbc.com",
+      "title": "Jamie Dimon says Iran war makes Middle East peace prospects better in the long term",
+      "body": "JPMorgan Chase CEO Jamie Dimon issued an optimistic viewpoint on Middle East peace, weeks into the war with Iran.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 18:14:24 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.237574+00:00"
+    },
+    {
+      "id": "b0eb861873e64ecb",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/24/arm-launches-its-own-cpu-with-meta-as-first-customer.html",
+      "source_author": "www.cnbc.com",
+      "title": "Arm releases first in-house chip, with Meta as debut customer",
+      "body": "Arm is making its first CPU, pivoting from only licensing its architecture to giants like Apple, Nvidia, Amazon and Google. CNBC got an exclusive first look.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 18:26:33 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.237633+00:00"
+    },
+    {
+      "id": "59bbed35fa2ca7cf",
+      "type": "sentiment",
+      "source_url": "https://www.cnbc.com/2026/03/24/amazon-humanoid-maker-fauna-robotics-sprout.html",
+      "source_author": "www.cnbc.com",
+      "title": "Amazon acquires 'approachable' humanoid maker Fauna Robotics",
+      "body": "Fauna's first product, called Sprout, is a $50,000 bipedal robot that's 3 feet, 6 inches tall and designed to be \"approachable and human-friendly.\"",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "mainstream_news",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.cnbc.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "mainstream_news",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 22:38:34 GMT"
+      },
+      "extracted_at": "2026-03-25T10:36:26.237692+00:00"
+    },
+    {
+      "id": "d3e34b701d323dea",
+      "type": "strategy",
+      "source_url": "https://finance.yahoo.com/m/cae0156a-a54a-3c8d-b197-2715d5ee5f26/dow-jones-futures-rise%2C-oil.html?.tsrc=rss",
+      "source_author": "feeds.finance.yahoo.com",
+      "title": "Dow Jones Futures Rise, Oil Prices Tumble On U.S. Peace Plan To Iran; 7 Stocks To Watch",
+      "body": "Futures rose and oil prices fell as the U.S. reportedly sent a peace plan to Iran. President Trump said Tehran is \"talking sense.\"",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "feeds.finance.yahoo.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 10:26:08 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.237747+00:00"
+    },
+    {
+      "id": "9a5517793f53f9ed",
+      "type": "sentiment",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/us-stock-market-today-p-100458050.html?.tsrc=rss",
+      "source_author": "feeds.finance.yahoo.com",
+      "title": "US Stock Market Today: S&P 500 Futures Climb As Inflation And Energy Jitters Linger",
+      "body": "The Morning Bull - US Market Morning Update Wednesday, Mar, 25 2026 US stock futures are pointing higher this morning, with E mini S&P 500 contracts up about 1% and Nasdaq 100 futures ahead by a little more than 1%. The backdrop is a mix of easing geopolitical worry and stubborn inflation risk. US 10 year Treasury yields are around 4.4%, which is relatively high and reflects worries that interest rates may stay elevated, especially as energy costs keep pressure on prices. At the same time, US...",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "hours",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "feeds.finance.yahoo.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 10:04:58 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.237833+00:00"
+    },
+    {
+      "id": "51992f9bf8213f4d",
+      "type": "sentiment",
+      "source_url": "https://finance.yahoo.com/news/morning-brief-3-factors-have-made-for-big-historical-stock-market-losses-100036294.html?.tsrc=rss",
+      "source_author": "feeds.finance.yahoo.com",
+      "title": "Morning Brief: 3 factors have made for big historical stock market losses",
+      "body": "In addition to monitoring the Iran situation, we're watching software stocks as Anthropic's new capacities may put them back into the hot seat.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "feeds.finance.yahoo.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 10:00:36 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.237905+00:00"
+    },
+    {
+      "id": "43ae42b0afb248b7",
+      "type": "sentiment",
+      "source_url": "https://finance.yahoo.com/news/3-factors-have-driven-double-digit-stock-market-losses-in-the-last-100-years-theyre-all-in-play-100007909.html?.tsrc=rss",
+      "source_author": "feeds.finance.yahoo.com",
+      "title": "3 factors have driven double-digit stock market losses in the last 100 years. They're all in play.",
+      "body": "In the relatively rare instances where stocks have seen declines greater than 10% in a calendar year, one of three reasons has been the trigger. The problem for investors right now is that all three are in play.",
+      "ticker_or_market": "",
+      "direction": "bullish",
+      "confidence": 0.55,
+      "urgency": "realtime",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss",
+        "greed"
+      ],
+      "raw_data": {
+        "page_name": "feeds.finance.yahoo.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "greed",
+        "created_at": "Wed, 25 Mar 2026 10:00:07 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.238040+00:00"
+    },
+    {
+      "id": "46d3cba3af35d124",
+      "type": "trend",
+      "source_url": "https://uk.finance.yahoo.com/news/arm-circle-asos-crest-nicholson-trending-tickers-095345582.html?.tsrc=rss",
+      "source_author": "feeds.finance.yahoo.com",
+      "title": "Trending tickers: Arm, Circle, Asos and Crest Nicholson",
+      "body": "The latest investor updates on stocks that are trending on Wednesday.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "feeds.finance.yahoo.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 09:53:45 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.238099+00:00"
+    },
+    {
+      "id": "5ecddee9947e1b0f",
+      "type": "sentiment",
+      "source_url": "https://finance.yahoo.com/sectors/healthcare/articles/1-healthcare-stock-consider-now-093830611.html?.tsrc=rss",
+      "source_author": "feeds.finance.yahoo.com",
+      "title": "1 Healthcare Stock to Consider Right Now and 2 We Turn Down",
+      "body": "Personal health and wellness is one of the many secular tailwinds for healthcare companies. Those leading the charge have not only realized strong financial performance but also propelled the broader industry\u2019s returns as healthcare stocks have gained 4.4% over the past six months. This was a good place to be as the S&P 500 was stuck in neutral.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "realtime",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "feeds.finance.yahoo.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 09:38:30 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.238189+00:00"
+    },
+    {
+      "id": "507e9f69604718bb",
+      "type": "sentiment",
+      "source_url": "https://www.fool.com/investing/2026/03/25/uh-oh-most-bearish-stock-market-signal-triggered/?.tsrc=rss",
+      "source_author": "feeds.finance.yahoo.com",
+      "title": "Uh-Oh! One of the Most Bearish Stock Market Signals Just Triggered.",
+      "body": "Who knew crossing a simple line in the sand could make such a dramatic difference in stock market returns?",
+      "ticker_or_market": "",
+      "direction": "bearish",
+      "confidence": 0.6,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "feeds.finance.yahoo.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 09:26:00 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.238247+00:00"
+    },
+    {
+      "id": "37294b4cdd34bf0f",
+      "type": "strategy",
+      "source_url": "https://uk.finance.yahoo.com/news/ftse-100-live-stocks-rise-donald-trump-ceasefire-plan-iran-war-uk-inflation-091207091.html?.tsrc=rss",
+      "source_author": "feeds.finance.yahoo.com",
+      "title": "FTSE 100 LIVE: Stocks rise on reports of Trump offering 15-point ceasefire plan to Iran",
+      "body": "The plan was submitted to Iran by intermediaries from Pakistan, who have offered to host renewed negotiations between Washington and Tehran.",
+      "ticker_or_market": "",
+      "direction": "bearish",
+      "confidence": 0.55,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "feeds.finance.yahoo.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 09:12:07 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.238307+00:00"
+    },
+    {
+      "id": "d65320fb370d592f",
+      "type": "news",
+      "source_url": "https://finance.yahoo.com/m/cdafd41f-970c-3677-8dc1-99c79d0bdad5/markets-rebound.-stock.html?.tsrc=rss",
+      "source_author": "feeds.finance.yahoo.com",
+      "title": "Markets Rebound. Stock Futures Surge, Oil Slumps on Iran Peace Talk Hopes.",
+      "body": "Stocks looked set to rebound Wednesday after the U.S. sent Iran a 15-point plan to end the conflict, raising investors' hopes that there is progress in cease-fire talks to end the conflict in the Middle East.  The three major indexes all dropped on Tuesday as the software selloff resumed in the absence of much news about the Iran war.  Brent international futures fell 3.9% to $96.29 a barrel and West Texas Intermediate U.S. futures slid 3.5% to $89.10 a barrel.",
+      "ticker_or_market": "",
+      "direction": "bearish",
+      "confidence": 0.55,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "feeds.finance.yahoo.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 09:04:07 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.238401+00:00"
+    },
+    {
+      "id": "97d70ca8d30c6699",
+      "type": "sentiment",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/1-software-stock-long-term-085830304.html?.tsrc=rss",
+      "source_author": "feeds.finance.yahoo.com",
+      "title": "1 Software Stock for Long-Term Investors and 2 We Turn Down",
+      "body": "Software is eating the world, and virtually no business is left untouched by it. This secular theme makes SaaS companies attractive investment candidates but also comes with higher valuations that cause volatility. Unfortunately, the rich prices have haunted them over the past six months as the industry has shed 25.2%. This drop was especially disheartening since the S&P 500 held its ground.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss",
+        "greed"
+      ],
+      "raw_data": {
+        "page_name": "feeds.finance.yahoo.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "greed",
+        "created_at": "Wed, 25 Mar 2026 08:58:30 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.238481+00:00"
+    },
+    {
+      "id": "c157ff84bcdebfca",
+      "type": "sentiment",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/3-industrials-stocks-think-twice-085330888.html?.tsrc=rss",
+      "source_author": "feeds.finance.yahoo.com",
+      "title": "3 Industrials Stocks We Think Twice About",
+      "body": "Whether you see them or not, industrials businesses play a crucial part in our daily activities. They are also bound to benefit from a friendlier regulatory environment with the Trump administration, and this excitement has led to a six-month gain of 7.7% for the sector. Investing here would have been wise - at the same time, the S&P 500 was flat.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "feeds.finance.yahoo.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 08:53:30 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.238552+00:00"
+    },
+    {
+      "id": "2b2edf8041c6dbe1",
+      "type": "prediction",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/3-financials-stocks-solid-fundamentals-084330869.html?.tsrc=rss",
+      "source_author": "feeds.finance.yahoo.com",
+      "title": "3 Financials Stocks with Solid Fundamentals",
+      "body": "Financial firms serve as the backbone of the economy, providing essential services from lending and investment management to risk management and payment processing. Still, investors are uneasy as companies face challenges from an unpredictable interest rate and inflation environment. These doubts have caused the industry to lag recently as financials stocks have collectively shed 10.2% over the past six months. This performance was discouraging since the S&P 500 stood firm.",
+      "ticker_or_market": "",
+      "direction": "bearish",
+      "confidence": 0.55,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "feeds.finance.yahoo.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 08:43:30 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.238626+00:00"
+    },
+    {
+      "id": "487d500ad702fcf0",
+      "type": "sentiment",
+      "source_url": "https://www.fool.com/investing/2026/03/25/the-sp-500-is-on-track-to-finish-q1-in-negative-te/?.tsrc=rss",
+      "source_author": "feeds.finance.yahoo.com",
+      "title": "The S&P 500 Is on Track to Finish Q1 in Negative Territory. Here's What History Suggests Comes Next.",
+      "body": "The end of 2026 could be better than its beginning, if history is a guide.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "feeds.finance.yahoo.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 08:34:00 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.238682+00:00"
+    },
+    {
+      "id": "4a79e01f15a29df8",
+      "type": "prediction",
+      "source_url": "https://www.fool.com/investing/2026/03/25/prediction-the-artificial-intelligence-ai-stocks-t/?.tsrc=rss",
+      "source_author": "feeds.finance.yahoo.com",
+      "title": "Prediction: The Artificial Intelligence (AI) Stocks That Win in 2026 Won't Be the Same Ones That Won in 2025",
+      "body": "Investors may look to rotate into a new batch of potential winners.",
+      "ticker_or_market": "",
+      "direction": "bearish",
+      "confidence": 0.55,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "feeds.finance.yahoo.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 08:30:00 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.238732+00:00"
+    },
+    {
+      "id": "1ea36b72278f9e56",
+      "type": "sentiment",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/zacks-analyst-blog-highlights-lockheed-070000116.html?.tsrc=rss",
+      "source_author": "feeds.finance.yahoo.com",
+      "title": "The Zacks Analyst Blog Highlights Lockheed Martin, Northrop Grumman, Apple and Microsoft",
+      "body": "Lockheed Martin, Apple and others highlight how investors navigate war-driven volatility with defense, commodities and long-term equity strategies.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "feeds.finance.yahoo.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 07:00:00 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.238790+00:00"
+    },
+    {
+      "id": "e2ad7820773e3b79",
+      "type": "sentiment",
+      "source_url": "https://finance.yahoo.com/news/us-forms-15-point-plan-034111544.html?.tsrc=rss",
+      "source_author": "feeds.finance.yahoo.com",
+      "title": "US Forms 15-Point Plan to End Iran War as Trump Pushes Talks",
+      "body": "(Bloomberg) -- The US has drafted a 15-point plan intended to help bring the war with Iran to a close, according to people familiar with the matter, highlighting the intensifying urgency within the Trump administration to resolve the conflict as the economic toll mounts.President Donald Trump has been pushing talks with Iran in a bid to halt the fighting. Yet those efforts have been clouded by uncertainty over the structure of negotiations, the Iranian participants and how any deal would be stru",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "feeds.finance.yahoo.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 05:25:28 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.238892+00:00"
+    },
+    {
+      "id": "1f181482b29353a4",
+      "type": "sentiment",
+      "source_url": "https://www.thestreet.com/investing/stocks/bank-of-america-reinstates-microsoft-stock-coverage?.tsrc=rss",
+      "source_author": "feeds.finance.yahoo.com",
+      "title": "Bank of America reinstates Microsoft stock coverage",
+      "body": "Microsoft (MSFT) stock has lost almost 23% year to date, at the time of writing, Tuesday afternoon, March 24, according to Yahoo Finance. Meanwhile, the SPDR S&P 500 index (SPY) is down about 3.75% in the same period. Alphabet (GOOGL) is down more than 5%.Amazon (AMZN) is down almost 10%.Apple ...",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "feeds.finance.yahoo.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 03:33:00 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.238960+00:00"
+    },
+    {
+      "id": "265ed06295ab7f03",
+      "type": "sentiment",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/coherent-cohr-climbs-6-78-015812201.html?.tsrc=rss",
+      "source_author": "feeds.finance.yahoo.com",
+      "title": "Coherent (COHR) Climbs 6.78% on S&P 500 Addition",
+      "body": "Coherent Corp. (NYSE:COHR) is one of the 10 Stocks Grabbing Investor Attention Today. Coherent Corp. rallied for a second day on Tuesday, jumping 6.78 percent to close at $272.33 apiece, as investors resumed buying positions in its stock following its official addition to the S&P 500 index. Companies being added to benchmark indices typically get [\u2026]",
+      "ticker_or_market": "",
+      "direction": "bullish",
+      "confidence": 0.6,
+      "urgency": "hours",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "feeds.finance.yahoo.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 01:58:12 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.239049+00:00"
+    },
+    {
+      "id": "518f84eaef8c162c",
+      "type": "strategy",
+      "source_url": "https://sg.finance.yahoo.com/news/stocks-bounce-oil-retreats-mideast-010442099.html?.tsrc=rss",
+      "source_author": "feeds.finance.yahoo.com",
+      "title": "Stocks bounce and oil retreats on Mideast ceasefire reports",
+      "body": "By Tom Westbrook SINGAPORE, March 25 (Reuters) - Stocks rose and oil fell on Wednesday on reports the U.S. is seeking a month-long ceasefire in its war on Iran, and had sent a 15-point plan to Iran",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "feeds.finance.yahoo.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 01:04:42 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.239107+00:00"
+    },
+    {
+      "id": "7bd5fac5d001465a",
+      "type": "sentiment",
+      "source_url": "https://finance.yahoo.com/markets/stocks/articles/3-reasons-avoid-gbx-1-005922346.html?.tsrc=rss",
+      "source_author": "feeds.finance.yahoo.com",
+      "title": "3 Reasons to Avoid GBX and 1 Stock to Buy Instead",
+      "body": "While the broader market has struggled with the S&P 500 down 1.9% since September 2025, Greenbrier has surged ahead as its stock price has climbed by 14.5% to $51.94 per share. This was partly thanks to its solid quarterly results, and the performance may have investors wondering how to approach the situation.",
+      "ticker_or_market": "",
+      "direction": "bullish",
+      "confidence": 0.6,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "feeds.finance.yahoo.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 00:59:22 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.239178+00:00"
+    },
+    {
+      "id": "f0e76b13df790f3f",
+      "type": "sentiment",
+      "source_url": "https://www.investing.com/news/sec-filings/mobix-labs-shareholders-approve-all-proposals-at-annual-meeting-93CH-4579313",
+      "source_author": "Investing.com",
+      "title": "Mobix Labs shareholders approve all proposals at annual meeting",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.investing.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "2026-03-25 10:26:21"
+      },
+      "extracted_at": "2026-03-25T10:36:26.239222+00:00"
+    },
+    {
+      "id": "e6c404713583acfe",
+      "type": "sentiment",
+      "source_url": "https://www.investing.com/news/transcripts/earnings-call-transcript-loblaw-q4-2025-sees-revenue-growth-stock-dips-93CH-4579311",
+      "source_author": "Investing.com",
+      "title": "Earnings call transcript: Loblaw Q4 2025 sees revenue growth, stock dips",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "bearish",
+      "confidence": 0.55,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.investing.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "2026-03-25 10:26:11"
+      },
+      "extracted_at": "2026-03-25T10:36:26.239267+00:00"
+    },
+    {
+      "id": "cd5286a3f85ee05c",
+      "type": "sentiment",
+      "source_url": "https://www.investing.com/news/economic-indicators/analysts-warn-uk-inflation-calm-wont-last-as-energy-prices-surge-4579312",
+      "source_author": "Investing.com",
+      "title": "Analysts warn UK inflation calm won\u2019t last as energy prices surge",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.investing.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "2026-03-25 10:26:10"
+      },
+      "extracted_at": "2026-03-25T10:36:26.239317+00:00"
+    },
+    {
+      "id": "6ef8de572eb3c4ec",
+      "type": "sentiment",
+      "source_url": "https://www.investing.com/news/economy-news/ecb-may-need-to-act-on-even-nottoopersistent-inflation-surge-lagarde-says-4579123",
+      "source_author": "Reuters",
+      "title": "ECB may need to act on even \u2019not-too-persistent\u2019 inflation surge, Lagarde says",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.investing.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "2026-03-25 10:24:29"
+      },
+      "extracted_at": "2026-03-25T10:36:26.239368+00:00"
+    },
+    {
+      "id": "8c356a8448894bb8",
+      "type": "sentiment",
+      "source_url": "https://www.investing.com/news/transcripts/earnings-call-transcript-kamada-ltd-misses-q4-2025-forecasts-stock-dips-93CH-4579310",
+      "source_author": "Investing.com",
+      "title": "Earnings call transcript: Kamada Ltd. misses Q4 2025 forecasts, stock dips",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "bearish",
+      "confidence": 0.55,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.investing.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "2026-03-25 10:24:02"
+      },
+      "extracted_at": "2026-03-25T10:36:26.239413+00:00"
+    },
+    {
+      "id": "5ad6f00e6968b7f7",
+      "type": "sentiment",
+      "source_url": "https://www.investing.com/news/economy-news/ecb-to-watch-price-expectations-and-wages-amid-inflation-fears-93CH-4579309",
+      "source_author": "Investing.com",
+      "title": "ECB to watch price expectations and wages amid inflation fears",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.investing.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "2026-03-25 10:22:57"
+      },
+      "extracted_at": "2026-03-25T10:36:26.239456+00:00"
+    },
+    {
+      "id": "f9ad28e2fc2a33a3",
+      "type": "prediction",
+      "source_url": "https://www.investing.com/news/analyst-ratings/argus-cuts-ulta-beauty-stock-price-target-on-recent-weakness-93CH-4579308",
+      "source_author": "Investing.com",
+      "title": "Argus cuts Ulta Beauty stock price target on recent weakness",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.investing.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "2026-03-25 10:22:51"
+      },
+      "extracted_at": "2026-03-25T10:36:26.239497+00:00"
+    },
+    {
+      "id": "3532d1ae5ba9f42c",
+      "type": "sentiment",
+      "source_url": "https://www.investing.com/news/analyst-ratings/citizens-reiterates-market-perform-on-rezolute-stock-after-fda-update-93CH-4579307",
+      "source_author": "Investing.com",
+      "title": "Citizens reiterates Market Perform on Rezolute stock after FDA update",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.investing.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "2026-03-25 10:22:51"
+      },
+      "extracted_at": "2026-03-25T10:36:26.239542+00:00"
+    },
+    {
+      "id": "686666e1aa166f60",
+      "type": "sentiment",
+      "source_url": "https://www.investing.com/news/analyst-ratings/bmo-downgrades-alexandria-real-estate-stock-rating-on-earnings-outlook-93CH-4579306",
+      "source_author": "Investing.com",
+      "title": "BMO downgrades Alexandria Real Estate stock rating on earnings outlook",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.investing.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "2026-03-25 10:22:50"
+      },
+      "extracted_at": "2026-03-25T10:36:26.239587+00:00"
+    },
+    {
+      "id": "354e4fd7d25712e1",
+      "type": "sentiment",
+      "source_url": "https://www.investing.com/news/analyst-ratings/citizens-reiterates-spruce-biosciences-stock-rating-on-approval-outlook-93CH-4579305",
+      "source_author": "Investing.com",
+      "title": "Citizens reiterates Spruce Biosciences stock rating on approval outlook",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "retail_investor",
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "www.investing.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "retail_investor",
+        "fear_greed": "neutral",
+        "created_at": "2026-03-25 10:22:49"
+      },
+      "extracted_at": "2026-03-25T10:36:26.239629+00:00"
+    },
+    {
+      "id": "517679e47a6059f8",
+      "type": "sentiment",
+      "source_url": "https://cointelegraph.com/news/indian-court-says-no-case-against-coindcx-founders-in-impersonation-linked-fraud?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "Indian court says \u2018no case\u2019 against CoinDCX founders in impersonation fraud",
+      "body": "A Thane judge granted bail to CoinDCX co-founders Sumit Surendra Gupta and Niraj Ashok Khandelwal, finding no case against them.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 08:35:34 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.239698+00:00"
+    },
+    {
+      "id": "eed8324b597e7fa5",
+      "type": "sentiment",
+      "source_url": "https://cointelegraph.com/news/ripple-singapore-sandbox-rlusd-trade-finance?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "Ripple joins Singapore sandbox to test RLUSD in trade finance",
+      "body": "Ripple joined the Monetary Authority of Singapore\u2019s BLOOM initiative with Unloq to test RLUSD and XRPL for programmable cross-border trade settlement in Singapore.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 08:12:23 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.239768+00:00"
+    },
+    {
+      "id": "cdc46f0459c1c8e3",
+      "type": "sentiment",
+      "source_url": "https://cointelegraph.com/news/irish-police-recover-bitcoin-wallet-clifton-collins?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "Irish police open Bitcoin wallet years after keys were apparently lost",
+      "body": "A crypto wallet tied to a convicted drug dealer thought to have lost his wallet keys transferred 500 Bitcoin to Coinbase on Tuesday.",
+      "ticker_or_market": "",
+      "direction": "bearish",
+      "confidence": 0.55,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 06:21:56 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.239831+00:00"
+    },
+    {
+      "id": "4fe4e85e9c27f9a1",
+      "type": "sentiment",
+      "source_url": "https://cointelegraph.com/news/persistent-btc-exchange-outflow-suggests-genuine-accumulation-by-investors-analyst?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "Bitcoin exchange outflows show \u2018genuine accumulation by investors\u2019: Analyst",
+      "body": "Ongoing accumulation of Bitcoin is likely one of the factors behind why the cryptocurrency is trading in a tight range, say crypto analysts.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 05:50:51 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.239900+00:00"
+    },
+    {
+      "id": "9215c1ed0a5b0b0a",
+      "type": "prediction",
+      "source_url": "https://cointelegraph.com/news/enlivex-health-firm-raise-debt-buy-tokens-rain-predictions-market?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "Pharma firm Enlivex raises $21M for prediction market Rain token treasury",
+      "body": "Enlivex says it acquired 3 billion Rain tokens at a discount and extended its option to purchase billions more discounted tokens until late next year.",
+      "ticker_or_market": "",
+      "direction": "bearish",
+      "confidence": 0.55,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 04:58:28 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.239956+00:00"
+    },
+    {
+      "id": "cbb28b32d06f3be1",
+      "type": "sentiment",
+      "source_url": "https://cointelegraph.com/news/robinhood-approves-share-buyback-stock-struggles-2026?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "Robinhood announces $1.5B share buyback as stock struggles in 2026",
+      "body": "Shares in Robinhood fell to their lowest level this year on Tuesday as crypto and tech stocks are battered by geopolitical headwinds.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.3,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 04:07:54 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.240013+00:00"
+    },
+    {
+      "id": "932e1da8790ffd0b",
+      "type": "strategy",
+      "source_url": "https://cointelegraph.com/news/openai-sora-video-app-shutdown-six-months?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "OpenAI kills off AI video app Sora after 6 months",
+      "body": "OpenAI CEO Sam Altman reportedly said all its text-to-video models would be shuttered, and a $1 billion investment from Disney has also been cancelled.",
+      "ticker_or_market": "",
+      "direction": "bearish",
+      "confidence": 0.55,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 03:18:36 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.240078+00:00"
+    },
+    {
+      "id": "3bd03ad9e3e7597c",
+      "type": "sentiment",
+      "source_url": "https://cointelegraph.com/news/ethereum-devs-up-security-efforts-post-quantum-team?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "Ethereum devs up security efforts with new \u2018Post-Quantum\u2019 team",
+      "body": "The Ethereum Foundation-linked Post-Quantum team says while the quantum threat isn\u2019t imminent, deploying a full solution without disrupting the network will take years.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Wed, 25 Mar 2026 02:10:15 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.240155+00:00"
+    },
+    {
+      "id": "8f32875b9e92f692",
+      "type": "trend",
+      "source_url": "https://cointelegraph.com/news/rising-us-treasury-yields-war-in-iran-rising-inflation-risk-pressure-bitcoin-price?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "Rising US Treasury yields, war in Iran, rising inflation risk pressure Bitcoin price",
+      "body": "Falling tech stock prices and rising bond yields have forced a rush for cash, preventing Bitcoin from gaining any bullish momentum.",
+      "ticker_or_market": "",
+      "direction": "bullish",
+      "confidence": 0.55,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 23:12:13 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.240213+00:00"
+    },
+    {
+      "id": "1303cd1b134ef312",
+      "type": "trend",
+      "source_url": "https://cointelegraph.com/news/what-happened-in-crypto-today?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "Here\u2019s what happened in crypto today",
+      "body": "Need to know what happened in crypto today? Here is the latest news on daily trends and events impacting Bitcoin price, blockchain, DeFi, NFTs, Web3 and crypto regulation.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "hours",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 21:42:52 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.240298+00:00"
+    },
+    {
+      "id": "75ed8d4b32dd7830",
+      "type": "sentiment",
+      "source_url": "https://cointelegraph.com/news/active-management-seen-as-next-phase-for-crypto-etfs-21shares-duncan-moir?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "21shares sees active strategies shaping next phase of crypto ETFs",
+      "body": "21shares president Duncan Moir sees shifting investor demand and evolving product strategies pushing crypto ETFs and ETPs beyond passive exposure.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 21:13:55 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.240356+00:00"
+    },
+    {
+      "id": "db436d72119343fd",
+      "type": "sentiment",
+      "source_url": "https://cointelegraph.com/news/circle-taps-african-fintech-sasai-to-expand-usdc-adoption-in-cross-border-payments?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "Circle taps African fintech Sasai to expand USDC adoption in cross-border payments",
+      "body": "The move aims to integrate the second-biggest dollar-pegged stablecoin into regional payment networks to improve cross-border transactions and remittances.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 19:57:59 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.240417+00:00"
+    },
+    {
+      "id": "17692a45044ee01d",
+      "type": "prediction",
+      "source_url": "https://cointelegraph.com/news/cftc-innovation-task-force-crypto-framework?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "CFTC chief launches innovation task force focused on crypto framework",
+      "body": "The task force will work with industry participants to develop regulatory approaches for crypto, AI and prediction markets.",
+      "ticker_or_market": "",
+      "direction": "bearish",
+      "confidence": 0.55,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 19:32:03 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.240470+00:00"
+    },
+    {
+      "id": "c9ba3dc6aaee6fbd",
+      "type": "news",
+      "source_url": "https://cointelegraph.com/news/lombard-taps-bitwise-to-bring-bitcoin-yield-and-lending-to-institutional-custody-embargo-tuesday-2-30-et?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "Lombard taps Bitwise to offer Bitcoin yield and lending to institutional custody",
+      "body": "Lombard CEO Jacob Phillips announced at the Digital Asset Summit that the platform enables institutions to earn yield and borrow against Bitcoin without moving assets out of custody.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 18:15:00 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.240532+00:00"
+    },
+    {
+      "id": "18895ebd0ced9509",
+      "type": "sentiment",
+      "source_url": "https://cointelegraph.com/news/bitcoin-holders-shift-from-panic-to-cash-buffer-discipline-as-volatility-deepens?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "Bitcoin holders shift from panic to cash-buffer discipline as volatility deepens",
+      "body": "Bitcoin volatility rose as stablecoin flows surged to $440 billion over the weekend, highlighting investors\u2019 pivot to cash as BTC spot and futures activity decreased.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss",
+        "fear"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "fear",
+        "created_at": "Tue, 24 Mar 2026 17:44:31 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.240607+00:00"
+    },
+    {
+      "id": "7284928be8407fac",
+      "type": "sentiment",
+      "source_url": "https://cointelegraph.com/news/tether-big-four-audit-usdt-reserves?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "Tether says \u2018Big Four\u2018 firm to handle first full audit of USDT reserves",
+      "body": "The long-anticipated audit could address years of scrutiny over Tether\u2019s reserve disclosures, though the company has not named the accounting firm.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 16:55:34 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.240673+00:00"
+    },
+    {
+      "id": "876f02a777a90cde",
+      "type": "prediction",
+      "source_url": "https://cointelegraph.com/news/bitgo-susquehanna-roll-out-institutional-otc-access-to-prediction-markets?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "BitGo, Susquehanna open OTC prediction markets trading to institutions",
+      "body": "The offering allows institutional investors to trade event-based contracts using crypto collateral, as regulatory scrutiny of prediction markets intensifies in the United States.",
+      "ticker_or_market": "",
+      "direction": "bearish",
+      "confidence": 0.55,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 16:31:58 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.240729+00:00"
+    },
+    {
+      "id": "0993f5089ff32d1a",
+      "type": "sentiment",
+      "source_url": "https://cointelegraph.com/news/bitcoin-hints-regime-shift-btc-price-dips-69-5k-iran-nerves?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "Bitcoin hints at \u2018regime shift\u2019 as BTC price dips to $69.5K on Iran nerves",
+      "body": "Bitcoin fell below $70,000 amid geopolitical tensions, while analysts pointed to early signs of a potential structural shift in market behavior.",
+      "ticker_or_market": "",
+      "direction": "bearish",
+      "confidence": 0.55,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 15:09:50 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.240796+00:00"
+    },
+    {
+      "id": "5bc6eae905d48ca3",
+      "type": "sentiment",
+      "source_url": "https://cointelegraph.com/news/ethereum-price-rally-pauses-at-2-200-what-will-trigger-breakout?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "Ethereum price rally pauses at $2.2K: What will trigger breakout?",
+      "body": "A resurgence in institutional demand and spot ETF inflow return could put Ethereum price in a better position to overcome the next hurdle at $2,200.",
+      "ticker_or_market": "",
+      "direction": "bullish",
+      "confidence": 0.6,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 14:43:25 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.240855+00:00"
+    },
+    {
+      "id": "5842fe626e9c0046",
+      "type": "prediction",
+      "source_url": "https://cointelegraph.com/news/fira-fixed-rate-defi-lending-450m-deposits?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "Fira launches fixed-rate DeFi lending market with $450M in deposits",
+      "body": "Fira debuted its fixed-rate DeFi lending protocol with $450 million in pre-launch deposits, seeking to make long-term decentralized lending rates more predictable.",
+      "ticker_or_market": "",
+      "direction": "bearish",
+      "confidence": 0.55,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 14:12:05 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.240909+00:00"
+    },
+    {
+      "id": "1807b2a48958831a",
+      "type": "sentiment",
+      "source_url": "https://cointelegraph.com/news/resolv-protocol-temporarily-halted-80m-exploit?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "Resolv temporarily halts protocol to \u2018contain the impact\u2019 of 80M USR exploit",
+      "body": "Resolv\u2019s USR dollar stablecoin is trading at just $0.24 after an attacker minted 80 million unbacked tokens, forcing a full protocol pause and reopening fears over stablecoin risk.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 13:57:49 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.240980+00:00"
+    },
+    {
+      "id": "3fea801858ef3eb6",
+      "type": "prediction",
+      "source_url": "https://cointelegraph.com/news/federal-regulation-looms-states-prediction-markets?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "Federal regulation looms as 11 states go after prediction markets",
+      "body": "Kalshi is facing off with state regulators around the US, who claim that prediction markets are a form of gambling and recognize that they are a significant source of potential revenue.",
+      "ticker_or_market": "",
+      "direction": "bearish",
+      "confidence": 0.55,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 13:53:21 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.241035+00:00"
+    },
+    {
+      "id": "4a05c72c51f1019b",
+      "type": "sentiment",
+      "source_url": "https://cointelegraph.com/news/nyse-securitize-24-7-tokenized-securities-platform?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "NYSE taps Securitize for 24/7 tokenized securities platform",
+      "body": "Securitize will become NYSE\u2019s first digital transfer agent to mint blockchain-based shares of stocks and develop standards for compliant tokenized stock issuance.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 13:12:22 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.241104+00:00"
+    },
+    {
+      "id": "7a61e63f7af7feee",
+      "type": "sentiment",
+      "source_url": "https://cointelegraph.com/news/solana-brings-mastercard-western-union-new-dev-platform?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "Solana lands Mastercard, Western Union on new dev platform",
+      "body": "Solana is aiming to attract enterprises and financial institutions to its ecosystem through a new unified developer platform, which is focused on tokenization and stablecoins.",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 13:00:00 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.241163+00:00"
+    },
+    {
+      "id": "c6121658d713180e",
+      "type": "sentiment",
+      "source_url": "https://cointelegraph.com/explained/mastercard-bvnk-stablecoin-infrastructure?utm_source=rss_feed&utm_medium=rss&utm_campaign=rss_partner_inbound",
+      "source_author": "cointelegraph.com",
+      "title": "Why Mastercard is buying stablecoin infrastructure instead of a token",
+      "body": "Mastercard\u2019s planned BVNK acquisition highlights a shift toward infrastructure over token issuance, reflecting how major payment firms are approaching stablecoins.",
+      "ticker_or_market": "",
+      "direction": "bullish",
+      "confidence": 0.6,
+      "urgency": "days",
+      "engagement": {
+        "likes": 0,
+        "shares": 0,
+        "comments": 0,
+        "velocity": 0
+      },
+      "tags": [
+        "rss"
+      ],
+      "raw_data": {
+        "page_name": "cointelegraph.com",
+        "source": "rss",
+        "all_tickers": [],
+        "demographic": "general",
+        "fear_greed": "neutral",
+        "created_at": "Tue, 24 Mar 2026 12:49:40 +0000"
+      },
+      "extracted_at": "2026-03-25T10:36:26.241234+00:00"
+    }
+  ],
+  "meta": {
+    "total_signals": 80
+  }
+}
