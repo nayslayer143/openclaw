@@ -4329,43 +4329,45 @@ function renderTrading() {
     el.className = 't-gate ' + (g.has_min_history ? (pass ? 'pass' : 'fail') : '')
   })
 
-  // P&L Chart — only show when we have data
-  const equitySection = document.getElementById('tEquitySection')
-  if (d.pnl_curve && d.pnl_curve.length >= 2) {
-    equitySection.style.display = 'block'
-    renderPnlChart(d.pnl_curve)
-  } else {
-    equitySection.style.display = 'none'
-  }
-
-  // (Removed sections — all data now in hero cards + unified feed)
-
   // PhantomClaw hero card
-  const ph = d.phantom || {}
-  const phPnl = ph.pnl || 0
-  document.getElementById('phPnl').textContent = (phPnl >= 0 ? '+' : '') + '$' + phPnl.toFixed(2)
-  document.getElementById('phPnl').style.color = phPnl >= 0 ? '#00e5ff' : '#ff2d95'
-  document.getElementById('phWL').textContent = (ph.wins || 0) + '/' + (ph.losses || 0)
-  document.getElementById('phWL').style.color = (ph.wins || 0) >= (ph.losses || 0) ? '#00e5ff' : '#ff2d95'
-  document.querySelectorAll('#phWR, #phWR2').forEach(el => { el.textContent = (ph.win_rate || 0).toFixed(0) + '%' })
-  document.getElementById('phOpen').textContent = ph.open || 0
+  try {
+    const ph = d.phantom || {}
+    const phPnl = ph.pnl || 0
+    const phPnlEl = document.getElementById('phPnl')
+    if (phPnlEl) {
+      phPnlEl.textContent = (phPnl >= 0 ? '+' : '') + '$' + phPnl.toFixed(2)
+      phPnlEl.style.color = phPnl >= 0 ? '#00e5ff' : '#ff2d95'
+    }
+    const phWLEl = document.getElementById('phWL')
+    if (phWLEl) {
+      phWLEl.textContent = (ph.wins || 0) + '/' + (ph.losses || 0)
+      phWLEl.style.color = (ph.wins || 0) >= (ph.losses || 0) ? '#00e5ff' : '#ff2d95'
+    }
+    document.querySelectorAll('#phWR, #phWR2').forEach(el => { el.textContent = (ph.win_rate || 0).toFixed(0) + '%' })
+    const phOpenEl = document.getElementById('phOpen')
+    if (phOpenEl) phOpenEl.textContent = ph.open || 0
 
-  const phBody = document.getElementById('phBody')
-  const phPositions = ph.positions || []
-  if (phPositions.length) {
-    phBody.innerHTML = phPositions.map(p => {
-      const pnlClass = (p.pnl || 0) >= 0 ? 't-pnl-pos' : 't-pnl-neg'
-      return `<tr>
-        <td style="color:rgba(255,0,200,0.7)">${(p.question || '').substring(0,30)}</td>
-        <td>${p.direction}</td>
-        <td class="${pnlClass}">${(p.pnl||0) >= 0 ? '+' : ''}$${(p.pnl||0).toFixed(2)}</td>
-        <td class="t-countdown" data-close="${p.close_time || ''}">${formatCountdown(p.close_time)}</td>
-      </tr>`
-    }).join('')
-  } else {
-    phBody.innerHTML = '<tr><td colspan="4" style="color:rgba(255,0,200,0.3);text-align:center">scanning...</td></tr>'
-  }
+    const phBody = document.getElementById('phBody')
+    const phPositions = ph.positions || []
+    if (phBody) {
+      if (phPositions.length) {
+        phBody.innerHTML = phPositions.map(p => {
+          const pnlClass = (p.pnl || 0) >= 0 ? 't-pnl-pos' : 't-pnl-neg'
+          return `<tr>
+            <td style="color:rgba(255,0,200,0.7)">${(p.question || '').substring(0,30)}</td>
+            <td>${p.direction}</td>
+            <td class="${pnlClass}">${(p.pnl||0) >= 0 ? '+' : ''}$${(p.pnl||0).toFixed(2)}</td>
+            <td class="t-countdown" data-close="${p.close_time || ''}">${formatCountdown(p.close_time)}</td>
+          </tr>`
+        }).join('')
+      } else {
+        phBody.innerHTML = '<tr><td colspan="4" style="color:rgba(255,0,200,0.3);text-align:center">scanning...</td></tr>'
+      }
+    }
+  } catch(e) { console.error('PhantomClaw render:', e) }
 
+  // Clawmpson hero card (try/catch isolated)
+  try {
   // Clawmpson hero card — open positions + recent trades (exclude phantom)
   const clawBody = document.getElementById('clawmpsonBody')
   const clawOpen = (d.open_positions || []).filter(p => !(p.strategy||'').startsWith('phantomclaw'))
@@ -4386,6 +4388,8 @@ function renderTrading() {
   } else {
     clawBody.innerHTML = '<tr><td colspan="5" style="color:var(--grey2);text-align:center">awaiting trades...</td></tr>'
   }
+
+  } catch(e) { console.error('Clawmpson render:', e) }
 
   // New agents: CalendarClaw, NewsClaw, SentimentClaw
   const agentConfigs = [
@@ -4430,7 +4434,7 @@ function renderTrading() {
   }
 
   // Unified Trade Feed — merge ALL open positions from all bots
-  buildUnifiedFeed(d)
+  try { buildUnifiedFeed(d) } catch(e) { console.error('UnifiedFeed render:', e) }
 
   // Missed opportunities
   const missed = d.missed_opportunities || []
