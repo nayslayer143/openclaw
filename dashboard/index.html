@@ -1774,11 +1774,14 @@ body {
       <div class="ticker-tape" id="tickerTape"></div>
     </div>
 
+    <!-- Error banner (hidden by default) -->
+    <div id="tradingError" style="display:none;background:rgba(255,0,46,0.15);border:1px solid var(--neon-red);color:var(--neon-red);padding:8px 16px;margin:0 0 8px;font-size:0.5rem;letter-spacing:1px;border-radius:4px"></div>
+
     <!-- ══ HERO: 3-Engine Trading Command Center ══ -->
     <div class="ideas-header" style="margin-bottom:8px">
       <div>
         <div class="ideas-title" style="display:flex;align-items:center;gap:12px">
-          TRADING COMMAND CENTER <span style="font-size:0.35rem;color:var(--grey3)">v24.3</span>
+          TRADING COMMAND CENTER <span style="font-size:0.35rem;color:var(--grey3)">v24.5</span>
           <span class="t-live-dot" id="tLiveDot"></span>
         </div>
         <div class="ideas-subtitle">PHANTOMCLAW × RIVALCLAW × CLAWMPSON — LIVE PAPER TRADING</div>
@@ -4256,11 +4259,20 @@ async function loadTrading() {
   _tradingLoading = true
   try {
     const r = await fetch('/api/trading/dashboard')
-    if (!r.ok) throw new Error('failed')
+    if (!r.ok) throw new Error(`HTTP ${r.status}`)
     tradingData = await r.json()
+    if (tradingData.error) throw new Error(tradingData.error)
     renderTrading()
+    // Clear any previous error banner
+    const errBanner = document.getElementById('tradingError')
+    if (errBanner) errBanner.style.display = 'none'
   } catch(e) {
     console.error('Trading load error:', e)
+    const errBanner = document.getElementById('tradingError')
+    if (errBanner) {
+      errBanner.textContent = 'TRADING FEED ERROR: ' + e.message
+      errBanner.style.display = 'block'
+    }
   } finally {
     _tradingLoading = false
   }
@@ -4276,49 +4288,68 @@ function renderTrading() {
   // Build ticker tape
   try { buildTickerTape(d) } catch(e) { console.error('Ticker:', e) }
 
-  // Portfolio cards
-  const w = d.wallet
+  // Portfolio cards (all null-guarded so missing elements can't kill the function)
+  try {
+  const w = d.wallet || {}
   const balEl = document.getElementById('tBalance')
-  balEl.textContent = '$' + w.balance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})
-  balEl.style.color = w.balance >= w.starting_balance ? 'var(--neon-green)' : 'var(--neon-red)'
+  if (balEl) {
+    balEl.textContent = '$' + (w.balance||0).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})
+    balEl.style.color = (w.balance||0) >= (w.starting_balance||1000) ? 'var(--neon-green)' : 'var(--neon-red)'
+  }
 
   const roiEl = document.getElementById('tRoi')
-  roiEl.textContent = (w.roi_pct >= 0 ? '+' : '') + w.roi_pct.toFixed(2) + '% ROI'
-  roiEl.style.color = w.roi_pct >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
+  if (roiEl) {
+    roiEl.textContent = ((w.roi_pct||0) >= 0 ? '+' : '') + (w.roi_pct||0).toFixed(2) + '% ROI'
+    roiEl.style.color = (w.roi_pct||0) >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
+  }
 
-  document.getElementById('tPositions').textContent = w.open_positions + ' / ' + (w.total_trades + w.open_positions)
+  const posEl = document.getElementById('tPositions')
+  if (posEl) posEl.textContent = (w.open_positions||0) + ' / ' + ((w.total_trades||0) + (w.open_positions||0))
   const urEl = document.getElementById('tUnrealized')
-  urEl.textContent = (w.unrealized_pnl >= 0 ? '+' : '') + '$' + w.unrealized_pnl.toFixed(2) + ' unrealized'
-  urEl.style.color = w.unrealized_pnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
+  if (urEl) {
+    urEl.textContent = ((w.unrealized_pnl||0) >= 0 ? '+' : '') + '$' + (w.unrealized_pnl||0).toFixed(2) + ' unrealized'
+    urEl.style.color = (w.unrealized_pnl||0) >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
+  }
 
   const winCount = w.wins || 0
-  const lossCount = w.total_trades - winCount
-  document.getElementById('tWinLoss').textContent = winCount + ' / ' + lossCount
-  document.getElementById('tWinLoss').style.color = winCount >= lossCount ? 'var(--neon-green)' : 'var(--neon-red)'
-  document.getElementById('tWinRate').textContent = w.win_rate.toFixed(0) + '% win rate'
+  const lossCount = (w.total_trades||0) - winCount
+  const wlEl = document.getElementById('tWinLoss')
+  if (wlEl) {
+    wlEl.textContent = winCount + ' / ' + lossCount
+    wlEl.style.color = winCount >= lossCount ? 'var(--neon-green)' : 'var(--neon-red)'
+  }
+  const wrEl = document.getElementById('tWinRate')
+  if (wrEl) wrEl.textContent = (w.win_rate||0).toFixed(0) + '% win rate'
 
   const rpEl = document.getElementById('tRealizedPnl')
-  rpEl.textContent = (w.realized_pnl >= 0 ? '+' : '') + '$' + w.realized_pnl.toFixed(2)
-  rpEl.style.color = w.realized_pnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
-
-  // Graduation status in the realized PnL card subtitle
-  const g = d.graduation
-  const gradEl = document.getElementById('tGradStatus')
-  if (g.all_pass) {
-    gradEl.textContent = 'READY FOR LIVE'
-    gradEl.style.color = 'var(--neon-green)'
-  } else if (g.has_min_history) {
-    gradEl.textContent = 'TESTING — some gates failing'
-    gradEl.style.color = 'var(--orange)'
-  } else {
-    gradEl.textContent = 'COLLECTING DATA — need 7d'
-    gradEl.style.color = 'var(--grey2)'
+  if (rpEl) {
+    rpEl.textContent = ((w.realized_pnl||0) >= 0 ? '+' : '') + '$' + (w.realized_pnl||0).toFixed(2)
+    rpEl.style.color = (w.realized_pnl||0) >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
   }
+  } catch(e) { console.error('Wallet render:', e) }
+
+  // Graduation status
+  try {
+  const g = d.graduation || {}
+  const gradEl = document.getElementById('tGradStatus')
+  if (gradEl) {
+    if (g.all_pass) {
+      gradEl.textContent = 'READY FOR LIVE'
+      gradEl.style.color = 'var(--neon-green)'
+    } else if (g.has_min_history) {
+      gradEl.textContent = 'TESTING — some gates failing'
+      gradEl.style.color = 'var(--orange)'
+    } else {
+      gradEl.textContent = 'COLLECTING DATA — need 7d'
+      gradEl.style.color = 'var(--grey2)'
+    }
+  }
+  } catch(e) { console.error('Graduation render:', e) }
 
   // Live balance chart
   try {
     seedBalanceHistory(d)
-    trackBalance(w.balance)
+    trackBalance((d.wallet || {}).balance || 0)
   } catch(e) { console.error('Balance chart:', e) }
 
   // Gates
