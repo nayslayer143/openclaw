@@ -260,3 +260,52 @@ def get_safe_command(text: str):
         if trigger in lower:
             return cmd
     return None
+
+
+# ── last30days skill commands ─────────────────────────────────────────────────
+
+_LAST30DAYS_PY = os.path.expanduser("~/.claude/skills/last30days/scripts/last30days.py")
+
+_RESEARCH_PREFIXES = ("/research ", "/r30 ")
+_BUZZ_PREFIXES = ("/buzz ", "/last30 ")
+
+
+def parse_last30days_command(text: str) -> dict | None:
+    """Parse /research or /buzz commands and return invocation info.
+
+    /research [topic]  — comprehensive research (default depth, all sources)
+    /buzz [topic]      — quick social pulse check (quick depth, compact output)
+
+    Returns:
+        {"mode": "research"|"buzz", "topic": str, "command": str} or None
+    """
+    stripped = text.strip()
+
+    # /research [topic]
+    for prefix in _RESEARCH_PREFIXES:
+        if stripped.lower().startswith(prefix):
+            topic = stripped[len(prefix):].strip()
+            if topic:
+                cmd = (
+                    f"python3 {_LAST30DAYS_PY} "
+                    f'"{topic}" --emit=compact --sources=auto'
+                )
+                return {"mode": "research", "topic": topic, "command": cmd}
+
+    # /buzz [topic]
+    for prefix in _BUZZ_PREFIXES:
+        if stripped.lower().startswith(prefix):
+            topic = stripped[len(prefix):].strip()
+            if topic:
+                cmd = (
+                    f"python3 {_LAST30DAYS_PY} "
+                    f'"{topic}" --quick --emit=compact --sources=reddit,x,hn'
+                )
+                return {"mode": "buzz", "topic": topic, "command": cmd}
+
+    return None
+
+
+def is_last30days_command(text: str) -> bool:
+    """Return True if text is a /research or /buzz command."""
+    return parse_last30days_command(text) is not None

@@ -1778,7 +1778,7 @@ body {
     <div class="ideas-header" style="margin-bottom:8px">
       <div>
         <div class="ideas-title" style="display:flex;align-items:center;gap:12px">
-          TRADING COMMAND CENTER
+          TRADING COMMAND CENTER <span style="font-size:0.35rem;color:var(--grey3)">v24.3</span>
           <span class="t-live-dot" id="tLiveDot"></span>
         </div>
         <div class="ideas-subtitle">PHANTOMCLAW × RIVALCLAW × CLAWMPSON — LIVE PAPER TRADING</div>
@@ -4446,6 +4446,12 @@ function renderTrading() {
   }
 
   // Unified Trade Feed — merge ALL open positions from all bots
+  // Debug: write trade count directly
+  try {
+    const _dbg = document.getElementById('ufBody')
+    if (_dbg) _dbg.innerHTML = `<tr><td colspan="10" style="color:yellow">Loading ${(d.open_positions||[]).length} + ${((d.phantom||{}).positions||[]).length}ph + ${(d.rivalclaw_positions||[]).length}rv trades...</td></tr>`
+  } catch(e){}
+
   try { buildUnifiedFeed(d) } catch(e) {
     console.error('UnifiedFeed render:', e)
     const ufErrBody = document.getElementById('ufBody')

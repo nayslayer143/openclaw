@@ -149,3 +149,20 @@
 {"event":"health","timestamp":1774319340,"ollama":"ok","disk_pct":9,"queue_depth":0,"error_count":0}
 {"event":"health","timestamp":1774319400,"ollama":"ok","disk_pct":9,"queue_depth":0,"error_count":0}
 {"event":"health","timestamp":1774319449,"ollama":"ok","disk_pct":9,"queue_depth":0,"error_count":0}
+{"event":"auto_deploy","timestamp":1774321200,"from":"3f933b7","to":"93693bb"}
+{"event":"health","timestamp":1774321200,"ollama":"ok","disk_pct":9,"queue_depth":0,"error_count":0}
+{"event":"auto_deploy","timestamp":1774323000,"from":"a091b49","to":"93693bb"}
+{"event":"health","timestamp":1774323000,"ollama":"ok","disk_pct":9,"queue_depth":0,"error_count":0}
+{"event":"auto_deploy","timestamp":1774324801,"from":"a0abb10","to":"93693bb"}
+{"event":"health","timestamp":1774324801,"ollama":"ok","disk_pct":9,"queue_depth":0,"error_count":0}
+{"event":"auto_deploy","timestamp":1774326600,"from":"cf9d774","to":"93693bb"}
+{"event":"health","timestamp":1774326600,"ollama":"ok","disk_pct":8,"queue_depth":0,"error_count":0}
+{"event":"auto_deploy","timestamp":1774328400,"from":"8187aec","to":"93693bb"}
+{"event":"health","timestamp":1774328400,"ollama":"ok","disk_pct":8,"queue_depth":0,"error_count":0}
+{"event":"auto_deploy","timestamp":1774330200,"from":"098047e","to":"93693bb"}
+{"event":"health","timestamp":1774330200,"ollama":"ok","disk_pct":8,"queue_depth":0,"error_count":0}
+{"event":"auto_deploy","timestamp":1774332000,"from":"4a91414","to":"93693bb"}
+{"event":"health","timestamp":1774332000,"ollama":"ok","disk_pct":8,"queue_depth":0,"error_count":0}
+{"timestamp":1774332006,"check":"ollama","status":"fail","detail":"Idea engine Ollama failure — restart failed, Tier-2 escalated"}
+{"event":"auto_deploy","timestamp":1774333800,"from":"4a91414","to":"93693bb"}
+{"event":"health","timestamp":1774333800,"ollama":"ok","disk_pct":8,"queue_depth":0,"error_count":0}

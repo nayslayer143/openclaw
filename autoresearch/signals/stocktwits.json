@@ -1,0 +1,40 @@
+{
+  "platform": "stocktwits",
+  "crawl_id": "stocktwits-20260324192131",
+  "crawled_at": "2026-03-24T19:21:32.421809",
+  "signals": [
+    {
+      "id": "b19a40db3c21a133",
+      "type": "sentiment",
+      "source_url": "",
+      "source_author": "symbol",
+      "title": "",
+      "body": "Feed",
+      "ticker_or_market": "AAPL",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "upvotes": 0,
+        "comments": 0,
+        "shares": 0
+      },
+      "tags": [
+        "stocktwits",
+        "$AAPL"
+      ],
+      "raw_data": {
+        "all_tickers": [
+          "AAPL"
+        ],
+        "st_sentiment": null,
+        "author_followers": 0,
+        "timestamp": ""
+      },
+      "extracted_at": "2026-03-25T02:21:32.421767+00:00"
+    }
+  ],
+  "meta": {
+    "total_signals": 1
+  }
+}

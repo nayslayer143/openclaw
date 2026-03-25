@@ -362,6 +362,65 @@ def handle_references(chat_id: str):
     send(chat_id, refs.format_references(ref_list))
 
 
+def handle_research(chat_id: str, topic: str):
+    """Run last30days deep research on a topic and return compact report."""
+    if not topic:
+        send(chat_id, "Usage: /research <topic>\nExample: /research Polymarket AI election")
+        return
+    send_typing(chat_id)
+    send(chat_id, f"Researching '{topic}' across Reddit, X, HN, YouTube… (~60-90s)")
+    parsed = intents.parse_last30days_command(f"/research {topic}")
+    if not parsed:
+        send(chat_id, "Could not build last30days command.")
+        return
+    try:
+        result = subprocess.run(
+            parsed["command"],
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=180,
+        )
+        output = result.stdout.strip() or result.stderr.strip() or "No output."
+        # Telegram message limit ~4096 chars
+        if len(output) > 3800:
+            output = output[:3800] + "\n…[truncated]"
+        send(chat_id, output)
+    except subprocess.TimeoutExpired:
+        send(chat_id, f"Research timed out for '{topic}'. Try /buzz for a faster check.")
+    except Exception as e:
+        send(chat_id, f"Research error: {e}")
+
+
+def handle_buzz(chat_id: str, topic: str):
+    """Quick social pulse check via last30days (Reddit + X + HN only, ~15s)."""
+    if not topic:
+        send(chat_id, "Usage: /buzz <topic>\nExample: /buzz Bitcoin ETF approval")
+        return
+    send_typing(chat_id)
+    send(chat_id, f"Quick buzz check for '{topic}'…")
+    parsed = intents.parse_last30days_command(f"/buzz {topic}")
+    if not parsed:
+        send(chat_id, "Could not build last30days command.")
+        return
+    try:
+        result = subprocess.run(
+            parsed["command"],
+            shell=True,
+            capture_output=True,
+            text=True,
+            timeout=60,
+        )
+        output = result.stdout.strip() or result.stderr.strip() or "No results found."
+        if len(output) > 3800:
+            output = output[:3800] + "\n…[truncated]"
+        send(chat_id, output)
+    except subprocess.TimeoutExpired:
+        send(chat_id, f"Buzz check timed out for '{topic}'.")
+    except Exception as e:
+        send(chat_id, f"Buzz error: {e}")
+
+
 def handle_papers(chat_id: str, topic: str):
     """Discover and summarize top 5 papers on a topic."""
     send_typing(chat_id)
@@ -937,6 +996,22 @@ def handle_message(msg: dict):
         if lower.startswith("/bet ") or lower == "/bet":
             bet_args = text[len("/bet"):].strip()
             handle_bet(chat_id, bet_args)
+            return
+        if lower.startswith("/research ") or lower == "/research":
+            topic = text[len("/research"):].strip()
+            handle_research(chat_id, topic)
+            return
+        if lower.startswith("/buzz ") or lower == "/buzz":
+            topic = text[len("/buzz"):].strip()
+            handle_buzz(chat_id, topic)
+            return
+        if lower.startswith("/r30 ") or lower == "/r30":
+            topic = text[len("/r30"):].strip()
+            handle_research(chat_id, topic)
+            return
+        if lower.startswith("/last30 ") or lower == "/last30":
+            topic = text[len("/last30"):].strip()
+            handle_buzz(chat_id, topic)
             return
 
     # ── 3. Process media if present ───────────────────────────────────────────

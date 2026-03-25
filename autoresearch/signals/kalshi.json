@@ -1,0 +1,300 @@
+{
+  "platform": "kalshi",
+  "crawl_id": "kalshi-6def8817",
+  "crawled_at": "2026-03-24T19:50:42.021931",
+  "signals": [
+    {
+      "id": "88a62ceec9c4a0f6",
+      "type": "prediction",
+      "source_url": "https://kalshi.com/markets/KXMVESPORTSMULTIGAMEEXTENDED-S2026D663EFED23D-C901EAAB737",
+      "source_author": "kalshi-market",
+      "title": "[Kalshi] yes Los Angeles L,no Detroit wins by over 18.5 Points,no Denver wins by over 29.5 Points,no Houston wins by over 16.5 Points,no Cleveland wins by over 19.5 Points,no Boston wins by over 13.5 ",
+      "body": "KXMVESPORTSMULTIGAMEEXTENDED-S2026D663EFED23D-C901EAAB737: Yes=0%, Vol=0, OI=0. Direction: bearish.",
+      "ticker_or_market": "KALSHI:KXMVESPORTSMULTIGAMEEXTENDED-S2026D663EFED23D-C901EAAB737",
+      "direction": "bearish",
+      "confidence": 0.3,
+      "urgency": "weeks",
+      "engagement": {
+        "volume": 0,
+        "open_interest": 0
+      },
+      "tags": [
+        "fed"
+      ],
+      "raw_data": {
+        "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026D663EFED23D-C901EAAB737",
+        "yes_price": 0,
+        "no_price": 0,
+        "volume": 0,
+        "open_interest": 0,
+        "status": "active",
+        "close_time": "2026-04-08T23:00:00Z"
+      },
+      "extracted_at": "2026-03-25T02:50:42.021514"
+    },
+    {
+      "id": "1128c00f72f7f84b",
+      "type": "prediction",
+      "source_url": "https://kalshi.com/markets/KXMVESPORTSMULTIGAMEEXTENDED-S2026DA6E6A56D2A-EFB6DCDFED1",
+      "source_author": "kalshi-market",
+      "title": "[Kalshi] yes Devin Booker: 2+,yes Devin Booker: 4+,yes Aaron Gordon: 10+,yes Jamal Murray: 20+,yes Nikola Joki\u0107: 25+,yes Devin Booker: 20+,yes Jalen Green: 15+,yes Aaron Gordon: 4+,yes Nikola Joki\u0107: 1",
+      "body": "KXMVESPORTSMULTIGAMEEXTENDED-S2026DA6E6A56D2A-EFB6DCDFED1: Yes=0%, Vol=0, OI=0. Direction: bearish.",
+      "ticker_or_market": "KALSHI:KXMVESPORTSMULTIGAMEEXTENDED-S2026DA6E6A56D2A-EFB6DCDFED1",
+      "direction": "bearish",
+      "confidence": 0.3,
+      "urgency": "weeks",
+      "engagement": {
+        "volume": 0,
+        "open_interest": 0
+      },
+      "tags": [
+        "fed"
+      ],
+      "raw_data": {
+        "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026DA6E6A56D2A-EFB6DCDFED1",
+        "yes_price": 0,
+        "no_price": 0,
+        "volume": 0,
+        "open_interest": 0,
+        "status": "active",
+        "close_time": "2026-04-08T03:00:00Z"
+      },
+      "extracted_at": "2026-03-25T02:50:42.021579"
+    },
+    {
+      "id": "7f1b2636dc0a6f9a",
+      "type": "prediction",
+      "source_url": "https://kalshi.com/markets/KXMVESPORTSMULTIGAMEEXTENDED-S2026FED084F83F7-028E6C48119",
+      "source_author": "kalshi-market",
+      "title": "[Kalshi] yes Auburn,yes Purdue,no Nebraska wins by over 8.5 Points",
+      "body": "KXMVESPORTSMULTIGAMEEXTENDED-S2026FED084F83F7-028E6C48119: Yes=0%, Vol=0, OI=0. Direction: bearish.",
+      "ticker_or_market": "KALSHI:KXMVESPORTSMULTIGAMEEXTENDED-S2026FED084F83F7-028E6C48119",
+      "direction": "bearish",
+      "confidence": 0.3,
+      "urgency": "weeks",
+      "engagement": {
+        "volume": 0,
+        "open_interest": 0
+      },
+      "tags": [
+        "fed"
+      ],
+      "raw_data": {
+        "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S2026FED084F83F7-028E6C48119",
+        "yes_price": 0,
+        "no_price": 0,
+        "volume": 0,
+        "open_interest": 0,
+        "status": "active",
+        "close_time": "2026-04-07T17:00:00Z"
+      },
+      "extracted_at": "2026-03-25T02:50:42.021612"
+    },
+    {
+      "id": "851eb2629571a449",
+      "type": "prediction",
+      "source_url": "https://kalshi.com/markets/KXMVECROSSCATEGORY-S202613FFFC1C6F9-D747FED8F60",
+      "source_author": "kalshi-market",
+      "title": "[Kalshi] yes Denver,yes Los Angeles L,yes Purdue,yes Both Teams To Score,yes Both Teams To Score",
+      "body": "KXMVECROSSCATEGORY-S202613FFFC1C6F9-D747FED8F60: Yes=0%, Vol=0, OI=0. Direction: bearish.",
+      "ticker_or_market": "KALSHI:KXMVECROSSCATEGORY-S202613FFFC1C6F9-D747FED8F60",
+      "direction": "bearish",
+      "confidence": 0.3,
+      "urgency": "weeks",
+      "engagement": {
+        "volume": 0,
+        "open_interest": 0
+      },
+      "tags": [
+        "fed"
+      ],
+      "raw_data": {
+        "ticker": "KXMVECROSSCATEGORY-S202613FFFC1C6F9-D747FED8F60",
+        "yes_price": 0,
+        "no_price": 0,
+        "volume": 0,
+        "open_interest": 0,
+        "status": "active",
+        "close_time": "2026-04-09T02:00:00Z"
+      },
+      "extracted_at": "2026-03-25T02:50:42.021645"
+    },
+    {
+      "id": "68dc30b44e0d4290",
+      "type": "prediction",
+      "source_url": "https://kalshi.com/markets/KXMVESPORTSMULTIGAMEEXTENDED-S20267BB45D90C73-25B586CFEDD",
+      "source_author": "kalshi-market",
+      "title": "[Kalshi] yes Aaron Gordon: 10+,yes Jalen Green: 15+,yes Aaron Gordon: 2+,yes Nikola Joki\u0107: 10+,yes Denver wins by over 2.5 Points",
+      "body": "KXMVESPORTSMULTIGAMEEXTENDED-S20267BB45D90C73-25B586CFEDD: Yes=0%, Vol=0, OI=0. Direction: bearish.",
+      "ticker_or_market": "KALSHI:KXMVESPORTSMULTIGAMEEXTENDED-S20267BB45D90C73-25B586CFEDD",
+      "direction": "bearish",
+      "confidence": 0.3,
+      "urgency": "weeks",
+      "engagement": {
+        "volume": 0,
+        "open_interest": 0
+      },
+      "tags": [
+        "fed"
+      ],
+      "raw_data": {
+        "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20267BB45D90C73-25B586CFEDD",
+        "yes_price": 0,
+        "no_price": 0,
+        "volume": 0,
+        "open_interest": 0,
+        "status": "active",
+        "close_time": "2026-04-08T03:00:00Z"
+      },
+      "extracted_at": "2026-03-25T02:50:42.021679"
+    },
+    {
+      "id": "fc375185888ef39e",
+      "type": "prediction",
+      "source_url": "https://kalshi.com/markets/KXMVESPORTSMULTIGAMEEXTENDED-S20260193E12B754-3971A8FFED8",
+      "source_author": "kalshi-market",
+      "title": "[Kalshi] yes Aaron Gordon: 1+,yes Jamal Murray: 1+,yes Nikola Joki\u0107: 1+,yes Devin Booker: 1+,yes Jamal Murray: 6+,yes Nikola Joki\u0107: 10+,yes Nikola Joki\u0107: 1+,yes Denver,yes Jamal Murray: 20+,yes Nikola",
+      "body": "KXMVESPORTSMULTIGAMEEXTENDED-S20260193E12B754-3971A8FFED8: Yes=0%, Vol=0, OI=0. Direction: bearish.",
+      "ticker_or_market": "KALSHI:KXMVESPORTSMULTIGAMEEXTENDED-S20260193E12B754-3971A8FFED8",
+      "direction": "bearish",
+      "confidence": 0.3,
+      "urgency": "weeks",
+      "engagement": {
+        "volume": 0,
+        "open_interest": 0
+      },
+      "tags": [
+        "fed"
+      ],
+      "raw_data": {
+        "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20260193E12B754-3971A8FFED8",
+        "yes_price": 0,
+        "no_price": 0,
+        "volume": 0,
+        "open_interest": 0,
+        "status": "active",
+        "close_time": "2026-04-08T03:00:00Z"
+      },
+      "extracted_at": "2026-03-25T02:50:42.021716"
+    },
+    {
+      "id": "1e9b44820d2dba81",
+      "type": "prediction",
+      "source_url": "https://kalshi.com/markets/KXMVESPORTSMULTIGAMEEXTENDED-S202655B8FFEDCC9-50A9A222B5E",
+      "source_author": "kalshi-market",
+      "title": "[Kalshi] yes Chicago,yes Denver,yes Los Angeles L,yes Cleveland,yes Los Angeles C,yes Kevin Durant: 15+,yes Julius Randle: 15+,yes Luka Don\u010di\u0107: 25+,yes Jaylen Brown: 20+",
+      "body": "KXMVESPORTSMULTIGAMEEXTENDED-S202655B8FFEDCC9-50A9A222B5E: Yes=0%, Vol=0, OI=0. Direction: bearish.",
+      "ticker_or_market": "KALSHI:KXMVESPORTSMULTIGAMEEXTENDED-S202655B8FFEDCC9-50A9A222B5E",
+      "direction": "bearish",
+      "confidence": 0.3,
+      "urgency": "weeks",
+      "engagement": {
+        "volume": 0,
+        "open_interest": 0
+      },
+      "tags": [
+        "fed"
+      ],
+      "raw_data": {
+        "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S202655B8FFEDCC9-50A9A222B5E",
+        "yes_price": 0,
+        "no_price": 0,
+        "volume": 0,
+        "open_interest": 0,
+        "status": "active",
+        "close_time": "2026-04-08T23:00:00Z"
+      },
+      "extracted_at": "2026-03-25T02:50:42.021755"
+    },
+    {
+      "id": "df44bcbdd3c1a60c",
+      "type": "prediction",
+      "source_url": "https://kalshi.com/markets/KXMVECROSSCATEGORY-S2026186AA50DD95-72922FED488",
+      "source_author": "kalshi-market",
+      "title": "[Kalshi] yes Phoenix,yes UTA Mammoth,yes CGY Flames",
+      "body": "KXMVECROSSCATEGORY-S2026186AA50DD95-72922FED488: Yes=0%, Vol=0, OI=0. Direction: bearish.",
+      "ticker_or_market": "KALSHI:KXMVECROSSCATEGORY-S2026186AA50DD95-72922FED488",
+      "direction": "bearish",
+      "confidence": 0.3,
+      "urgency": "weeks",
+      "engagement": {
+        "volume": 0,
+        "open_interest": 0
+      },
+      "tags": [
+        "fed"
+      ],
+      "raw_data": {
+        "ticker": "KXMVECROSSCATEGORY-S2026186AA50DD95-72922FED488",
+        "yes_price": 0,
+        "no_price": 0,
+        "volume": 0,
+        "open_interest": 0,
+        "status": "active",
+        "close_time": "2026-04-08T03:00:00Z"
+      },
+      "extracted_at": "2026-03-25T02:50:42.021797"
+    },
+    {
+      "id": "a73714c373a7eefa",
+      "type": "prediction",
+      "source_url": "https://kalshi.com/markets/KXMVESPORTSMULTIGAMEEXTENDED-S20261EFED86BA70-096DFE1F005",
+      "source_author": "kalshi-market",
+      "title": "[Kalshi] yes Aaron Gordon: 1+,yes Nikola Joki\u0107: 11+,yes Devin Booker: 2+,yes Aaron Gordon: 2+",
+      "body": "KXMVESPORTSMULTIGAMEEXTENDED-S20261EFED86BA70-096DFE1F005: Yes=0%, Vol=0, OI=0. Direction: bearish.",
+      "ticker_or_market": "KALSHI:KXMVESPORTSMULTIGAMEEXTENDED-S20261EFED86BA70-096DFE1F005",
+      "direction": "bearish",
+      "confidence": 0.3,
+      "urgency": "weeks",
+      "engagement": {
+        "volume": 0,
+        "open_interest": 0
+      },
+      "tags": [
+        "fed"
+      ],
+      "raw_data": {
+        "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20261EFED86BA70-096DFE1F005",
+        "yes_price": 0,
+        "no_price": 0,
+        "volume": 0,
+        "open_interest": 0,
+        "status": "active",
+        "close_time": "2026-04-08T03:00:00Z"
+      },
+      "extracted_at": "2026-03-25T02:50:42.021828"
+    },
+    {
+      "id": "ccb2a385fb4739f2",
+      "type": "prediction",
+      "source_url": "https://kalshi.com/markets/KXMVESPORTSMULTIGAMEEXTENDED-S20264FED44B6243-8F2FCB5CC87",
+      "source_author": "kalshi-market",
+      "title": "[Kalshi] yes Jamal Murray: 1+,yes Devin Booker: 1+,yes Kevin Durant: 1+,yes Reed Sheppard: 1+,yes Austin Reaves: 1+,yes Derrick White: 1+,yes Jaylen Brown: 1+,yes Shai Gilgeous-Alexander: 1+,yes Devin",
+      "body": "KXMVESPORTSMULTIGAMEEXTENDED-S20264FED44B6243-8F2FCB5CC87: Yes=0%, Vol=0, OI=0. Direction: bearish.",
+      "ticker_or_market": "KALSHI:KXMVESPORTSMULTIGAMEEXTENDED-S20264FED44B6243-8F2FCB5CC87",
+      "direction": "bearish",
+      "confidence": 0.3,
+      "urgency": "weeks",
+      "engagement": {
+        "volume": 0,
+        "open_interest": 0
+      },
+      "tags": [
+        "fed"
+      ],
+      "raw_data": {
+        "ticker": "KXMVESPORTSMULTIGAMEEXTENDED-S20264FED44B6243-8F2FCB5CC87",
+        "yes_price": 0,
+        "no_price": 0,
+        "volume": 0,
+        "open_interest": 0,
+        "status": "active",
+        "close_time": "2026-04-08T03:00:00Z"
+      },
+      "extracted_at": "2026-03-25T02:50:42.021862"
+    }
+  ],
+  "meta": {
+    "total_signals": 10
+  }
+}
