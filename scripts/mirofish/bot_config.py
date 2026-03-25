@@ -91,3 +91,14 @@ def confidence_position_pct(confidence: float, base_pct: float = 0.03) -> float:
         return base_pct * 1.5
     else:
         return base_pct * 1.5  # cap — very high was losing money from oversizing
+
+
+def is_trading_hours() -> bool:
+    """Returns False during 00-06 UTC — our worst session (40% WR, -$466).
+    Calibrated from 107 resolved trades (2026-03-25).
+    """
+    from datetime import datetime, timezone
+    hour = datetime.now(timezone.utc).hour
+    if hour < 6:
+        return False
+    return True

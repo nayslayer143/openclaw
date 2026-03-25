@@ -150,6 +150,10 @@ def place_trade(conn, market_id, question, direction, entry, confidence, thesis,
 
 
 def run():
+    from scripts.mirofish.bot_config import is_trading_hours
+    if not is_trading_hours():
+        print("[harvester] Outside trading hours (00-06 UTC) — skipping")
+        return
     conn = get_conn()
     balance = get_balance(conn)
     open_ids = get_open_ids(conn)
