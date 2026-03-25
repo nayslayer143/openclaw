@@ -41,7 +41,9 @@ EMBED_MODEL           = os.environ.get("SCHOLAR_EMBED_MODEL", "nomic-embed-text"
 RELEVANCE_THRESHOLD   = float(os.environ.get("SCHOLAR_RELEVANCE_THRESHOLD", "0.75"))
 HF_REQUEST_TIMEOUT    = 30  # seconds for all HuggingFace HTTP calls
 
-OPENCLAW_ROOT = Path.home() / "openclaw"
+OPENCLAW_ROOT   = Path.home() / "openclaw"
+WATCHLIST_PATH  = Path(__file__).parent / "watchlist.json"
+REPOMAN_INBOX   = Path.home() / "repo-man" / "inbox"
 
 # ── Directory creation ────────────────────────────────────────────────────────
 # Ensure output directories exist at import time.
@@ -74,6 +76,108 @@ DEFAULT_DOMAINS = [
     "tool use LLM",
     "agentic systems",
 ]
+
+# ── Watchlist ─────────────────────────────────────────────────────────────────
+
+def load_watchlist() -> list[dict]:
+    """Load watchlist entries from watchlist.json. Returns [] if missing or broken."""
+    if not WATCHLIST_PATH.exists():
+        return []
+    try:
+        return json.loads(WATCHLIST_PATH.read_text()).get("entries", [])
+    except Exception as e:
+        print(f"[scholar] watchlist load failed: {e}")
+        return []
+
+
+def _watchlist_search_terms() -> list[str]:
+    """Collect all search_terms across all watchlist entries."""
+    terms: list[str] = []
+    for entry in load_watchlist():
+        terms.extend(entry.get("monitor", {}).get("search_terms", []))
+    return terms
+
+
+# ── Repo Man inbox push ───────────────────────────────────────────────────────
+
+def _push_to_repoman(
+    paper_id: str,
+    priority: str,
+    findings: list,
+    techniques: list,
+    relevance: str,
+) -> bool:
+    """
+    Drop a structured JSON file into ~/repo-man/inbox/ after a successful digest.
+    Repo Man picks these up for security scoring, OpenClaw routing, and dispatch
+    block generation. Never raises — errors are logged and swallowed.
+
+    Drop schema: repoman-inbox-v1
+    """
+    try:
+        REPOMAN_INBOX.mkdir(parents=True, exist_ok=True)
+
+        # Re-fetch title + url from DB (paper is guaranteed present at call site)
+        with db._get_conn() as conn:
+            row = conn.execute(
+                "SELECT title, url FROM papers WHERE paper_id=?", (paper_id,)
+            ).fetchone()
+        title = (row["title"] if row else None) or paper_id
+        url = (row["url"] if row else None) or f"https://huggingface.co/papers/{paper_id}"
+
+        # Build summary and action recommendation
+        summary_parts: list[str] = []
+        if findings:
+            summary_parts.append("Findings: " + " | ".join(str(f) for f in findings[:5]))
+        if relevance:
+            summary_parts.append(f"Relevance: {relevance}")
+        summary = " ".join(summary_parts) or title
+
+        action = "Review paper findings and identify applicable improvements."
+        if techniques:
+            action = "Implement: " + "; ".join(str(t) for t in techniques[:3]) + "."
+        if relevance:
+            action += f" Context: {relevance}"
+
+        # Structured content block for Repo Man's analysis pipeline
+        content_lines = [f"Priority: {priority}", "", "Key Findings:"]
+        content_lines += [f"- {f}" for f in (findings or [])]
+        if techniques:
+            content_lines += ["", "Implementable Techniques:"]
+            content_lines += [f"- {t}" for t in techniques]
+        if relevance:
+            content_lines += ["", f"Relevance:\n{relevance}"]
+        extracted_content = "\n".join(content_lines)
+
+        drop = {
+            "schema": "repoman-inbox-v1",
+            "source": "autoresearch-scholar",
+            "dropped_at": datetime.datetime.utcnow().isoformat(),
+            "raw_input": url,
+            "source_type": "generic_url",
+            "title": title,
+            "extracted_content": extracted_content,
+            "pre_analysis": {
+                "backend": "ollama",
+                "summary": summary,
+                "key_ideas": [str(t) for t in (techniques or [])],
+                "relevance_tags": ["research", "paper", priority.lower(), "autoresearch-scholar"],
+                "novelty_score": None,
+                "action_recommendation": action,
+            },
+            "priority": priority,
+        }
+
+        slug = re.sub(r"[^a-z0-9]+", "-", paper_id.lower())[:30].strip("-")
+        ts = datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%S")
+        fname = f"scholar-{slug}-{ts}.json"
+        (REPOMAN_INBOX / fname).write_text(json.dumps(drop, indent=2))
+        print(f"[scholar] → repo-man inbox: {fname}")
+        return True
+    except Exception as e:
+        print(f"[scholar] repoman push failed for {paper_id}: {e}")
+        return False
+
 
 # ── DB helpers ────────────────────────────────────────────────────────────────
 
@@ -400,6 +504,7 @@ def digest_paper(paper_id: str) -> dict:
         action=",".join(actions) if actions else "none",
     )
     mark_digested(paper_id)
+    _push_to_repoman(paper_id, priority, findings, techniques, relevance)
 
     return {
         "paper_id": paper_id,
@@ -496,10 +601,14 @@ def auto_mode(domains: list[str] | None = None) -> dict:
     if domains is None:
         domains = DEFAULT_DOMAINS
 
+    # Merge watchlist search terms so overnight sweep covers monitored papers
+    watchlist_terms = _watchlist_search_terms()
+    merged_domains = list(domains) + [t for t in watchlist_terms if t not in domains]
+
     today = datetime.datetime.utcnow().strftime("%Y-%m-%d")
     all_candidates: list[dict] = []
 
-    for keyword in domains:
+    for keyword in merged_domains:
         try:
             candidates = discover(query=keyword, limit=20)
             all_candidates.extend(candidates)
