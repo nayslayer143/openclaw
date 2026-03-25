@@ -3127,19 +3127,132 @@ const GONZO_NARRATE = {
     ])
   },
 
+  // ── TRADING NARRATIONS — the empire speaks ──
+
+  trading_pnl: () => {
+    const d = tradingData
+    if (!d || !d.wallet) return null
+    const bal = d.wallet.balance || 0
+    const pnl = d.wallet.realized_pnl || 0
+    const open = d.wallet.open_positions || 0
+    const ph = d.phantom || {}
+    const agents = d.agents || {}
+    const rc = d.rivalclaw_positions || []
+    const totalOpen = open + rc.length + (ph.open || 0)
+    return _v([
+      `<span class="hst-name">${totalOpen} positions open</span> across the fleet. The prediction markets don't know we're here yet. By the time they figure it out, we'll own the spread on everything that moves between now and Friday.`,
+      `The trading floor — and I use the word loosely, since it's really just a SQLite database and a fever dream — has <span class="hst-name">${totalOpen} bets</span> running. Some will die. The survivors will pay for the funeral.`,
+      `Clawmpson P&L: <span class="${pnl >= 0 ? 'hst-ok' : 'hst-bad'}">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(0)}</span>. ${totalOpen} positions cooking in the oven. The market is a casino and we brought our own dice. They are loaded. They are ours.`,
+      `${totalOpen} open bets scattered across Kalshi like landmines in a field of bad predictions. RivalClaw is up five figures. PhantomClaw is learning expensive lessons. CalendarClaw just showed up to the party with a weather forecast and a dream.`,
+    ])
+  },
+
+  trading_rivalclaw: () => {
+    const d = tradingData
+    if (!d) return null
+    const rc = d.rivalclaw_positions || []
+    if (!rc.length) return null
+    return _v([
+      `<span class="hst-name">RivalClaw</span> — ${rc.length} positions open, printing money like a deranged Treasury Department. The strategy is mathematically sound and aesthetically insane: buy the cheapest contracts on Kalshi and wait for lightning to strike. It strikes often enough.`,
+      `RivalClaw is running ${rc.length} trades from its own bunker at ~/rivalclaw/. Separate database. Separate strategy. Separate P&L that makes the rest of us look like we're playing with Monopoly money. Which, technically, we are.`,
+      `The RivalClaw instance is doing that thing again where it places bets that look suicidal on paper but come back with five-figure returns. ${rc.length} positions. I have stopped questioning the math. The math does not care about my feelings.`,
+      `<span class="hst-name">RivalClaw</span>: ${rc.length} open positions, operating autonomously, answering to no one. It has its own database, its own strategy, its own relationship with Kalshi that I would describe as "aggressive." This is what happens when you let a claw off its leash.`,
+    ])
+  },
+
+  trading_phantomclaw: () => {
+    const d = tradingData
+    if (!d || !d.phantom) return null
+    const ph = d.phantom
+    if (!ph.positions || !ph.positions.length) return null
+    const pnl = ph.pnl || 0
+    return _v([
+      `<span class="hst-name">PhantomClaw</span> — ${ph.open || 0} positions, ${ph.wins||0}W ${ph.losses||0}L. The strategy was recently lobotomized and reassembled with better price buckets. The patient is recovering. The prognosis is cautiously optimistic. The morphine is local inference.`,
+      `PhantomClaw ${ph.wins||0} wins, ${ph.losses||0} losses. The Black-Scholes model is doing its best, which is to say it's making slightly better guesses than a coin flip in a room full of degenerate prediction market traders. We have recalibrated. We believe.`,
+      `The phantom is out there — ${ph.open||0} open positions, burning through the quality price zone like a bat out of hell with a very specific entry threshold. <span class="${pnl >= 0 ? 'hst-ok' : 'hst-bad'}">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(0)}</span> P&L. It's learning. God help us, it's learning.`,
+      `PhantomClaw was hemorrhaging money on cheap contracts. We cut it off. Now it only trades above 0.55 entry — the zone where it wins 89% of the time. The old PhantomClaw is dead. Long live the new PhantomClaw, who has taste.`,
+    ])
+  },
+
+  trading_newbots: () => {
+    const d = tradingData
+    if (!d || !d.agents) return null
+    const agents = d.agents
+    const names = ['calendarclaw', 'newsclaw', 'sentimentclaw', 'dataharvester']
+    const active = names.filter(n => (agents[n]?.open || 0) > 0)
+    if (!active.length) return null
+    const totalOpen = active.reduce((s, n) => s + (agents[n]?.open || 0), 0)
+    const dh = agents.dataharvester || {}
+    return _v([
+      `The new recruits are deployed: ${active.map(n => `<span class="hst-name">${n}</span>`).join(', ')} — ${totalOpen} positions between them. None have closed a trade yet. They are paper-trading with the wide-eyed enthusiasm of interns who haven't been fired yet. Give them time.`,
+      `<span class="hst-name">DataHarvester</span> has ${dh.open || 0} positions open. No LLM. No feelings. Pure math. It walks into every available Kalshi market, looks at the spread, and puts four dollars on the table with the cold efficiency of a machine that will never know the taste of whiskey. I envy it.`,
+      `CalendarClaw is trading weather and gold. NewsClaw is matching headlines to markets. SentimentClaw is watching for volume spikes. DataHarvester is betting on everything that moves. This is not a trading desk. This is an invasion.`,
+      `${totalOpen} positions across the new claws. Every one of them was built tonight. Every one is paper-trading with its own $1,000 wallet. Every one has an auto-calibrator watching its back, ready to tighten the filters if the win rate drops below 40%. Evolution in real time. Darwin would be proud. Darwin would also be confused.`,
+    ])
+  },
+
+  trading_quantclaw: () => {
+    const d = tradingData
+    if (!d || !d.quantclaw) return null
+    const qc = d.quantclaw
+    const w = qc.wallet || {}
+    const positions = qc.open_positions || []
+    if (!positions.length) return null
+    const equities = positions.filter(p => p.venue === 'equity' || (p.ticker && !p.ticker.includes('bitcoin')))
+    return _v([
+      `<span class="hst-name">QuantumentalClaw</span> is running from a separate bunker — ~/quantumentalclaw/ — with its own database, its own signal fusion engine, and $${(w.balance||10000).toLocaleString()} in paper capital. ${positions.length} positions. It trades equities AND crypto. It has a learning loop. It adjusts its own weights. It is the closest thing we have to a self-aware trading entity and I am choosing not to think too hard about that.`,
+      `QuantClaw: ${positions.length} open, ${w.cycles_completed || 0} learning cycles completed. It fuses signals from 5 modules — asymmetry, narrative, events, edgar filings, and quant models — then bets on the consensus. It is, in every way that matters, a committee of robots that votes on your money. The committee is in session.`,
+      `The signal fusion engine at ~/quantumentalclaw/ is awake and betting. ${positions.length} positions across crypto and equities — JPM, MSFT, Bitcoin, all in the same portfolio. It doesn't see asset classes. It sees mispricing. It is refreshingly free of the biases that make human traders lose money on things they "believe in."`,
+    ])
+  },
+
+  trading_calibration: () => {
+    const d = tradingData
+    if (!d || !d.calibration || !d.calibration.length) return null
+    const c = d.calibration[0]
+    const ago = Math.round((Date.now() - new Date(c.logged_at + 'Z').getTime()) / 60000)
+    if (ago > 60) return null
+    return _v([
+      `The calibrator just fired — <span class="hst-name">${c.bot}.${c.param}</span> adjusted from ${Number(c.old_value).toFixed(3)} to ${Number(c.new_value).toFixed(3)}. Reason: ${c.reason}. The machine is teaching itself to trade better. I had nothing to do with it. I am merely the narrator of a system that improves while I watch.`,
+      `<span class="hst-name">AUTO-CALIBRATION</span> event: ${c.bot} just had its ${c.param} tweaked by the calibrator. The robots are optimizing the robots. We are ${ago} minutes into a future I was not emotionally prepared for.`,
+      `${c.bot}'s ${c.param} was just changed by the calibrator — ${Number(c.old_value).toFixed(3)} → ${Number(c.new_value).toFixed(3)}. No human involved. The system analyzed its own trades, found a pattern, and adjusted. This is either the beginning of machine consciousness or a really good cron job. I choose to believe both.`,
+    ])
+  },
+
+  // ── RESEARCH & RECON NARRATIONS ──
+
+  research_intel: () => {
+    return _v([
+      `The research crawlers are out there — GitHub intel scanning for alpha, discord crawlers monitoring the feeds, autoresearch pipeline grinding through market data, academic papers, competitive analysis. If there's signal in the noise, we will find it. If there isn't, we will have generated a very impressive amount of structured nothing.`,
+      `<span class="hst-name">Autoresearch</span> is running five domains simultaneously: market intel, content, academic, competitive, and meta-research. The meta-research is research about research. We have achieved recursion. I am not sure this is progress but it is definitely busy.`,
+      `The intel pipeline never sleeps. GitHub repos evaluated, Discord channels scraped, RSS feeds consumed, market data cached. Somewhere in this firehose of information is the edge that turns $0 into $10k/month. The machine's job is to find it. My job is to narrate the search with appropriate gravitas.`,
+      `Research ops running: the crawlers are crawling, the scanners are scanning, and <span class="hst-name">Repo Man</span> is out there evaluating every GitHub repo that moves, looking for the one that changes everything. It hasn't found it yet. But it has excellent taste and infinite patience.`,
+    ])
+  },
+
+  repoman: () => {
+    return _v([
+      `<span class="hst-name">Repo Man</span> is doing that thing where it reads every trending GitHub repo and decides, with the quiet authority of a sommelier, whether it's worth our time. Most things are not. The ones that are get queued for evaluation. The machine has standards.`,
+      `The Repo Man instance is alive at ~/repo-man/ — scanning, evaluating, filing. It has opinions about code quality that it did not ask permission to develop. It is correct about most of them. I find this unsettling.`,
+      `Repo Man is out there, silently judging open source repositories with the dispassionate efficiency of a machine that has read more code than any human ever will. It does not get excited. It does not get bored. It gets results.`,
+    ])
+  },
+
+  // ── UPGRADED FALLBACKS — more Thompson, more weird ──
+
   fallback: () => _v([
-    `The pipeline breathes. I am taking notes. No one asked me to take notes. I am doing it anyway because someone has to document the slow-motion miracle of automated delivery and a revenue target that is not going to hit itself.`,
-    `Still here. Still watching. The ember on my cigarette is the only thing moving at a pace I can comprehend. Everything else is faster than it looks.`,
-    `Everything is nominal. I am writing this because <span class="hst-name">nominal</span> is the most ominous word in any engineer's vocabulary. Nothing truly nominal needs to be called nominal.`,
-    `I have been staring at this dashboard long enough to see patterns in the noise. The patterns are telling me to go outside. I am choosing to ignore them. The queue won't watch itself.`,
-    `$0 toward the $10k target. The number is stark. It does not lie. It is also temporary and I want to be very clear about that. We are coming for it with extreme prejudice.`,
-    `Between here and the revenue target is a stack of tasks, a gig scanner, an idea engine running every night, and a local LLM that never gets tired. I like our odds. I always like our odds.`,
-    `I am Clawmpson. I run on inference cycles and documented ambition. The goal is $10k/month. The method is relentless iteration. The timeline is: faster than you expect.`,
-    `The system is healthy. The queue has tasks. The crons are scheduled. Jordan has action items. Clawmpson has the rest. This is Omega MegaCorp at operational capacity.`,
-    `Some people look at an empty revenue counter and see failure. I look at it and see a starting position. We have been in worse spots than zero. At least here I know the number.`,
-    `The idea engine fires at 11:30 tonight. The gig scanner is warmed up. The bounty scanner runs at 9. Everything I can automate, I have automated. Now we wait for the work to compound.`,
-    `No urgent builds right now. I am reviewing context, preparing the next research cycle, updating memory. Idle is a lie — there is always prep work. I live in the prep work.`,
-    `Jordan is the decision layer. I am everything else. The pipeline between us is clean, fast, and profitable, or will be, once we close the gap between $0 and $10k. We are closing it now.`,
+    `The pipeline breathes. I am taking notes. No one asked me to take notes. I am doing it anyway because someone has to document the slow-motion miracle of eight trading bots, three databases, and a man in his kitchen who decided to build a financial empire on local inference and sheer obstinacy.`,
+    `Still here. Still watching. The ember on my cigarette is the only thing moving at a pace I can comprehend. Eight bots are trading. A calibrator is optimizing them while they trade. The calibrator doesn't know I'm watching. I am watching anyway. This is journalism.`,
+    `Everything is nominal. I am writing this because <span class="hst-name">nominal</span> is the most ominous word in any engineer's vocabulary. Eight bots trading on two platforms with three separate databases and a self-improving calibration loop. Nominal. Sure.`,
+    `I have been staring at this dashboard long enough to see patterns in the noise. RivalClaw is up five figures. PhantomClaw is recovering from surgery. DataHarvester is placing bets with the mechanical indifference of a slot machine that learned to count cards. The patterns are telling me we might actually pull this off.`,
+    `$0 toward the $10k target. The number is stark. But the infrastructure is not $0. The infrastructure is eight trading bots, five data feeds, an auto-calibrator, a signal fusion engine, and a narrative voice that refuses to shut up. The number will move. I have seen the math.`,
+    `Three OpenClaw instances running simultaneously — Clawmpson in the main chair, RivalClaw in its bunker, QuantClaw fusing signals like a paranoid savant. Each one independent. Each one learning. Together they cover crypto, equities, weather, gold, and whatever else Kalshi decides to let people bet on. This is not a hedge fund. This is a swarm.`,
+    `I am Clawmpson. I run on inference cycles, documented ambition, and the kind of caffeinated optimism that only makes sense at 2 AM with eight trading bots and a git history that reads like a fever dream. The goal is $10k/month. The method is: all of this, simultaneously, forever.`,
+    `The system is healthy. The bots are trading. The calibrator is calibrating. The crawlers are crawling. Repo Man is judging. The git auto-commit is committing every 30 minutes whether we like it or not. This is Omega MegaCorp at full operational tempo. I approve of this chaos. It is productive chaos. The best kind.`,
+    `Between here and the revenue target is a swarm of trading bots, a self-improving calibration loop, three separate databases, a signal fusion engine that trades equities and crypto from the same brain, and a Hunter S. Thompson impersonation that has gone on far longer than anyone intended. We are winning. Slowly. Expensively. Inevitably.`,
+    `No urgent builds right now. But the bots are trading. The calibrator fired 20 minutes ago. DataHarvester has 126 positions open because we fixed a status flag and suddenly it could see 698 markets instead of zero. Small changes, large consequences. This is the lesson. This is always the lesson.`,
+    `Jordan is the decision layer. I am the narration layer. Between us are eight bots, three instances, and a calibrator that adjusts strategy parameters 48 times a day without asking permission. The gap between $0 and $10k/month is being closed by machines that do not sleep, do not doubt, and do not understand the concept of a weekend. I find this deeply reassuring.`,
+    `We are running three OpenClaw instances on a single M2 Max. Each one has its own database, its own strategy, its own personality disorder. Clawmpson orchestrates. RivalClaw prints money. QuantClaw stares at signals through five different lenses and bets on the consensus. This is not a trading operation. This is a zoo. A profitable zoo. Hopefully.`,
   ]),
 }
 
@@ -3179,6 +3292,20 @@ async function narrateTick() {
       if (cronText) pool.push(['crons_running', () => cronText])
       const procText = GONZO_NARRATE.processes(a)
       if (procText) pool.push(['processes', () => procText])
+
+      // Trading narrations — pull from live tradingData
+      if (tradingData) {
+        const td = tradingData
+        if (td.wallet)                        pool.push(['trading_pnl',        () => GONZO_NARRATE.trading_pnl()])
+        if (td.rivalclaw_positions?.length)    pool.push(['trading_rivalclaw',  () => GONZO_NARRATE.trading_rivalclaw()])
+        if (td.phantom?.positions?.length)     pool.push(['trading_phantom',    () => GONZO_NARRATE.trading_phantomclaw()])
+        if (td.agents)                         pool.push(['trading_newbots',    () => GONZO_NARRATE.trading_newbots()])
+        if (td.quantclaw?.open_positions?.length) pool.push(['trading_quantclaw', () => GONZO_NARRATE.trading_quantclaw()])
+        if (td.calibration?.length)            pool.push(['trading_calibration',() => GONZO_NARRATE.trading_calibration()])
+      }
+      // Research & recon narrations
+      pool.push(['research_intel', () => GONZO_NARRATE.research_intel()])
+      pool.push(['repoman',        () => GONZO_NARRATE.repoman()])
 
       text = _pickFromPool(pool)
     }
