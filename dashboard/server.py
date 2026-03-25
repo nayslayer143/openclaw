@@ -1185,6 +1185,18 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
         except Exception:
             pass
 
+        # 10d. QuantumentalClaw positions (separate DB)
+        quantclaw_data = {"wallet": {}, "positions": []}
+        try:
+            qc_db = Path.home() / "quantumentalclaw" / "quantumentalclaw.db"
+            if qc_db.exists():
+                qc_conn = sqlite3.connect(str(qc_db))
+                qc_conn.row_factory = sqlite3.Row
+                quantclaw_data = _quantumentalclaw_state(qc_conn)
+                qc_conn.close()
+        except Exception as qe:
+            quantclaw_data["error"] = str(qe)
+
         # 11. Missed opportunities summary
         missed_summary = []
         try:
@@ -1223,6 +1235,7 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
             "phantom": phantom_stats,
             "agents": agent_stats,
             "rivalclaw_positions": rivalclaw_positions,
+            "quantclaw": quantclaw_data,
             "missed_opportunities": missed_summary,
         }
         _trading_cache["data"] = result
