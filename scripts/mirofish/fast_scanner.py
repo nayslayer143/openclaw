@@ -147,6 +147,17 @@ def _fetch_fresh_short_markets():
 
 def run():
     """Fast scan: find short-expiry Kalshi markets with spot-price edge."""
+    # Circuit breaker check
+    try:
+        from scripts.mirofish.paper_wallet import check_circuit_breaker, reset_wallet
+        breaker = check_circuit_breaker()
+        if breaker:
+            print("[fast_scan] Circuit breaker — wallet depleted, resetting")
+            reset_wallet()
+            _notify_dashboard()
+            return
+    except Exception:
+        pass
     now = datetime.datetime.utcnow()
     max_close = (now + datetime.timedelta(hours=MAX_EXPIRY_HOURS)).isoformat()
 
@@ -230,6 +241,7 @@ def run():
         open_questions = set()
 
     trades_placed = 0
+    new_trade_ids: set[int] = set()  # track IDs placed this run
     events_traded: set[str] = set()  # limit 1 bracket per event
 
     def _g(row, key, default=None):
@@ -248,11 +260,13 @@ def run():
         if not ticker or ticker in open_ids:
             continue
 
+        title_str = _g(m, "title") or ticker
+
         # Skip if already traded this event or similar question
         event_ticker = _g(m, "event_ticker") or ticker[:20]
         if event_ticker in events_traded:
             continue
-        question_prefix = (title_str or "")[:30]
+        question_prefix = title_str[:30]
         if question_prefix in open_questions:
             continue
 
@@ -260,7 +274,6 @@ def run():
         yes_ask = _g(m, "yes_ask", 0) or 0
         no_bid = _g(m, "no_bid", 0) or 0
         no_ask = _g(m, "no_ask", 0) or 0
-        title_str = _g(m, "title") or ticker
 
         # Skip if no real prices
         if yes_bid <= 0 and yes_ask <= 0:
@@ -290,8 +303,9 @@ def run():
                 if entry > 0 and entry < 1:
                     amount = min(POSITION_PCT * balance, MAX_POSITION_PCT * balance)
                     shares = amount / entry
-                    _place_trade(conn, ticker, title_str, direction,
+                    _tid = _place_trade(conn, ticker, title_str, direction,
                                  entry, amount, shares, gap, "fast_arb")
+                    if _tid: new_trade_ids.add(_tid)
                     trades_placed += 1
                     open_ids.add(ticker)
                     open_questions.add(question_prefix)
@@ -325,11 +339,13 @@ def run():
                                 else:
                                     direction = "YES" if trend_pct < 0 else "NO"
                                 entry = yes_p if direction == "YES" else no_p
-                                if entry > 0 and entry < 1:
+                                edge = min(abs(trend_pct), 0.10)  # cap edge at 10%
+                                if entry >= MIN_ENTRY_PRICE and entry < 0.95 and edge > 0.001:
                                     amount = min(POSITION_PCT * balance, MAX_POSITION_PCT * balance)
                                     shares = amount / entry
-                                    _place_trade(conn, ticker, title_str, direction,
-                                                 entry, amount, shares, abs(trend_pct), "fast_15m_trend")
+                                    _tid = _place_trade(conn, ticker, title_str, direction,
+                                                 entry, amount, shares, edge, "fast_15m_trend")
+                                    if _tid: new_trade_ids.add(_tid)
                                     trades_placed += 1
                                     open_ids.add(ticker)
                                     open_questions.add(question_prefix)
@@ -340,7 +356,8 @@ def run():
             if ticker in open_ids:
                 continue
 
-        # Strategy 2b: Price-lag vs spot (for crypto bracket markets)
+        # Strategy 2b: Price-lag vs spot (for crypto bracket/threshold markets)
+        # Parse what the market is asking and compare to spot price
         import re
         for asset, prefixes in CRYPTO_TICKERS.items():
             if not any(ticker.startswith(p) for p in prefixes):
@@ -349,6 +366,9 @@ def run():
                 continue
 
             spot_price = spot[asset]
+            title_lower = title_str.lower()
+
+            # Parse threshold from title
             threshold_match = re.search(r'\$?([\d,]+(?:\.\d+)?)', title_str)
             if not threshold_match:
                 continue
@@ -357,43 +377,108 @@ def run():
             except ValueError:
                 continue
 
-            # Is spot clearly above or below the threshold?
-            distance_pct = abs(spot_price - threshold) / spot_price if spot_price > 0 else 0
+            # Skip if threshold is wildly different from spot (extreme longshot)
+            distance_pct = abs(spot_price - threshold) / spot_price if spot_price > 0 else 999
+            if distance_pct > 0.10:
+                # More than 10% away from spot — too speculative for short-term
+                continue
 
-            if distance_pct > MIN_EDGE:
-                if spot_price > threshold:
-                    # Spot above threshold → YES more likely
+            # Determine direction based on question semantics + spot vs threshold
+            # "above X" / "over X" → YES if spot > threshold
+            # "below X" / "under X" → YES if spot < threshold
+            # "range" with threshold → check if spot is in range
+            if "above" in title_lower or "over" in title_lower or ("-T" in ticker):
+                # Threshold contract: resolves YES if price > threshold
+                if spot_price > threshold * 1.01:
                     direction = "YES"
-                    entry = yes_p if yes_p > 0 else 0.5
-                else:
+                elif spot_price < threshold * 0.99:
                     direction = "NO"
-                    entry = no_p if no_p > 0 else 0.5
+                else:
+                    continue  # too close to call
+            elif "below" in title_lower or "under" in title_lower:
+                if spot_price < threshold * 0.99:
+                    direction = "YES"
+                elif spot_price > threshold * 1.01:
+                    direction = "NO"
+                else:
+                    continue
+            else:
+                continue  # can't parse direction
 
-                if entry > 0 and entry < 1:
-                    amount = min(POSITION_PCT * balance, MAX_POSITION_PCT * balance)
-                    shares = amount / entry
-                    _place_trade(conn, ticker, title_str, direction,
-                                 entry, amount, shares, distance_pct, "fast_spot_lag")
-                    trades_placed += 1
-                    open_ids.add(ticker)
-                    open_questions.add(question_prefix)
-                    events_traded.add(event_ticker)
+            entry = yes_p if direction == "YES" else no_p
+            edge = distance_pct
+
+            # Only trade if entry price reflects actual edge (not 1-cent longshots)
+            if entry >= MIN_ENTRY_PRICE and entry < 0.95 and edge > MIN_EDGE:
+                amount = min(POSITION_PCT * balance, MAX_POSITION_PCT * balance)
+                shares = amount / entry
+                _tid = _place_trade(conn, ticker, title_str, direction,
+                             entry, amount, shares, edge, "fast_spot_lag")
+                if _tid: new_trade_ids.add(_tid)
+                trades_placed += 1
+                open_ids.add(ticker)
+                open_questions.add(question_prefix)
+                events_traded.add(event_ticker)
             break
 
+    # Resolve any expired Kalshi trades with actual results
+    resolved = _resolve_expired(conn, skip_ids=new_trade_ids)
     conn.close()
 
-    if trades_placed > 0:
-        print(f"[fast_scan] Placed {trades_placed} trades")
+    if trades_placed > 0 or resolved > 0:
+        print(f"[fast_scan] Placed {trades_placed} trades, resolved {resolved}")
         _notify_dashboard()
     else:
         print(f"[fast_scan] No edge found in {len(markets)} short-expiry markets")
 
 
-def _place_trade(conn, market_id, question, direction, entry_price, amount, shares, edge, strategy):
-    """Insert a paper trade directly (bypasses wallet for speed)."""
+def _resolve_expired(conn, skip_ids: set | None = None) -> int:
+    """Check Kalshi API for resolution on open expired trades. Skips trades just placed this run."""
+    try:
+        from scripts.mirofish.kalshi_feed import _call_kalshi
+    except ImportError:
+        return 0
+
+    if skip_ids is None:
+        skip_ids = set()
+
+    open_kalshi = conn.execute(
+        "SELECT id, market_id, direction, entry_price, shares FROM paper_trades WHERE status='open' AND market_id LIKE 'KX%'"
+    ).fetchall()
+    open_kalshi = [t for t in open_kalshi if t["id"] not in skip_ids]
+
+    resolved = 0
+    for t in open_kalshi:
+        data = _call_kalshi("GET", f"/markets/{t['market_id']}")
+        if not data:
+            continue
+        m = data.get("market", data)
+        result = m.get("result", "")
+        if not result:
+            continue
+
+        we_bet = t["direction"].lower()
+        we_won = (result == "yes" and we_bet == "yes") or (result == "no" and we_bet == "no")
+        exit_price = 1.0 if we_won else 0.0
+        pnl = t["shares"] * (exit_price - t["entry_price"])
+        status = "closed_win" if we_won else "closed_loss"
+
+        conn.execute("UPDATE paper_trades SET exit_price=?, pnl=?, status=?, closed_at=? WHERE id=?",
+                     (exit_price, pnl, status, datetime.datetime.utcnow().isoformat(), t["id"]))
+        sign = "+" if pnl >= 0 else ""
+        print(f"[fast_scan] Resolved: {t['market_id'][:30]} → {status} {sign}${pnl:.2f}")
+        resolved += 1
+
+    if resolved:
+        conn.commit()
+    return resolved
+
+
+def _place_trade(conn, market_id, question, direction, entry_price, amount, shares, edge, strategy) -> int | None:
+    """Insert a paper trade directly (bypasses wallet for speed). Returns trade ID."""
     ts = datetime.datetime.utcnow().isoformat()
     try:
-        conn.execute("""
+        cur = conn.execute("""
             INSERT INTO paper_trades
             (market_id, question, direction, shares, entry_price, amount_usd,
              status, confidence, reasoning, strategy, opened_at)
@@ -405,9 +490,12 @@ def _place_trade(conn, market_id, question, direction, entry_price, amount, shar
             strategy, ts,
         ))
         conn.commit()
+        trade_id = cur.lastrowid
         print(f"[fast_scan] {direction} ${amount:.0f} on '{question[:50]}' [{strategy}] edge={edge:.3f}")
+        return trade_id
     except Exception as e:
         print(f"[fast_scan] Trade error: {e}")
+        return None
 
 
 if __name__ == "__main__":

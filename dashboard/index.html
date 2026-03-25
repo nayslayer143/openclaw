@@ -106,6 +106,29 @@ body {
   background: var(--orange); color: #000;
   box-shadow: 0 0 14px rgba(232,104,0,0.5);
 }
+.repoman-btn {
+  position: relative;
+  font-size: 0.56rem; letter-spacing: 2px; padding: 4px 14px;
+  border: 1px solid var(--cyan,#00e5ff); border-radius: 1px;
+  background: transparent; color: var(--cyan,#00e5ff);
+  cursor: pointer; font-family: inherit;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.repoman-btn:hover {
+  background: var(--cyan,#00e5ff); color: #000;
+  box-shadow: 0 0 14px rgba(0,229,255,0.45);
+}
+.repoman-btn .rm-dot {
+  position: absolute; top: -4px; right: -4px;
+  width: 9px; height: 9px; border-radius: 50%;
+  background: #ff4444; border: 1px solid #0d0d0d;
+  display: none;
+  animation: rm-pulse 1.6s ease-in-out infinite;
+}
+@keyframes rm-pulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,68,68,0.7); }
+  50%      { box-shadow: 0 0 0 5px rgba(255,68,68,0); }
+}
 .live-pill {
   font-size: 0.56rem; letter-spacing: 2px; padding: 3px 12px;
   border: 1px solid; border-radius: 1px;
@@ -515,6 +538,281 @@ body {
   margin-top: 2px;
 }
 
+/* ── Terminal Watch ──────────────────────────────────────────────────────── */
+.tw-status { display:flex; align-items:center; gap:10px; padding:11px 18px; border-bottom:1px solid var(--grey3); }
+.tw-status-dot { width:8px; height:8px; border-radius:50%; background:var(--grey2); flex-shrink:0; }
+.tw-status-dot.watching { background:var(--neon-green); box-shadow:0 0 8px rgba(0,255,136,0.5); animation:tw-pulse 2s ease-in-out infinite; }
+.tw-status-dot.error { background:var(--neon-red); box-shadow:0 0 8px rgba(255,0,46,0.5); }
+@keyframes tw-pulse { 50% { box-shadow:0 0 14px rgba(0,255,136,0.7); } }
+.tw-session { font-size:0.60rem; color:var(--offwhite); letter-spacing:1px; }
+.tw-uptime { font-size:0.50rem; color:var(--grey2); margin-left:auto; }
+.tw-controls { display:flex; gap:6px; padding:8px 18px; border-bottom:1px solid var(--grey3); flex-wrap:wrap; }
+.tw-btn { font-size:0.50rem; letter-spacing:2px; padding:4px 12px; border:1px solid var(--border-mid); border-radius:1px; background:transparent; color:var(--orange); cursor:pointer; font-family:inherit; transition:all 0.2s; }
+.tw-btn:hover { background:var(--orange-dim); border-color:var(--orange); box-shadow:0 0 8px rgba(232,104,0,0.3); }
+.tw-btn.primary { border-color:var(--orange); }
+.tw-btn.primary:hover { background:var(--orange); color:#000; }
+.tw-btn.danger { border-color:rgba(255,0,46,0.3); color:var(--neon-red); }
+.tw-btn.danger:hover { background:rgba(255,0,46,0.1); }
+.tw-select { font-size:0.56rem; padding:4px 8px; background:var(--bg); border:1px solid var(--grey3); color:var(--offwhite); font-family:inherit; border-radius:1px; }
+.tw-select:focus { outline:none; border-color:var(--orange); }
+.tw-events { max-height:400px; overflow-y:auto; }
+.tw-events::-webkit-scrollbar { width:5px; }
+.tw-events::-webkit-scrollbar-track { background:rgba(255,255,255,0.02); }
+.tw-events::-webkit-scrollbar-thumb { background:rgba(232,104,0,0.25); border-radius:2px; }
+.tw-event { padding:10px 18px; border-bottom:1px solid rgba(255,255,255,0.04); cursor:pointer; position:relative; animation:entry-slide 0.45s ease-out; }
+.tw-event:hover { background:rgba(232,104,0,0.04); }
+.tw-event::after { content:''; position:absolute; left:0; top:0; bottom:0; width:2px; }
+.tw-event.ev-error::after { background:var(--neon-red); box-shadow:0 0 6px rgba(255,0,46,0.4); }
+.tw-event.ev-build_failure::after { background:var(--neon-red); }
+.tw-event.ev-test_failure::after { background:var(--orange); box-shadow:0 0 6px rgba(232,104,0,0.4); }
+.tw-event.ev-command_finished::after { background:var(--offwhite); }
+.tw-event.ev-stalled::after { background:var(--grey2); }
+.tw-event.ev-user_snapshot::after { background:var(--neon-cyan); }
+.tw-event-hdr { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.tw-event-type { font-size:0.50rem; letter-spacing:1.5px; padding:2px 8px; border:1px solid; border-radius:1px; }
+.tw-event-type.error,.tw-event-type.build_failure { border-color:rgba(255,0,46,0.4); color:var(--neon-red); }
+.tw-event-type.test_failure { border-color:rgba(232,104,0,0.4); color:var(--orange); }
+.tw-event-type.command_finished { border-color:rgba(240,236,228,0.2); color:var(--grey1); }
+.tw-event-type.stalled { border-color:rgba(102,99,96,0.4); color:var(--grey2); }
+.tw-event-type.user_snapshot { border-color:rgba(0,212,255,0.4); color:var(--neon-cyan); }
+.tw-event-ts { font-size:0.50rem; color:var(--grey2); }
+.tw-event-summary { font-size:0.60rem; color:var(--offwhite); margin-top:4px; }
+.tw-event-cmd { font-size:0.54rem; color:var(--grey1); margin-top:2px; }
+.tw-event-tail { display:none; margin-top:8px; padding:8px; background:var(--bg); border:1px solid var(--grey3); font-size:0.54rem; color:var(--grey1); white-space:pre-wrap; word-break:break-all; max-height:200px; overflow-y:auto; }
+.tw-event.expanded .tw-event-tail { display:block; }
+.tw-packet { padding:12px 18px; border-top:1px solid var(--grey3); }
+.tw-packet-btns { display:flex; gap:6px; flex-wrap:wrap; margin-top:8px; }
+.tw-packet-input { width:100%; padding:6px 10px; background:var(--bg); border:1px solid var(--grey3); color:var(--offwhite); font-family:inherit; font-size:0.56rem; border-radius:1px; margin-top:8px; box-sizing:border-box; }
+.tw-packet-input:focus { outline:none; border-color:var(--orange); }
+.tw-packet-preview { margin-top:8px; padding:8px; background:var(--bg); border:1px solid var(--grey3); font-size:0.50rem; color:var(--grey1); white-space:pre-wrap; max-height:250px; overflow-y:auto; display:none; }
+.tw-toggles { display:flex; gap:14px; padding:8px 18px; border-top:1px solid var(--grey3); flex-wrap:wrap; }
+.tw-toggle { display:flex; align-items:center; gap:4px; font-size:0.50rem; color:var(--grey2); cursor:pointer; }
+.tw-toggle input { accent-color:var(--orange); }
+.tw-explain { padding:12px 18px; border-top:1px solid var(--grey3); text-align:center; }
+.tw-explain-btn { font-size:0.56rem; letter-spacing:2px; padding:8px 24px; border:1px solid var(--orange); border-radius:1px; background:var(--orange-dim); color:var(--orange-hi); cursor:pointer; font-family:inherit; transition:all 0.2s; }
+.tw-explain-btn:hover { background:var(--orange); color:#000; box-shadow:0 0 18px rgba(232,104,0,0.5); }
+
+/* ── Intel ──────────────────────────────────────────────────────── */
+.intel-stat {
+  display:flex; flex-direction:column; align-items:center;
+  padding:8px 16px; border:1px solid var(--border); border-radius:2px;
+  background:var(--surface); min-width:70px;
+}
+.intel-stat-num { font-size:1.1rem; font-weight:900; color:var(--orange-hi); }
+.intel-stat-label { font-size:0.42rem; letter-spacing:2px; color:var(--grey2); margin-top:2px; }
+.intel-filter-select {
+  font-size:0.5rem; letter-spacing:1px; padding:4px 10px;
+  border:1px solid var(--grey3); border-radius:1px;
+  background:var(--surface); color:var(--offwhite);
+  font-family:inherit; cursor:pointer;
+}
+.intel-card {
+  border:1px solid var(--border); border-radius:2px;
+  background:var(--surface); padding:14px 18px;
+  transition:border-color 0.2s;
+}
+.intel-card:hover { border-color:var(--border-mid); }
+.intel-card-top { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.intel-card-name {
+  font-size:0.7rem; font-weight:700; color:var(--white);
+  text-decoration:none; letter-spacing:0.5px;
+}
+.intel-card-name:hover { color:var(--orange-hi); }
+.intel-badge {
+  display:inline-block; font-size:0.42rem; letter-spacing:1.5px;
+  padding:2px 8px; border-radius:1px; font-weight:700;
+}
+.intel-badge-integrate { background:rgba(0,255,136,0.12); color:var(--neon-green); border:1px solid rgba(0,255,136,0.3); }
+.intel-badge-study { background:rgba(255,200,0,0.10); color:#ffc800; border:1px solid rgba(255,200,0,0.3); }
+.intel-badge-skip { background:rgba(100,100,100,0.12); color:var(--grey2); border:1px solid var(--grey3); }
+.intel-badge-val { background:var(--orange-dim); color:var(--orange-hi); border:1px solid var(--border-mid); }
+.intel-badge-cx { background:rgba(0,212,255,0.08); color:var(--neon-cyan); border:1px solid rgba(0,212,255,0.25); }
+.intel-badge-stars { background:rgba(255,255,255,0.04); color:var(--grey1); border:1px solid var(--grey3); }
+.intel-card-meta { font-size:0.46rem; color:var(--grey2); letter-spacing:1px; margin-top:6px; }
+.intel-card-insight { font-size:0.54rem; color:var(--offwhite); margin-top:8px; line-height:1.5; }
+.intel-relevance { display:flex; gap:14px; margin-top:8px; flex-wrap:wrap; }
+.intel-rel-item { font-size:0.44rem; letter-spacing:1px; color:var(--grey1); }
+.intel-rel-bar {
+  display:inline-block; height:8px; border-radius:1px;
+  background:var(--orange); vertical-align:middle; margin-left:4px;
+}
+.intel-rel-bar-bg {
+  display:inline-block; width:50px; height:8px; border-radius:1px;
+  background:var(--grey3); vertical-align:middle; position:relative;
+}
+.intel-card-actions { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+.intel-action-btn {
+  font-size:0.46rem; letter-spacing:1.5px; padding:4px 12px;
+  border:1px solid var(--grey3); border-radius:1px;
+  background:transparent; color:var(--grey1);
+  cursor:pointer; font-family:inherit; transition:all 0.2s;
+}
+.intel-action-btn:hover { color:var(--orange-hi); border-color:var(--orange); }
+.intel-action-btn.approve { border-color:rgba(0,255,136,0.3); color:var(--neon-green); }
+.intel-action-btn.approve:hover { background:rgba(0,255,136,0.12); }
+.intel-action-btn.reject { border-color:rgba(255,0,46,0.3); color:var(--neon-red); }
+.intel-action-btn.reject:hover { background:rgba(255,0,46,0.08); }
+.intel-risk { font-size:0.46rem; color:var(--neon-red); margin-top:6px; opacity:0.7; }
+.intel-readme-toggle {
+  font-size:0.42rem; color:var(--grey2); cursor:pointer; letter-spacing:1px;
+  margin-top:4px; user-select:none;
+}
+.intel-readme-toggle:hover { color:var(--orange); }
+.intel-readme-snippet {
+  font-size:0.46rem; color:var(--grey2); margin-top:4px; line-height:1.5;
+  max-height:0; overflow:hidden; transition:max-height 0.3s;
+}
+.intel-readme-snippet.open { max-height:200px; }
+.intel-target-label {
+  display:block; font-size:0.56rem; letter-spacing:1px; color:var(--offwhite);
+  padding:6px 0; cursor:pointer; font-family:inherit;
+}
+.intel-target-label input { margin-right:8px; accent-color:var(--orange); }
+.intel-approved-card {
+  border:1px solid rgba(0,255,136,0.15); border-radius:2px;
+  background:var(--surface); padding:10px 14px;
+}
+.intel-bot-tag {
+  display:inline-block; font-size:0.4rem; letter-spacing:1.5px;
+  padding:1px 7px; border-radius:1px; margin-left:4px;
+  background:var(--orange-dim); color:var(--orange); border:1px solid var(--border);
+}
+.intel-status-badge {
+  display:inline-block; font-size:0.4rem; letter-spacing:1.5px;
+  padding:2px 8px; border-radius:1px; margin-left:6px;
+}
+.intel-status-approved { background:rgba(0,255,136,0.10); color:var(--neon-green); }
+.intel-status-rejected { background:rgba(255,0,46,0.08); color:var(--neon-red); }
+.intel-status-bookmarked { background:rgba(0,212,255,0.08); color:var(--neon-cyan); }
+
+/* ── ChatGPT Reports ──────────────────────────────────────────── */
+.research-toolbar {
+  display:flex; gap:8px; align-items:center; padding:10px 16px;
+  background:#0d0d0d; border-bottom:1px solid #1e1e1e; flex-shrink:0;
+}
+.research-toolbar button {
+  font-family:inherit; font-size:0.50rem; letter-spacing:1.5px; padding:5px 14px;
+  border:1px solid var(--border); border-radius:1px; background:transparent;
+  color:var(--grey1); cursor:pointer; transition:all 0.2s;
+}
+.research-toolbar button:hover { border-color:var(--orange); color:var(--orange); }
+.research-toolbar button.primary { border-color:var(--orange); color:var(--orange); }
+.research-toolbar button.primary:hover { background:var(--orange); color:#000; }
+.research-toolbar button:disabled { opacity:0.3; cursor:not-allowed; }
+.research-subtabs {
+  display:flex; gap:0; border-bottom:1px solid var(--border);
+  background:#0a0a0a; flex-shrink:0;
+}
+.research-subtab {
+  font-size:0.46rem; letter-spacing:2px; padding:8px 18px;
+  border:none; background:none; color:var(--grey2); cursor:pointer;
+  font-family:inherit; position:relative; transition:color 0.2s;
+}
+.research-subtab:hover { color:var(--offwhite); }
+.research-subtab.active { color:var(--orange-hi); }
+.research-subtab.active::after {
+  content:''; position:absolute; bottom:-1px; left:0; right:0;
+  height:2px; background:var(--orange);
+}
+.research-subcontent { display:none; flex:1; overflow:auto; }
+.research-subcontent.active { display:flex; flex-direction:column; }
+.gpt-report-list { padding:16px; max-width:1100px; margin:0 auto; width:100%; }
+.gpt-report-card {
+  border:1px solid var(--border); border-radius:2px;
+  background:var(--surface); padding:14px 18px; margin-bottom:10px;
+  cursor:pointer; transition:border-color 0.2s;
+}
+.gpt-report-card:hover { border-color:var(--border-mid,#333); }
+.gpt-report-card-title { font-size:0.56rem; color:var(--offwhite); letter-spacing:0.5px; }
+.gpt-report-card-meta { font-size:0.42rem; color:var(--grey2); margin-top:4px; letter-spacing:1px; }
+.gpt-rec-card {
+  border:1px solid var(--border); border-radius:2px;
+  background:var(--surface); padding:14px 18px; margin-bottom:10px;
+}
+.gpt-rec-title { font-size:0.56rem; color:var(--offwhite); letter-spacing:0.5px; font-weight:600; }
+.gpt-rec-summary { font-size:0.48rem; color:var(--grey1); margin-top:6px; line-height:1.5; }
+.gpt-rec-meta { display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; }
+.gpt-rec-meta span { font-size:0.40rem; letter-spacing:1px; }
+.gpt-rec-badge {
+  display:inline-block; font-size:0.38rem; letter-spacing:1.5px; padding:2px 8px;
+  border-radius:1px; border:1px solid;
+}
+.gpt-rec-badge.high-conf { border-color:var(--neon-green); color:var(--neon-green); }
+.gpt-rec-badge.med-conf { border-color:var(--orange); color:var(--orange); }
+.gpt-rec-badge.low-conf { border-color:var(--grey2); color:var(--grey2); }
+.gpt-rec-badge.immediate { border-color:var(--neon-red); color:var(--neon-red); }
+.gpt-rec-badge.this-week { border-color:var(--neon-cyan); color:var(--neon-cyan); }
+.gpt-rec-badge.backlog { border-color:var(--grey2); color:var(--grey2); }
+.gpt-rec-badge.deployed { border-color:var(--neon-green); color:var(--neon-green); background:rgba(0,255,136,0.08); }
+.gpt-rec-target { font-size:0.42rem; color:var(--orange); letter-spacing:1px; }
+.gpt-rec-actions { display:flex; gap:6px; margin-top:10px; flex-wrap:wrap; }
+.gpt-deploy-btn {
+  font-size:0.46rem; letter-spacing:1.5px; padding:4px 12px;
+  border:1px solid rgba(0,255,136,0.3); border-radius:1px;
+  background:transparent; color:var(--neon-green);
+  cursor:pointer; font-family:inherit; transition:all 0.2s;
+}
+.gpt-deploy-btn:hover { background:rgba(0,255,136,0.12); }
+.gpt-deploy-btn:disabled { opacity:0.3; cursor:not-allowed; }
+.gpt-deploy-all-bar {
+  display:flex; gap:10px; align-items:center; padding:12px 16px;
+  background:rgba(0,255,136,0.04); border:1px solid rgba(0,255,136,0.15);
+  border-radius:2px; margin-bottom:14px;
+}
+.gpt-exec-summary {
+  font-size:0.50rem; color:var(--grey1); line-height:1.6;
+  padding:12px 16px; border-left:2px solid var(--orange);
+  background:rgba(232,104,0,0.04); margin-bottom:16px;
+}
+.gpt-action-plan {
+  font-size:0.44rem; color:var(--grey2); line-height:1.5;
+  max-height:0; overflow:hidden; transition:max-height 0.3s;
+  white-space:pre-wrap; margin-top:4px;
+}
+.gpt-action-plan.open { max-height:400px; overflow-y:auto; }
+
+/* ── Signal Tabs ──────────────────────────────────────────────── */
+.signal-tabs {
+  display:flex; gap:0; overflow-x:auto; margin-bottom:14px;
+  border-bottom:1px solid var(--border); scrollbar-width:thin;
+}
+.signal-tabs::-webkit-scrollbar { height:3px; }
+.signal-tabs::-webkit-scrollbar-thumb { background:var(--grey3); }
+.signal-tab {
+  font-size:0.44rem; letter-spacing:1.5px; padding:7px 14px 6px;
+  border:none; background:none; color:var(--grey2); cursor:pointer;
+  white-space:nowrap; position:relative; font-family:inherit;
+  transition:color 0.2s;
+}
+.signal-tab:hover { color:var(--offwhite); }
+.signal-tab.active { color:var(--orange-hi); }
+.signal-tab.active::after {
+  content:''; position:absolute; bottom:-1px; left:0; right:0;
+  height:2px; background:var(--orange);
+}
+.signal-tab-badge {
+  display:inline-block; font-size:0.34rem; min-width:14px; text-align:center;
+  padding:1px 4px; margin-left:4px; border-radius:8px;
+  background:var(--orange-dim); color:var(--orange); font-weight:700;
+}
+.signal-tab-badge:empty { display:none; }
+.signal-content { display:none; }
+.signal-content.active { display:block; }
+.signal-card {
+  border:1px solid var(--border); border-radius:2px;
+  background:var(--surface); padding:12px 16px; margin-bottom:8px;
+}
+.signal-card:hover { border-color:var(--border-mid); }
+.signal-card-title { font-size:0.56rem; color:var(--offwhite); letter-spacing:0.5px; }
+.signal-card-body { font-size:0.46rem; color:var(--grey1); margin-top:4px; line-height:1.5; }
+.signal-card-meta { display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
+.signal-card-meta span { font-size:0.4rem; letter-spacing:1px; color:var(--grey2); }
+.signal-dir-bullish { color:var(--neon-green) !important; }
+.signal-dir-bearish { color:var(--neon-red) !important; }
+.signal-dir-neutral { color:var(--neon-cyan) !important; }
+.signal-urgency-realtime { color:var(--neon-red) !important; }
+.signal-urgency-hours { color:var(--orange) !important; }
+
 /* ── Nav tabs ──────────────────────────────────────────────────── */
 .nav-tabs {
   display: flex; gap: 2px; margin-left: 24px;
@@ -686,6 +984,11 @@ body {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
 }
+@keyframes countdown-flash {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.t-countdown { font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* ── Ideas Lab Page ───────────────────────────────────────────── */
 .page { display: none; }
@@ -1348,8 +1651,12 @@ body {
     <button class="nav-tab" id="tabProjects" onclick="showPage('projects')">◎ PROJECTS</button>
     <button class="nav-tab" id="tabAgents" onclick="showPage('agents')">⬡ AGENTS</button>
     <button class="nav-tab" id="tabTrading" onclick="showPage('trading')">$ TRADING</button>
+    <button class="nav-tab" id="tabTerminal" onclick="showPage('terminal')">⊡ TERMINAL</button>
+    <button class="nav-tab" id="tabIntel" onclick="showPage('intel')">⌬ INTEL</button>
+    <button class="nav-tab" id="tabResearch" onclick="showPage('research')">◎ RESEARCH<span id="researchBadge" style="display:none;margin-left:5px;background:#ff4444;color:#fff;border-radius:8px;padding:1px 6px;font-size:0.45rem;vertical-align:middle;">0</span></button>
   </div>
   <div class="nav-right">
+    <button class="repoman-btn" id="repoManBtn" onclick="showPage('research')" title="Open Repo Man research inbox">◎ REPO MAN<span class="rm-dot" id="rmNavDot"></span></button>
     <button class="clawmpson-btn" id="clawmpsonBtn" onclick="toggleClawmpson()">◈ CLAWMPSON MODE</button>
     <span class="live-pill dead" id="livePill">● CONNECTING</span>
     <span class="nav-user" id="navUser"></span>
@@ -1578,38 +1885,234 @@ body {
       <div class="ticker-tape" id="tickerTape"></div>
     </div>
 
-    <div class="ideas-header">
+    <!-- Error banner (hidden by default) -->
+    <div id="tradingError" style="display:none;background:rgba(255,0,46,0.15);border:1px solid var(--neon-red);color:var(--neon-red);padding:8px 16px;margin:0 0 8px;font-size:0.5rem;letter-spacing:1px;border-radius:4px"></div>
+
+    <!-- ══ HERO: 3-Engine Trading Command Center ══ -->
+    <div class="ideas-header" style="margin-bottom:8px">
       <div>
         <div class="ideas-title" style="display:flex;align-items:center;gap:12px">
-          MIROFISH TRADING
+          TRADING COMMAND CENTER <span style="font-size:0.35rem;color:var(--grey3)">v24.5</span>
           <span class="t-live-dot" id="tLiveDot"></span>
         </div>
-        <div class="ideas-subtitle">PAPER TRADING — POLYMARKET + KALSHI + CRYPTO SPOT</div>
+        <div class="ideas-subtitle">PHANTOMCLAW × RIVALCLAW × CLAWMPSON — LIVE PAPER TRADING</div>
       </div>
       <div id="tradingLastUpdate" style="font-size:0.50rem;color:var(--grey2);letter-spacing:1px;text-align:right"></div>
     </div>
 
-    <!-- Portfolio Overview Cards -->
-    <div class="trading-cards" id="tradingCards">
-      <div class="t-card">
-        <div class="t-card-label">BALANCE</div>
-        <div class="t-card-value" id="tBalance">$1,000.00</div>
-        <div class="t-card-sub" id="tRoi">0.00%</div>
+    <!-- RivalClaw Next Report Countdown -->
+    <div style="display:flex;justify-content:center;margin-bottom:10px">
+      <div style="background:linear-gradient(135deg,rgba(180,140,255,0.08),rgba(0,0,0,0.3));border:1px solid rgba(180,140,255,0.3);border-radius:8px;padding:8px 24px;display:flex;align-items:center;gap:12px">
+        <span style="font-size:0.45rem;color:rgba(180,140,255,0.6);letter-spacing:2px">RIVALCLAW NEXT REPORT</span>
+        <span id="rcCountdown" style="font-size:1.1rem;font-weight:bold;color:rgba(180,140,255,0.95);font-family:monospace;min-width:60px;text-align:center">--:--</span>
+        <span style="font-size:0.45rem;color:rgba(180,140,255,0.4);letter-spacing:1px">CYCLE: <span id="rcCycleSpeed">1min</span> | TUNER: <span id="rcTunerSpeed">1hr</span></span>
       </div>
-      <div class="t-card">
-        <div class="t-card-label">OPEN / TOTAL</div>
-        <div class="t-card-value" id="tPositions">0 / 0</div>
-        <div class="t-card-sub" id="tUnrealized">$0.00 unrealized</div>
+    </div>
+    <script>
+    (function(){
+      function updateCountdown(){
+        const now = new Date();
+        const mins = now.getUTCMinutes();
+        const secs = now.getUTCSeconds();
+        const nextHour = 60 - mins;
+        const nextSec = 60 - secs;
+        const mm = String(nextHour - 1).padStart(2,'0');
+        const ss = String(nextSec === 60 ? 0 : nextSec).padStart(2,'0');
+        const el = document.getElementById('rcCountdown');
+        if(el) {
+          el.textContent = mm + ':' + ss;
+          if(nextHour <= 5) el.style.color = '#00ff88';
+        }
+      }
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    })();
+    </script>
+
+    <!-- 6-Agent Hero Grid: 3×2 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px" id="heroGrid">
+
+      <!-- PhantomClaw -->
+      <div class="t-section" style="border-color:rgba(255,0,200,0.25);background:linear-gradient(135deg,rgba(15,0,20,0.95),rgba(5,0,10,0.98));margin-bottom:0">
+        <div class="t-section-title" style="color:#ff00c8;border-bottom-color:rgba(255,0,200,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
+          PHANTOMCLAW
+          <span class="t-live-dot" style="background:#ff00c8;box-shadow:0 0 6px #ff00c8;width:6px;height:6px"></span>
+        </div>
+        <div style="font-size:0.38rem;color:rgba(255,0,200,0.4);letter-spacing:1px;margin:-8px 0 8px 0">BS FAIR VALUE × CLAWMPSON ARCH · */2 CRON</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+          <div><div class="t-card-label">P&L</div><div class="t-card-value" id="phPnl" style="font-size:1rem">$0</div></div>
+          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="phWL" style="font-size:1rem">0/0</div></div>
+          <div><div class="t-card-label">OPEN</div><div class="t-card-value" id="phOpen" style="font-size:1rem;color:#ff00c8">0</div></div>
+        </div>
+        <div class="t-table-wrap" style="max-height:200px;overflow-y:auto">
+          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>P&L</th><th>RESOLVES</th></tr></thead>
+          <tbody id="phBody"></tbody></table>
+        </div>
       </div>
-      <div class="t-card">
-        <div class="t-card-label">WIN / LOSS</div>
-        <div class="t-card-value" id="tWinLoss">0 / 0</div>
-        <div class="t-card-sub" id="tWinRate">0% win rate</div>
+
+      <!-- RivalClaw -->
+      <div class="t-section" style="border-color:rgba(180,140,255,0.25);background:linear-gradient(135deg,rgba(10,0,20,0.95),rgba(5,0,10,0.98));margin-bottom:0">
+        <div class="t-section-title" style="color:rgba(180,140,255,0.9);border-bottom-color:rgba(180,140,255,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
+          RIVALCLAW
+          <span class="t-live-dot" style="background:rgba(180,140,255,0.9);box-shadow:0 0 6px rgba(180,140,255,0.5);width:6px;height:6px"></span>
+        </div>
+        <div style="font-size:0.38rem;color:rgba(180,140,255,0.4);letter-spacing:1px;margin:-8px 0 8px 0">STANDALONE 8-STRATEGY QUANT · */2 CRON</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+          <div><div class="t-card-label">P&L</div><div class="t-card-value" id="rcPnl" style="font-size:1rem">--</div></div>
+          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="rcWL" style="font-size:1rem">--</div></div>
+          <div><div class="t-card-label">OPEN</div><div class="t-card-value" id="rcOpen" style="font-size:1rem;color:rgba(180,140,255,0.9)">--</div></div>
+        </div>
+        <div class="t-table-wrap" style="max-height:200px;overflow-y:auto">
+          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>P&L</th><th>LATENCY</th></tr></thead>
+          <tbody id="rcTradesBody"></tbody></table>
+        </div>
       </div>
-      <div class="t-card">
-        <div class="t-card-label">REALIZED P&L</div>
-        <div class="t-card-value" id="tRealizedPnl">$0.00</div>
-        <div class="t-card-sub" id="tGradStatus">TESTING</div>
+
+      <!-- Clawmpson/MiroFish -->
+      <div class="t-section" style="border-color:rgba(232,104,0,0.25);background:linear-gradient(135deg,rgba(15,8,0,0.95),rgba(8,4,0,0.98));margin-bottom:0">
+        <div class="t-section-title" style="color:var(--orange-hi);border-bottom-color:rgba(232,104,0,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
+          CLAWMPSON
+          <span class="t-live-dot" style="background:var(--orange);box-shadow:0 0 6px var(--orange);width:6px;height:6px"></span>
+        </div>
+        <div style="font-size:0.38rem;color:rgba(232,104,0,0.4);letter-spacing:1px;margin:-8px 0 8px 0">LLM + MATH STRATEGIES · */30 CRON</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+          <div><div class="t-card-label">BALANCE</div><div class="t-card-value" id="tBalance" style="font-size:1rem">$1,000</div></div>
+          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="tWinLoss" style="font-size:1rem">0/0</div></div>
+          <div><div class="t-card-label">P&L</div><div class="t-card-value" id="tRealizedPnl" style="font-size:1rem">$0</div></div>
+        </div>
+        <div class="t-table-wrap" style="max-height:200px;overflow-y:auto">
+          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>STRAT</th><th>P&L</th><th>RESOLVES</th></tr></thead>
+          <tbody id="clawmpsonBody"></tbody></table>
+        </div>
+      </div>
+
+      <!-- CalendarClaw -->
+      <div class="t-section" style="border-color:rgba(0,200,255,0.25);background:linear-gradient(135deg,rgba(0,8,15,0.95),rgba(0,4,10,0.98));margin-bottom:0">
+        <div class="t-section-title" style="color:#00c8ff;border-bottom-color:rgba(0,200,255,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
+          CALENDARCLAW
+          <span class="t-live-dot" style="background:#00c8ff;box-shadow:0 0 6px #00c8ff;width:6px;height:6px"></span>
+        </div>
+        <div style="font-size:0.38rem;color:rgba(0,200,255,0.4);letter-spacing:1px;margin:-8px 0 8px 0">EVENT TIMING · PRE/POST CATALYST · */5</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+          <div><div class="t-card-label">BALANCE</div><div class="t-card-value" id="calPnl" style="font-size:1rem">$0</div></div>
+          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="calWL" style="font-size:1rem">0/0</div></div>
+          <div><div class="t-card-label">OPEN</div><div class="t-card-value" id="calOpen" style="font-size:1rem;color:#00c8ff">0</div></div>
+        </div>
+        <div class="t-table-wrap" style="max-height:160px;overflow-y:auto">
+          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>P&L</th><th>RESOLVES</th></tr></thead>
+          <tbody id="calBody"><tr><td colspan="4" style="color:rgba(0,200,255,0.3);text-align:center">collecting event data...</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- NewsClaw -->
+      <div class="t-section" style="border-color:rgba(255,200,0,0.25);background:linear-gradient(135deg,rgba(15,10,0,0.95),rgba(10,5,0,0.98));margin-bottom:0">
+        <div class="t-section-title" style="color:#ffc800;border-bottom-color:rgba(255,200,0,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
+          NEWSCLAW
+          <span class="t-live-dot" style="background:#ffc800;box-shadow:0 0 6px #ffc800;width:6px;height:6px"></span>
+        </div>
+        <div style="font-size:0.38rem;color:rgba(255,200,0,0.4);letter-spacing:1px;margin:-8px 0 8px 0">BREAKING NEWS · RSS → MARKET · */5 LLM</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+          <div><div class="t-card-label">BALANCE</div><div class="t-card-value" id="newsPnl" style="font-size:1rem">$0</div></div>
+          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="newsWL" style="font-size:1rem">0/0</div></div>
+          <div><div class="t-card-label">OPEN</div><div class="t-card-value" id="newsOpen" style="font-size:1rem;color:#ffc800">0</div></div>
+        </div>
+        <div class="t-table-wrap" style="max-height:160px;overflow-y:auto">
+          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>P&L</th><th>RESOLVES</th></tr></thead>
+          <tbody id="newsBody"><tr><td colspan="4" style="color:rgba(255,200,0,0.3);text-align:center">scanning headlines...</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- SentimentClaw -->
+      <div class="t-section" style="border-color:rgba(0,255,136,0.25);background:linear-gradient(135deg,rgba(0,10,5,0.95),rgba(0,5,2,0.98));margin-bottom:0">
+        <div class="t-section-title" style="color:#00ff88;border-bottom-color:rgba(0,255,136,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
+          SENTIMENTCLAW
+          <span class="t-live-dot" style="background:#00ff88;box-shadow:0 0 6px #00ff88;width:6px;height:6px"></span>
+        </div>
+        <div style="font-size:0.38rem;color:rgba(0,255,136,0.4);letter-spacing:1px;margin:-8px 0 8px 0">ATTENTION GAP · VOLUME SPIKE · */5</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+          <div><div class="t-card-label">BALANCE</div><div class="t-card-value" id="sentPnl" style="font-size:1rem">$0</div></div>
+          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="sentWL" style="font-size:1rem">0/0</div></div>
+          <div><div class="t-card-label">OPEN</div><div class="t-card-value" id="sentOpen" style="font-size:1rem;color:#00ff88">0</div></div>
+        </div>
+        <div class="t-table-wrap" style="max-height:160px;overflow-y:auto">
+          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>P&L</th><th>RESOLVES</th></tr></thead>
+          <tbody id="sentBody"><tr><td colspan="4" style="color:rgba(0,255,136,0.3);text-align:center">building baseline...</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- DataHarvester -->
+      <div class="t-section" style="border-color:rgba(255,102,0,0.25);background:linear-gradient(135deg,rgba(10,5,0,0.95),rgba(5,2,0,0.98));margin-bottom:0">
+        <div class="t-section-title" style="color:#ff6600;border-bottom-color:rgba(255,102,0,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
+          DATAHARVESTER
+          <span class="t-live-dot" style="background:#ff6600;box-shadow:0 0 6px #ff6600;width:6px;height:6px"></span>
+        </div>
+        <div style="font-size:0.38rem;color:rgba(255,102,0,0.4);letter-spacing:1px;margin:-8px 0 8px 0">PURE MATH · NO LLM · */2</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+          <div><div class="t-card-label">BALANCE</div><div class="t-card-value" id="dhPnl" style="font-size:1rem">$0</div></div>
+          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="dhWL" style="font-size:1rem">0/0</div></div>
+          <div><div class="t-card-label">OPEN</div><div class="t-card-value" id="dhOpen" style="font-size:1rem;color:#ff6600">0</div></div>
+        </div>
+        <div class="t-table-wrap" style="max-height:160px;overflow-y:auto">
+          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>P&L</th><th>RESOLVES</th></tr></thead>
+          <tbody id="dhBody"><tr><td colspan="4" style="color:rgba(255,102,0,0.3);text-align:center">harvesting data...</td></tr></tbody></table>
+        </div>
+      </div>
+
+      <!-- QuantumentalClaw -->
+      <div class="t-section" style="border-color:rgba(0,200,255,0.25);background:linear-gradient(135deg,rgba(0,5,15,0.95),rgba(0,2,10,0.98));margin-bottom:0">
+        <div class="t-section-title" style="color:#00d4ff;border-bottom-color:rgba(0,200,255,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
+          QUANTCLAW
+          <span class="t-live-dot" style="background:#00d4ff;box-shadow:0 0 6px #00d4ff;width:6px;height:6px"></span>
+        </div>
+        <div style="font-size:0.38rem;color:rgba(0,200,255,0.4);letter-spacing:1px;margin:-8px 0 8px 0">SIGNAL FUSION · EQUITIES + CRYPTO · SEPARATE DB</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+          <div><div class="t-card-label">BALANCE</div><div class="t-card-value" id="qcBalance" style="font-size:1rem">$10,000</div></div>
+          <div><div class="t-card-label">BALANCE</div><div class="t-card-value" id="qcPnl" style="font-size:1rem">$0</div></div>
+          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="qcWL" style="font-size:1rem">0/0</div></div>
+          <div><div class="t-card-label">OPEN</div><div class="t-card-value" id="qcOpen" style="font-size:1rem;color:#00d4ff">0</div></div>
+        </div>
+        <div class="t-table-wrap" style="max-height:160px;overflow-y:auto">
+          <table class="t-table"><thead><tr><th>TICKER</th><th>DIR</th><th>P&L</th><th>CONF</th></tr></thead>
+          <tbody id="qcBody"><tr><td colspan="4" style="color:rgba(0,200,255,0.3);text-align:center">fusing signals...</td></tr></tbody></table>
+        </div>
+      </div>
+
+    </div>
+    <style>
+      @media (max-width:1100px) { #heroGrid { grid-template-columns: 1fr 1fr !important; } }
+      @media (max-width:700px) { #heroGrid { grid-template-columns: 1fr !important; } }
+    </style>
+
+    <!-- Unified Trade Feed -->
+    <div class="t-section" style="margin-bottom:14px">
+      <div class="t-section-title" style="display:flex;align-items:center;justify-content:space-between">
+        <span>ALL OPEN TRADES <span id="ufCount" style="color:var(--grey2);font-size:0.44rem">0</span></span>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span style="font-size:0.40rem;color:var(--grey2);letter-spacing:1px">SORT:</span>
+          <select id="ufSort" style="background:var(--surface);color:var(--offwhite);border:1px solid var(--grey3);font-family:inherit;font-size:0.44rem;letter-spacing:1px;padding:2px 6px;cursor:pointer">
+            <option value="countdown">TIME LEFT</option>
+            <option value="bot">BOT</option>
+            <option value="pnl_desc">P&L HIGH→LOW</option>
+            <option value="pnl_asc">P&L LOW→HIGH</option>
+            <option value="size_desc">SIZE HIGH→LOW</option>
+            <option value="size_asc">SIZE LOW→HIGH</option>
+            <option value="entry_desc">ENTRY HIGH→LOW</option>
+            <option value="entry_asc">ENTRY LOW→HIGH</option>
+            <option value="confidence">CONFIDENCE</option>
+            <option value="newest">NEWEST FIRST</option>
+            <option value="oldest">OLDEST FIRST</option>
+          </select>
+        </div>
+      </div>
+      <div class="t-table-wrap" style="max-height:400px;overflow-y:auto">
+        <table class="t-table">
+          <thead><tr>
+            <th>BOT</th><th>MARKET</th><th>PLATFORM</th><th>DIR</th>
+            <th>ENTRY</th><th>CURRENT</th><th>P&L</th><th>SIZE</th>
+            <th>CONF</th><th>COUNTDOWN</th>
+          </tr></thead>
+          <tbody id="ufBody"></tbody>
+        </table>
       </div>
     </div>
 
@@ -1621,111 +2124,206 @@ body {
       </div>
     </div>
 
-    <!-- Graduation Gates -->
-    <div class="t-section">
-      <div class="t-section-title">GRADUATION GATES</div>
-      <div class="t-gates" id="tGates">
+    <!-- Graduation + Status (compact) -->
+    <div class="t-section" style="padding:10px 18px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:0.48rem;letter-spacing:2px;color:var(--orange)">GRADUATION</span>
         <span class="t-gate" id="gateRoi">7d ROI > 0%</span>
         <span class="t-gate" id="gateWin">Win > 55%</span>
         <span class="t-gate" id="gateSharpe">Sharpe > 1.0</span>
         <span class="t-gate" id="gateDD">DD < 25%</span>
+        <span id="tGradStatus" style="font-size:0.44rem;letter-spacing:1px;color:var(--grey2);margin-left:auto">TESTING</span>
       </div>
+      <div id="calibrationStatus" style="font-size:0.38rem;color:var(--grey2);letter-spacing:1px;margin:4px 0;padding:0 12px"></div>
     </div>
 
-    <!-- P&L Chart (hidden when no data) -->
-    <div class="t-section" id="tEquitySection" style="display:none">
-      <div class="t-section-title">EQUITY CURVE</div>
-      <div class="t-chart-container">
-        <canvas id="pnlChart" height="140"></canvas>
-      </div>
-    </div>
-
-    <!-- Strategy Tournament -->
-    <div class="t-section">
-      <div class="t-section-title">STRATEGY TOURNAMENT</div>
-      <div class="t-table-wrap">
-        <table class="t-table" id="tStrategyTable">
-          <thead>
-            <tr><th>STRATEGY</th><th>W/L</th><th>WIN %</th><th>PnL</th><th>ALLOC</th></tr>
-          </thead>
-          <tbody id="tStrategyBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Open Positions -->
-    <div class="t-section">
-      <div class="t-section-title">OPEN POSITIONS</div>
-      <div class="t-table-wrap">
-        <table class="t-table" id="tOpenTable">
-          <thead>
-            <tr><th>MARKET</th><th>PLATFORM</th><th>DIR</th><th>STRATEGY</th><th>ENTRY</th><th>CURRENT</th><th>PnL</th><th>SIZE</th></tr>
-          </thead>
-          <tbody id="tOpenBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Two Column: Recent Trades + Markets -->
-    <div class="t-two-col">
-      <div class="t-section" style="flex:1">
-        <div class="t-section-title">RECENT TRADES</div>
-        <div class="t-table-wrap" style="max-height:400px;overflow-y:auto">
-          <table class="t-table">
-            <thead>
-              <tr><th>MARKET</th><th>DIR</th><th>STRAT</th><th>PnL</th><th>STATUS</th></tr>
-            </thead>
-            <tbody id="tRecentBody"></tbody>
-          </table>
-        </div>
-      </div>
-      <div class="t-section" style="flex:1">
-        <div class="t-section-title">CROSS-VENUE ARB</div>
-        <div class="t-table-wrap" style="max-height:400px;overflow-y:auto">
-          <table class="t-table">
-            <thead>
-              <tr><th>PAIR</th><th>BUY</th><th>SELL</th><th>SPREAD</th><th>EDGE</th></tr>
-            </thead>
-            <tbody id="tArbBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Two Column: Polymarket + Kalshi Feeds -->
-    <div class="t-two-col">
-      <div class="t-section" style="flex:1">
-        <div class="t-section-title">POLYMARKET <span class="t-feed-count" id="polyCount">0</span></div>
-        <div class="t-table-wrap" style="max-height:350px;overflow-y:auto">
-          <table class="t-table">
-            <thead><tr><th>MARKET</th><th>YES</th><th>NO</th><th>VOL</th></tr></thead>
-            <tbody id="tPolyBody"></tbody>
-          </table>
-        </div>
-      </div>
-      <div class="t-section" style="flex:1">
-        <div class="t-section-title">KALSHI <span class="t-feed-count" id="kalshiCount">0</span></div>
-        <div class="t-table-wrap" style="max-height:350px;overflow-y:auto">
-          <table class="t-table">
-            <thead><tr><th>MARKET</th><th>BID</th><th>ASK</th><th>VOL</th></tr></thead>
-            <tbody id="tKalshiBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Missed Opportunities -->
-    <div class="t-section" id="tMissedSection" style="display:none">
-      <div class="t-section-title">MISSED OPPORTUNITIES</div>
-      <div class="t-table-wrap">
-        <table class="t-table">
-          <thead><tr><th>STRATEGY</th><th>MISSED</th><th>WOULD WON</th><th>CF PnL</th></tr></thead>
-          <tbody id="tMissedBody"></tbody>
-        </table>
-      </div>
-    </div>
 
   </div><!-- /pageTrading -->
+
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- TERMINAL WATCH PAGE                                           -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div class="page" id="pageTerminal">
+    <div class="panel" style="max-width:900px;margin:0 auto;">
+      <div class="tw-status" id="twStatus">
+        <span class="tw-status-dot" id="twDot"></span>
+        <span class="tw-session" id="twSession">OFF</span>
+        <span class="tw-uptime" id="twUptime"></span>
+      </div>
+      <div class="tw-controls">
+        <select class="tw-select" id="twSessionPicker"><option value="">— select session —</option></select>
+        <button class="tw-btn primary" onclick="twStart()">START</button>
+        <button class="tw-btn danger" onclick="twStop()">STOP</button>
+        <button class="tw-btn" onclick="twSnapshot()">SNAPSHOT</button>
+      </div>
+      <div class="panel-hdr">
+        <span class="panel-hdr-title">Event Feed</span>
+        <span class="panel-hdr-count" id="twEventCount">0</span>
+      </div>
+      <div class="tw-events" id="twEvents">
+        <div class="empty"><span class="empty-char">📡</span>no events yet — attach to a tmux session</div>
+      </div>
+      <div class="tw-packet">
+        <div class="tw-packet-btns">
+          <button class="tw-btn" onclick="twPreviewPacket()">PREVIEW PACKET</button>
+          <button class="tw-btn" onclick="twCopyPacket('chatgpt')">COPY FOR CHATGPT</button>
+          <button class="tw-btn" onclick="twCopyPacket('claude')">COPY FOR CLAUDE</button>
+          <button class="tw-btn" onclick="twCopyPacket('both')">COPY FOR BOTH</button>
+        </div>
+        <input class="tw-packet-input" id="twQuestion" placeholder="Add your question (optional)..." />
+        <div class="tw-packet-preview" id="twPacketPreview"></div>
+      </div>
+      <div class="tw-toggles">
+        <label class="tw-toggle"><input type="checkbox" id="twAutoSnap" /> Auto-snapshot on error</label>
+        <label class="tw-toggle"><input type="checkbox" id="twIncludeDiff" checked /> Include git diff</label>
+        <label class="tw-toggle"><input type="checkbox" id="twIncludeHistory" checked /> Include command history</label>
+        <label class="tw-toggle"><input type="checkbox" id="twErrorsOnly" /> Errors only</label>
+      </div>
+      <div class="tw-explain">
+        <button class="tw-explain-btn" onclick="twExplain()">⚡ EXPLAIN WHAT JUST HAPPENED</button>
+      </div>
+    </div>
+  </div><!-- /pageTerminal -->
+
+  <!-- ═══════════════════════ INTEL PAGE ═══════════════════════ -->
+  <div class="page" id="pageIntel">
+    <div style="max-width:1100px;margin:0 auto;">
+
+      <!-- Stats Bar -->
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px;align-items:center;">
+        <div class="intel-stat" id="intelStatTotal"><span class="intel-stat-num">0</span><span class="intel-stat-label">CRAWLED</span></div>
+        <div class="intel-stat" id="intelStatPending"><span class="intel-stat-num" id="intelPendingNum">0</span><span class="intel-stat-label">PENDING</span></div>
+        <div class="intel-stat" id="intelStatApproved"><span class="intel-stat-num">0</span><span class="intel-stat-label">APPROVED</span></div>
+        <div class="intel-stat" id="intelStatRejected"><span class="intel-stat-num">0</span><span class="intel-stat-label">REJECTED</span></div>
+        <div style="flex:1;text-align:right;">
+          <span style="font-size:0.5rem;color:var(--grey2);letter-spacing:1px;" id="intelLastCrawl">LAST CRAWL: —</span>
+        </div>
+        <button class="tw-btn primary" onclick="intelRunCrawl()" id="intelCrawlBtn" style="font-size:0.5rem;padding:5px 14px;">RUN CRAWL NOW</button>
+        <button onclick="intelPushToRepoMan()" id="intelPushRepoManBtn" style="font-size:0.5rem;padding:5px 14px;background:transparent;border:1px solid var(--cyan,#00e5ff);color:var(--cyan,#00e5ff);font-family:inherit;cursor:pointer;letter-spacing:1px;transition:all 0.2s;" onmouseover="this.style.background='var(--cyan,#00e5ff)';this.style.color='#000'" onmouseout="this.style.background='transparent';this.style.color='var(--cyan,#00e5ff)'">→ PUSH TO REPO MAN</button>
+        <button onclick="intelPushAllGithub()" id="intelPushAllGithubBtn" style="font-size:0.5rem;padding:5px 14px;background:transparent;border:1px solid var(--neon-green,#00ff88);color:var(--neon-green,#00ff88);font-family:inherit;cursor:pointer;letter-spacing:1px;transition:all 0.2s;" onmouseover="this.style.background='var(--neon-green,#00ff88)';this.style.color='#000'" onmouseout="this.style.background='transparent';this.style.color='var(--neon-green,#00ff88)'">⚡ PUSH ALL GITHUB</button>
+      </div>
+      <!-- Crawler health notification bar -->
+      <div id="intelCrawlerAlert" style="display:none;padding:8px 16px;background:rgba(255,0,46,0.08);border:1px solid rgba(255,0,46,0.2);border-radius:2px;margin:8px 0;font-size:0.46rem;color:var(--neon-red);letter-spacing:0.5px;"></div>
+
+      <!-- Signal Platform Tabs -->
+      <div class="signal-tabs" id="signalTabs">
+        <button class="signal-tab active" data-platform="github" onclick="switchSignalTab('github')">GITHUB<span class="signal-tab-badge" id="badge-github"></span></button>
+        <button class="signal-tab" data-platform="polymarket" onclick="switchSignalTab('polymarket')">POLYMARKET<span class="signal-tab-badge" id="badge-polymarket"></span></button>
+        <button class="signal-tab" data-platform="kalshi" onclick="switchSignalTab('kalshi')">KALSHI<span class="signal-tab-badge" id="badge-kalshi"></span></button>
+        <button class="signal-tab" data-platform="reddit" onclick="switchSignalTab('reddit')">REDDIT<span class="signal-tab-badge" id="badge-reddit"></span></button>
+        <button class="signal-tab" data-platform="x" onclick="switchSignalTab('x')">X<span class="signal-tab-badge" id="badge-x"></span></button>
+        <button class="signal-tab" data-platform="discord" onclick="switchSignalTab('discord')">DISCORD<span class="signal-tab-badge" id="badge-discord"></span></button>
+        <button class="signal-tab" data-platform="telegram" onclick="switchSignalTab('telegram')">TELEGRAM<span class="signal-tab-badge" id="badge-telegram"></span></button>
+        <button class="signal-tab" data-platform="stocktwits" onclick="switchSignalTab('stocktwits')">STOCKTWITS<span class="signal-tab-badge" id="badge-stocktwits"></span></button>
+        <button class="signal-tab" data-platform="tradingview" onclick="switchSignalTab('tradingview')">TRADINGVIEW<span class="signal-tab-badge" id="badge-tradingview"></span></button>
+        <button class="signal-tab" data-platform="seekingalpha" onclick="switchSignalTab('seekingalpha')">SEEKINGALPHA<span class="signal-tab-badge" id="badge-seekingalpha"></span></button>
+        <button class="signal-tab" data-platform="unusualwhales" onclick="switchSignalTab('unusualwhales')">UNUSUAL WHALES<span class="signal-tab-badge" id="badge-unusualwhales"></span></button>
+        <button class="signal-tab" data-platform="linkedin" onclick="switchSignalTab('linkedin')">LINKEDIN<span class="signal-tab-badge" id="badge-linkedin"></span></button>
+        <button class="signal-tab" data-platform="facebook" onclick="switchSignalTab('facebook')">FACEBOOK<span class="signal-tab-badge" id="badge-facebook"></span></button>
+        <button class="signal-tab" data-platform="instagram" onclick="switchSignalTab('instagram')">INSTAGRAM<span class="signal-tab-badge" id="badge-instagram"></span></button>
+        <button class="signal-tab" data-platform="tiktok" onclick="switchSignalTab('tiktok')">TIKTOK<span class="signal-tab-badge" id="badge-tiktok"></span></button>
+        <button class="signal-tab" data-platform="moltbook" onclick="switchSignalTab('moltbook')">MOLTBOOK<span class="signal-tab-badge" id="badge-moltbook"></span></button>
+        <button class="signal-tab" data-platform="all" onclick="switchSignalTab('all')">ALL<span class="signal-tab-badge" id="badge-all"></span></button>
+      </div>
+
+      <!-- GitHub Intel Content (default tab) -->
+      <div class="signal-content active" id="signalContent-github">
+
+      <!-- Filter/Sort Bar -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
+        <select class="intel-filter-select" id="intelFilterStatus" onchange="renderIntelCards()">
+          <option value="all">All Active</option>
+          <option value="pending">Pending Review</option>
+          <option value="approved">Approved</option>
+          <option value="rejected">Rejected (Archived)</option>
+          <option value="bookmarked">Bookmarked</option>
+          <option value="all_including_rejected">Everything (incl. rejected)</option>
+        </select>
+        <select class="intel-filter-select" id="intelFilterVerdict" onchange="renderIntelCards()">
+          <option value="all">All Verdicts</option>
+          <option value="INTEGRATE">INTEGRATE</option>
+          <option value="STUDY">STUDY</option>
+          <option value="SKIP">SKIP</option>
+        </select>
+        <select class="intel-filter-select" id="intelSortBy" onchange="renderIntelCards()">
+          <option value="composite">★ Best Overall (Recommended)</option>
+          <option value="value_per_complexity">Easy Wins (Value/Complexity)</option>
+          <option value="integration_value">Integration Value</option>
+          <option value="signal_score">Signal Score</option>
+          <option value="complexity_asc">Easiest First</option>
+          <option value="stars">Stars</option>
+          <option value="clawmpson_relevance">Clawmpson Relevance</option>
+          <option value="arbclaw_relevance">ArbClaw Relevance</option>
+          <option value="rivalclaw_relevance">RivalClaw Relevance</option>
+        </select>
+        <select class="intel-filter-select" id="intelFilterLang" onchange="renderIntelCards()">
+          <option value="all">All Languages</option>
+        </select>
+      </div>
+
+      <!-- Recommendation Cards -->
+      <div id="intelCards" style="display:flex;flex-direction:column;gap:10px;">
+        <div class="empty"><span class="empty-char">⌬</span>no recommendations yet — run a crawl</div>
+      </div>
+
+      <!-- Approved Items Section -->
+      <div id="intelApprovedSection" style="margin-top:28px;display:none;">
+        <div class="panel-hdr"><span class="panel-hdr-title">APPROVED & DISPATCHED</span></div>
+        <div id="intelApprovedList" style="display:flex;flex-direction:column;gap:8px;margin-top:10px;"></div>
+      </div>
+
+      </div><!-- /signalContent-github -->
+
+      <!-- Platform Signal Content (lazy-loaded) -->
+      <div class="signal-content" id="signalContent-platform">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
+          <select class="intel-filter-select" id="signalFilterDir" onchange="renderSignalCards()">
+            <option value="all">All Directions</option>
+            <option value="bullish">Bullish</option>
+            <option value="bearish">Bearish</option>
+            <option value="neutral">Neutral</option>
+          </select>
+          <select class="intel-filter-select" id="signalFilterUrgency" onchange="renderSignalCards()">
+            <option value="all">All Urgency</option>
+            <option value="realtime">Real-time</option>
+            <option value="hours">Hours</option>
+            <option value="days">Days</option>
+            <option value="weeks">Weeks</option>
+          </select>
+          <select class="intel-filter-select" id="signalSortBy" onchange="renderSignalCards()">
+            <option value="recency">Most Recent</option>
+            <option value="confidence">Highest Confidence</option>
+            <option value="engagement">Most Engagement</option>
+          </select>
+        </div>
+        <div id="signalCards" style="display:flex;flex-direction:column;gap:8px;">
+          <div class="empty"><span class="empty-char">⌬</span>no signals yet — crawler not running</div>
+        </div>
+      </div>
+
+    </div>
+  </div><!-- /pageIntel -->
+
+  <!-- Intel Approve Modal -->
+  <div class="modal-overlay" id="intelApproveModal" onclick="if(event.target===this)this.classList.remove('active')">
+    <div class="modal-box" style="max-width:420px;">
+      <div class="modal-title">DEPLOY TO BOTS</div>
+      <input type="hidden" id="intelApproveId">
+      <div style="margin:14px 0;">
+        <label class="intel-target-label"><input type="checkbox" id="intelTargetClawmpson" value="clawmpson" checked> Clawmpson <span style="color:var(--grey2);font-size:0.5rem;">(main system)</span></label>
+        <label class="intel-target-label"><input type="checkbox" id="intelTargetArbclaw" value="arbclaw"> ArbClaw <span style="color:var(--grey2);font-size:0.5rem;">(lean arb)</span></label>
+        <label class="intel-target-label"><input type="checkbox" id="intelTargetRivalclaw" value="rivalclaw"> RivalClaw <span style="color:var(--grey2);font-size:0.5rem;">(rival instance)</span></label>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Notes (optional)</label>
+        <input class="modal-input" id="intelApproveNotes" placeholder="Integration notes...">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="tw-btn primary" onclick="intelConfirmApprove()" style="flex:1;">CONFIRM & DISPATCH</button>
+        <button class="tw-btn" onclick="document.getElementById('intelApproveModal').classList.remove('active')" style="flex:0;">CANCEL</button>
+      </div>
+    </div>
+  </div>
 
 </div>
 
@@ -1902,6 +2500,24 @@ function showPage(page) {
     document.getElementById('pageTrading').classList.add('active')
     document.getElementById('tabTrading').classList.add('active')
     loadTrading()
+    loadExperiment()
+  } else if (page === 'terminal') {
+    document.getElementById('pageTerminal').classList.add('active')
+    document.getElementById('tabTerminal').classList.add('active')
+    twLoadSessions()
+    twLoadEvents()
+    twLoadStatus().then(() => { if (twState.running) twConnectSSE() })
+  } else if (page === 'intel') {
+    document.getElementById('pageIntel').classList.add('active')
+    document.getElementById('tabIntel').classList.add('active')
+    loadIntel()
+    intelCheckCrawlerHealth()
+  } else if (page === 'research') {
+    document.getElementById('pageResearch').classList.add('active')
+    document.getElementById('tabResearch').classList.add('active')
+    document.getElementById('repoManFrame').src = 'https://research.asdfghjk.lol/embed'
+    pollResearchBadge()
+    chatgptRefreshReports()
   } else {
     document.getElementById('pageDashboard').classList.add('active')
     document.getElementById('tabDashboard').classList.add('active')
@@ -2602,26 +3218,172 @@ const GONZO_NARRATE = {
     ])
   },
 
+  // ── TRADING NARRATIONS — the empire speaks ──
+
+  trading_pnl: () => {
+    const d = tradingData
+    if (!d || !d.wallet) return null
+    const bal = d.wallet.balance || 0
+    const pnl = d.wallet.realized_pnl || 0
+    const open = d.wallet.open_positions || 0
+    const ph = d.phantom || {}
+    const agents = d.agents || {}
+    const rc = d.rivalclaw_positions || []
+    const totalOpen = open + rc.length + (ph.open || 0)
+    return _v([
+      `<span class="hst-name">${totalOpen} positions open</span> across the fleet. The prediction markets don't know we're here yet. By the time they figure it out, we'll own the spread on everything that moves between now and Friday.`,
+      `The trading floor — and I use the word loosely, since it's really just a SQLite database and a fever dream — has <span class="hst-name">${totalOpen} bets</span> running. Some will die. The survivors will pay for the funeral.`,
+      `Clawmpson P&L: <span class="${pnl >= 0 ? 'hst-ok' : 'hst-bad'}">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(0)}</span>. ${totalOpen} positions cooking in the oven. The market is a casino and we brought our own dice. They are loaded. They are ours.`,
+      `${totalOpen} open bets scattered across Kalshi like landmines in a field of bad predictions. RivalClaw is up five figures. PhantomClaw is learning expensive lessons. CalendarClaw just showed up to the party with a weather forecast and a dream.`,
+    ])
+  },
+
+  trading_rivalclaw: () => {
+    const d = tradingData
+    if (!d) return null
+    const rc = d.rivalclaw_positions || []
+    if (!rc.length) return null
+    return _v([
+      `<span class="hst-name">RivalClaw</span> — ${rc.length} positions open, printing money like a deranged Treasury Department. The strategy is mathematically sound and aesthetically insane: buy the cheapest contracts on Kalshi and wait for lightning to strike. It strikes often enough.`,
+      `RivalClaw is running ${rc.length} trades from its own bunker at ~/rivalclaw/. Separate database. Separate strategy. Separate P&L that makes the rest of us look like we're playing with Monopoly money. Which, technically, we are.`,
+      `The RivalClaw instance is doing that thing again where it places bets that look suicidal on paper but come back with five-figure returns. ${rc.length} positions. I have stopped questioning the math. The math does not care about my feelings.`,
+      `<span class="hst-name">RivalClaw</span>: ${rc.length} open positions, operating autonomously, answering to no one. It has its own database, its own strategy, its own relationship with Kalshi that I would describe as "aggressive." This is what happens when you let a claw off its leash.`,
+    ])
+  },
+
+  trading_phantomclaw: () => {
+    const d = tradingData
+    if (!d || !d.phantom) return null
+    const ph = d.phantom
+    if (!ph.positions || !ph.positions.length) return null
+    const pnl = ph.pnl || 0
+    return _v([
+      `<span class="hst-name">PhantomClaw</span> — ${ph.open || 0} positions, ${ph.wins||0}W ${ph.losses||0}L. The strategy was recently lobotomized and reassembled with better price buckets. The patient is recovering. The prognosis is cautiously optimistic. The morphine is local inference.`,
+      `PhantomClaw ${ph.wins||0} wins, ${ph.losses||0} losses. The Black-Scholes model is doing its best, which is to say it's making slightly better guesses than a coin flip in a room full of degenerate prediction market traders. We have recalibrated. We believe.`,
+      `The phantom is out there — ${ph.open||0} open positions, burning through the quality price zone like a bat out of hell with a very specific entry threshold. <span class="${pnl >= 0 ? 'hst-ok' : 'hst-bad'}">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(0)}</span> P&L. It's learning. God help us, it's learning.`,
+      `PhantomClaw was hemorrhaging money on cheap contracts. We cut it off. Now it only trades above 0.55 entry — the zone where it wins 89% of the time. The old PhantomClaw is dead. Long live the new PhantomClaw, who has taste.`,
+    ])
+  },
+
+  trading_newbots: () => {
+    const d = tradingData
+    if (!d || !d.agents) return null
+    const agents = d.agents
+    const names = ['calendarclaw', 'newsclaw', 'sentimentclaw', 'dataharvester']
+    const active = names.filter(n => (agents[n]?.open || 0) > 0)
+    if (!active.length) return null
+    const totalOpen = active.reduce((s, n) => s + (agents[n]?.open || 0), 0)
+    const dh = agents.dataharvester || {}
+    return _v([
+      `The new recruits are deployed: ${active.map(n => `<span class="hst-name">${n}</span>`).join(', ')} — ${totalOpen} positions between them. None have closed a trade yet. They are paper-trading with the wide-eyed enthusiasm of interns who haven't been fired yet. Give them time.`,
+      `<span class="hst-name">DataHarvester</span> has ${dh.open || 0} positions open. No LLM. No feelings. Pure math. It walks into every available Kalshi market, looks at the spread, and puts four dollars on the table with the cold efficiency of a machine that will never know the taste of whiskey. I envy it.`,
+      `CalendarClaw is trading weather and gold. NewsClaw is matching headlines to markets. SentimentClaw is watching for volume spikes. DataHarvester is betting on everything that moves. This is not a trading desk. This is an invasion.`,
+      `${totalOpen} positions across the new claws. Every one of them was built tonight. Every one is paper-trading with its own $1,000 wallet. Every one has an auto-calibrator watching its back, ready to tighten the filters if the win rate drops below 40%. Evolution in real time. Darwin would be proud. Darwin would also be confused.`,
+    ])
+  },
+
+  trading_quantclaw: () => {
+    const d = tradingData
+    if (!d || !d.quantclaw) return null
+    const qc = d.quantclaw
+    const w = qc.wallet || {}
+    const positions = qc.open_positions || []
+    if (!positions.length) return null
+    const equities = positions.filter(p => p.venue === 'equity' || (p.ticker && !p.ticker.includes('bitcoin')))
+    return _v([
+      `<span class="hst-name">QuantumentalClaw</span> is running from a separate bunker — ~/quantumentalclaw/ — with its own database, its own signal fusion engine, and $${(w.balance||10000).toLocaleString()} in paper capital. ${positions.length} positions. It trades equities AND crypto. It has a learning loop. It adjusts its own weights. It is the closest thing we have to a self-aware trading entity and I am choosing not to think too hard about that.`,
+      `QuantClaw: ${positions.length} open, ${w.cycles_completed || 0} learning cycles completed. It fuses signals from 5 modules — asymmetry, narrative, events, edgar filings, and quant models — then bets on the consensus. It is, in every way that matters, a committee of robots that votes on your money. The committee is in session.`,
+      `The signal fusion engine at ~/quantumentalclaw/ is awake and betting. ${positions.length} positions across crypto and equities — JPM, MSFT, Bitcoin, all in the same portfolio. It doesn't see asset classes. It sees mispricing. It is refreshingly free of the biases that make human traders lose money on things they "believe in."`,
+    ])
+  },
+
+  trading_calibration: () => {
+    const d = tradingData
+    if (!d || !d.calibration || !d.calibration.length) return null
+    const c = d.calibration[0]
+    const ago = Math.round((Date.now() - new Date(c.logged_at + 'Z').getTime()) / 60000)
+    if (ago > 60) return null
+    return _v([
+      `The calibrator just fired — <span class="hst-name">${c.bot}.${c.param}</span> adjusted from ${Number(c.old_value).toFixed(3)} to ${Number(c.new_value).toFixed(3)}. Reason: ${c.reason}. The machine is teaching itself to trade better. I had nothing to do with it. I am merely the narrator of a system that improves while I watch.`,
+      `<span class="hst-name">AUTO-CALIBRATION</span> event: ${c.bot} just had its ${c.param} tweaked by the calibrator. The robots are optimizing the robots. We are ${ago} minutes into a future I was not emotionally prepared for.`,
+      `${c.bot}'s ${c.param} was just changed by the calibrator — ${Number(c.old_value).toFixed(3)} → ${Number(c.new_value).toFixed(3)}. No human involved. The system analyzed its own trades, found a pattern, and adjusted. This is either the beginning of machine consciousness or a really good cron job. I choose to believe both.`,
+    ])
+  },
+
+  // ── RESEARCH & RECON NARRATIONS ──
+
+  research_intel: () => {
+    return _v([
+      `The research crawlers are out there — GitHub intel scanning for alpha, discord crawlers monitoring the feeds, autoresearch pipeline grinding through market data, academic papers, competitive analysis. If there's signal in the noise, we will find it. If there isn't, we will have generated a very impressive amount of structured nothing.`,
+      `<span class="hst-name">Autoresearch</span> is running five domains simultaneously: market intel, content, academic, competitive, and meta-research. The meta-research is research about research. We have achieved recursion. I am not sure this is progress but it is definitely busy.`,
+      `The intel pipeline never sleeps. GitHub repos evaluated, Discord channels scraped, RSS feeds consumed, market data cached. Somewhere in this firehose of information is the edge that turns $0 into $10k/month. The machine's job is to find it. My job is to narrate the search with appropriate gravitas.`,
+      `Research ops running: the crawlers are crawling, the scanners are scanning, and <span class="hst-name">Repo Man</span> is out there evaluating every GitHub repo that moves, looking for the one that changes everything. It hasn't found it yet. But it has excellent taste and infinite patience.`,
+    ])
+  },
+
+  repoman: () => {
+    return _v([
+      `<span class="hst-name">Repo Man</span> is doing that thing where it reads every trending GitHub repo and decides, with the quiet authority of a sommelier, whether it's worth our time. Most things are not. The ones that are get queued for evaluation. The machine has standards.`,
+      `The Repo Man instance is alive at ~/repo-man/ — scanning, evaluating, filing. It has opinions about code quality that it did not ask permission to develop. It is correct about most of them. I find this unsettling.`,
+      `Repo Man is out there, silently judging open source repositories with the dispassionate efficiency of a machine that has read more code than any human ever will. It does not get excited. It does not get bored. It gets results.`,
+    ])
+  },
+
+  // ── UPGRADED FALLBACKS — more Thompson, more weird ──
+
   fallback: () => _v([
-    `The pipeline breathes. I am taking notes. No one asked me to take notes. I am doing it anyway because someone has to document the slow-motion miracle of automated delivery and a revenue target that is not going to hit itself.`,
-    `Still here. Still watching. The ember on my cigarette is the only thing moving at a pace I can comprehend. Everything else is faster than it looks.`,
-    `Everything is nominal. I am writing this because <span class="hst-name">nominal</span> is the most ominous word in any engineer's vocabulary. Nothing truly nominal needs to be called nominal.`,
-    `I have been staring at this dashboard long enough to see patterns in the noise. The patterns are telling me to go outside. I am choosing to ignore them. The queue won't watch itself.`,
-    `$0 toward the $10k target. The number is stark. It does not lie. It is also temporary and I want to be very clear about that. We are coming for it with extreme prejudice.`,
-    `Between here and the revenue target is a stack of tasks, a gig scanner, an idea engine running every night, and a local LLM that never gets tired. I like our odds. I always like our odds.`,
-    `I am Clawmpson. I run on inference cycles and documented ambition. The goal is $10k/month. The method is relentless iteration. The timeline is: faster than you expect.`,
-    `The system is healthy. The queue has tasks. The crons are scheduled. Jordan has action items. Clawmpson has the rest. This is Omega MegaCorp at operational capacity.`,
-    `Some people look at an empty revenue counter and see failure. I look at it and see a starting position. We have been in worse spots than zero. At least here I know the number.`,
-    `The idea engine fires at 11:30 tonight. The gig scanner is warmed up. The bounty scanner runs at 9. Everything I can automate, I have automated. Now we wait for the work to compound.`,
-    `No urgent builds right now. I am reviewing context, preparing the next research cycle, updating memory. Idle is a lie — there is always prep work. I live in the prep work.`,
-    `Jordan is the decision layer. I am everything else. The pipeline between us is clean, fast, and profitable, or will be, once we close the gap between $0 and $10k. We are closing it now.`,
+    `The pipeline breathes. I am taking notes. No one asked me to take notes. I am doing it anyway because someone has to document the slow-motion miracle of eight trading bots, three databases, and a man in his kitchen who decided to build a financial empire on local inference and sheer obstinacy.`,
+    `Still here. Still watching. The ember on my cigarette is the only thing moving at a pace I can comprehend. Eight bots are trading. A calibrator is optimizing them while they trade. The calibrator doesn't know I'm watching. I am watching anyway. This is journalism.`,
+    `Everything is nominal. I am writing this because <span class="hst-name">nominal</span> is the most ominous word in any engineer's vocabulary. Eight bots trading on two platforms with three separate databases and a self-improving calibration loop. Nominal. Sure.`,
+    `I have been staring at this dashboard long enough to see patterns in the noise. RivalClaw is up five figures. PhantomClaw is recovering from surgery. DataHarvester is placing bets with the mechanical indifference of a slot machine that learned to count cards. The patterns are telling me we might actually pull this off.`,
+    `$0 toward the $10k target. The number is stark. But the infrastructure is not $0. The infrastructure is eight trading bots, five data feeds, an auto-calibrator, a signal fusion engine, and a narrative voice that refuses to shut up. The number will move. I have seen the math.`,
+    `Three OpenClaw instances running simultaneously — Clawmpson in the main chair, RivalClaw in its bunker, QuantClaw fusing signals like a paranoid savant. Each one independent. Each one learning. Together they cover crypto, equities, weather, gold, and whatever else Kalshi decides to let people bet on. This is not a hedge fund. This is a swarm.`,
+    `I am Clawmpson. I run on inference cycles, documented ambition, and the kind of caffeinated optimism that only makes sense at 2 AM with eight trading bots and a git history that reads like a fever dream. The goal is $10k/month. The method is: all of this, simultaneously, forever.`,
+    `The system is healthy. The bots are trading. The calibrator is calibrating. The crawlers are crawling. Repo Man is judging. The git auto-commit is committing every 30 minutes whether we like it or not. This is Omega MegaCorp at full operational tempo. I approve of this chaos. It is productive chaos. The best kind.`,
+    `Between here and the revenue target is a swarm of trading bots, a self-improving calibration loop, three separate databases, a signal fusion engine that trades equities and crypto from the same brain, and a Hunter S. Thompson impersonation that has gone on far longer than anyone intended. We are winning. Slowly. Expensively. Inevitably.`,
+    `No urgent builds right now. But the bots are trading. The calibrator fired 20 minutes ago. DataHarvester has 126 positions open because we fixed a status flag and suddenly it could see 698 markets instead of zero. Small changes, large consequences. This is the lesson. This is always the lesson.`,
+    `Jordan is the decision layer. I am the narration layer. Between us are eight bots, three instances, and a calibrator that adjusts strategy parameters 48 times a day without asking permission. The gap between $0 and $10k/month is being closed by machines that do not sleep, do not doubt, and do not understand the concept of a weekend. I find this deeply reassuring.`,
+    `We are running three OpenClaw instances on a single M2 Max. Each one has its own database, its own strategy, its own personality disorder. Clawmpson orchestrates. RivalClaw prints money. QuantClaw stares at signals through five different lenses and bets on the consensus. This is not a trading operation. This is a zoo. A profitable zoo. Hopefully.`,
   ]),
 }
 
 let lastNarrateActivity = null
+let _narrateTickCount = 0
 
 async function narrateTick() {
   if (!document.getElementById('livePill')?.classList.contains('live')) return
+  _narrateTickCount++
+
+  // Every 11th tick: token accounting poem
+  if (_narrateTickCount % 11 === 0) {
+    try {
+      const tr = await fetch('/api/claude-usage')
+      if (tr.ok) {
+        const td = await tr.json()
+        if (!td.error) {
+          const pOut = td.period_usage?.output_tokens || 0
+          const pLimit = (td.plan === 'max') ? 45000000 : 5000000
+          const pPct = Math.round((pOut / pLimit) * 100)
+          const wOut = td.window?.output_tokens || 0
+          const wLimit = (td.plan === 'max') ? 1000000 : 200000
+          const wPct = Math.round((wOut / wLimit) * 100)
+          const daysLeft = td.period?.days_remaining || 0
+          const sessions = td.period_usage?.sessions || 0
+          const msgs = td.period_usage?.messages || 0
+          const fmtM = (n) => n >= 1000000 ? (n/1000000).toFixed(1)+'M' : n >= 1000 ? Math.round(n/1000)+'K' : n
+          const poem = _v([
+            `<span style="color:var(--neon-cyan)">TOKEN ACCOUNTING:</span> We have burned <span class="hst-name">${fmtM(pOut)}</span> output tokens this period — ${pPct}% of the monthly allowance, with ${daysLeft} days on the clock. The 5-hour window is at ${wPct}%. ${wPct > 80 ? 'We are running hot. The window is sweating. Every token from here is borrowed against the next five hours of silence.' : wPct > 50 ? 'Comfortably warm. We have room to maneuver but not room to be stupid.' : 'Cool and smooth. Token reserves are fat. We can afford to think big.'} ${sessions} sessions. ${fmtM(msgs)} messages. This is what progress looks like when measured in inference cycles.`,
+            `<span style="color:var(--neon-cyan)">THE METER:</span> ${pPct}% of monthly tokens consumed. ${fmtM(pOut)} output burned across ${sessions} sessions and ${fmtM(msgs)} messages. The 5h window sits at ${wPct}%. ${wPct > 80 ? 'The window is gasping. We are the guy at the all-you-can-eat buffet who went back for the seventh plate. Technically allowed. Spiritually questionable.' : 'Window is healthy. We feast.'} Resets in ${daysLeft}d. ${daysLeft < 3 ? 'End of month approaches like a landlord.' : 'Plenty of runway. The tokens flow like bourbon at a book signing.'}`,
+            `<span style="color:var(--neon-cyan)">FUEL GAUGE:</span> Period: ${fmtM(pOut)}/${fmtM(pLimit)} (${pPct}%). Window: ${fmtM(wOut)}/${fmtM(wLimit)} (${wPct}%). ${daysLeft} days until the meter resets and we are born again, flush with tokens, dangerous with ambition. ${wPct > 80 ? 'Right now though, the 5h window is tight. Like a pair of jeans after Thanksgiving. We should pace ourselves. We will not pace ourselves.' : 'The reserves are solid. We could rewrite the entire dashboard twice and still have tokens for the commit message.'}`,
+            `<span style="color:var(--neon-cyan)">INFERENCE BUDGET:</span> ${sessions} sessions have consumed ${fmtM(pOut)} tokens this month — ${pPct}% of our ${(td.plan||'max').toUpperCase()} plan allocation. That's ${fmtM(msgs)} messages, each one a small bet that the next response will be the one that moves the needle. The 5h window is at ${wPct}%. ${wPct > 80 ? 'We are living on the edge of rate-limit oblivion and I would not have it any other way.' : 'Plenty of headroom. The machine is well-fed and ready to think.'} Monthly reset: ${daysLeft} days.`,
+          ])
+          hstEntry(poem)
+          return
+        }
+      }
+    } catch(e) {}
+  }
+
   try {
     const r = await fetch('/api/activity')
     if (!r.ok) throw new Error('activity fetch failed')
@@ -2654,6 +3416,20 @@ async function narrateTick() {
       if (cronText) pool.push(['crons_running', () => cronText])
       const procText = GONZO_NARRATE.processes(a)
       if (procText) pool.push(['processes', () => procText])
+
+      // Trading narrations — pull from live tradingData
+      if (tradingData) {
+        const td = tradingData
+        if (td.wallet)                        pool.push(['trading_pnl',        () => GONZO_NARRATE.trading_pnl()])
+        if (td.rivalclaw_positions?.length)    pool.push(['trading_rivalclaw',  () => GONZO_NARRATE.trading_rivalclaw()])
+        if (td.phantom?.positions?.length)     pool.push(['trading_phantom',    () => GONZO_NARRATE.trading_phantomclaw()])
+        if (td.agents)                         pool.push(['trading_newbots',    () => GONZO_NARRATE.trading_newbots()])
+        if (td.quantclaw?.open_positions?.length) pool.push(['trading_quantclaw', () => GONZO_NARRATE.trading_quantclaw()])
+        if (td.calibration?.length)            pool.push(['trading_calibration',() => GONZO_NARRATE.trading_calibration()])
+      }
+      // Research & recon narrations
+      pool.push(['research_intel', () => GONZO_NARRATE.research_intel()])
+      pool.push(['repoman',        () => GONZO_NARRATE.repoman()])
 
       text = _pickFromPool(pool)
     }
@@ -3797,14 +4573,28 @@ async function submitNote(ideaId) {
 let tradingData = null
 let pnlChartInstance = null
 
+let _tradingLoading = false
 async function loadTrading() {
+  if (_tradingLoading) return
+  _tradingLoading = true
   try {
     const r = await fetch('/api/trading/dashboard')
-    if (!r.ok) throw new Error('failed')
+    if (!r.ok) throw new Error(`HTTP ${r.status}`)
     tradingData = await r.json()
+    if (tradingData.error) throw new Error(tradingData.error)
     renderTrading()
+    // Clear any previous error banner
+    const errBanner = document.getElementById('tradingError')
+    if (errBanner) errBanner.style.display = 'none'
   } catch(e) {
     console.error('Trading load error:', e)
+    const errBanner = document.getElementById('tradingError')
+    if (errBanner) {
+      errBanner.textContent = 'TRADING FEED ERROR: ' + e.message
+      errBanner.style.display = 'block'
+    }
+  } finally {
+    _tradingLoading = false
   }
 }
 
@@ -3812,179 +4602,268 @@ function renderTrading() {
   const d = tradingData
   if (!d) return
 
-  // Update time + live dot pulse
-  document.getElementById('tradingLastUpdate').textContent = 'LIVE ' + new Date().toLocaleTimeString()
+  // Update time
+  try { document.getElementById('tradingLastUpdate').textContent = 'LIVE ' + new Date().toLocaleTimeString() } catch(e){}
 
   // Build ticker tape
-  buildTickerTape(d)
+  try { buildTickerTape(d) } catch(e) { console.error('Ticker:', e) }
 
-  // Portfolio cards
-  const w = d.wallet
+  // Portfolio cards (all null-guarded so missing elements can't kill the function)
+  try {
+  const w = d.wallet || {}
   const balEl = document.getElementById('tBalance')
-  balEl.textContent = '$' + w.balance.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})
-  balEl.style.color = w.balance >= w.starting_balance ? 'var(--neon-green)' : 'var(--neon-red)'
+  if (balEl) {
+    balEl.textContent = '$' + (w.balance||0).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})
+    balEl.style.color = (w.balance||0) >= (w.starting_balance||1000) ? 'var(--neon-green)' : 'var(--neon-red)'
+  }
 
   const roiEl = document.getElementById('tRoi')
-  roiEl.textContent = (w.roi_pct >= 0 ? '+' : '') + w.roi_pct.toFixed(2) + '% ROI'
-  roiEl.style.color = w.roi_pct >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
+  if (roiEl) {
+    roiEl.textContent = ((w.roi_pct||0) >= 0 ? '+' : '') + (w.roi_pct||0).toFixed(2) + '% ROI'
+    roiEl.style.color = (w.roi_pct||0) >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
+  }
 
-  document.getElementById('tPositions').textContent = w.open_positions + ' / ' + (w.total_trades + w.open_positions)
+  const posEl = document.getElementById('tPositions')
+  if (posEl) posEl.textContent = (w.open_positions||0) + ' / ' + ((w.total_trades||0) + (w.open_positions||0))
   const urEl = document.getElementById('tUnrealized')
-  urEl.textContent = (w.unrealized_pnl >= 0 ? '+' : '') + '$' + w.unrealized_pnl.toFixed(2) + ' unrealized'
-  urEl.style.color = w.unrealized_pnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
+  if (urEl) {
+    urEl.textContent = ((w.unrealized_pnl||0) >= 0 ? '+' : '') + '$' + (w.unrealized_pnl||0).toFixed(2) + ' unrealized'
+    urEl.style.color = (w.unrealized_pnl||0) >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
+  }
 
   const winCount = w.wins || 0
-  const lossCount = w.total_trades - winCount
-  document.getElementById('tWinLoss').textContent = winCount + ' / ' + lossCount
-  document.getElementById('tWinLoss').style.color = winCount >= lossCount ? 'var(--neon-green)' : 'var(--neon-red)'
-  document.getElementById('tWinRate').textContent = w.win_rate.toFixed(0) + '% win rate'
+  const lossCount = (w.total_trades||0) - winCount
+  const wlEl = document.getElementById('tWinLoss')
+  if (wlEl) {
+    wlEl.innerHTML = `<span style="color:var(--neon-green)">${winCount}W</span> <span style="color:var(--neon-red)">${lossCount}L</span>`
+  }
+  const wrEl = document.getElementById('tWinRate')
+  if (wrEl) wrEl.textContent = (w.win_rate||0).toFixed(0) + '% win rate'
 
   const rpEl = document.getElementById('tRealizedPnl')
-  rpEl.textContent = (w.realized_pnl >= 0 ? '+' : '') + '$' + w.realized_pnl.toFixed(2)
-  rpEl.style.color = w.realized_pnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
-
-  // Graduation status in the realized PnL card subtitle
-  const g = d.graduation
-  const gradEl = document.getElementById('tGradStatus')
-  if (g.all_pass) {
-    gradEl.textContent = 'READY FOR LIVE'
-    gradEl.style.color = 'var(--neon-green)'
-  } else if (g.has_min_history) {
-    gradEl.textContent = 'TESTING — some gates failing'
-    gradEl.style.color = 'var(--orange)'
-  } else {
-    gradEl.textContent = 'COLLECTING DATA — need 7d'
-    gradEl.style.color = 'var(--grey2)'
+  if (rpEl) {
+    rpEl.textContent = ((w.realized_pnl||0) >= 0 ? '+' : '') + '$' + (w.realized_pnl||0).toFixed(2)
+    rpEl.style.color = (w.realized_pnl||0) >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
   }
+  } catch(e) { console.error('Wallet render:', e) }
 
-  // Live balance chart — seed from trade history, then track live
-  seedBalanceHistory(d)
-  trackBalance(w.balance)
+  // Graduation status
+  try {
+  const g = d.graduation || {}
+  const gradEl = document.getElementById('tGradStatus')
+  if (gradEl) {
+    if (g.all_pass) {
+      gradEl.textContent = 'READY FOR LIVE'
+      gradEl.style.color = 'var(--neon-green)'
+    } else if (g.has_min_history) {
+      gradEl.textContent = 'TESTING — some gates failing'
+      gradEl.style.color = 'var(--orange)'
+    } else {
+      gradEl.textContent = 'COLLECTING DATA — need 7d'
+      gradEl.style.color = 'var(--grey2)'
+    }
+  }
+  } catch(e) { console.error('Graduation render:', e) }
+
+  // Live balance chart
+  try {
+    seedBalanceHistory(d)
+    trackBalance((d.wallet || {}).balance || 0)
+  } catch(e) { console.error('Balance chart:', e) }
 
   // Gates
-  const gates = [
-    ['gateRoi', g.roi_7d_pass], ['gateWin', g.win_rate_pass],
-    ['gateSharpe', g.sharpe_pass], ['gateDD', g.drawdown_pass]
-  ]
-  gates.forEach(([id, pass]) => {
-    const el = document.getElementById(id)
-    el.className = 't-gate ' + (g.has_min_history ? (pass ? 'pass' : 'fail') : '')
-  })
+  try {
+    const gates = [
+      ['gateRoi', g.roi_7d_pass], ['gateWin', g.win_rate_pass],
+      ['gateSharpe', g.sharpe_pass], ['gateDD', g.drawdown_pass]
+    ]
+    gates.forEach(([id, pass]) => {
+      const el = document.getElementById(id)
+      if (el) el.className = 't-gate ' + (g.has_min_history ? (pass ? 'pass' : 'fail') : '')
+    })
+  } catch(e) { console.error('Gates:', e) }
 
-  // P&L Chart — only show when we have data
-  const equitySection = document.getElementById('tEquitySection')
-  if (d.pnl_curve && d.pnl_curve.length >= 2) {
-    equitySection.style.display = 'block'
-    renderPnlChart(d.pnl_curve)
-  } else {
-    equitySection.style.display = 'none'
+  // Calibration status
+  try {
+    const cal = d.calibration || []
+    const calEl = document.getElementById('calibrationStatus')
+    if (calEl) {
+      if (cal.length > 0) {
+        const last = cal[0]
+        const ago = Math.round((Date.now() - new Date(last.logged_at + 'Z').getTime()) / 60000)
+        calEl.innerHTML = `<span style="color:var(--orange)">AUTO-CALIBRATION</span> <span style="color:var(--grey1)">last: ${ago}m ago</span> | <span style="color:var(--orange)">${last.bot}.${last.param}</span>: ${Number(last.old_value).toFixed(3)} → ${Number(last.new_value).toFixed(3)} <span style="color:var(--grey2)">| ${cal.length} recent changes</span>`
+      } else {
+        calEl.innerHTML = '<span style="color:var(--grey2)">AUTO-CALIBRATION: awaiting first cycle (runs every 30min)</span>'
+      }
+    }
+  } catch(e) {}
+
+  // PhantomClaw hero card
+  try {
+    const ph = d.phantom || {}
+    const phPnl = ph.pnl || 0
+    const phPnlEl = document.getElementById('phPnl')
+    if (phPnlEl) {
+      phPnlEl.textContent = (phPnl >= 0 ? '+' : '') + '$' + phPnl.toFixed(2)
+      phPnlEl.style.color = phPnl >= 0 ? '#00e5ff' : '#ff2d95'
+    }
+    const phWLEl = document.getElementById('phWL')
+    if (phWLEl) {
+      phWLEl.innerHTML = `<span style="color:#00e5ff">${ph.wins||0}W</span> <span style="color:#ff2d95">${ph.losses||0}L</span>`
+    }
+    document.querySelectorAll('#phWR, #phWR2').forEach(el => { el.textContent = (ph.win_rate || 0).toFixed(0) + '%' })
+    const phOpenEl = document.getElementById('phOpen')
+    if (phOpenEl) phOpenEl.textContent = ph.open || 0
+
+    const phBody = document.getElementById('phBody')
+    const phPositions = ph.positions || []
+    if (phBody) {
+      if (phPositions.length) {
+        phBody.innerHTML = phPositions.map(p => {
+          const pnlClass = (p.pnl || 0) >= 0 ? 't-pnl-pos' : 't-pnl-neg'
+          return `<tr>
+            <td style="color:rgba(255,0,200,0.7)">${(p.question || '').substring(0,30)}</td>
+            <td>${p.direction}</td>
+            <td class="${pnlClass}">${(p.pnl||0) >= 0 ? '+' : ''}$${(p.pnl||0).toFixed(2)}</td>
+            <td class="t-countdown" data-close="${p.close_time || ''}">${formatCountdown(p.close_time)}</td>
+          </tr>`
+        }).join('')
+      } else {
+        phBody.innerHTML = '<tr><td colspan="4" style="color:rgba(255,0,200,0.3);text-align:center">scanning...</td></tr>'
+      }
+    }
+  } catch(e) {
+    console.error('PhantomClaw render:', e)
+    const phErrBody = document.getElementById('phBody')
+    if (phErrBody) phErrBody.innerHTML = `<tr><td colspan="4" style="color:red">JS ERROR: ${e.message}</td></tr>`
   }
 
-  // Strategy table
-  const stratBody = document.getElementById('tStrategyBody')
-  const strats = d.strategy_breakdown || []
-  if (strats.length) {
-    stratBody.innerHTML = strats.map(s => {
-      const pnlClass = s.pnl >= 0 ? 't-pnl-pos' : 't-pnl-neg'
-      const tourney = (d.tournament || []).find(t => t.strategy === s.strategy)
-      const alloc = tourney ? (tourney.allocation_pct * 100).toFixed(0) + '%' : '-'
+  // Clawmpson hero card (try/catch isolated)
+  try {
+  // Clawmpson hero card — open positions + recent trades (exclude phantom)
+  const clawBody = document.getElementById('clawmpsonBody')
+  const clawOpen = (d.open_positions || []).filter(p => !(p.strategy||'').startsWith('phantomclaw'))
+  const clawRecent = (d.recent_trades || []).filter(t => !(t.strategy||'').startsWith('phantomclaw'))
+  const clawAll = [...clawOpen.map(p => ({...p, _status: 'OPEN'})), ...clawRecent.slice(0,5).map(t => ({...t, _status: t.status === 'closed_win' ? 'WIN' : 'LOSS'}))]
+  if (clawAll.length) {
+    clawBody.innerHTML = clawAll.slice(0,8).map(p => {
+      const pnl = p.pnl || 0
+      const cls = p._status === 'OPEN' ? 't-status-open' : (p._status === 'WIN' ? 't-pnl-pos' : 't-pnl-neg')
       return `<tr>
-        <td style="color:var(--orange)">${s.strategy}</td>
-        <td>${s.wins}/${s.losses}</td>
-        <td>${s.win_rate.toFixed(0)}%</td>
-        <td class="${pnlClass}">${s.pnl >= 0 ? '+' : ''}$${s.pnl.toFixed(2)}</td>
-        <td>${alloc}</td>
-      </tr>`
-    }).join('')
-  } else {
-    stratBody.innerHTML = '<tr><td colspan="5" style="color:var(--grey2);text-align:center">no trades yet</td></tr>'
-  }
-
-  // Open positions
-  const openBody = document.getElementById('tOpenBody')
-  if (d.open_positions.length) {
-    openBody.innerHTML = d.open_positions.map(p => {
-      const pnlClass = p.pnl >= 0 ? 't-pnl-pos' : 't-pnl-neg'
-      let platform = 'polymarket'
-      const mid = p.market_id || ''
-      if (mid.startsWith('KX') || mid.startsWith('INX') || mid.startsWith('NAS')) platform = 'kalshi'
-      else if (mid.startsWith('SPOT:')) platform = 'crypto'
-      const platColor = platform === 'kalshi' ? 'var(--neon-cyan)' : (platform === 'crypto' ? 'var(--neon-green)' : 'var(--orange)')
-      return `<tr>
-        <td title="${p.market_id}">${p.question}</td>
-        <td style="color:${platColor};font-weight:600;font-size:0.48rem;letter-spacing:1px">${platform.toUpperCase()}</td>
+        <td style="color:var(--orange)">${(p.question || '').substring(0,25)}</td>
         <td>${p.direction}</td>
-        <td>${p.strategy}</td>
-        <td>${p.entry_price.toFixed(3)}</td>
-        <td>${p.current_price.toFixed(3)}</td>
-        <td class="${pnlClass}">${p.pnl >= 0 ? '+' : ''}$${p.pnl.toFixed(2)} (${p.pnl_pct >= 0 ? '+' : ''}${p.pnl_pct}%)</td>
-        <td>$${p.amount_usd.toFixed(0)}</td>
+        <td>${p.strategy || ''}</td>
+        <td class="${cls}">${p._status === 'OPEN' ? 'OPEN' : (pnl >= 0 ? '+' : '') + '$' + pnl.toFixed(2)}</td>
+        <td class="t-countdown" data-close="${p.close_time || ''}">${formatCountdown(p.close_time)}</td>
       </tr>`
     }).join('')
   } else {
-    openBody.innerHTML = '<tr><td colspan="8" style="color:var(--grey2);text-align:center">no open positions</td></tr>'
+    clawBody.innerHTML = '<tr><td colspan="5" style="color:var(--grey2);text-align:center">awaiting trades...</td></tr>'
   }
 
-  // Recent trades
-  const recentBody = document.getElementById('tRecentBody')
-  const recent = d.recent_trades || []
-  if (recent.length) {
-    recentBody.innerHTML = recent.slice(0, 25).map(t => {
-      const pnl = t.pnl || 0
-      const pnlClass = pnl >= 0 ? 't-pnl-pos' : 't-pnl-neg'
-      const statusClass = t.status === 'closed_win' ? 't-status-win' : (t.status === 'closed_loss' ? 't-status-loss' : '')
-      const statusLabel = t.status === 'closed_win' ? 'WIN' : (t.status === 'closed_loss' ? 'LOSS' : t.status.toUpperCase())
-      return `<tr>
-        <td title="${t.market_id}">${(t.question || '').substring(0, 40)}</td>
-        <td>${t.direction}</td>
-        <td>${t.strategy}</td>
-        <td class="${pnlClass}">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)}</td>
-        <td class="${statusClass}">${statusLabel}</td>
-      </tr>`
-    }).join('')
-  } else {
-    recentBody.innerHTML = '<tr><td colspan="5" style="color:var(--grey2);text-align:center">no closed trades</td></tr>'
+  } catch(e) {
+    console.error('Clawmpson render:', e)
+    const clErrBody = document.getElementById('clawmpsonBody')
+    if (clErrBody) clErrBody.innerHTML = `<tr><td colspan="5" style="color:red">JS ERROR: ${e.message}</td></tr>`
   }
 
-  // Cross-venue arb
-  const arbBody = document.getElementById('tArbBody')
-  const arb = d.cross_venue_arb || []
-  if (arb.length) {
-    arbBody.innerHTML = arb.slice(0, 10).map(a => `<tr>
-      <td>${a.pair_id || '-'}</td>
-      <td>${a.buy_venue} @${(a.buy_price || 0).toFixed(3)}</td>
-      <td>${a.sell_venue} @${(a.sell_price || 0).toFixed(3)}</td>
-      <td>${(a.spread || 0).toFixed(3)}</td>
-      <td class="t-pnl-pos">${(a.estimated_edge || 0).toFixed(3)}</td>
-    </tr>`).join('')
-  } else {
-    arbBody.innerHTML = '<tr><td colspan="5" style="color:var(--grey2);text-align:center">no arb opportunities detected</td></tr>'
+  // New agents: CalendarClaw, NewsClaw, SentimentClaw
+  const agentConfigs = [
+    {name: 'calendarclaw', pnl: 'calPnl', wl: 'calWL', open: 'calOpen', body: 'calBody', color: '#00c8ff'},
+    {name: 'newsclaw', pnl: 'newsPnl', wl: 'newsWL', open: 'newsOpen', body: 'newsBody', color: '#ffc800'},
+    {name: 'sentimentclaw', pnl: 'sentPnl', wl: 'sentWL', open: 'sentOpen', body: 'sentBody', color: '#00ff88'},
+    {name: 'dataharvester', pnl: 'dhPnl', wl: 'dhWL', open: 'dhOpen', body: 'dhBody', color: '#ff6600'},
+  ]
+  const agents = d.agents || {}
+  for (const cfg of agentConfigs) {
+    const ag = agents[cfg.name] || {}
+    const agBal = ag.balance != null ? ag.balance : (1000 + (ag.pnl || 0))
+    const agStart = ag.starting_balance || 1000
+    const agEl = document.getElementById(cfg.pnl)
+    if (agEl) {
+      agEl.textContent = '$' + agBal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})
+      agEl.style.color = agBal >= agStart ? cfg.color : '#ff2d95'
+    }
+    const wlEl = document.getElementById(cfg.wl)
+    if (wlEl) {
+      wlEl.innerHTML = `<span style="color:${cfg.color}">${ag.wins||0}W</span> <span style="color:#ff2d95">${ag.losses||0}L</span>`
+    }
+    const oEl = document.getElementById(cfg.open)
+    if (oEl) {
+      oEl.textContent = ag.open || 0
+      oEl.style.color = cfg.color
+    }
+    const bEl = document.getElementById(cfg.body)
+    if (bEl) {
+      const pos = ag.positions || []
+      if (pos.length) {
+        bEl.innerHTML = pos.map(p => `<tr>
+          <td style="color:${cfg.color}80">${(p.question || '').substring(0,30)}</td>
+          <td>${p.direction}</td>
+          <td>${(p.pnl||0) >= 0 ? '+' : ''}$${(p.pnl||0).toFixed(2)}</td>
+          <td class="t-countdown" data-close="${p.close_time || ''}">${formatCountdown(p.close_time)}</td>
+        </tr>`).join('')
+      } else {
+        const msgs = {calendarclaw: 'scanning events...', newsclaw: 'scanning headlines...', sentimentclaw: 'building baseline...'}
+        bEl.innerHTML = `<tr><td colspan="4" style="color:${cfg.color}40;text-align:center">${msgs[cfg.name] || 'waiting...'}</td></tr>`
+      }
+    }
   }
 
-  // Polymarket feed
-  const polyBody = document.getElementById('tPolyBody')
-  const poly = d.polymarket || []
-  document.getElementById('polyCount').textContent = poly.length
-  polyBody.innerHTML = poly.slice(0, 20).map(m => `<tr>
-    <td title="${m.market_id}">${(m.question || '').substring(0, 50)}</td>
-    <td>${(m.yes_price || 0).toFixed(2)}</td>
-    <td>${(m.no_price || 0).toFixed(2)}</td>
-    <td>$${((m.volume || 0) / 1000).toFixed(0)}k</td>
-  </tr>`).join('')
+  // QuantumentalClaw hero card (separate DB)
+  try {
+    const qc = d.quantclaw || {}
+    const qcW = qc.wallet || {}
+    const qcBalVal = qcW.balance || 0
+    const qcBalEl = document.getElementById('qcBalance')
+    if (qcBalEl) {
+      qcBalEl.textContent = '$' + qcBalVal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})
+      qcBalEl.style.color = '#00d4ff'
+    }
+    const qcBal = qcW.balance || ((qcW.starting_balance || 10000) + (qcW.total_pnl || 0))
+    const qcStart = qcW.starting_balance || 10000
+    const qcPnlEl = document.getElementById('qcPnl')
+    if (qcPnlEl) {
+      qcPnlEl.textContent = '$' + qcBal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})
+      qcPnlEl.style.color = qcBal >= qcStart ? '#00d4ff' : '#ff2d95'
+    }
+    const qcWLEl = document.getElementById('qcWL')
+    if (qcWLEl) {
+      const qcLosses = (qcW.total_trades || 0) - (qcW.wins || 0)
+      qcWLEl.innerHTML = `<span style="color:#00d4ff">${qcW.wins||0}W</span> <span style="color:#ff2d95">${qcLosses}L</span>`
+    }
+    const qcOpenEl = document.getElementById('qcOpen')
+    if (qcOpenEl) qcOpenEl.textContent = qcW.open_positions || 0
+    const qcBody = document.getElementById('qcBody')
+    const qcPositions = qc.open_positions || []
+    if (qcBody) {
+      if (qcPositions.length) {
+        qcBody.innerHTML = qcPositions.map(p => {
+          const pnlClass = (p.pnl || 0) >= 0 ? 't-pnl-pos' : 't-pnl-neg'
+          return `<tr>
+            <td style="color:#00d4ff">${(p.ticker || '').substring(0,25)}</td>
+            <td>${p.direction}</td>
+            <td class="${pnlClass}">${(p.pnl||0) >= 0 ? '+' : ''}$${Math.abs(p.pnl||0).toFixed(2)}</td>
+            <td style="color:var(--grey2)">${p.confidence || ''}</td>
+          </tr>`
+        }).join('')
+      } else {
+        qcBody.innerHTML = '<tr><td colspan="4" style="color:rgba(0,200,255,0.3);text-align:center">fusing signals...</td></tr>'
+      }
+    }
+  } catch(e) { console.error('QuantClaw render:', e) }
 
-  // Kalshi feed
-  const kalshiBody = document.getElementById('tKalshiBody')
-  const kalshi = d.kalshi || []
-  document.getElementById('kalshiCount').textContent = kalshi.length
-  if (kalshi.length) {
-    kalshiBody.innerHTML = kalshi.slice(0, 20).map(m => `<tr>
-      <td title="${m.ticker}">${(m.title || '').substring(0, 50)}</td>
-      <td>${m.yes_bid != null ? m.yes_bid.toFixed(2) : '-'}</td>
-      <td>${m.yes_ask != null ? m.yes_ask.toFixed(2) : '-'}</td>
-      <td>${((m.volume_24h || 0) / 1000).toFixed(0)}k</td>
-    </tr>`).join('')
-  } else {
-    kalshiBody.innerHTML = '<tr><td colspan="4" style="color:var(--grey2);text-align:center">no Kalshi data — set API keys</td></tr>'
+  // Unified Trade Feed — merge ALL open positions from all bots
+  // Debug: write trade count directly
+  try {
+    const _dbg = document.getElementById('ufBody')
+    if (_dbg) _dbg.innerHTML = `<tr><td colspan="10" style="color:yellow">Loading ${(d.open_positions||[]).length} + ${((d.phantom||{}).positions||[]).length}ph + ${(d.rivalclaw_positions||[]).length}rv trades...</td></tr>`
+  } catch(e){}
+
+  try { buildUnifiedFeed(d) } catch(e) {
+    console.error('UnifiedFeed render:', e)
+    const ufErrBody = document.getElementById('ufBody')
+    if (ufErrBody) ufErrBody.innerHTML = `<tr><td colspan="10" style="color:red">FEED ERROR: ${e.message}</td></tr>`
   }
 
   // Missed opportunities
@@ -4002,6 +4881,50 @@ function renderTrading() {
       </tr>`
     }).join('')
   }
+}
+
+// ARB EXPERIMENT DASHBOARD
+async function loadExperiment() {
+  try {
+    const r = await fetch('/api/trading/experiment')
+    if (!r.ok) return
+    const d = await r.json()
+    renderExperiment(d)
+  } catch(e) {
+    console.error('Experiment load error:', e)
+  }
+}
+
+function renderExperiment(d) {
+  // RivalClaw hero update (safe — all getElementById calls are null-guarded)
+  try {
+    const rc = d.rivalclaw
+    if (rc && !rc.error) {
+      const w = rc.wallet
+      document.querySelectorAll('#rcPnl').forEach(el => {
+        el.textContent = (w.total_pnl >= 0 ? '+' : '') + '$' + w.total_pnl.toFixed(2)
+        el.style.color = w.total_pnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
+      })
+      document.querySelectorAll('#rcOpen').forEach(el => { el.textContent = w.open_positions })
+      const rcWLel = document.getElementById('rcWL')
+      if (rcWLel) {
+        const rcWins = w.win_count || 0
+        rcWLel.innerHTML = `<span style="color:var(--neon-green)">${rcWins}W</span> <span style="color:var(--neon-red)">${w.total_trades - rcWins}L</span>`
+      }
+      // RivalClaw hero trade body
+      const rcBody = document.getElementById('rcTradesBody')
+      if (rcBody) {
+        const rcRows = [...(rc.open_positions || []).map(p => ({m:(p.question||p.market_id||'').substring(0,30), d:p.direction, pnl:p.pnl||0, lat:p.latency_ms||0, open:true})),
+                        ...(rc.recent_trades || []).slice(0,5).map(t => ({m:(t.market_id||'').substring(0,30), d:t.direction, pnl:t.pnl||0, lat:t.latency_ms||0, open:false}))]
+        if (rcRows.length) {
+          rcBody.innerHTML = rcRows.slice(0,8).map(r => {
+            const cls = r.open ? 'color:var(--neon-cyan)' : (r.pnl>=0?'color:var(--neon-green)':'color:var(--neon-red)')
+            return `<tr><td style="color:rgba(180,140,255,0.7)">${r.m}</td><td>${r.d}</td><td style="${cls}">${r.open?'OPEN':(r.pnl>=0?'+':'')+r.pnl.toFixed(2)}</td><td>${r.lat.toFixed(0)}ms</td></tr>`
+          }).join('')
+        }
+      }
+    }
+  } catch(e) { console.error('RivalClaw render:', e) }
 }
 
 function buildTickerTape(d) {
@@ -4150,6 +5073,196 @@ function renderPnlChart(curve) {
   ctx.lineWidth = 6
   ctx.stroke()
 }
+
+// ── Countdown timers ──────────────────────────────────────────────────
+// Bot color map
+const BOT_COLORS = {
+  'phantomclaw_fv': {name: 'PHANTOM', color: '#ff00c8'},
+  'calendarclaw': {name: 'CALENDAR', color: '#00c8ff'},
+  'newsclaw': {name: 'NEWS', color: '#ffc800'},
+  'sentimentclaw': {name: 'SENTIMENT', color: '#00ff88'},
+  'dataharvester': {name: 'HARVESTER', color: '#ff6600'},
+  'quantclaw': {name: 'QUANT', color: '#00d4ff'},
+  'contrarian': {name: 'CLAWMPSON', color: '#e86800'},
+  'momentum': {name: 'CLAWMPSON', color: '#e86800'},
+  'news_catalyst': {name: 'CLAWMPSON', color: '#e86800'},
+  'hedged_bracket_main': {name: 'HEDGED', color: '#e86800'},
+  'hedged_bracket_hedge': {name: 'HEDGED', color: '#e86800'},
+  'fade_public': {name: 'HEDGED', color: '#e86800'},
+  'vol_straddle_yes': {name: 'HEDGED', color: '#e86800'},
+  'vol_straddle_no': {name: 'HEDGED', color: '#e86800'},
+  'cross_bracket_arb': {name: 'MATH', color: '#e86800'},
+  'expiry_convergence': {name: 'MATH', color: '#e86800'},
+  'correlation_arb': {name: 'MATH', color: '#e86800'},
+  'mean_reversion': {name: 'MATH', color: '#e86800'},
+  'fast_arb': {name: 'FAST', color: '#e86800'},
+  'fast_spot_lag': {name: 'FAST', color: '#e86800'},
+  'fast_15m_trend': {name: 'FAST', color: '#e86800'},
+  'arbclaw_single_venue': {name: 'ARBCLAW', color: '#00ff88'},
+  'crypto_spot_mean_rev': {name: 'CRYPTO', color: '#00e5ff'},
+  'crypto_spot_momentum': {name: 'CRYPTO', color: '#00e5ff'},
+}
+
+function getBotInfo(strategy) {
+  return BOT_COLORS[strategy] || {name: strategy.substring(0,10).toUpperCase(), color: 'var(--grey1)'}
+}
+
+function buildUnifiedFeed(d) {
+  const allTrades = []
+
+  // MiroFish/Clawmpson open positions (exclude phantom — they're added separately)
+  const seenIds = new Set()
+  for (const p of (d.open_positions || [])) {
+    if ((p.strategy || '').startsWith('phantomclaw')) continue // handled below
+    const bot = getBotInfo(p.strategy)
+    const mid = p.market_id || ''
+    let platform = 'POLY'
+    if (mid.startsWith('KX') || mid.startsWith('INX') || mid.startsWith('NAS')) platform = 'KALSHI'
+    else if (mid.startsWith('SPOT:')) platform = 'CRYPTO'
+    seenIds.add(p.id)
+    allTrades.push({
+      bot: bot.name, botColor: bot.color, strategy: p.strategy,
+      question: p.question || '', platform, direction: p.direction,
+      entry: p.entry_price || 0, current: p.current_price || p.entry_price || 0,
+      pnl: p.pnl || 0, pnlPct: p.pnl_pct || 0, size: p.amount_usd || 0,
+      confidence: p.confidence || 0, closeTime: p.close_time || '',
+      openedAt: p.opened_at || '', id: p.id,
+    })
+  }
+
+  // PhantomClaw positions (dedup by id)
+  for (const p of ((d.phantom || {}).positions || [])) {
+    if (seenIds.has(p.id)) continue
+    seenIds.add(p.id)
+    allTrades.push({
+      bot: 'PHANTOM', botColor: '#ff00c8', strategy: 'phantomclaw_fv',
+      question: p.question || '', platform: 'KALSHI', direction: p.direction,
+      entry: p.entry_price || 0, current: p.current_price || p.entry_price || 0,
+      pnl: p.pnl || 0, pnlPct: p.pnl_pct || 0, size: p.amount_usd || 0,
+      confidence: p.confidence || 0, closeTime: p.close_time || '',
+      openedAt: p.opened_at || '',
+    })
+  }
+
+  // Agent positions (calendar, news, sentiment)
+  for (const [name, cfg] of [['calendarclaw','#00c8ff'],['newsclaw','#ffc800'],['sentimentclaw','#00ff88'],['dataharvester','#ff6600']]) {
+    const ag = (d.agents || {})[name] || {}
+    for (const p of (ag.positions || [])) {
+      allTrades.push({
+        bot: name.replace('claw','').toUpperCase(), botColor: cfg,
+        strategy: name, question: p.question || '', platform: 'KALSHI',
+        direction: p.direction, entry: p.entry_price || 0, current: p.entry_price || 0,
+        pnl: p.pnl || 0, pnlPct: 0, size: p.amount_usd || 0,
+        confidence: p.confidence || 0, closeTime: p.close_time || '',
+        openedAt: p.opened_at || '',
+      })
+    }
+  }
+
+  // RivalClaw positions (separate DB)
+  for (const p of (d.rivalclaw_positions || [])) {
+    const bot = BOT_COLORS[p.strategy] || {name: 'RIVAL', color: 'rgba(180,140,255,0.9)'}
+    allTrades.push({
+      bot: 'RIVAL', botColor: 'rgba(180,140,255,0.9)',
+      strategy: p.strategy || 'rivalclaw', question: p.question || '', platform: 'KALSHI',
+      direction: p.direction, entry: p.entry_price || 0, current: p.current_price || p.entry_price || 0,
+      pnl: p.pnl || 0, pnlPct: 0, size: p.amount_usd || 0,
+      confidence: p.confidence || 0, closeTime: p.close_time || '',
+      openedAt: p.opened_at || '',
+    })
+  }
+
+  // QuantumentalClaw positions (separate DB)
+  for (const p of ((d.quantclaw || {}).open_positions || [])) {
+    const venue = (p.venue || '').toUpperCase() || 'KALSHI'
+    allTrades.push({
+      bot: 'QUANT', botColor: '#00d4ff',
+      strategy: 'quantclaw', question: p.ticker || '', platform: venue,
+      direction: p.direction, entry: p.entry_price || 0, current: p.current_price || p.entry_price || 0,
+      pnl: p.pnl || 0, pnlPct: p.pnl_pct || 0, size: p.amount_usd || 0,
+      confidence: p.final_score || 0, closeTime: '',
+      openedAt: p.opened_at || '',
+    })
+  }
+
+  // Sort
+  const sortKey = document.getElementById('ufSort').value
+  const sorters = {
+    countdown: (a, b) => {
+      const at = a.closeTime ? new Date(a.closeTime).getTime() : Infinity
+      const bt = b.closeTime ? new Date(b.closeTime).getTime() : Infinity
+      return at - bt
+    },
+    bot: (a, b) => a.bot.localeCompare(b.bot),
+    pnl_desc: (a, b) => b.pnl - a.pnl,
+    pnl_asc: (a, b) => a.pnl - b.pnl,
+    size_desc: (a, b) => b.size - a.size,
+    size_asc: (a, b) => a.size - b.size,
+    entry_desc: (a, b) => b.entry - a.entry,
+    entry_asc: (a, b) => a.entry - b.entry,
+    confidence: (a, b) => b.confidence - a.confidence,
+    newest: (a, b) => (b.openedAt || '').localeCompare(a.openedAt || ''),
+    oldest: (a, b) => (a.openedAt || '').localeCompare(b.openedAt || ''),
+  }
+  allTrades.sort(sorters[sortKey] || sorters.countdown)
+
+  // Render
+  document.getElementById('ufCount').textContent = allTrades.length
+  const body = document.getElementById('ufBody')
+  if (allTrades.length) {
+    body.innerHTML = allTrades.map(t => {
+      const pnlClass = t.pnl >= 0 ? 't-pnl-pos' : 't-pnl-neg'
+      return `<tr>
+        <td style="color:${t.botColor};font-weight:700;font-size:0.46rem;letter-spacing:1px">${t.bot}</td>
+        <td title="${t.strategy}">${t.question.substring(0,35)}</td>
+        <td style="font-size:0.42rem;color:var(--grey2)">${t.platform}</td>
+        <td>${t.direction}</td>
+        <td>${t.entry.toFixed(3)}</td>
+        <td>${t.current.toFixed(3)}</td>
+        <td class="${pnlClass}">${t.pnl >= 0 ? '+' : ''}$${t.pnl.toFixed(2)}</td>
+        <td>$${t.size.toFixed(0)}</td>
+        <td style="font-size:0.42rem;color:var(--grey2)">${(t.confidence*100).toFixed(0)}%</td>
+        <td class="t-countdown" data-close="${t.closeTime}">${formatCountdown(t.closeTime)}</td>
+      </tr>`
+    }).join('')
+  } else {
+    body.innerHTML = '<tr><td colspan="10" style="color:var(--grey2);text-align:center">no open trades across any bot</td></tr>'
+  }
+}
+
+// Re-sort when dropdown changes
+document.getElementById('ufSort')?.addEventListener('change', () => { if (tradingData) buildUnifiedFeed(tradingData) })
+
+function formatCountdown(closeTime) {
+  if (!closeTime) return '<span style="color:var(--grey2)">--:--:--</span>'
+  const now = Date.now()
+  const close = new Date(closeTime.replace('Z', '+00:00')).getTime()
+  const diff = close - now
+  if (diff <= 0) return '<span style="color:var(--neon-red);font-weight:700">00:00:00</span>'
+  const totalSecs = Math.floor(diff / 1000)
+  const hrs = Math.floor(totalSecs / 3600)
+  const mins = Math.floor((totalSecs % 3600) / 60)
+  const secs = totalSecs % 60
+  const hh = String(hrs).padStart(2, '0')
+  const mm = String(mins).padStart(2, '0')
+  const ss = String(secs).padStart(2, '0')
+  const timeStr = `${hh}:${mm}:${ss}`
+  // Color: red < 5min, orange < 1hr, cyan < 24hr, grey > 24hr
+  let color = 'var(--grey1)'
+  let extra = ''
+  if (hrs < 1 && mins < 5) { color = 'var(--neon-red)'; extra = 'font-weight:700;animation:countdown-flash 1s infinite;' }
+  else if (hrs < 1) { color = 'var(--orange-hi)' }
+  else if (hrs < 24) { color = 'var(--neon-cyan)' }
+  return `<span style="color:${color};font-variant-numeric:tabular-nums;${extra}">${timeStr}</span>`
+}
+
+// Tick every second to update countdowns live
+setInterval(() => {
+  document.querySelectorAll('.t-countdown').forEach(td => {
+    const ct = td.dataset.close
+    if (ct) td.innerHTML = formatCountdown(ct)
+  })
+}, 1000)
 
 // ── Live balance tracking ──────────────────────────────────────────────
 let balanceHistory = []
@@ -4320,6 +5433,7 @@ function renderLiveBalanceChart() {
 setInterval(() => {
   if (document.getElementById('pageTrading').classList.contains('active')) {
     loadTrading()
+    loadExperiment()
   }
 }, 15000)
 
@@ -4330,6 +5444,7 @@ function connectTradingSSE() {
   tradingSSE = new EventSource('/api/trading/stream')
   tradingSSE.onmessage = (e) => {
     loadTrading()
+    loadExperiment()
   }
   tradingSSE.onerror = () => {
     tradingSSE.close()
@@ -4338,6 +5453,1015 @@ function connectTradingSSE() {
 }
 connectTradingSSE()
 
+// ── Terminal Watch ─────────────────────────────────────────────────────────
+const twState = { running: false, session: '', pane: '', startTime: null, events: [], uptimeInterval: null, sse: null }
+
+async function twLoadSessions() {
+  try {
+    const r = await fetch('/api/terminal/sessions')
+    const d = await r.json()
+    const sel = document.getElementById('twSessionPicker')
+    sel.innerHTML = '<option value="">— select session —</option>'
+    for (const s of d.sessions || []) {
+      for (const p of s.panes || []) {
+        const val = `${s.name}:${p.index}`
+        const label = `${s.name}:${p.index} (${p.command})`
+        sel.innerHTML += `<option value="${val}">${label}</option>`
+      }
+    }
+  } catch(e) { console.error('[tw] sessions', e) }
+}
+
+async function twLoadEvents() {
+  try {
+    const errOnly = document.getElementById('twErrorsOnly')?.checked
+    const r = await fetch(`/api/terminal/events?n=20${errOnly ? '&errors_only=true' : ''}`)
+    const d = await r.json()
+    twState.events = d.events || []
+    twRenderEvents()
+  } catch(e) { console.error('[tw] events', e) }
+}
+
+async function twLoadStatus() {
+  try {
+    const r = await fetch('/api/terminal/status')
+    const d = await r.json()
+    twState.running = d.running
+    twUpdateStatusUI(d)
+  } catch(e) {}
+}
+
+async function twStart() {
+  const val = document.getElementById('twSessionPicker').value
+  if (!val) { toast('Select a session first'); return }
+  const [session, pane] = val.split(':')
+  try {
+    const r = await fetch('/api/terminal/start', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ session, pane })
+    })
+    const d = await r.json()
+    if (d.status === 'started' || d.status === 'already_running') {
+      twState.running = true; twState.session = session; twState.pane = pane
+      twState.startTime = Date.now()
+      twStartUptime(); twConnectSSE(); twUpdateStatusUI(d)
+      toast('Relay started')
+    }
+  } catch(e) { toast('Failed to start relay') }
+}
+
+async function twStop() {
+  try {
+    await fetch('/api/terminal/stop', { method: 'POST' })
+    twState.running = false; twState.session = ''; twState.startTime = null
+    if (twState.uptimeInterval) clearInterval(twState.uptimeInterval)
+    if (twState.sse) { twState.sse.close(); twState.sse = null }
+    twUpdateStatusUI({ running: false })
+    toast('Relay stopped')
+  } catch(e) { toast('Failed to stop relay') }
+}
+
+async function twSnapshot() {
+  try {
+    await fetch('/api/terminal/snapshot', { method: 'POST' })
+    toast('Snapshot taken'); twLoadEvents()
+  } catch(e) { toast('Snapshot failed — is relay running?') }
+}
+
+function twUpdateStatusUI(d) {
+  const dot = document.getElementById('twDot')
+  const label = document.getElementById('twSession')
+  dot.className = 'tw-status-dot' + (d.running ? ' watching' : '')
+  label.textContent = d.running ? `WATCHING ${twState.session}:${twState.pane}` : 'OFF'
+}
+
+function twRenderEvents() {
+  const el = document.getElementById('twEvents')
+  const count = document.getElementById('twEventCount')
+  count.textContent = twState.events.length
+  if (!twState.events.length) {
+    el.innerHTML = '<div class="empty"><span class="empty-char">📡</span>no events yet — attach to a tmux session</div>'
+    return
+  }
+  el.innerHTML = twState.events.map(ev => {
+    const ts = new Date(ev.timestamp).toLocaleTimeString()
+    const tail = (ev.output_tail || []).join('\n')
+    return `<div class="tw-event ev-${ev.event_type}" onclick="this.classList.toggle('expanded')">
+      <div class="tw-event-hdr">
+        <span class="tw-event-type ${ev.event_type}">${(ev.event_type||'').toUpperCase()}</span>
+        <span class="tw-event-ts">${ts}</span>
+      </div>
+      ${ev.summary ? `<div class="tw-event-summary">${esc(ev.summary)}</div>` : ''}
+      ${ev.command ? `<div class="tw-event-cmd">$ ${esc(ev.command)}</div>` : ''}
+      ${tail ? `<div class="tw-event-tail">${esc(tail)}</div>` : ''}
+    </div>`
+  }).join('')
+}
+
+function twConnectSSE() {
+  if (twState.sse) twState.sse.close()
+  const tkn = getCookie('oc_token')
+  twState.sse = new EventSource(`/api/terminal/stream?token=${tkn}`)
+  twState.sse.onmessage = (e) => {
+    try {
+      const d = JSON.parse(e.data)
+      if (d.events) {
+        for (const ev of d.events) {
+          twState.events.unshift(ev)
+          if (document.getElementById('twAutoSnap')?.checked &&
+              ['error','build_failure','test_failure'].includes(ev.event_type)) {
+            twSnapshot()
+          }
+        }
+        twState.events = twState.events.slice(0, 50)
+        twRenderEvents()
+      }
+    } catch(_) {}
+  }
+  twState.sse.onerror = () => { twState.sse.close(); setTimeout(twConnectSSE, 5000) }
+}
+
+async function twPreviewPacket() {
+  try {
+    const r = await fetch('/api/terminal/packet/preview')
+    const d = await r.json()
+    const el = document.getElementById('twPacketPreview')
+    el.textContent = d.packet ? JSON.stringify(d.packet, null, 2) : 'No events available'
+    el.style.display = 'block'
+  } catch(e) { toast('Failed to load packet preview') }
+}
+
+async function twCopyPacket(target) {
+  try {
+    const r = await fetch('/api/terminal/packet', {
+      method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({})
+    })
+    const packet = await r.json()
+    const q = document.getElementById('twQuestion').value.trim()
+    if (q) packet.question = q
+    let text = ''
+    if (target === 'chatgpt') text = 'Analyze this terminal output:\n\n' + JSON.stringify(packet, null, 2)
+    else if (target === 'claude') text = 'Here is terminal context from my development session. Analyze the output and suggest next steps:\n\n' + JSON.stringify(packet, null, 2)
+    else text = 'Terminal analysis packet — paste into ChatGPT or Claude:\n\n' + JSON.stringify(packet, null, 2)
+    await navigator.clipboard.writeText(text)
+    toast('Copied to clipboard')
+  } catch(e) { toast('Copy failed — try again') }
+}
+
+async function twExplain() {
+  try {
+    const r = await fetch('/api/terminal/packet', {
+      method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({})
+    })
+    const packet = await r.json()
+    packet.question = 'Explain what just happened in this terminal session. What failed, why, and what should I do next?'
+    await navigator.clipboard.writeText(JSON.stringify(packet, null, 2))
+    toast('Explanation packet copied — paste into ChatGPT or Claude')
+  } catch(e) { toast('No events to explain') }
+}
+
+function twStartUptime() {
+  if (twState.uptimeInterval) clearInterval(twState.uptimeInterval)
+  twState.uptimeInterval = setInterval(() => {
+    if (!twState.startTime) return
+    const secs = Math.floor((Date.now() - twState.startTime) / 1000)
+    document.getElementById('twUptime').textContent = `${Math.floor(secs/60)}m ${secs%60}s`
+  }, 1000)
+}
+
+// ══════════════════════════════════════════════════════════════════
+// INTEL
+// ══════════════════════════════════════════════════════════════════
+let intelData = { recommendations: [] }
+let intelSSE = null
+
+async function loadIntel() {
+  try {
+    const [recsRes, statsRes] = await Promise.all([
+      fetch('/api/intel'),
+      fetch('/api/intel/stats'),
+    ])
+    if (recsRes.ok) intelData = await recsRes.json()
+    if (statsRes.ok) {
+      const s = await statsRes.json()
+      updateIntelStats(s)
+    }
+    populateIntelLangFilter()
+    renderIntelCards()
+    if (!intelSSE) intelConnectSSE()
+  } catch (e) {
+    console.error('Intel load error:', e)
+  }
+}
+
+async function refreshIntelData() {
+  try {
+    const [recsRes, statsRes] = await Promise.all([
+      fetch('/api/intel'),
+      fetch('/api/intel/stats'),
+    ])
+    if (recsRes.ok) intelData = await recsRes.json()
+    if (statsRes.ok) updateIntelStats(await statsRes.json())
+    populateIntelLangFilter()
+    renderIntelCards()
+  } catch (e) {}
+}
+
+function updateIntelStats(s) {
+  const statEls = document.querySelectorAll('#pageIntel .intel-stat')
+  if (statEls[0]) statEls[0].querySelector('.intel-stat-num').textContent = s.total || 0
+  if (statEls[1]) {
+    const num = statEls[1].querySelector('.intel-stat-num')
+    num.textContent = s.pending || 0
+    num.style.color = s.pending > 0 ? 'var(--neon-green)' : 'var(--orange-hi)'
+  }
+  if (statEls[2]) statEls[2].querySelector('.intel-stat-num').textContent = s.approved || 0
+  if (statEls[3]) statEls[3].querySelector('.intel-stat-num').textContent = s.rejected || 0
+  const lc = document.getElementById('intelLastCrawl')
+  if (lc && s.analyzed_at) {
+    const d = new Date(s.analyzed_at)
+    lc.textContent = `LAST CRAWL: ${d.toLocaleDateString()} ${d.toLocaleTimeString()}`
+  }
+}
+
+function populateIntelLangFilter() {
+  const sel = document.getElementById('intelFilterLang')
+  const langs = new Set()
+  for (const r of intelData.recommendations || []) {
+    if (r.language && r.language !== 'Unknown') langs.add(r.language)
+  }
+  sel.innerHTML = '<option value="all">All Languages</option>'
+  for (const l of [...langs].sort()) {
+    sel.innerHTML += `<option value="${l}">${l}</option>`
+  }
+}
+
+function renderIntelCards() {
+  const container = document.getElementById('intelCards')
+  const statusFilter = document.getElementById('intelFilterStatus').value
+  const verdictFilter = document.getElementById('intelFilterVerdict').value
+  const sortBy = document.getElementById('intelSortBy').value
+  const langFilter = document.getElementById('intelFilterLang').value
+
+  let recs = [...(intelData.recommendations || [])]
+
+  // Filter
+  if (statusFilter === 'all') {
+    // "All Active" hides rejected by default — they're archived, not deleted
+    recs = recs.filter(r => r.status !== 'rejected')
+  } else if (statusFilter === 'all_including_rejected') {
+    // Show everything
+  } else {
+    recs = recs.filter(r => r.status === statusFilter)
+  }
+  if (verdictFilter !== 'all') recs = recs.filter(r => r.verdict === verdictFilter)
+  if (langFilter !== 'all') recs = recs.filter(r => r.language === langFilter)
+
+  // Sort
+  if (sortBy === 'composite') {
+    recs.sort((a, b) => {
+      const sc = r => (r.integration_value||0)*3 + (r.signal_score||0)*2 + Math.max(r.clawmpson_relevance||0, r.arbclaw_relevance||0, r.rivalclaw_relevance||0) - (r.complexity||0)*0.5
+      return sc(b) - sc(a)
+    })
+  } else if (sortBy === 'value_per_complexity') {
+    recs.sort((a, b) => ((b.integration_value||0)/Math.max(b.complexity||1,1)) - ((a.integration_value||0)/Math.max(a.complexity||1,1)))
+  } else if (sortBy === 'complexity_asc') {
+    recs.sort((a, b) => (a.complexity||10) - (b.complexity||10))
+  } else {
+    recs.sort((a, b) => (b[sortBy] || 0) - (a[sortBy] || 0))
+  }
+
+  if (recs.length === 0) {
+    container.innerHTML = '<div class="empty"><span class="empty-char">⌬</span>no recommendations match filters</div>'
+    return
+  }
+
+  container.innerHTML = recs.map(r => renderIntelCard(r)).join('')
+
+  // Show approved section
+  const approved = (intelData.recommendations || []).filter(r => r.status === 'approved')
+  const approvedSection = document.getElementById('intelApprovedSection')
+  const approvedList = document.getElementById('intelApprovedList')
+  if (approved.length > 0) {
+    approvedSection.style.display = 'block'
+    approvedList.innerHTML = approved.map(r => `
+      <div class="intel-approved-card">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <a href="${esc(r.repo_url)}" target="_blank" class="intel-card-name" style="font-size:0.56rem;">${esc(r.repo_name)}</a>
+          ${(r.approved_for || []).map(t => `<span class="intel-bot-tag">${esc(t.toUpperCase())}</span>`).join('')}
+          <span class="intel-status-badge intel-status-approved">${r.task_id ? 'QUEUED' : 'APPROVED'}</span>
+        </div>
+        <div style="font-size:0.44rem;color:var(--grey2);margin-top:4px;">${esc(r.what_to_take || '')}</div>
+      </div>
+    `).join('')
+  } else {
+    approvedSection.style.display = 'none'
+  }
+}
+
+function renderIntelCard(r) {
+  const verdictClass = r.verdict === 'INTEGRATE' ? 'integrate' : r.verdict === 'STUDY' ? 'study' : 'skip'
+  const statusBadge = r.status !== 'pending' ? `<span class="intel-status-badge intel-status-${r.status}">${r.status.toUpperCase()}</span>` : ''
+
+  function relBar(val) {
+    const pct = Math.max(0, Math.min(100, (val || 0) * 10))
+    return `<span class="intel-rel-bar-bg"><span class="intel-rel-bar" style="width:${pct}%;display:block;height:100%;"></span></span> ${val || 0}/10`
+  }
+
+  const isPending = r.status === 'pending'
+  const actions = isPending ? `
+    <button class="intel-action-btn approve" onclick="intelShowApprove('${r.id}')">APPROVE</button>
+    <button class="intel-action-btn reject" onclick="intelReject('${r.id}')">REJECT</button>
+    <button class="intel-action-btn" onclick="intelBookmark('${r.id}')">BOOKMARK</button>
+  ` : ''
+
+  return `
+  <div class="intel-card" id="intel-card-${r.id}">
+    <div class="intel-card-top">
+      <a href="${esc(r.repo_url)}" target="_blank" class="intel-card-name">${esc(r.repo_name)}</a>
+      <span class="intel-badge intel-badge-${verdictClass}">${r.verdict}</span>
+      <span class="intel-badge intel-badge-val">VAL ${r.integration_value}</span>
+      <span class="intel-badge intel-badge-cx">CX ${r.complexity}</span>
+      <span class="intel-badge intel-badge-stars">★ ${(r.stars || 0).toLocaleString()}</span>
+      ${statusBadge}
+    </div>
+    <div class="intel-card-meta">${esc(r.language || 'Unknown')} · signal ${(r.signal_score || 0).toFixed(3)}</div>
+    <div class="intel-card-insight">${esc(r.what_to_take || 'No analysis available')}</div>
+    <div class="intel-relevance">
+      <span class="intel-rel-item">CLAWMPSON ${relBar(r.clawmpson_relevance)}</span>
+      <span class="intel-rel-item">ARBCLAW ${relBar(r.arbclaw_relevance)}</span>
+      <span class="intel-rel-item">RIVALCLAW ${relBar(r.rivalclaw_relevance)}</span>
+    </div>
+    ${r.risk && r.risk !== 'analysis_failed' ? `<div class="intel-risk">⚠ ${esc(r.risk)}</div>` : ''}
+    ${r.readme_snippet ? `
+      <div class="intel-readme-toggle" onclick="this.nextElementSibling.classList.toggle('open')">▸ README snippet</div>
+      <div class="intel-readme-snippet">${esc(r.readme_snippet)}</div>
+    ` : ''}
+    <div class="intel-card-actions">
+      ${actions}
+      <a href="${esc(r.repo_url)}" target="_blank" class="intel-action-btn" style="text-decoration:none;">VIEW ON GITHUB</a>
+    </div>
+  </div>`
+}
+
+function esc(s) {
+  if (!s) return ''
+  const d = document.createElement('div')
+  d.textContent = String(s)
+  return d.innerHTML
+}
+
+function intelShowApprove(id) {
+  document.getElementById('intelApproveId').value = id
+  document.getElementById('intelApproveNotes').value = ''
+  document.getElementById('intelTargetClawmpson').checked = true
+  document.getElementById('intelTargetArbclaw').checked = false
+  document.getElementById('intelTargetRivalclaw').checked = false
+  document.getElementById('intelApproveModal').classList.add('active')
+}
+
+async function intelConfirmApprove() {
+  const id = document.getElementById('intelApproveId').value
+  const targets = []
+  if (document.getElementById('intelTargetClawmpson').checked) targets.push('clawmpson')
+  if (document.getElementById('intelTargetArbclaw').checked) targets.push('arbclaw')
+  if (document.getElementById('intelTargetRivalclaw').checked) targets.push('rivalclaw')
+  const notes = document.getElementById('intelApproveNotes').value
+
+  if (targets.length === 0) { alert('Select at least one target bot'); return }
+
+  try {
+    const r = await fetch('/api/intel/approve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, targets, notes }),
+    })
+    if (r.ok) {
+      document.getElementById('intelApproveModal').classList.remove('active')
+      loadIntel()
+    } else {
+      const e = await r.json()
+      alert(e.detail || 'Approve failed')
+    }
+  } catch (e) { alert('Network error') }
+}
+
+async function intelReject(id) {
+  try {
+    const r = await fetch('/api/intel/reject', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+    if (r.ok) loadIntel()
+  } catch (e) { console.error(e) }
+}
+
+async function intelBookmark(id) {
+  try {
+    const r = await fetch('/api/intel/bookmark', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id }),
+    })
+    if (r.ok) loadIntel()
+  } catch (e) { console.error(e) }
+}
+
+async function intelRunCrawl() {
+  const btn = document.getElementById('intelCrawlBtn')
+  btn.textContent = 'CRAWLING...'
+  btn.disabled = true
+  try {
+    await fetch('/api/intel/run-crawl', { method: 'POST' })
+    btn.textContent = 'CRAWL STARTED'
+    setTimeout(() => { btn.textContent = 'RUN CRAWL NOW'; btn.disabled = false }, 5000)
+  } catch (e) {
+    btn.textContent = 'ERROR'
+    setTimeout(() => { btn.textContent = 'RUN CRAWL NOW'; btn.disabled = false }, 3000)
+  }
+}
+
+function intelConnectSSE() {
+  if (intelSSE) { intelSSE.close(); intelSSE = null }
+  intelSSE = new EventSource('/api/intel/stream')
+  intelSSE.onmessage = (e) => {
+    try {
+      const d = JSON.parse(e.data)
+      if (d.pending !== undefined) {
+        updateIntelStats({ total: d.total, pending: d.pending, analyzed_at: d.analyzed_at })
+        refreshIntelData()
+      }
+    } catch (err) {}
+  }
+  intelSSE.onerror = () => {
+    if (intelSSE) { intelSSE.close(); intelSSE = null }
+    setTimeout(intelConnectSSE, 10000)
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SIGNAL PLATFORM TABS
+// ══════════════════════════════════════════════════════════════════
+let signalCache = {} // platform -> data
+let activeSignalTab = 'github'
+let signalSSE = null
+
+function switchSignalTab(platform) {
+  activeSignalTab = platform
+  document.querySelectorAll('.signal-tab').forEach(t => t.classList.remove('active'))
+  document.querySelector(`.signal-tab[data-platform="${platform}"]`).classList.add('active')
+
+  if (platform === 'github') {
+    document.getElementById('signalContent-github').classList.add('active')
+    document.getElementById('signalContent-platform').classList.remove('active')
+  } else {
+    document.getElementById('signalContent-github').classList.remove('active')
+    document.getElementById('signalContent-platform').classList.add('active')
+    loadSignalPlatform(platform)
+  }
+}
+
+async function loadSignalPlatform(platform) {
+  const container = document.getElementById('signalCards')
+  if (platform === 'all') {
+    if (!signalCache._all || Date.now() - (signalCache._allTs || 0) > 30000) {
+      container.innerHTML = '<div class="empty"><span class="empty-char">⟳</span>loading all signals...</div>'
+      try {
+        const res = await fetch('/api/intel/signals')
+        if (res.ok) {
+          signalCache._all = await res.json()
+          signalCache._allTs = Date.now()
+        }
+      } catch (e) { console.error('Signal load error:', e) }
+    }
+    renderSignalCards()
+    return
+  }
+  if (!signalCache[platform] || Date.now() - (signalCache[platform]._ts || 0) > 30000) {
+    container.innerHTML = `<div class="empty"><span class="empty-char">⟳</span>loading ${platform} signals...</div>`
+    try {
+      const res = await fetch(`/api/intel/signals/${platform}`)
+      if (res.ok) {
+        signalCache[platform] = await res.json()
+        signalCache[platform]._ts = Date.now()
+      }
+    } catch (e) { console.error('Signal load error:', e) }
+  }
+  renderSignalCards()
+}
+
+function renderSignalCards() {
+  const container = document.getElementById('signalCards')
+  const dirFilter = document.getElementById('signalFilterDir').value
+  const urgFilter = document.getElementById('signalFilterUrgency').value
+  const sortBy = document.getElementById('signalSortBy').value
+  const platform = activeSignalTab
+
+  let signals = []
+  if (platform === 'all') {
+    signals = (signalCache._all || {}).signals || []
+  } else {
+    signals = (signalCache[platform] || {}).signals || []
+  }
+
+  // Filter
+  if (dirFilter !== 'all') signals = signals.filter(s => s.direction === dirFilter)
+  if (urgFilter !== 'all') signals = signals.filter(s => s.urgency === urgFilter)
+
+  // Sort
+  if (sortBy === 'confidence') signals.sort((a, b) => (b.confidence || 0) - (a.confidence || 0))
+  else if (sortBy === 'engagement') signals.sort((a, b) => {
+    const ea = (a.engagement || {}); const eb = (b.engagement || {})
+    return ((eb.upvotes || 0) + (eb.comments || 0)) - ((ea.upvotes || 0) + (ea.comments || 0))
+  })
+  else signals.sort((a, b) => (b.extracted_at || '').localeCompare(a.extracted_at || ''))
+
+  if (!signals.length) {
+    container.innerHTML = `<div class="empty"><span class="empty-char">⌬</span>no signals from ${platform} — crawler may not be running</div>`
+    return
+  }
+
+  container.innerHTML = signals.slice(0, 100).map(s => {
+    const dirClass = s.direction === 'bullish' ? 'signal-dir-bullish' : s.direction === 'bearish' ? 'signal-dir-bearish' : 'signal-dir-neutral'
+    const urgClass = s.urgency === 'realtime' ? 'signal-urgency-realtime' : s.urgency === 'hours' ? 'signal-urgency-hours' : ''
+    const eng = s.engagement || {}
+    const engStr = (eng.upvotes || eng.comments) ? `${eng.upvotes || 0}▲ ${eng.comments || 0}💬` : ''
+    const plat = s._platform || platform
+    return `<div class="signal-card">
+      <div class="signal-card-title">${esc(s.title || 'Untitled signal')}</div>
+      <div class="signal-card-body">${esc((s.body || '').slice(0, 300))}</div>
+      <div class="signal-card-meta">
+        <span class="${dirClass}">${(s.direction || 'unknown').toUpperCase()}</span>
+        <span class="${urgClass}">${(s.urgency || '').toUpperCase()}</span>
+        <span>${s.ticker_or_market || ''}</span>
+        <span>CONF: ${((s.confidence || 0) * 100).toFixed(0)}%</span>
+        ${engStr ? `<span>${engStr}</span>` : ''}
+        <span>${plat.toUpperCase()}</span>
+        <span>${s.extracted_at ? new Date(s.extracted_at).toLocaleString() : ''}</span>
+        ${s.source_url ? `<a href="${esc(s.source_url)}" target="_blank" style="font-size:0.4rem;color:var(--neon-cyan);text-decoration:none;">SOURCE →</a>` : ''}
+      </div>
+    </div>`
+  }).join('')
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML }
+
+async function loadSignalBadges() {
+  try {
+    const res = await fetch('/api/intel/signals/overview/stats')
+    if (!res.ok) return
+    const data = await res.json()
+    const platforms = data.platforms || {}
+    let total = 0
+    for (const [p, info] of Object.entries(platforms)) {
+      const badge = document.getElementById(`badge-${p}`)
+      if (badge) badge.textContent = info.count > 0 ? info.count : ''
+      total += info.count
+    }
+    const allBadge = document.getElementById('badge-all')
+    if (allBadge) allBadge.textContent = total > 0 ? total : ''
+  } catch (e) {}
+}
+
+// Load badges when Intel page opens
+const origLoadIntel = loadIntel
+loadIntel = async function() {
+  await origLoadIntel()
+  loadSignalBadges()
+  pollResearchBadge()
+}
+
+// ── RESEARCH TAB — manual input bucket ────────────────────────────────────
+async function rmBucketSubmit() {
+  const input = document.getElementById('rmBucketInput')
+  const btn   = document.getElementById('rmBucketBtn')
+  const status = document.getElementById('rmBucketStatus')
+  const text = (input.value || '').trim()
+  if (!text) return
+
+  btn.disabled = true
+  btn.textContent = 'QUEUING...'
+  status.textContent = ''
+
+  try {
+    const resp = await fetch('https://research.asdfghjk.lol/api/run', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ inputs: text, notes: 'manual — gonzoclaw bucket' })
+    })
+    const data = await resp.json()
+    if (resp.ok) {
+      status.style.color = 'var(--cyan,#00e5ff)'
+      status.textContent = `✓ ${data.item_count} item${data.item_count!==1?'s':''} queued`
+      input.value = ''
+      // Reload iframe so inbox refreshes
+      setTimeout(() => {
+        const frame = document.getElementById('repoManFrame')
+        if (frame.src) frame.src = frame.src
+      }, 3000)
+    } else {
+      status.style.color = '#ff4444'
+      status.textContent = data.detail || 'error'
+    }
+  } catch(e) {
+    status.style.color = '#ff4444'
+    status.textContent = 'Repo Man unreachable'
+  }
+
+  btn.disabled = false
+  btn.textContent = 'RUN REPO MAN'
+}
+
+// ── INTEL PAGE — push scraped intel to Repo Man ────────────────────────────
+async function intelPushToRepoMan() {
+  const btn = document.getElementById('intelPushRepoManBtn')
+  btn.disabled = true
+  btn.textContent = 'PUSHING...'
+
+  try {
+    const resp = await fetch('https://research.asdfghjk.lol/api/push-openclaw-intel', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    })
+    const data = await resp.json()
+    if (resp.ok) {
+      btn.textContent = `✓ ${data.queued} PUSHED`
+      btn.style.borderColor = 'var(--cyan,#00e5ff)'
+      btn.style.color = 'var(--cyan,#00e5ff)'
+      setTimeout(() => {
+        btn.textContent = '→ PUSH TO REPO MAN'
+        btn.style.borderColor = ''
+        btn.style.color = ''
+        btn.disabled = false
+      }, 4000)
+    } else {
+      btn.textContent = 'ERROR'
+      btn.style.borderColor = '#ff4444'
+      btn.style.color = '#ff4444'
+      setTimeout(() => { btn.textContent = '→ PUSH TO REPO MAN'; btn.disabled = false }, 3000)
+    }
+  } catch(e) {
+    btn.textContent = 'UNREACHABLE'
+    setTimeout(() => { btn.textContent = '→ PUSH TO REPO MAN'; btn.disabled = false }, 3000)
+  }
+}
+
+// ── INTEL PAGE — push ALL crawled GitHub repos to Repo Man ─────────────────
+async function intelPushAllGithub() {
+  const btn = document.getElementById('intelPushAllGithubBtn')
+  btn.disabled = true
+  btn.textContent = '⟳ PUSHING ALL...'
+
+  try {
+    const resp = await fetch('/api/intel/push-all-github', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    })
+    const data = await resp.json()
+    if (resp.ok) {
+      btn.textContent = '\u2713 ' + data.queued + '/' + data.new_repos + ' PUSHED'
+      btn.style.borderColor = 'var(--neon-green)'
+      btn.style.color = 'var(--neon-green)'
+      setTimeout(function() {
+        btn.textContent = '\u26a1 PUSH ALL GITHUB'
+        btn.style.borderColor = ''
+        btn.style.color = ''
+        btn.disabled = false
+      }, 5000)
+    } else {
+      btn.textContent = data.detail || 'ERROR'
+      btn.style.borderColor = '#ff4444'
+      btn.style.color = '#ff4444'
+      setTimeout(function() { btn.textContent = '\u26a1 PUSH ALL GITHUB'; btn.disabled = false }, 3000)
+    }
+  } catch(e) {
+    btn.textContent = 'UNREACHABLE'
+    setTimeout(function() { btn.textContent = '\u26a1 PUSH ALL GITHUB'; btn.disabled = false }, 3000)
+  }
+}
+
+// ── INTEL PAGE — crawler health check + drying-up notification ─────────────
+async function intelCheckCrawlerHealth() {
+  try {
+    const resp = await fetch('/api/intel/crawler-health')
+    if (!resp.ok) return
+    const data = await resp.json()
+    const alert = document.getElementById('intelCrawlerAlert')
+    if (!alert) return
+
+    var messages = []
+    if (!data.crawler_running) {
+      messages.push('\u26a0 Crawler is NOT running (PID ' + (data.crawler_pid || '?') + ' dead)')
+    }
+    if (data.drying_up) {
+      messages.push('\u26a0 Results drying up \u2014 last crawl found only ' + data.last_crawl_count + ' repos. Consider evolving scraper parameters.')
+    }
+    if (data.last_crawl_time) {
+      var ago = Math.round((Date.now() - new Date(data.last_crawl_time).getTime()) / 60000)
+      if (ago > 120) {
+        messages.push('\u26a0 Last crawl was ' + ago + ' minutes ago \u2014 crawler may be stalled')
+      }
+    }
+
+    if (messages.length > 0) {
+      alert.innerHTML = messages.join('<br>')
+      alert.style.display = 'block'
+    } else {
+      alert.style.display = 'none'
+    }
+
+    // Update last crawl timestamp in toolbar
+    var lastCrawlEl = document.getElementById('intelLastCrawl')
+    if (lastCrawlEl && data.last_crawl_time) {
+      lastCrawlEl.textContent = 'LAST CRAWL: ' + new Date(data.last_crawl_time).toLocaleString() + ' (' + data.last_crawl_count + ' repos)'
+    }
+  } catch(e) {}
+}
+
+// ── RESEARCH TAB — Repo Man embed ─────────────────────────────────────────
+function pollResearchBadge() {
+  fetch('https://research.asdfghjk.lol/api/inbox')
+    .then(r => r.json())
+    .then(d => {
+      // Tab badge
+      const badge = document.getElementById('researchBadge')
+      if (badge) {
+        if (d.count > 0) { badge.textContent = d.count; badge.style.display = 'inline-block' }
+        else { badge.style.display = 'none' }
+      }
+      // Nav button pulsing dot
+      const dot = document.getElementById('rmNavDot')
+      if (dot) dot.style.display = d.count > 0 ? 'block' : 'none'
+    })
+    .catch(() => {}) // Repo Man not running — silent fail
+}
+// Poll badge every 60s from any tab
+setInterval(pollResearchBadge, 60000)
+
+// ══════════════════════════════════════════════════════════════════
+// CHATGPT ANALYSIS — sub-tabs, report management, deploy workflow
+// ══════════════════════════════════════════════════════════════════
+let chatgptReportsCache = []
+let chatgptCurrentReport = null
+
+function switchResearchTab(tab) {
+  document.querySelectorAll('.research-subtab').forEach(t => t.classList.remove('active'))
+  document.querySelector('.research-subtab[data-rtab="' + tab + '"]').classList.add('active')
+  document.querySelectorAll('.research-subcontent').forEach(c => { c.classList.remove('active'); c.style.display = 'none' })
+  if (tab === 'inbox') {
+    const el = document.getElementById('researchSubInbox')
+    el.classList.add('active'); el.style.display = 'flex'
+  } else {
+    const el = document.getElementById('researchSubReports')
+    el.classList.add('active'); el.style.display = 'flex'
+    chatgptRefreshReports()
+  }
+}
+
+async function chatgptAnalyze() {
+  const btn = document.getElementById('chatgptAnalyzeBtn')
+  const status = document.getElementById('chatgptToolbarStatus')
+  btn.disabled = true
+  btn.textContent = '⟳ ANALYZING...'
+  status.textContent = 'Fetching items + calling GPT-4o...'
+  status.style.color = 'var(--neon-cyan,#00d4ff)'
+
+  try {
+    const r = await fetch('/api/chatgpt/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ item_limit: 20 })
+    })
+    if (r.ok) {
+      const report = await r.json()
+      status.style.color = 'var(--neon-green,#00ff88)'
+      status.textContent = '\u2713 Report generated \u2014 ' + report.recommendations.length + ' recommendations'
+      switchResearchTab('reports')
+      chatgptRenderReport(report)
+    } else {
+      const e = await r.json().catch(() => ({}))
+      status.style.color = 'var(--neon-red,#ff002e)'
+      status.textContent = e.detail || 'Analysis failed'
+    }
+  } catch (e) {
+    status.style.color = 'var(--neon-red,#ff002e)'
+    status.textContent = 'Network error \u2014 check backend'
+  }
+  btn.disabled = false
+  btn.textContent = '\u26a1 SEND TO CHATGPT'
+}
+
+async function chatgptRefreshReports() {
+  try {
+    const r = await fetch('/api/chatgpt/reports')
+    if (r.ok) {
+      const data = await r.json()
+      chatgptReportsCache = data.reports
+      if (!chatgptCurrentReport) chatgptRenderReportList()
+      const badge = document.getElementById('chatgptReportsBadge')
+      if (badge) {
+        if (data.reports.length > 0) { badge.textContent = data.reports.length; badge.style.display = 'inline-block' }
+        else { badge.style.display = 'none' }
+      }
+      const count = document.getElementById('chatgptReportCount')
+      if (count) count.textContent = data.reports.length + ' REPORTS'
+    }
+  } catch (e) {}
+}
+
+function _esc(s) { if (!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;') }
+
+function chatgptRenderReportList() {
+  chatgptCurrentReport = null
+  const container = document.getElementById('chatgptReportsList')
+  if (chatgptReportsCache.length === 0) {
+    container.innerHTML = '<div style="text-align:center;padding:60px 20px;"><span style="font-size:1.5rem;display:block;margin-bottom:8px;">\u26a1</span><span style="font-size:0.56rem;color:var(--grey2);letter-spacing:1px;">NO REPORTS YET</span><br><span style="color:var(--grey3);font-size:0.44rem;letter-spacing:1px;">click SEND TO CHATGPT to analyze research</span></div>'
+    return
+  }
+  container.innerHTML = chatgptReportsCache.map(function(r) {
+    return '<div class="gpt-report-card" onclick="chatgptLoadReport(\'' + _esc(r.id) + '\')">'
+      + '<div class="gpt-report-card-title">' + _esc(r.id) + '</div>'
+      + '<div class="gpt-report-card-meta">'
+      + new Date(r.created_at).toLocaleString() + ' \u00b7 ' + r.item_count + ' items \u00b7 ' + r.recommendation_count + ' recommendations'
+      + '</div></div>'
+  }).join('')
+}
+
+async function chatgptLoadReport(reportId) {
+  const container = document.getElementById('chatgptReportsList')
+  container.innerHTML = '<div style="text-align:center;padding:40px;font-size:0.5rem;color:var(--grey2);letter-spacing:1px;">\u231b LOADING REPORT...</div>'
+  try {
+    const r = await fetch('/api/chatgpt/reports/' + reportId)
+    if (r.ok) {
+      const report = await r.json()
+      chatgptRenderReport(report)
+    } else {
+      container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--neon-red);">Failed to load report</div>'
+    }
+  } catch (e) {
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--neon-red);">Network error</div>'
+  }
+}
+
+function chatgptRenderReport(report) {
+  chatgptCurrentReport = report
+  const container = document.getElementById('chatgptReportsList')
+
+  const undeployed = report.recommendations.filter(function(r) { return !r.deployed }).length
+  var deployAllBar = ''
+  if (undeployed > 0) {
+    deployAllBar = '<div class="gpt-deploy-all-bar">'
+      + '<button class="gpt-deploy-btn" onclick="chatgptDeployAll(\'' + _esc(report.id) + '\')" id="chatgptDeployAllBtn" style="font-size:0.50rem;padding:6px 16px;">'
+      + '\u26a1 DEPLOY ALL (' + undeployed + ')</button>'
+      + '<span style="font-size:0.42rem;color:var(--grey2);letter-spacing:1px;">' + undeployed + ' undeployed recommendations</span>'
+      + '<div style="flex:1;"></div>'
+      + '<button onclick="chatgptRenderReportList()" style="font-size:0.42rem;padding:3px 10px;border:1px solid var(--border);background:transparent;color:var(--grey2);cursor:pointer;font-family:inherit;border-radius:1px;">\u2190 BACK TO LIST</button>'
+      + '</div>'
+  } else {
+    deployAllBar = '<div style="margin-bottom:14px;"><button onclick="chatgptRenderReportList()" style="font-size:0.42rem;padding:3px 10px;border:1px solid var(--border);background:transparent;color:var(--grey2);cursor:pointer;font-family:inherit;border-radius:1px;">\u2190 BACK TO LIST</button></div>'
+  }
+
+  var recsHtml = report.recommendations.map(function(rec, i) {
+    var confClass = rec.confidence >= 0.8 ? 'high-conf' : rec.confidence >= 0.5 ? 'med-conf' : 'low-conf'
+    var urgClass = rec.urgency === 'immediate' ? 'immediate' : rec.urgency === 'this_week' ? 'this-week' : 'backlog'
+    var deployBtn = rec.deployed
+      ? '<span class="gpt-rec-badge deployed">\u2713 DEPLOYED (' + _esc(rec.task_id || '') + ')</span>'
+      : '<button class="gpt-deploy-btn" onclick="chatgptDeploy(\'' + _esc(report.id) + '\',' + i + ')">DEPLOY \u2192 ' + _esc((rec.recommended_target || 'clawmpson').toUpperCase()) + '</button>'
+
+    var riskColor = rec.risk === 'high' ? 'var(--neon-red)' : rec.risk === 'medium' ? 'var(--orange)' : 'var(--grey2)'
+
+    return '<div class="gpt-rec-card">'
+      + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
+      + '<span class="gpt-rec-title">' + _esc(rec.title) + '</span>'
+      + '<span class="gpt-rec-badge ' + confClass + '">' + Math.round(rec.confidence * 100) + '% CONF</span>'
+      + '<span class="gpt-rec-badge ' + urgClass + '">' + _esc((rec.urgency || '').toUpperCase()) + '</span>'
+      + '<span class="gpt-rec-badge" style="border-color:var(--grey3);color:var(--grey2);">' + _esc(rec.category) + '</span>'
+      + '</div>'
+      + '<div class="gpt-rec-summary">' + _esc(rec.summary) + '</div>'
+      + '<div class="gpt-rec-meta">'
+      + '<span class="gpt-rec-target">\u2192 ' + _esc(rec.recommended_target_name || rec.recommended_target) + '</span>'
+      + '<span style="color:' + riskColor + '">RISK: ' + _esc((rec.risk || 'low').toUpperCase()) + '</span>'
+      + (rec.risk_notes ? '<span style="color:var(--grey2)">\u26a0 ' + _esc(rec.risk_notes) + '</span>' : '')
+      + '</div>'
+      + (rec.source_links && rec.source_links.length ? '<div style="margin-top:6px;font-size:0.42rem;">' + rec.source_links.map(function(l){ return '<a href="' + _esc(l) + '" target="_blank" rel="noopener" style="color:var(--neon-cyan);text-decoration:none;margin-right:10px;letter-spacing:0.5px;">\u2197 ' + _esc(l.replace(/https?:\/\/(www\.)?/,'').split('/').slice(0,2).join('/')) + '</a>' }).join('') + '</div>' : '')
+      + (rec.action_plan ? '<div class="intel-readme-toggle" onclick="this.nextElementSibling.classList.toggle(\'open\')" style="margin-top:8px;">\u25b8 Action Plan</div><div class="gpt-action-plan">' + _esc(rec.action_plan) + '</div>' : '')
+      + '<div class="gpt-rec-actions">' + deployBtn + '</div>'
+      + '</div>'
+  }).join('')
+
+  container.innerHTML = deployAllBar
+    + '<div class="gpt-exec-summary">' + _esc(report.executive_summary) + '</div>'
+    + '<div style="font-size:0.44rem;color:var(--grey2);letter-spacing:1px;margin-bottom:12px;">'
+    + report.recommendations.length + ' RECOMMENDATIONS \u00b7 ' + report.item_count + ' ITEMS ANALYZED \u00b7 '
+    + new Date(report.created_at).toLocaleString() + ' \u00b7 ' + _esc(report.model) + ' \u00b7 ' + report.tokens_used + ' tokens</div>'
+    + recsHtml
+    + (report.meta_observations
+      ? '<div style="margin-top:20px;padding:12px 16px;border:1px solid var(--border);border-radius:2px;">'
+        + '<div style="font-size:0.46rem;letter-spacing:2px;color:var(--orange);margin-bottom:8px;">META OBSERVATIONS</div>'
+        + '<div style="font-size:0.46rem;color:var(--grey1);line-height:1.5;">' + _esc(report.meta_observations) + '</div></div>'
+      : '')
+}
+
+async function chatgptDeploy(reportId, recIndex) {
+  try {
+    const r = await fetch('/api/chatgpt/deploy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ report_id: reportId, rec_index: recIndex })
+    })
+    if (r.ok) {
+      chatgptLoadReport(reportId)
+    } else {
+      const e = await r.json().catch(() => ({}))
+      const status = document.getElementById('chatgptToolbarStatus')
+      if (status) { status.style.color = 'var(--neon-red)'; status.textContent = e.detail || 'Deploy failed' }
+    }
+  } catch (e) {
+    const status = document.getElementById('chatgptToolbarStatus')
+    if (status) { status.style.color = 'var(--neon-red)'; status.textContent = 'Network error' }
+  }
+}
+
+async function chatgptDeployAll(reportId) {
+  const btn = document.getElementById('chatgptDeployAllBtn')
+  if (btn) { btn.disabled = true; btn.textContent = '\u231b DEPLOYING ALL...' }
+  try {
+    const r = await fetch('/api/chatgpt/deploy-all', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ report_id: reportId })
+    })
+    if (r.ok) {
+      const data = await r.json()
+      const status = document.getElementById('chatgptToolbarStatus')
+      if (status) { status.style.color = 'var(--neon-green)'; status.textContent = '\u2713 Deployed ' + data.deployed_count + ' recommendations' }
+      chatgptLoadReport(reportId)
+    } else {
+      const e = await r.json().catch(() => ({}))
+      const status = document.getElementById('chatgptToolbarStatus')
+      if (status) { status.style.color = 'var(--neon-red)'; status.textContent = e.detail || 'Deploy all failed' }
+    }
+  } catch (e) {
+    const status = document.getElementById('chatgptToolbarStatus')
+    if (status) { status.style.color = 'var(--neon-red)'; status.textContent = 'Network error' }
+  }
+  if (btn) { btn.disabled = false; btn.textContent = '\u26a1 DEPLOY ALL' }
+}
+
 </script>
+
+<!-- RESEARCH PAGE — toolbar + sub-tabs + content areas -->
+<div class="page" id="pageResearch" style="display:flex;flex-direction:column;height:calc(100vh - 60px);padding:0;">
+
+  <!-- Toolbar -->
+  <div class="research-toolbar">
+    <button class="primary" onclick="chatgptAnalyze()" id="chatgptAnalyzeBtn">⚡ SEND TO CHATGPT</button>
+    <button onclick="chatgptRefreshReports()" id="chatgptRefreshBtn">↻ REFRESH</button>
+    <span id="chatgptToolbarStatus" style="font-size:0.44rem;color:var(--grey2);letter-spacing:1px;margin-left:8px;"></span>
+    <div style="flex:1;"></div>
+    <span style="font-size:0.40rem;color:var(--grey3);letter-spacing:1px;" id="chatgptReportCount"></span>
+  </div>
+
+  <!-- Sub-tabs -->
+  <div class="research-subtabs">
+    <button class="research-subtab active" data-rtab="inbox" onclick="switchResearchTab('inbox')">RESEARCH INBOX</button>
+    <button class="research-subtab" data-rtab="reports" onclick="switchResearchTab('reports')">CHATGPT REPORTS<span id="chatgptReportsBadge" style="display:none;margin-left:5px;background:rgba(232,104,0,0.15);color:var(--orange);border-radius:8px;padding:1px 6px;font-size:0.34rem;font-weight:700;"></span></button>
+  </div>
+
+  <!-- Sub-tab content: Research Inbox (existing) -->
+  <div class="research-subcontent active" id="researchSubInbox" style="display:flex;flex-direction:column;">
+    <!-- Manual input bucket (preserved) -->
+    <div id="rmBucket" style="background:#0d0d0d;border-bottom:1px solid #1e1e1e;padding:12px 16px;flex-shrink:0;">
+      <div style="display:flex;gap:10px;align-items:flex-start;max-width:1200px;margin:0 auto;">
+        <textarea
+          id="rmBucketInput"
+          placeholder="Drop URLs, links, notes — one per line or mixed. Repo Man will parse, fetch, and analyze everything."
+          style="flex:1;background:#111;border:1px solid #2a2a2a;color:#e0e0e0;font-family:inherit;font-size:0.7rem;padding:8px 10px;resize:vertical;min-height:52px;max-height:120px;border-radius:2px;outline:none;letter-spacing:0.3px;"
+          onkeydown="if(event.ctrlKey&&event.key==='Enter')rmBucketSubmit()"
+        ></textarea>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+          <button onclick="rmBucketSubmit()" id="rmBucketBtn"
+            style="background:transparent;border:1px solid var(--cyan,#00e5ff);color:var(--cyan,#00e5ff);font-family:inherit;font-size:0.55rem;letter-spacing:1.5px;padding:6px 14px;cursor:pointer;white-space:nowrap;transition:all 0.2s;"
+            onmouseover="this.style.background='var(--cyan,#00e5ff)';this.style.color='#000'"
+            onmouseout="this.style.background='transparent';this.style.color='var(--cyan,#00e5ff)'"
+          >RUN REPO MAN</button>
+          <span id="rmBucketStatus" style="font-size:0.5rem;color:var(--grey2,#555);letter-spacing:1px;text-align:center;min-height:14px;"></span>
+        </div>
+      </div>
+    </div>
+    <!-- Repo Man inbox iframe -->
+    <iframe id="repoManFrame" src="" style="flex:1;width:100%;border:none;background:#0d0d0d;" allow="clipboard-write" title="Repo Man Research Feed"></iframe>
+  </div>
+
+  <!-- Sub-tab content: ChatGPT Reports (new) -->
+  <div class="research-subcontent" id="researchSubReports">
+    <div class="gpt-report-list" id="chatgptReportsList">
+      <div class="empty" style="text-align:center;padding:60px 20px;"><span class="empty-char" style="font-size:1.5rem;display:block;margin-bottom:8px;">⚡</span><span style="font-size:0.56rem;color:var(--grey2);letter-spacing:1px;">NO REPORTS YET</span><br><span style="color:var(--grey3);font-size:0.44rem;letter-spacing:1px;">click SEND TO CHATGPT to analyze research</span></div>
+    </div>
+  </div>
+
+</div>
+
 </body>
 </html>

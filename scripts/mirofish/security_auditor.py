@@ -91,7 +91,7 @@ def _check_daily_exposure(balance: float) -> tuple[bool, str]:
             row = conn.execute("""
                 SELECT COALESCE(SUM(amount_usd), 0) as total
                 FROM paper_trades
-                WHERE status = 'open' OR DATE(opened_at) = ?
+                WHERE (status = 'open' OR (status IN ('closed_win','closed_loss','expired') AND DATE(opened_at) = ?))
             """, (today,)).fetchone()
         exposure = row["total"]
         cap = balance * MAX_DAILY_EXPOSURE_PCT

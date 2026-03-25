@@ -3,7 +3,7 @@
 OpenClaw Dashboard — FastAPI backend
 Real-time task monitor with GitHub OAuth
 """
-import os, json, asyncio, secrets, time, hashlib, subprocess, re, uuid, base64
+import os, json, asyncio, secrets, time, hashlib, subprocess, re, uuid, base64, signal, sys
 from pathlib import Path
 from typing import AsyncGenerator, Optional
 from datetime import datetime, timedelta
@@ -24,6 +24,8 @@ LOGS_DIR       = OPENCLAW_ROOT / "logs"
 IDEAS_DIR      = OPENCLAW_ROOT / "ideas"
 IDEAS_MEDIA    = IDEAS_DIR / "media"
 PROJECTS_FILE  = OPENCLAW_ROOT / "projects" / "projects.json"
+CHATGPT_REPORTS_DIR = OPENCLAW_ROOT / "outputs" / "chatgpt-reports"
+REPO_MAN_API = os.environ.get("REPO_MAN_API", "https://research.asdfghjk.lol")
 
 ENV_FILE = OPENCLAW_ROOT / ".env"
 def load_env():
@@ -53,6 +55,11 @@ PUBLIC_URL  = os.environ.get("DASHBOARD_PUBLIC_URL", "http://localhost:7080")
 OAUTH_CALLBACK = f"{PUBLIC_URL}/auth/github/callback"
 ACCESS_TOKEN   = os.environ.get("DASHBOARD_ACCESS_TOKEN", "")
 DASH_PASSWORD  = os.environ.get("DASHBOARD_PASSWORD", "")
+
+# Terminal Watch
+TERMINAL_RELAY = OPENCLAW_ROOT / "scripts" / "terminal-relay.py"
+TERMINAL_LOG   = LOGS_DIR / "terminal-watch.jsonl"
+TERMINAL_PID   = LOGS_DIR / "terminal-relay.pid"
 
 # ── App ───────────────────────────────────────────────────────────────────────
 app = FastAPI(title="OpenClaw Dashboard")
@@ -869,6 +876,7 @@ async def trading_notify():
     """Called by simulator to signal a trade was placed or closed."""
     global _trading_version
     _trading_version += 1
+    _trading_cache["data"] = None  # invalidate cache on trade events
     return {"version": _trading_version}
 
 @app.get("/api/trading/stream")
@@ -909,9 +917,15 @@ def _trading_db():
     conn.row_factory = sqlite3.Row
     return conn
 
+_trading_cache = {"data": None, "ts": 0}
+
 @app.get("/api/trading/dashboard")
 async def get_trading_dashboard(user: str = Depends(get_current_user)):
-    """Comprehensive trading dashboard data for the TRADING tab."""
+    """Comprehensive trading dashboard data for the TRADING tab. Cached 5s."""
+    now = time.time()
+    if _trading_cache["data"] and (now - _trading_cache["ts"]) < 5:
+        return _trading_cache["data"]
+
     conn = _trading_db()
     if not conn:
         return {"error": "Database not found"}
@@ -922,7 +936,7 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
         if ctx:
             starting = float(ctx[0])
 
-        closed_pnl = conn.execute("SELECT COALESCE(SUM(pnl), 0) as total FROM paper_trades WHERE status != 'open'").fetchone()[0]
+        closed_pnl = conn.execute("SELECT COALESCE(SUM(pnl), 0) as total FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')").fetchone()[0]
         open_trades = conn.execute("SELECT * FROM paper_trades WHERE status='open' ORDER BY opened_at DESC").fetchall()
 
         # Mark-to-market open positions
@@ -938,6 +952,15 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
             pnl = t["shares"] * (current_price - t["entry_price"])
             pnl_pct = (pnl / t["amount_usd"] * 100) if t["amount_usd"] > 0 else 0
             unrealized += pnl
+            # Look up close_time from kalshi_markets or market_data
+            close_time = None
+            km = conn.execute("SELECT close_time FROM kalshi_markets WHERE ticker=? ORDER BY fetched_at DESC LIMIT 1", (t["market_id"],)).fetchone()
+            if km and km["close_time"]:
+                close_time = km["close_time"]
+            else:
+                md = conn.execute("SELECT end_date FROM market_data WHERE market_id=? ORDER BY fetched_at DESC LIMIT 1", (t["market_id"],)).fetchone()
+                if md and md["end_date"]:
+                    close_time = md["end_date"]
             open_list.append({
                 "id": t["id"], "market_id": t["market_id"],
                 "question": t["question"][:80], "direction": t["direction"],
@@ -945,7 +968,7 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
                 "current_price": current_price, "shares": t["shares"],
                 "amount_usd": t["amount_usd"], "pnl": round(pnl, 2),
                 "pnl_pct": round(pnl_pct, 1), "confidence": t["confidence"],
-                "opened_at": t["opened_at"],
+                "opened_at": t["opened_at"], "close_time": close_time,
             })
 
         balance = starting + closed_pnl + unrealized
@@ -956,7 +979,7 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
             SELECT id, market_id, question, direction, strategy, entry_price,
                    exit_price, shares, amount_usd, pnl, status, confidence,
                    opened_at, closed_at
-            FROM paper_trades WHERE status != 'open'
+            FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')
             ORDER BY closed_at DESC LIMIT 50
         """).fetchall()
         closed_list = [dict(r) for r in recent_closed]
@@ -966,7 +989,7 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
         pnl_curve = [{"date": r["date"], "balance": r["balance"], "roi_pct": r["roi_pct"], "win_rate": r["win_rate"]} for r in daily_pnl]
 
         # 4. Win/loss stats
-        all_closed = conn.execute("SELECT status, strategy, pnl FROM paper_trades WHERE status != 'open'").fetchall()
+        all_closed = conn.execute("SELECT status, strategy, pnl FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')").fetchall()
         total_closed = len(all_closed)
         wins = sum(1 for t in all_closed if t["status"] == "closed_win")
         win_rate = wins / total_closed if total_closed > 0 else 0
@@ -1059,7 +1082,147 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
             grad["drawdown_pass"] = max_dd < 0.25
             grad["all_pass"] = all([grad["roi_7d_pass"], grad["win_rate_pass"], grad["sharpe_pass"], grad["drawdown_pass"]])
 
-        # 10. Missed opportunities summary
+        # 10. PhantomClaw stats (RivalClaw strategy running inside Clawmpson)
+        phantom_stats = {"trades": 0, "wins": 0, "losses": 0, "pnl": 0, "open": 0, "positions": []}
+        try:
+            phantom_closed = conn.execute("""
+                SELECT COUNT(*) as n,
+                       SUM(CASE WHEN status='closed_win' THEN 1 ELSE 0 END) as w,
+                       COALESCE(SUM(pnl), 0) as p
+                FROM paper_trades WHERE strategy LIKE 'phantomclaw%' AND status IN ('closed_win','closed_loss','expired')
+            """).fetchone()
+            phantom_open = conn.execute("""
+                SELECT id, market_id, question, direction, entry_price, amount_usd, confidence, opened_at, strategy
+                FROM paper_trades WHERE strategy LIKE 'phantomclaw%' AND status='open'
+                ORDER BY opened_at DESC
+            """).fetchall()
+            # Get close_time for each
+            phantom_positions = []
+            for po in phantom_open:
+                pdict = dict(po)
+                km = conn.execute("SELECT close_time FROM kalshi_markets WHERE ticker=? ORDER BY fetched_at DESC LIMIT 1", (po["market_id"],)).fetchone()
+                pdict["close_time"] = km["close_time"] if km and km["close_time"] else None
+                # Mark to market
+                latest_k = conn.execute("SELECT yes_bid, no_bid FROM kalshi_markets WHERE ticker=? ORDER BY fetched_at DESC LIMIT 1", (po["market_id"],)).fetchone()
+                ep = po["entry_price"] or 0.01
+                cp = ep  # default
+                if latest_k:
+                    raw_cp = latest_k["yes_bid"] if po["direction"] == "YES" else latest_k["no_bid"]
+                    if raw_cp is not None:
+                        cp = raw_cp / 100.0 if raw_cp > 1 else raw_cp
+                pdict["current_price"] = cp
+                pdict["pnl"] = round((cp - ep) * (po["amount_usd"] / ep) if ep > 0 else 0, 2)
+                amt = po["amount_usd"] or 1
+                pdict["pnl_pct"] = round(pdict["pnl"] / amt * 100, 1) if amt > 0 else 0
+                phantom_positions.append(pdict)
+
+            pc_n = phantom_closed["n"] or 0
+            pc_w = phantom_closed["w"] or 0
+            pc_p = phantom_closed["p"] or 0
+            phantom_stats = {
+                "trades": pc_n,
+                "wins": pc_w,
+                "losses": pc_n - pc_w,
+                "pnl": round(pc_p, 2),
+                "open": len(phantom_open),
+                "win_rate": round(pc_w / pc_n * 100, 1) if pc_n > 0 else 0,
+                "positions": phantom_positions,
+            }
+        except Exception as phantom_err:
+            phantom_stats["error"] = str(phantom_err)
+
+        # 10b. Per-agent stats for CalendarClaw, NewsClaw, SentimentClaw
+        agent_stats = {}
+        for agent_name in ("calendarclaw", "newsclaw", "sentimentclaw", "dataharvester"):
+            try:
+                ac = conn.execute("""
+                    SELECT COUNT(*) as n,
+                           SUM(CASE WHEN status='closed_win' THEN 1 ELSE 0 END) as w,
+                           COALESCE(SUM(pnl), 0) as p
+                    FROM paper_trades WHERE strategy=? AND status IN ('closed_win','closed_loss','expired')
+                """, (agent_name,)).fetchone()
+                ao = conn.execute("""
+                    SELECT id, market_id, question, direction, entry_price, shares, amount_usd, opened_at
+                    FROM paper_trades WHERE strategy=? AND status='open' ORDER BY opened_at DESC
+                """, (agent_name,)).fetchall()
+                positions = []
+                agent_unrealized = 0.0
+                for po in ao:
+                    pd = dict(po)
+                    # Mark-to-market: get current price from kalshi_markets or market_data
+                    current_price = po["entry_price"]
+                    km = conn.execute("SELECT yes_ask, no_ask, yes_bid, no_bid, close_time FROM kalshi_markets WHERE ticker=? ORDER BY fetched_at DESC LIMIT 1", (po["market_id"],)).fetchone()
+                    if km:
+                        pd["close_time"] = km["close_time"] if km["close_time"] else None
+                        if po["direction"] == "YES":
+                            current_price = km["yes_bid"] or km["yes_ask"] or po["entry_price"]
+                        else:
+                            current_price = km["no_bid"] or km["no_ask"] or po["entry_price"]
+                    else:
+                        # Try polymarket market_data
+                        md = conn.execute("SELECT yes_price, no_price, end_date FROM market_data WHERE market_id=? ORDER BY fetched_at DESC LIMIT 1", (po["market_id"],)).fetchone()
+                        if md:
+                            pd["close_time"] = md["end_date"] if md["end_date"] else None
+                            current_price = md["yes_price"] if po["direction"] == "YES" else md["no_price"]
+                        else:
+                            pd["close_time"] = None
+                    pnl = (po["shares"] or 0) * (current_price - po["entry_price"])
+                    pd["pnl"] = round(pnl, 2)
+                    pd["current_price"] = current_price
+                    agent_unrealized += pnl
+                    positions.append(pd)
+                n = ac["n"] or 0
+                w = ac["w"] or 0
+                realized = ac["p"] or 0
+                total_pnl = round(realized + agent_unrealized, 2)
+                agent_stats[agent_name] = {
+                    "trades": n, "wins": w, "losses": n - w,
+                    "pnl": total_pnl,
+                    "balance": round(1000.0 + total_pnl, 2),
+                    "starting_balance": 1000.0,
+                    "open": len(ao),
+                    "win_rate": round(w / n * 100, 1) if n > 0 else 0,
+                    "positions": positions,
+                }
+            except Exception:
+                agent_stats[agent_name] = {"trades": 0, "wins": 0, "losses": 0, "pnl": 0, "balance": 1000.0, "starting_balance": 1000.0, "open": 0, "win_rate": 0, "positions": []}
+
+        # 10c. RivalClaw open positions (separate DB) for unified feed
+        rivalclaw_positions = []
+        try:
+            rc_db = Path.home() / "rivalclaw" / "rivalclaw.db"
+            if rc_db.exists():
+                rc_conn = sqlite3.connect(str(rc_db))
+                rc_conn.row_factory = sqlite3.Row
+                rc_open = rc_conn.execute("""
+                    SELECT market_id, question, direction, strategy, entry_price, amount_usd,
+                           confidence, opened_at, pnl
+                    FROM paper_trades WHERE status='open' ORDER BY opened_at DESC
+                """).fetchall()
+                for ro in rc_open:
+                    rd = dict(ro)
+                    # Try to get close_time from rivalclaw's kalshi data or our kalshi_markets
+                    km = conn.execute("SELECT close_time FROM kalshi_markets WHERE ticker=? ORDER BY fetched_at DESC LIMIT 1", (ro["market_id"],)).fetchone()
+                    rd["close_time"] = km["close_time"] if km and km["close_time"] else None
+                    rd["current_price"] = ro["entry_price"]
+                    rivalclaw_positions.append(rd)
+                rc_conn.close()
+        except Exception:
+            pass
+
+        # 10d. QuantumentalClaw positions (separate DB)
+        quantclaw_data = {"wallet": {}, "positions": []}
+        try:
+            qc_db = Path.home() / "quantumentalclaw" / "quantumentalclaw.db"
+            if qc_db.exists():
+                qc_conn = sqlite3.connect(str(qc_db))
+                qc_conn.row_factory = sqlite3.Row
+                quantclaw_data = _quantumentalclaw_state(qc_conn)
+                qc_conn.close()
+        except Exception as qe:
+            quantclaw_data["error"] = str(qe)
+
+        # 11. Missed opportunities summary
         missed_summary = []
         try:
             missed = conn.execute("""
@@ -1073,7 +1236,18 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
         except Exception:
             pass
 
-        return {
+        # 12. Calibration status
+        calibration = []
+        try:
+            cal_rows = conn.execute(
+                "SELECT bot, param, old_value, new_value, reason, mode, win_rate, sample_size, logged_at "
+                "FROM calibration_log ORDER BY logged_at DESC LIMIT 10"
+            ).fetchall()
+            calibration = [dict(r) for r in cal_rows]
+        except Exception:
+            pass
+
+        result = {
             "wallet": {
                 "balance": round(balance, 2),
                 "starting_balance": starting,
@@ -1094,13 +1268,1467 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
             "polymarket": poly_list,
             "kalshi": kalshi_list,
             "cross_venue_arb": xv_arb,
+            "phantom": phantom_stats,
+            "agents": agent_stats,
+            "rivalclaw_positions": rivalclaw_positions,
+            "quantclaw": quantclaw_data,
             "missed_opportunities": missed_summary,
+            "calibration": calibration,
         }
+        _trading_cache["data"] = result
+        _trading_cache["ts"] = time.time()
+        return result
     finally:
         conn.close()
 
 
-@app.get("/{path:path}", response_class=HTMLResponse)
+# ── ArbClaw / RivalClaw Experiment ────────────────────────────────────────────
+
+def _experiment_db(instance):
+    """Open SQLite DB for an experiment instance (arbclaw, rivalclaw, or quantumentalclaw)."""
+    paths = {
+        "arbclaw": Path.home() / "arbclaw" / "arbclaw.db",
+        "rivalclaw": Path.home() / "rivalclaw" / "rivalclaw.db",
+        "quantumentalclaw": Path.home() / "quantumentalclaw" / "quantumentalclaw.db",
+    }
+    db_path = paths.get(instance)
+    if not db_path or not db_path.exists():
+        return None
+    conn = sqlite3.connect(str(db_path))
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
+def _arbclaw_state(conn):
+    """Read ArbClaw wallet state (different schema: positions/trades tables)."""
+    starting = 1000.0
+    total_pnl = conn.execute("SELECT COALESCE(SUM(pnl), 0) FROM trades").fetchone()[0]
+    locked = conn.execute("SELECT COALESCE(SUM(amount_usd), 0) FROM positions WHERE status='open'").fetchone()[0]
+    balance = starting + total_pnl - locked
+
+    open_pos = conn.execute("SELECT * FROM positions WHERE status='open' ORDER BY opened_at DESC").fetchall()
+    open_list = []
+    for p in open_pos:
+        latest = conn.execute(
+            "SELECT yes_price, no_price FROM market_snapshots WHERE market_id=? ORDER BY fetched_at DESC LIMIT 1",
+            (p["market_id"],)
+        ).fetchone()
+        current = p["entry_price"]
+        if latest:
+            current = latest["yes_price"] if p["direction"] == "YES" else latest["no_price"]
+        pnl = (current - p["entry_price"]) * p["shares"] if p["shares"] else 0
+        pnl_pct = (pnl / p["amount_usd"] * 100) if p["amount_usd"] and p["amount_usd"] > 0 else 0
+        open_list.append({
+            "market_id": p["market_id"], "question": (p["question"] or "")[:80],
+            "direction": p["direction"], "entry_price": p["entry_price"],
+            "current_price": current, "amount_usd": p["amount_usd"],
+            "pnl": round(pnl, 2), "pnl_pct": round(pnl_pct, 1),
+            "latency_ms": p["signal_to_trade_latency_ms"] or 0,
+            "opened_at": p["opened_at"],
+        })
+
+    recent = conn.execute(
+        "SELECT * FROM trades ORDER BY closed_at DESC LIMIT 20"
+    ).fetchall()
+    recent_list = [{
+        "market_id": r["market_id"], "direction": r["direction"],
+        "entry_price": r["entry_price"], "exit_price": r["exit_price"],
+        "pnl": round(r["pnl"] or 0, 2),
+        "latency_ms": r["signal_to_trade_latency_ms"] or 0,
+        "opened_at": r["opened_at"], "closed_at": r["closed_at"],
+    } for r in recent]
+
+    total_trades = conn.execute("SELECT COUNT(*) FROM trades").fetchone()[0]
+    wins = conn.execute("SELECT COUNT(*) FROM trades WHERE pnl > 0").fetchone()[0]
+    avg_latency = conn.execute("SELECT AVG(signal_to_trade_latency_ms) FROM trades WHERE signal_to_trade_latency_ms > 0").fetchone()[0]
+
+    # Daily PnL curve
+    daily = conn.execute("SELECT date, balance FROM daily_pnl ORDER BY date ASC").fetchall()
+    pnl_curve = [{"date": r["date"], "balance": r["balance"]} for r in daily]
+
+    return {
+        "instance": "arbclaw",
+        "wallet": {
+            "balance": round(balance, 2), "starting_balance": starting,
+            "total_pnl": round(total_pnl, 2),
+            "total_trades": total_trades, "wins": wins,
+            "win_rate": round(wins / total_trades * 100, 1) if total_trades > 0 else 0,
+            "open_positions": len(open_list),
+            "avg_latency_ms": round(avg_latency or 0, 1),
+        },
+        "open_positions": open_list,
+        "recent_trades": recent_list,
+        "pnl_curve": pnl_curve,
+    }
+
+
+def _rivalclaw_state(conn):
+    """Read RivalClaw wallet state (Mirofish-compatible schema)."""
+    starting = 1000.0
+    ctx = conn.execute("SELECT value FROM context WHERE chat_id='rivalclaw' AND key='starting_balance'").fetchone()
+    if ctx:
+        starting = float(ctx[0])
+
+    closed_pnl = conn.execute("SELECT COALESCE(SUM(pnl), 0) FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')").fetchone()[0]
+    open_trades = conn.execute("SELECT * FROM paper_trades WHERE status='open' ORDER BY opened_at DESC").fetchall()
+
+    unrealized = 0.0
+    open_list = []
+    for t in open_trades:
+        latest = conn.execute(
+            "SELECT yes_price, no_price FROM market_data WHERE market_id=? ORDER BY fetched_at DESC LIMIT 1",
+            (t["market_id"],)
+        ).fetchone()
+        current = t["entry_price"]
+        if latest:
+            current = latest["yes_price"] if t["direction"] == "YES" else latest["no_price"]
+            if current is None:
+                current = t["entry_price"]
+        pnl = t["shares"] * (current - t["entry_price"])
+        pnl_pct = (pnl / t["amount_usd"] * 100) if t["amount_usd"] > 0 else 0
+        unrealized += pnl
+        open_list.append({
+            "market_id": t["market_id"], "question": (t["question"] or "")[:80],
+            "direction": t["direction"], "strategy": t["strategy"],
+            "entry_price": t["entry_price"], "current_price": current,
+            "amount_usd": t["amount_usd"], "pnl": round(pnl, 2), "pnl_pct": round(pnl_pct, 1),
+            "latency_ms": t["signal_to_trade_latency_ms"] or 0,
+            "opened_at": t["opened_at"],
+        })
+
+    balance = starting + closed_pnl + unrealized
+
+    recent = conn.execute(
+        "SELECT * FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired') ORDER BY closed_at DESC LIMIT 20"
+    ).fetchall()
+    recent_list = [{
+        "market_id": r["market_id"], "direction": r["direction"],
+        "entry_price": r["entry_price"], "exit_price": r["exit_price"],
+        "pnl": round(r["pnl"] or 0, 2), "status": r["status"],
+        "latency_ms": r["signal_to_trade_latency_ms"] or 0,
+        "opened_at": r["opened_at"], "closed_at": r["closed_at"],
+    } for r in recent]
+
+    all_closed = conn.execute("SELECT status, pnl FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')").fetchall()
+    total_closed = len(all_closed)
+    wins = sum(1 for t in all_closed if t["status"] == "closed_win")
+
+    avg_latency = conn.execute(
+        "SELECT AVG(signal_to_trade_latency_ms) FROM paper_trades WHERE signal_to_trade_latency_ms > 0"
+    ).fetchone()[0]
+
+    # Cycle metrics
+    cycle_metrics = []
+    try:
+        rows = conn.execute(
+            "SELECT * FROM cycle_metrics ORDER BY id DESC LIMIT 20"
+        ).fetchall()
+        cycle_metrics = [dict(r) for r in rows]
+    except Exception:
+        pass
+
+    # Daily PnL curve
+    daily = conn.execute("SELECT date, balance, roi_pct FROM daily_pnl ORDER BY date ASC").fetchall()
+    pnl_curve = [{"date": r["date"], "balance": r["balance"], "roi_pct": r["roi_pct"]} for r in daily]
+
+    return {
+        "instance": "rivalclaw",
+        "wallet": {
+            "balance": round(balance, 2), "starting_balance": starting,
+            "total_pnl": round(closed_pnl, 2),
+            "unrealized_pnl": round(unrealized, 2),
+            "total_trades": total_closed, "wins": wins,
+            "win_rate": round(wins / total_closed * 100, 1) if total_closed > 0 else 0,
+            "open_positions": len(open_list),
+            "avg_latency_ms": round(avg_latency or 0, 1),
+        },
+        "open_positions": open_list,
+        "recent_trades": recent_list,
+        "pnl_curve": pnl_curve,
+        "cycle_metrics": cycle_metrics,
+    }
+
+
+def _quantumentalclaw_state(conn):
+    """Read QuantumentalClaw state — signal fusion engine with learning loop."""
+    starting = 10000.0
+    ctx = conn.execute("SELECT value FROM context WHERE key='starting_balance'").fetchone()
+    if ctx:
+        starting = float(ctx[0])
+
+    # Closed trades PnL
+    closed_pnl = 0.0
+    try:
+        closed_pnl = conn.execute(
+            "SELECT COALESCE(SUM(pnl_usd), 0) FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')"
+        ).fetchone()[0]
+    except Exception:
+        pass
+
+    # Open positions
+    open_trades = conn.execute(
+        "SELECT pt.*, td.event_id, td.venue, td.ticker, td.direction, td.final_score, "
+        "td.confidence, td.amount_usd as decision_amount, td.signal_snapshot, td.reasoning "
+        "FROM paper_trades pt "
+        "JOIN trade_decisions td ON pt.decision_id = td.decision_id "
+        "WHERE pt.status='open' ORDER BY pt.executed_at DESC"
+    ).fetchall()
+
+    unrealized = 0.0
+    open_list = []
+    for t in open_trades:
+        entry = t["fill_price"]
+        current = entry  # No live price tracking yet; will improve
+        pnl = t["fill_shares"] * (current - entry)
+        pnl_pct = (pnl / t["fill_amount_usd"] * 100) if t["fill_amount_usd"] > 0 else 0
+        unrealized += pnl
+
+        # Parse signal snapshot
+        snapshot = {}
+        try:
+            snapshot = json.loads(t["signal_snapshot"]) if t["signal_snapshot"] else {}
+        except Exception:
+            pass
+
+        open_list.append({
+            "event_id": t["event_id"], "venue": t["venue"],
+            "ticker": t["ticker"], "direction": t["direction"],
+            "entry_price": entry, "current_price": current,
+            "amount_usd": t["fill_amount_usd"],
+            "final_score": t["final_score"], "confidence": t["confidence"],
+            "signal_scores": snapshot,
+            "pnl": round(pnl, 2), "pnl_pct": round(pnl_pct, 1),
+            "reasoning": t["reasoning"] or "",
+            "opened_at": t["executed_at"],
+        })
+
+    balance = starting + closed_pnl + unrealized
+
+    # Recent closed trades
+    recent = conn.execute(
+        "SELECT pt.*, td.event_id, td.venue, td.ticker, td.direction, td.final_score, td.signal_snapshot "
+        "FROM paper_trades pt "
+        "JOIN trade_decisions td ON pt.decision_id = td.decision_id "
+        "WHERE pt.status IN ('closed_win','closed_loss','expired') "
+        "ORDER BY pt.exit_at DESC LIMIT 20"
+    ).fetchall()
+    recent_list = []
+    for r in recent:
+        recent_list.append({
+            "event_id": r["event_id"], "venue": r["venue"],
+            "ticker": r["ticker"], "direction": r["direction"],
+            "entry_price": r["fill_price"], "exit_price": r["exit_price"],
+            "pnl": round(r["pnl_usd"] or 0, 2), "status": r["status"],
+            "final_score": r["final_score"],
+            "opened_at": r["executed_at"], "closed_at": r["exit_at"],
+        })
+
+    # Stats
+    all_closed = conn.execute(
+        "SELECT status, pnl_usd FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')"
+    ).fetchall()
+    total_closed = len(all_closed)
+    wins = sum(1 for t in all_closed if t["status"] == "closed_win")
+
+    # Cycle count
+    cycle_count = 0
+    try:
+        cc = conn.execute("SELECT value FROM context WHERE key='cycle_count'").fetchone()
+        if cc:
+            cycle_count = int(cc[0])
+    except Exception:
+        pass
+
+    # Signal weight history (learning evolution)
+    weight_history = []
+    try:
+        rows = conn.execute("SELECT * FROM weight_log ORDER BY logged_at DESC LIMIT 20").fetchall()
+        weight_history = [dict(r) for r in rows]
+    except Exception:
+        pass
+
+    # Module accuracy
+    module_stats = []
+    try:
+        rows = conn.execute(
+            "SELECT module, accuracy, total_signals, avg_score FROM module_accuracy "
+            "ORDER BY computed_at DESC LIMIT 10"
+        ).fetchall()
+        module_stats = [dict(r) for r in rows]
+    except Exception:
+        pass
+
+    # Daily PnL curve
+    pnl_curve = []
+    try:
+        daily = conn.execute("SELECT date, ending_balance, realized_pnl FROM daily_pnl ORDER BY date ASC").fetchall()
+        pnl_curve = [{"date": r["date"], "balance": r["ending_balance"], "pnl": r["realized_pnl"]} for r in daily]
+    except Exception:
+        pass
+
+    return {
+        "instance": "quantumentalclaw",
+        "wallet": {
+            "balance": round(balance, 2), "starting_balance": starting,
+            "total_pnl": round(closed_pnl, 2),
+            "unrealized_pnl": round(unrealized, 2),
+            "total_trades": total_closed, "wins": wins,
+            "win_rate": round(wins / total_closed * 100, 1) if total_closed > 0 else 0,
+            "open_positions": len(open_list),
+            "cycles_completed": cycle_count,
+        },
+        "open_positions": open_list,
+        "recent_trades": recent_list,
+        "pnl_curve": pnl_curve,
+        "weight_history": weight_history,
+        "module_accuracy": module_stats,
+    }
+
+
+@app.get("/api/trading/experiment")
+async def get_experiment_dashboard(user: str = Depends(get_current_user)):
+    """Four-way experiment dashboard: ArbClaw + RivalClaw + QuantumentalClaw."""
+    result = {"arbclaw": None, "rivalclaw": None, "quantumentalclaw": None}
+    for instance in ("arbclaw", "rivalclaw", "quantumentalclaw"):
+        conn = _experiment_db(instance)
+        if not conn:
+            continue
+        try:
+            if instance == "arbclaw":
+                result[instance] = _arbclaw_state(conn)
+            elif instance == "rivalclaw":
+                result[instance] = _rivalclaw_state(conn)
+            else:
+                result[instance] = _quantumentalclaw_state(conn)
+        except Exception as e:
+            result[instance] = {"error": str(e)}
+        finally:
+            conn.close()
+    return result
+
+
+# ── Terminal Watch ────────────────────────────────────────────────────────────
+
+@app.get("/api/terminal/sessions")
+async def terminal_sessions(user: str = Depends(get_current_user)):
+    """List available tmux sessions and panes."""
+    try:
+        r = subprocess.run(["tmux", "list-sessions", "-F", "#{session_name}:#{session_windows}"],
+                          capture_output=True, text=True, timeout=3)
+        if r.returncode != 0:
+            return {"sessions": []}
+        sessions = []
+        for line in r.stdout.strip().splitlines():
+            if ":" not in line: continue
+            name, windows = line.rsplit(":", 1)
+            pr = subprocess.run(["tmux", "list-panes", "-t", name, "-F",
+                "#{pane_index}:#{pane_id}:#{pane_current_command}:#{pane_current_path}"],
+                capture_output=True, text=True, timeout=3)
+            panes = []
+            if pr.returncode == 0:
+                for pl in pr.stdout.strip().splitlines():
+                    parts = pl.split(":", 3)
+                    if len(parts) >= 4:
+                        panes.append({"index": int(parts[0]), "id": parts[1],
+                                      "command": parts[2], "cwd": parts[3]})
+            sessions.append({"name": name, "windows": int(windows), "panes": panes})
+        return {"sessions": sessions}
+    except Exception:
+        return {"sessions": []}
+
+@app.post("/api/terminal/start")
+async def terminal_start(request: Request, user: str = Depends(get_current_user)):
+    """Start relay on a tmux session/pane."""
+    data = await request.json()
+    session = data.get("session")
+    if not session: raise HTTPException(400, "Missing 'session'")
+    pane = data.get("pane")
+    if TERMINAL_PID.exists():
+        try:
+            pid = int(TERMINAL_PID.read_text().strip())
+            os.kill(pid, 0)
+            return {"status": "already_running", "pid": pid}
+        except (ProcessLookupError, ValueError):
+            TERMINAL_PID.unlink(missing_ok=True)
+    cmd = [sys.executable, str(TERMINAL_RELAY), "--session", session]
+    if pane is not None: cmd.extend(["--pane", str(pane)])
+    subprocess.Popen(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    for _ in range(10):
+        time.sleep(0.2)
+        if TERMINAL_PID.exists():
+            return {"status": "started", "pid": int(TERMINAL_PID.read_text().strip()),
+                    "session": session, "pane": pane}
+    return {"status": "started", "session": session, "pane": pane}
+
+@app.post("/api/terminal/stop")
+async def terminal_stop(user: str = Depends(get_current_user)):
+    """Stop the relay."""
+    if not TERMINAL_PID.exists(): return {"status": "not_running"}
+    try:
+        pid = int(TERMINAL_PID.read_text().strip())
+        os.kill(pid, signal.SIGTERM)
+        TERMINAL_PID.unlink(missing_ok=True)
+        return {"status": "stopped", "pid": pid}
+    except ProcessLookupError:
+        TERMINAL_PID.unlink(missing_ok=True)
+        return {"status": "not_running", "note": "stale PID cleaned"}
+
+@app.get("/api/terminal/status")
+async def terminal_status(user: str = Depends(get_current_user)):
+    """Relay status check."""
+    running, pid = False, None
+    if TERMINAL_PID.exists():
+        try:
+            pid = int(TERMINAL_PID.read_text().strip())
+            os.kill(pid, 0); running = True
+        except (ProcessLookupError, ValueError):
+            TERMINAL_PID.unlink(missing_ok=True); pid = None
+    event_count = sum(1 for _ in open(TERMINAL_LOG)) if TERMINAL_LOG.exists() else 0
+    return {"running": running, "pid": pid, "event_count": event_count}
+
+@app.get("/api/terminal/events")
+async def terminal_events(n: int = 20, errors_only: bool = False,
+                          user: str = Depends(get_current_user)):
+    """Last N events from JSONL log."""
+    if not TERMINAL_LOG.exists(): return {"events": []}
+    events = []
+    for line in reversed(TERMINAL_LOG.read_text().strip().splitlines()):
+        try:
+            ev = json.loads(line)
+            if errors_only and ev.get("event_type") not in ("error", "build_failure", "test_failure"):
+                continue
+            events.append(ev)
+            if len(events) >= n: break
+        except Exception: pass
+    return {"events": events}
+
+@app.get("/api/terminal/stream")
+async def terminal_stream(request: Request):
+    """SSE stream of new terminal events."""
+    token = request.cookies.get("oc_token") or request.query_params.get("token")
+    if not token or not verify_token(token):
+        if not is_localhost(request): raise HTTPException(401, "Not authenticated")
+    async def event_gen():
+        last_count = sum(1 for _ in open(TERMINAL_LOG)) if TERMINAL_LOG.exists() else 0
+        while True:
+            if await request.is_disconnected(): break
+            try:
+                if TERMINAL_LOG.exists():
+                    lines = TERMINAL_LOG.read_text().strip().splitlines()
+                    if len(lines) > last_count:
+                        new_events = []
+                        for line in lines[last_count:]:
+                            try: new_events.append(json.loads(line))
+                            except Exception: pass
+                        if new_events:
+                            yield f"data: {json.dumps({'events': new_events})}\n\n"
+                        last_count = len(lines)
+                    else:
+                        yield ": heartbeat\n\n"
+                else:
+                    yield ": heartbeat\n\n"
+            except Exception:
+                yield ": heartbeat\n\n"
+            await asyncio.sleep(2)
+    return StreamingResponse(event_gen(), media_type="text/event-stream",
+                            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+@app.post("/api/terminal/snapshot")
+async def terminal_snapshot(user: str = Depends(get_current_user)):
+    """Trigger manual snapshot."""
+    if not TERMINAL_PID.exists(): raise HTTPException(400, "Relay not running")
+    try:
+        pid = int(TERMINAL_PID.read_text().strip()); os.kill(pid, 0)
+    except (ProcessLookupError, ValueError):
+        raise HTTPException(400, "Relay not running")
+    trigger = LOGS_DIR / "terminal-snapshot-trigger"
+    trigger.write_text(datetime.now().isoformat())
+    pre_count = sum(1 for _ in open(TERMINAL_LOG)) if TERMINAL_LOG.exists() else 0
+    for _ in range(15):
+        time.sleep(0.2)
+        if TERMINAL_LOG.exists() and sum(1 for _ in open(TERMINAL_LOG)) > pre_count:
+            return json.loads(TERMINAL_LOG.read_text().strip().splitlines()[-1])
+    return {"status": "snapshot_requested", "note": "check events shortly"}
+
+def _build_packet(event=None):
+    cwd = event.get("cwd", str(OPENCLAW_ROOT)) if event else str(OPENCLAW_ROOT)
+    recent = []
+    if TERMINAL_LOG.exists():
+        for line in reversed(TERMINAL_LOG.read_text().strip().splitlines()[-20:]):
+            try:
+                ev = json.loads(line)
+                if ev.get("command"): recent.append(ev["command"])
+                if len(recent) >= 5: break
+            except Exception: pass
+    try:
+        br = subprocess.run(["git", "rev-parse", "--abbrev-ref", "HEAD"],
+                           capture_output=True, text=True, cwd=cwd, timeout=3)
+        branch = br.stdout.strip() if br.returncode == 0 else "unknown"
+    except Exception: branch = "unknown"
+    try:
+        dr = subprocess.run(["git", "diff", "--stat"], capture_output=True, text=True, cwd=cwd, timeout=5)
+        diff_stat = dr.stdout.strip() if dr.returncode == 0 else ""
+    except Exception: diff_stat = ""
+    try:
+        fr = subprocess.run(["git", "diff", "--name-only"], capture_output=True, text=True, cwd=cwd, timeout=5)
+        changed = [f for f in fr.stdout.strip().splitlines() if f] if fr.returncode == 0 else []
+    except Exception: changed = []
+    return {
+        "context": {"repo": Path(cwd).name, "branch": branch, "cwd": cwd,
+                    "session": event.get("session", "") if event else "",
+                    "recent_commands": recent, "git_diff_stat": diff_stat, "changed_files": changed},
+        "event": {"type": event.get("event_type", "") if event else "",
+                 "command": event.get("command", "") if event else "",
+                 "exit_code": event.get("exit_code") if event else None,
+                 "output_tail": event.get("output_tail", []) if event else [],
+                 "duration_ms": event.get("duration_ms") if event else None},
+        "question": "Explain what failed and suggest a fix."
+    }
+
+@app.post("/api/terminal/packet")
+async def terminal_packet(request: Request, user: str = Depends(get_current_user)):
+    """Build analysis packet from last or specified event."""
+    data = await request.json() if request.headers.get("content-type") == "application/json" else {}
+    event = None
+    if TERMINAL_LOG.exists():
+        lines = TERMINAL_LOG.read_text().strip().splitlines()
+        event_id = data.get("event_id")
+        if event_id:
+            for line in reversed(lines):
+                try:
+                    ev = json.loads(line)
+                    if ev.get("timestamp") == event_id: event = ev; break
+                except Exception: pass
+        elif lines:
+            try: event = json.loads(lines[-1])
+            except Exception: pass
+    if not event: raise HTTPException(404, "No events found")
+    return _build_packet(event)
+
+@app.get("/api/terminal/packet/preview")
+async def terminal_packet_preview(user: str = Depends(get_current_user)):
+    """Preview packet from most recent event."""
+    event = None
+    if TERMINAL_LOG.exists():
+        lines = TERMINAL_LOG.read_text().strip().splitlines()
+        if lines:
+            try: event = json.loads(lines[-1])
+            except Exception: pass
+    if not event: return {"packet": None, "note": "No events available"}
+    return {"packet": _build_packet(event)}
+
+
+# ── GitHub Intel ──────────────────────────────────────────────────────────────
+INTEL_DIR        = OPENCLAW_ROOT / "autoresearch" / "github-intel"
+INTEL_RECS       = INTEL_DIR / "recommendations.json"
+INTEL_ARCHIVE    = INTEL_DIR / "archive.json"
+INTEL_CRAWL_SCRIPT = OPENCLAW_ROOT / "scripts" / "github-intel-cron.sh"
+
+def _read_intel_recs() -> dict:
+    if INTEL_RECS.exists():
+        try:
+            return json.loads(INTEL_RECS.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return {"crawl_date": "", "analyzed_at": "", "model": "", "total_analyzed": 0, "recommendations": []}
+
+def _write_intel_recs(data: dict):
+    INTEL_DIR.mkdir(parents=True, exist_ok=True)
+    INTEL_RECS.write_text(json.dumps(data, indent=2), encoding="utf-8")
+
+def _read_intel_archive() -> list:
+    """Read the rejection/review archive. Repos are NEVER deleted — rejected ones live here."""
+    if INTEL_ARCHIVE.exists():
+        try:
+            return json.loads(INTEL_ARCHIVE.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return []
+
+def _write_intel_archive(archive: list):
+    INTEL_DIR.mkdir(parents=True, exist_ok=True)
+    INTEL_ARCHIVE.write_text(json.dumps(archive, indent=2), encoding="utf-8")
+
+@app.get("/api/intel")
+async def intel_list(sort: str = "composite", user: str = Depends(get_current_user)):
+    """Latest recommendations with flexible sorting.
+    Sort options: composite, integration_value, signal_score, complexity, stars,
+                  clawmpson_relevance, arbclaw_relevance, rivalclaw_relevance, recency, value_per_complexity
+    """
+    data = _read_intel_recs()
+    recs = data.get("recommendations", [])
+    sort_desc = True
+    if sort == "composite":
+        # Weighted composite: integration_value*3 + signal_score*2 + max_relevance - complexity*0.5
+        def composite(r):
+            max_rel = max(r.get("clawmpson_relevance", 0), r.get("arbclaw_relevance", 0), r.get("rivalclaw_relevance", 0))
+            return r.get("integration_value", 0) * 3 + r.get("signal_score", 0) * 2 + max_rel - r.get("complexity", 0) * 0.5
+        recs.sort(key=composite, reverse=True)
+    elif sort == "value_per_complexity":
+        # Best bang for buck: high value, low complexity
+        recs.sort(key=lambda r: (r.get("integration_value", 0) / max(r.get("complexity", 1), 1)), reverse=True)
+    elif sort == "complexity":
+        # Low complexity first (easiest to integrate)
+        recs.sort(key=lambda r: r.get("complexity", 10))
+        sort_desc = False
+    elif sort == "recency":
+        recs.sort(key=lambda r: r.get("last_updated", "") or "", reverse=True)
+    elif sort in ("integration_value", "signal_score", "stars", "clawmpson_relevance", "arbclaw_relevance", "rivalclaw_relevance"):
+        recs.sort(key=lambda r: r.get(sort, 0), reverse=True)
+    else:
+        recs.sort(key=lambda r: r.get("integration_value", 0), reverse=True)
+    return {
+        "crawl_date": data.get("crawl_date", ""),
+        "analyzed_at": data.get("analyzed_at", ""),
+        "model": data.get("model", ""),
+        "total_analyzed": data.get("total_analyzed", 0),
+        "recommendations": recs,
+    }
+
+@app.get("/api/intel/history")
+async def intel_history(user: str = Depends(get_current_user)):
+    """List past crawl dates from archived files."""
+    history = []
+    if INTEL_DIR.exists():
+        for f in sorted(INTEL_DIR.glob("recommendations*.json"), key=lambda p: p.stat().st_mtime, reverse=True):
+            try:
+                d = json.loads(f.read_text(encoding="utf-8"))
+                history.append({
+                    "file": f.name,
+                    "crawl_date": d.get("crawl_date", ""),
+                    "analyzed_at": d.get("analyzed_at", ""),
+                    "count": d.get("total_analyzed", 0),
+                })
+            except Exception:
+                pass
+    return history
+
+@app.get("/api/intel/repo/{rec_id}")
+async def intel_repo_detail(rec_id: str, user: str = Depends(get_current_user)):
+    """Full detail for one recommendation."""
+    data = _read_intel_recs()
+    for rec in data.get("recommendations", []):
+        if rec.get("id") == rec_id:
+            return rec
+    raise HTTPException(404, "Recommendation not found")
+
+@app.post("/api/intel/approve")
+async def intel_approve(request: Request, user: str = Depends(get_current_user)):
+    """Approve recommendation and dispatch to queue."""
+    body = await request.json()
+    rec_id = body.get("id", "")
+    targets = body.get("targets", [])
+    notes = body.get("notes", "")
+
+    valid_targets = {"clawmpson", "arbclaw", "rivalclaw"}
+    targets = [t for t in targets if t in valid_targets]
+    if not targets:
+        raise HTTPException(400, "At least one target bot required")
+
+    data = _read_intel_recs()
+    rec = None
+    for r in data.get("recommendations", []):
+        if r.get("id") == rec_id:
+            rec = r
+            break
+    if not rec:
+        raise HTTPException(404, "Recommendation not found")
+
+    # Update recommendation
+    task_id = f"intel-{str(uuid.uuid4())[:8]}"
+    rec["status"] = "approved"
+    rec["approved_for"] = targets
+    rec["approved_at"] = datetime.now().isoformat()
+    rec["task_id"] = task_id
+    _write_intel_recs(data)
+
+    # Create task in pending.json
+    task = {
+        "id": task_id,
+        "type": "github-intel-integration",
+        "title": f"Integrate {rec.get('what_to_take', 'patterns')[:80]} from {rec.get('repo_name', 'unknown')}",
+        "description": f"LLM verdict: {rec.get('verdict', 'STUDY')}. {rec.get('what_to_take', '')} Risk: {rec.get('risk', 'none')}. {notes}".strip(),
+        "source_repo": rec.get("repo_url", ""),
+        "targets": targets,
+        "priority": "medium",
+        "status": "pending",
+        "created_at": datetime.now().isoformat(),
+        "approved_by": user,
+        "recommendation_id": rec_id,
+    }
+
+    pending = []
+    if PENDING_JSON.exists():
+        try:
+            pending = json.loads(PENDING_JSON.read_text(encoding="utf-8"))
+        except Exception:
+            pending = []
+    pending.append(task)
+    PENDING_JSON.write_text(json.dumps(pending, indent=2), encoding="utf-8")
+
+    return {"ok": True, "task_id": task_id, "targets": targets}
+
+@app.post("/api/intel/reject")
+async def intel_reject(request: Request, user: str = Depends(get_current_user)):
+    """Reject a recommendation — marks as rejected AND copies to archive. Repos are NEVER deleted."""
+    body = await request.json()
+    rec_id = body.get("id", "")
+    reason = body.get("reason", "")
+
+    data = _read_intel_recs()
+    for r in data.get("recommendations", []):
+        if r.get("id") == rec_id:
+            r["status"] = "rejected"
+            r["rejected_at"] = datetime.now().isoformat()
+            r["rejected_by"] = user
+            if reason:
+                r["reject_reason"] = reason
+            _write_intel_recs(data)
+            # Also copy to archive (repos are NEVER deleted, even on reject)
+            archive = _read_intel_archive()
+            # Avoid duplicates in archive by ID
+            if not any(a.get("id") == rec_id for a in archive):
+                archive.append({**r, "archived_at": datetime.now().isoformat()})
+            else:
+                # Update existing archive entry
+                for i, a in enumerate(archive):
+                    if a.get("id") == rec_id:
+                        archive[i] = {**r, "archived_at": datetime.now().isoformat()}
+                        break
+            _write_intel_archive(archive)
+            return {"ok": True}
+    raise HTTPException(404, "Recommendation not found")
+
+@app.get("/api/intel/archive")
+async def intel_archive_list(user: str = Depends(get_current_user)):
+    """View all archived (rejected) repos — nothing is ever deleted."""
+    return _read_intel_archive()
+
+@app.post("/api/intel/bookmark")
+async def intel_bookmark(request: Request, user: str = Depends(get_current_user)):
+    """Bookmark for later review."""
+    body = await request.json()
+    rec_id = body.get("id", "")
+
+    data = _read_intel_recs()
+    for r in data.get("recommendations", []):
+        if r.get("id") == rec_id:
+            r["status"] = "bookmarked"
+            _write_intel_recs(data)
+            return {"ok": True}
+    raise HTTPException(404, "Recommendation not found")
+
+@app.post("/api/intel/run-crawl")
+async def intel_run_crawl(user: str = Depends(get_current_user)):
+    """Trigger crawl + analysis manually (fire-and-forget)."""
+    if not INTEL_CRAWL_SCRIPT.exists():
+        raise HTTPException(500, "Crawl script not found")
+    subprocess.Popen(
+        ["/bin/bash", str(INTEL_CRAWL_SCRIPT)],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        start_new_session=True,
+    )
+    return {"ok": True, "message": "Crawl started in background"}
+
+
+@app.post("/api/intel/push-all-github")
+async def intel_push_all_github(request: Request, user: str = Depends(get_current_user)):
+    """Push ALL unique GitHub repos from crawl files to Repo Man for analysis."""
+    import glob as _glob
+
+    datasets_dir = OPENCLAW_ROOT / "autoresearch" / "outputs" / "datasets"
+    crawl_files = sorted(_glob.glob(str(datasets_dir / "crawl_*.json")))
+
+    # Collect unique repos by URL
+    seen = {}
+    for filepath in crawl_files:
+        try:
+            items = json.loads(Path(filepath).read_text(encoding="utf-8"))
+            if not isinstance(items, list):
+                continue
+            for item in items:
+                url = item.get("url") or item.get("html_url") or ""
+                if url and "github.com" in url and url not in seen:
+                    seen[url] = {
+                        "url": url,
+                        "name": item.get("full_name") or item.get("name", ""),
+                        "stars": item.get("stars", 0),
+                        "description": (item.get("description") or "")[:200],
+                        "language": item.get("language", ""),
+                        "signal_score": item.get("signal_score", 0),
+                        "category": item.get("category", ""),
+                    }
+        except Exception:
+            continue
+
+    if not seen:
+        raise HTTPException(400, "No GitHub repos found in crawl data")
+
+    # Check which are already in Repo Man (by querying recommendations.json for pushed URLs)
+    already_pushed = set()
+    if INTEL_RECS.exists():
+        try:
+            data = json.loads(INTEL_RECS.read_text(encoding="utf-8"))
+            for r in data.get("recommendations", []):
+                if r.get("repo_url"):
+                    already_pushed.add(r["repo_url"])
+        except Exception:
+            pass
+
+    # Filter to only new repos
+    new_repos = {url: info for url, info in seen.items() if url not in already_pushed}
+
+    if not new_repos:
+        return {"ok": True, "queued": 0, "total_unique": len(seen),
+                "already_pushed": len(already_pushed),
+                "message": "All repos already pushed to Repo Man"}
+
+    # Push to Repo Man via /api/run in batches of 10 (no auth needed, same as manual bucket)
+    repoman_url = REPO_MAN_API.rstrip("/")
+    total_queued = 0
+    errors = []
+
+    batch_size = 10
+    repo_list = list(new_repos.values())
+
+    async with httpx.AsyncClient(timeout=60) as client:
+        for i in range(0, len(repo_list), batch_size):
+            batch = repo_list[i:i + batch_size]
+            # /api/run takes newline-separated URLs as "inputs" string
+            urls_text = "\n".join(
+                f"{repo['url']}  # {repo['name']} | {repo['stars']}★"
+                for repo in batch
+            )
+            try:
+                resp = await client.post(
+                    f"{repoman_url}/api/run",
+                    headers={"Content-Type": "application/json"},
+                    json={
+                        "inputs": urls_text,
+                        "notes": "github-intel-bulk — pushed from Gonzoclaw dashboard",
+                    },
+                )
+                if resp.status_code in (200, 202):
+                    data = resp.json()
+                    total_queued += data.get("item_count", len(batch))
+                else:
+                    errors.append(f"Batch {i//batch_size}: {resp.status_code} {resp.text[:200]}")
+            except Exception as exc:
+                errors.append(f"Batch {i//batch_size}: {exc}")
+            # Delay between batches so Repo Man can process
+            await asyncio.sleep(2)
+
+    return {
+        "ok": total_queued > 0,
+        "queued": total_queued,
+        "total_unique": len(seen),
+        "already_pushed": len(already_pushed),
+        "new_repos": len(new_repos),
+        "errors": errors[:5] if errors else [],
+        "message": f"Pushed {total_queued} of {len(new_repos)} new repos to Repo Man",
+    }
+
+
+@app.get("/api/intel/crawler-health")
+async def intel_crawler_health(user: str = Depends(get_current_user)):
+    """Check crawler status: is it running, when was last crawl, did it find results?"""
+    import glob as _glob
+
+    # Check if continuous crawler PID is alive
+    pid_file = LOGS_DIR / "github-intel-continuous.pid"
+    crawler_running = False
+    crawler_pid = None
+    if pid_file.exists():
+        try:
+            crawler_pid = int(pid_file.read_text().strip())
+            os.kill(crawler_pid, 0)  # Signal 0 = check if alive
+            crawler_running = True
+        except (ValueError, OSError):
+            crawler_running = False
+
+    # Find latest crawl file and its results
+    datasets_dir = OPENCLAW_ROOT / "autoresearch" / "outputs" / "datasets"
+    crawl_files = sorted(_glob.glob(str(datasets_dir / "crawl_*.json")))
+    last_crawl_file = crawl_files[-1] if crawl_files else None
+    last_crawl_count = 0
+    last_crawl_time = None
+
+    if last_crawl_file:
+        try:
+            last_crawl_count = len(json.loads(Path(last_crawl_file).read_text()))
+        except Exception:
+            pass
+        try:
+            last_crawl_time = datetime.fromtimestamp(
+                Path(last_crawl_file).stat().st_mtime
+            ).isoformat()
+        except Exception:
+            pass
+
+    # Check last 2 crawls to detect drying up
+    recent_counts = []
+    for f in crawl_files[-5:]:
+        try:
+            recent_counts.append(len(json.loads(Path(f).read_text())))
+        except Exception:
+            recent_counts.append(0)
+
+    # Detect if results are drying up (last crawl found <10 new repos or declining trend)
+    drying_up = False
+    if recent_counts:
+        drying_up = recent_counts[-1] < 10
+        if len(recent_counts) >= 3:
+            # Check for declining trend
+            avg_recent = sum(recent_counts[-2:]) / 2
+            avg_earlier = sum(recent_counts[:-2]) / max(len(recent_counts) - 2, 1)
+            if avg_earlier > 0 and avg_recent / avg_earlier < 0.3:
+                drying_up = True
+
+    return {
+        "crawler_running": crawler_running,
+        "crawler_pid": crawler_pid,
+        "last_crawl_time": last_crawl_time,
+        "last_crawl_count": last_crawl_count,
+        "recent_counts": recent_counts,
+        "total_crawl_files": len(crawl_files),
+        "drying_up": drying_up,
+    }
+
+@app.get("/api/intel/stream")
+async def intel_stream(request: Request):
+    """SSE stream for new recommendations."""
+    token = request.cookies.get("oc_token") or request.query_params.get("token")
+    if not token or not verify_token(token):
+        if not is_localhost(request):
+            raise HTTPException(401, "Not authenticated")
+
+    async def event_gen():
+        last_mtime = 0.0
+        while True:
+            try:
+                if INTEL_RECS.exists():
+                    mtime = INTEL_RECS.stat().st_mtime
+                    if mtime != last_mtime:
+                        last_mtime = mtime
+                        data = _read_intel_recs()
+                        payload = json.dumps({
+                            "total": data.get("total_analyzed", 0),
+                            "pending": len([r for r in data.get("recommendations", []) if r.get("status") == "pending"]),
+                            "analyzed_at": data.get("analyzed_at", ""),
+                        })
+                        yield f"data: {payload}\n\n"
+                    else:
+                        yield ": heartbeat\n\n"
+                else:
+                    yield ": heartbeat\n\n"
+            except Exception as e:
+                yield f"data: {json.dumps({'error': str(e)})}\n\n"
+            await asyncio.sleep(5)
+
+    return StreamingResponse(event_gen(), media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+@app.get("/api/intel/stats")
+async def intel_stats(user: str = Depends(get_current_user)):
+    """Aggregate stats."""
+    data = _read_intel_recs()
+    recs = data.get("recommendations", [])
+    archive = _read_intel_archive()
+    stats = {"total": len(recs), "total_library": data.get("total_library", len(recs)),
+             "pending": 0, "approved": 0, "rejected": 0, "bookmarked": 0,
+             "integrate": 0, "study": 0, "skip": 0, "archived": len(archive)}
+    for r in recs:
+        s = r.get("status", "pending")
+        if s in stats:
+            stats[s] += 1
+        v = r.get("verdict", "").lower()
+        if v in stats:
+            stats[v] += 1
+    stats["crawl_date"] = data.get("crawl_date", "")
+    stats["analyzed_at"] = data.get("analyzed_at", "")
+    return stats
+
+
+# ── Crawler Signal Bus ────────────────────────────────────────────────────────
+SIGNALS_DIR = OPENCLAW_ROOT / "autoresearch" / "signals"
+
+SIGNAL_PLATFORMS = [
+    "github", "polymarket", "kalshi", "reddit", "x", "discord", "telegram",
+    "stocktwits", "tradingview", "seekingalpha", "unusualwhales",
+    "linkedin", "facebook", "instagram", "tiktok", "moltbook",
+]
+
+def _read_signal(platform: str) -> dict:
+    f = SIGNALS_DIR / f"{platform}.json"
+    if f.exists():
+        try:
+            return json.loads(f.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return {"platform": platform, "signals": [], "meta": {"total_signals": 0}}
+
+@app.get("/api/intel/signals")
+async def signals_all(user: str = Depends(get_current_user)):
+    """All platforms, latest signals combined."""
+    combined = []
+    for p in SIGNAL_PLATFORMS:
+        data = _read_signal(p)
+        for s in data.get("signals", []):
+            s["_platform"] = p
+            combined.append(s)
+    combined.sort(key=lambda s: s.get("extracted_at", ""), reverse=True)
+    return {"platforms": SIGNAL_PLATFORMS, "signals": combined[:200], "total": len(combined)}
+
+@app.get("/api/intel/signals/{platform}")
+async def signals_platform(platform: str, user: str = Depends(get_current_user)):
+    """Signals for one platform."""
+    if platform not in SIGNAL_PLATFORMS:
+        raise HTTPException(404, f"Unknown platform: {platform}")
+    return _read_signal(platform)
+
+@app.get("/api/intel/signals/{platform}/history")
+async def signals_history(platform: str, user: str = Depends(get_current_user)):
+    """Historical signal counts from SQLite if available."""
+    # Check crawler's local DB
+    crawler_db = OPENCLAW_ROOT / "crawlers" / f"openclaw-{platform}-crawler" / "data" / "signals.db"
+    if not crawler_db.exists():
+        crawler_db = OPENCLAW_ROOT / "crawlers" / f"openclaw-{platform}-feed" / "data" / "signals.db"
+    if not crawler_db.exists():
+        return {"platform": platform, "history": [], "total": 0}
+    try:
+        import sqlite3 as _sql
+        conn = _sql.connect(str(crawler_db))
+        rows = conn.execute(
+            "SELECT date(extracted_at) as d, COUNT(*) as c FROM signals WHERE platform=? GROUP BY d ORDER BY d DESC LIMIT 30",
+            (platform,)
+        ).fetchall()
+        conn.close()
+        return {"platform": platform, "history": [{"date": r[0], "count": r[1]} for r in rows], "total": sum(r[1] for r in rows)}
+    except Exception:
+        return {"platform": platform, "history": [], "total": 0}
+
+@app.get("/api/intel/signals/overview/stats")
+async def signals_stats(user: str = Depends(get_current_user)):
+    """Cross-platform signal stats."""
+    stats = {}
+    total = 0
+    for p in SIGNAL_PLATFORMS:
+        data = _read_signal(p)
+        count = len(data.get("signals", []))
+        stats[p] = {"count": count, "crawled_at": data.get("crawled_at", "")}
+        total += count
+    return {"platforms": stats, "total_signals": total, "active_platforms": sum(1 for v in stats.values() if v["count"] > 0)}
+
+@app.get("/api/intel/signals/stream/live")
+async def signals_stream(request: Request):
+    """SSE for real-time signal updates across all platforms."""
+    token = request.cookies.get("oc_token") or request.query_params.get("token")
+    if not token or not verify_token(token):
+        if not is_localhost(request):
+            raise HTTPException(401, "Not authenticated")
+
+    async def event_gen():
+        last_mtimes = {}
+        while True:
+            try:
+                changed = []
+                for p in SIGNAL_PLATFORMS:
+                    f = SIGNALS_DIR / f"{p}.json"
+                    if f.exists():
+                        mt = f.stat().st_mtime
+                        if mt != last_mtimes.get(p, 0):
+                            last_mtimes[p] = mt
+                            changed.append(p)
+                if changed:
+                    payload = json.dumps({"updated": changed, "ts": datetime.now().isoformat()})
+                    yield f"data: {payload}\n\n"
+                else:
+                    yield ": heartbeat\n\n"
+            except Exception as e:
+                yield f"data: {json.dumps({'error': str(e)})}\n\n"
+            await asyncio.sleep(5)
+
+    return StreamingResponse(event_gen(), media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+# ══════════════════════════════════════════════════════════════════
+# CHATGPT ANALYSIS — Send research to GPT-4o, get recommendations
+# ══════════════════════════════════════════════════════════════════
+
+_CHATGPT_SYSTEM_PROMPT = """You are a strategic advisor for OpenClaw, a web business operating system with three deployed trading instances:
+
+1. **Clawmpson** (clawmpson) — Primary instance. Full business OS with 4 trading strategies, 5 data feeds, graduation engine, 13 agents. Handles trading, software dev, agentic ops, marketing, content, research.
+2. **RivalClaw** (rivalclaw) — Lightweight 8-strategy quant engine with hedge engine and self-tuner. Polymarket-centric, mechanical execution.
+3. **QuantumentalClaw** (quantumentalclaw) — Signal fusion engine for asymmetric opportunities across equities and prediction markets. 5 independent signal types.
+
+You are analyzing research items that were collected and pre-analyzed by Repo Man (a research ingestion pipeline). Each item includes its original LINK — use these links to inform your analysis and include them in your recommendations so the human operator can verify sources.
+
+For each batch, provide a JSON response with:
+1. executive_summary: 2-3 sentence overview of all findings
+2. recommendations: array of actionable strategies/integrations/improvements
+3. meta_observations: cross-cutting patterns you noticed
+
+Each recommendation MUST include:
+- title: concise action title (under 80 chars)
+- summary: what this is and why it matters (2-3 sentences)
+- category: one of trading_signal, integration, research, infrastructure, content
+- confidence: 0.0-1.0 (how confident this is actionable and valuable)
+- urgency: immediate, this_week, or backlog
+- recommended_target: which instance should handle this (clawmpson, rivalclaw, or quantumentalclaw)
+- recommended_target_name: human-readable instance name (Lobster S. Clawmpson, RivalClaw, QuantumentalClaw)
+- action_plan: step-by-step markdown plan (concrete enough for an AI coding agent to execute)
+- source_items: list of item IDs this recommendation is based on
+- source_links: list of original URLs/links for the source items (so operator can verify)
+- risk: low, medium, or high
+- risk_notes: specific risk concerns (null if low risk)
+
+Respond ONLY with valid JSON. No markdown fences, no commentary outside the JSON."""
+
+
+@app.post("/api/chatgpt/analyze")
+async def chatgpt_analyze(request: Request, user: str = Depends(get_current_user)):
+    """Fetch research from Repo Man, send to GPT-4o, save report."""
+    openai_key = os.environ.get("OPENAI_API_KEY", "")
+    if not openai_key:
+        raise HTTPException(500, "OPENAI_API_KEY not configured")
+
+    body = {}
+    try:
+        body = await request.json()
+    except Exception:
+        pass
+    item_limit = body.get("item_limit", 20)
+
+    # 1. Fetch completed items from Repo Man
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.get(f"{REPO_MAN_API}/api/inbox", params={"limit": item_limit})
+            resp.raise_for_status()
+            inbox = resp.json()
+    except Exception as exc:
+        raise HTTPException(502, f"Failed to fetch from Repo Man: {exc}")
+
+    items = inbox.get("items", [])
+    if not items:
+        raise HTTPException(400, "No completed research items to analyze")
+
+    # 2. Predigest: extract essentials, cluster similar items, compress
+    def _extract_item(item):
+        """Pull only the fields GPT needs, aggressively truncated."""
+        analysis = ""
+        key_ideas = []
+        for key in ("claude_analysis", "openai_analysis", "ollama_analysis"):
+            a = item.get(key)
+            if a and isinstance(a, dict):
+                if not analysis and a.get("summary"):
+                    analysis = a["summary"][:250]
+                if not key_ideas and a.get("key_ideas"):
+                    key_ideas = [str(k)[:60] for k in a["key_ideas"][:3]]
+        routing = item.get("openclaw_routing") or {}
+        return {
+            "id": item.get("id", "unknown"),
+            "title": item.get("title", "Untitled")[:100],
+            "url": item.get("raw_input", ""),
+            "source": item.get("source_type", "unknown"),
+            "novelty": round(item.get("novelty_score", 0), 2),
+            "action": item.get("action_recommendation", ""),
+            "analysis": analysis,
+            "ideas": key_ideas,
+            "target": routing.get("recommended_instance", ""),
+            "route_reason": routing.get("reasoning", "")[:100],
+        }
+
+    digested = [_extract_item(i) for i in items]
+
+    # Cluster by source type to reduce redundancy
+    clusters = {}
+    for d in digested:
+        key = d["source"]
+        clusters.setdefault(key, []).append(d)
+
+    # Build compressed prompt
+    item_blocks = []
+    input_items_summary = []
+    for source_type, cluster in clusters.items():
+        if len(cluster) > 3:
+            # Summarize cluster: keep top 3 by novelty, note the rest
+            cluster.sort(key=lambda x: x["novelty"], reverse=True)
+            top = cluster[:3]
+            rest_count = len(cluster) - 3
+            for d in top:
+                item_blocks.append(
+                    f"[{d['id']}] {d['title']} | novelty={d['novelty']} | {d['action']}\n"
+                    f"  LINK: {d['url']}\n"
+                    f"  {d['analysis']}\n  Ideas: {', '.join(d['ideas'])}\n  → {d['target']} ({d['route_reason']})"
+                )
+            if rest_count:
+                # Still include links for omitted items so GPT can investigate
+                rest_links = [f"  - {d['url']}" for d in cluster[3:] if d.get("url")]
+                omit_block = f"(+{rest_count} more {source_type} items, lower novelty)"
+                if rest_links:
+                    omit_block += "\n  Links:\n" + "\n".join(rest_links)
+                item_blocks.append(omit_block)
+            for d in cluster:
+                input_items_summary.append({
+                    "id": d["id"], "title": d["title"], "url": d["url"],
+                    "source_type": d["source"], "novelty_score": d["novelty"],
+                    "action_recommendation": d["action"],
+                })
+        else:
+            for d in cluster:
+                item_blocks.append(
+                    f"[{d['id']}] {d['title']} | novelty={d['novelty']} | {d['action']}\n"
+                    f"  LINK: {d['url']}\n"
+                    f"  {d['analysis']}\n  Ideas: {', '.join(d['ideas'])}\n  → {d['target']} ({d['route_reason']})"
+                )
+                input_items_summary.append({
+                    "id": d["id"], "title": d["title"], "url": d["url"],
+                    "source_type": d["source"], "novelty_score": d["novelty"],
+                    "action_recommendation": d["action"],
+                })
+
+    user_message = (
+        f"Analyze these {len(items)} research items ({len(clusters)} source types) "
+        f"and provide strategic recommendations:\n\n"
+        + "\n\n".join(item_blocks)
+    )
+
+    # Log prompt size for observability
+    prompt_chars = len(_CHATGPT_SYSTEM_PROMPT) + len(user_message)
+    est_tokens = prompt_chars // 4
+    import logging
+    logging.getLogger("dashboard").info(
+        f"ChatGPT analyze: {len(items)} items → {len(item_blocks)} blocks, "
+        f"~{est_tokens} input tokens, {prompt_chars} chars"
+    )
+
+    # 3. Call OpenAI API (with retry for 429 rate limits)
+    oai_data = None
+    last_err = None
+    for attempt in range(3):
+        try:
+            async with httpx.AsyncClient(timeout=90) as client:
+                oai_resp = await client.post(
+                    "https://api.openai.com/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {openai_key}",
+                        "Content-Type": "application/json",
+                    },
+                    json={
+                        "model": os.environ.get("CHATGPT_RESEARCH_MODEL", "gpt-4o"),
+                        "max_tokens": int(os.environ.get("CHATGPT_RESEARCH_MAX_TOKENS", "2048")),
+                        "temperature": 0.3,
+                        "response_format": {"type": "json_object"},
+                        "messages": [
+                            {"role": "system", "content": _CHATGPT_SYSTEM_PROMPT},
+                            {"role": "user", "content": user_message},
+                        ],
+                    },
+                )
+                if oai_resp.status_code == 429 and attempt < 2:
+                    wait = int(oai_resp.headers.get("retry-after", 20 * (attempt + 1)))
+                    await asyncio.sleep(wait)
+                    continue
+                oai_resp.raise_for_status()
+                oai_data = oai_resp.json()
+                break
+        except Exception as exc:
+            last_err = exc
+            if attempt < 2:
+                await asyncio.sleep(10 * (attempt + 1))
+            continue
+    if oai_data is None:
+        raise HTTPException(502, f"OpenAI API call failed after 3 attempts: {last_err}")
+
+    # 4. Parse response
+    tokens_used = oai_data.get("usage", {}).get("total_tokens", 0)
+    raw_content = oai_data["choices"][0]["message"]["content"]
+    try:
+        parsed = json.loads(raw_content)
+    except json.JSONDecodeError:
+        raise HTTPException(502, "OpenAI returned invalid JSON")
+
+    # 5. Build report
+    now = datetime.now()
+    report_id = f"rpt-{now.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:4]}"
+
+    # Ensure recommendations have all required fields
+    recs = parsed.get("recommendations", [])
+    for rec in recs:
+        rec.setdefault("deployed", False)
+        rec.setdefault("deployed_at", None)
+        rec.setdefault("task_id", None)
+        rec.setdefault("risk_notes", None)
+
+    report = {
+        "id": report_id,
+        "created_at": now.isoformat(),
+        "model": os.environ.get("CHATGPT_RESEARCH_MODEL", "gpt-4o"),
+        "tokens_used": tokens_used,
+        "item_count": len(items),
+        "input_items": input_items_summary,
+        "executive_summary": parsed.get("executive_summary", ""),
+        "recommendations": recs,
+        "meta_observations": parsed.get("meta_observations", ""),
+        "status": "complete",
+    }
+
+    # 6. Save
+    CHATGPT_REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    report_file = CHATGPT_REPORTS_DIR / f"{report_id}.json"
+    report_file.write_text(json.dumps(report, indent=2), encoding="utf-8")
+
+    return report
+
+
+@app.get("/api/chatgpt/reports")
+async def chatgpt_list_reports(user: str = Depends(get_current_user)):
+    """List all saved ChatGPT analysis reports."""
+    CHATGPT_REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    reports = []
+    for f in sorted(CHATGPT_REPORTS_DIR.glob("*.json"), reverse=True):
+        try:
+            data = json.loads(f.read_text(encoding="utf-8"))
+            reports.append({
+                "id": data["id"],
+                "created_at": data["created_at"],
+                "item_count": data.get("item_count", 0),
+                "recommendation_count": len(data.get("recommendations", [])),
+                "status": data.get("status", "complete"),
+            })
+        except Exception:
+            pass
+    return {"reports": reports}
+
+
+@app.get("/api/chatgpt/reports/{report_id}")
+async def chatgpt_get_report(report_id: str, user: str = Depends(get_current_user)):
+    """Return a full ChatGPT analysis report."""
+    report_file = CHATGPT_REPORTS_DIR / f"{report_id}.json"
+    if not report_file.exists():
+        raise HTTPException(404, "Report not found")
+    return json.loads(report_file.read_text(encoding="utf-8"))
+
+
+@app.post("/api/chatgpt/deploy")
+async def chatgpt_deploy(request: Request, user: str = Depends(get_current_user)):
+    """Deploy a single ChatGPT recommendation to the task queue."""
+    body = await request.json()
+    report_id = body.get("report_id", "")
+    rec_index = body.get("rec_index", -1)
+
+    report_file = CHATGPT_REPORTS_DIR / f"{report_id}.json"
+    if not report_file.exists():
+        raise HTTPException(404, "Report not found")
+
+    report = json.loads(report_file.read_text(encoding="utf-8"))
+    recs = report.get("recommendations", [])
+    if rec_index < 0 or rec_index >= len(recs):
+        raise HTTPException(400, "Invalid recommendation index")
+
+    rec = recs[rec_index]
+    if rec.get("deployed"):
+        raise HTTPException(400, "Already deployed")
+
+    target = rec.get("recommended_target", "clawmpson")
+    valid_targets = {"clawmpson", "arbclaw", "rivalclaw", "quantumentalclaw"}
+    if target not in valid_targets:
+        target = "clawmpson"
+
+    task_id = f"chatgpt-{uuid.uuid4().hex[:8]}"
+    task = {
+        "id": task_id,
+        "type": "chatgpt-strategy-deploy",
+        "title": f"[ChatGPT] {rec.get('title', 'Untitled')[:80]}",
+        "description": rec.get("summary", ""),
+        "strategy_details": rec.get("action_plan", ""),
+        "confidence": rec.get("confidence", 0),
+        "targets": [target],
+        "priority": "high" if rec.get("confidence", 0) >= 0.8 else "medium",
+        "status": "pending",
+        "created_at": datetime.now().isoformat(),
+        "approved_by": user,
+        "source_report": report_id,
+        "source_rec_index": rec_index,
+    }
+
+    pending = []
+    if PENDING_JSON.exists():
+        try:
+            pending = json.loads(PENDING_JSON.read_text(encoding="utf-8"))
+        except Exception:
+            pending = []
+    pending.append(task)
+    PENDING_JSON.write_text(json.dumps(pending, indent=2), encoding="utf-8")
+
+    rec["deployed"] = True
+    rec["deployed_at"] = datetime.now().isoformat()
+    rec["task_id"] = task_id
+    report_file.write_text(json.dumps(report, indent=2), encoding="utf-8")
+
+    return {"ok": True, "task_id": task_id, "targets": [target]}
+
+
+@app.post("/api/chatgpt/deploy-all")
+async def chatgpt_deploy_all(request: Request, user: str = Depends(get_current_user)):
+    """Deploy all undeployed recommendations from a report."""
+    body = await request.json()
+    report_id = body.get("report_id", "")
+
+    report_file = CHATGPT_REPORTS_DIR / f"{report_id}.json"
+    if not report_file.exists():
+        raise HTTPException(404, "Report not found")
+
+    report = json.loads(report_file.read_text(encoding="utf-8"))
+
+    pending = []
+    if PENDING_JSON.exists():
+        try:
+            pending = json.loads(PENDING_JSON.read_text(encoding="utf-8"))
+        except Exception:
+            pending = []
+
+    task_ids = []
+    for i, rec in enumerate(report.get("recommendations", [])):
+        if rec.get("deployed"):
+            continue
+        target = rec.get("recommended_target", "clawmpson")
+        valid_targets = {"clawmpson", "arbclaw", "rivalclaw", "quantumentalclaw"}
+        if target not in valid_targets:
+            target = "clawmpson"
+
+        task_id = f"chatgpt-{uuid.uuid4().hex[:8]}"
+        task = {
+            "id": task_id,
+            "type": "chatgpt-strategy-deploy",
+            "title": f"[ChatGPT] {rec.get('title', 'Untitled')[:80]}",
+            "description": rec.get("summary", ""),
+            "strategy_details": rec.get("action_plan", ""),
+            "confidence": rec.get("confidence", 0),
+            "targets": [target],
+            "priority": "high" if rec.get("confidence", 0) >= 0.8 else "medium",
+            "status": "pending",
+            "created_at": datetime.now().isoformat(),
+            "approved_by": user,
+            "source_report": report_id,
+            "source_rec_index": i,
+        }
+        pending.append(task)
+        task_ids.append(task_id)
+
+        rec["deployed"] = True
+        rec["deployed_at"] = datetime.now().isoformat()
+        rec["task_id"] = task_id
+
+    PENDING_JSON.write_text(json.dumps(pending, indent=2), encoding="utf-8")
+    report_file.write_text(json.dumps(report, indent=2), encoding="utf-8")
+
+    return {"ok": True, "task_ids": task_ids, "deployed_count": len(task_ids)}
+
+
+@app.get("/{path:path}")
 async def spa(path: str, request: Request):
     # Let API routes through
     if path.startswith("api/") or path.startswith("auth/"):
@@ -1108,10 +2736,14 @@ async def spa(path: str, request: Request):
     # Check auth — localhost skips OAuth
     token = request.cookies.get("oc_token")
     if not token or not verify_token(token):
-        if is_localhost(request):
-            return (Path(__file__).parent / "index.html").read_text()
-        return RedirectResponse(url="/login")
-    return (Path(__file__).parent / "index.html").read_text()
+        if not is_localhost(request):
+            return RedirectResponse(url="/login")
+    html = (Path(__file__).parent / "index.html").read_text()
+    return HTMLResponse(content=html, headers={
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+    })
 
 if __name__ == "__main__":
     import uvicorn

@@ -1,0 +1,32 @@
+{
+  "version": "1",
+  "updated": "2026-03-25",
+  "description": "AutoScholar watchlist — named papers/techniques to monitor across HF, llama.cpp, and Ollama ecosystems.",
+  "entries": [
+    {
+      "id": "turboquant",
+      "name": "TurboQuant",
+      "description": "Google Research technique for extreme KV cache compression — 6x memory reduction at 3-bit precision with zero accuracy loss. Training-free. Works on Llama, Mistral, and Gemma families.",
+      "source_url": "https://research.google/blog/turboquant-redefining-ai-efficiency-with-extreme-compression/",
+      "priority": "P1",
+      "tags": ["quantization", "KV-cache", "inference-optimization", "ollama", "local-llm"],
+      "added": "2026-03-25",
+      "rationale": "Directly impacts M2 Max inference performance. 6x KV cache reduction could enable running larger models within the 96GB envelope, or significantly increase context length for existing models at zero accuracy cost.",
+      "monitor": {
+        "search_terms": [
+          "TurboQuant KV cache compression",
+          "extreme KV cache quantization inference",
+          "llama.cpp KV cache 3-bit quantization",
+          "TurboQuant Llama Mistral Gemma implementation",
+          "Ollama KV cache compression"
+        ],
+        "targets": [
+          "llama.cpp implementation PRs (Ollama uses llama.cpp under the hood)",
+          "HuggingFace implementations or model quantizations using TurboQuant",
+          "Follow-up papers improving on the technique",
+          "Ollama native support announcements"
+        ]
+      }
+    }
+  ]
+}

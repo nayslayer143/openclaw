@@ -512,3 +512,8 @@ def to_market_event(raw: dict) -> "MarketEvent":
     """Convert a Kalshi market dict into a canonical MarketEvent."""
     from scripts.mirofish.market_event import MarketEventNormalizer
     return MarketEventNormalizer.normalize_kalshi(raw)
+
+
+if __name__ == "__main__":
+    markets = fetch()
+    print(f"[kalshi_feed] Refreshed {len(markets)} markets to DB")

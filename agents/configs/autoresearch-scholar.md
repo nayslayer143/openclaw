@@ -71,6 +71,18 @@ Add to crontab with: `crontab -e`
 - tool use LLM
 - agentic systems
 
+## Watchlist
+
+Named papers and techniques with explicit monitoring targets.
+File: `scripts/autoresearch/watchlist.json`
+
+`auto_mode()` merges all `monitor.search_terms` from watchlist entries into the
+overnight domain sweep automatically. To add a new entry: edit `watchlist.json`.
+
+| ID | Name | Priority | Tags |
+|----|------|----------|------|
+| turboquant | TurboQuant (Google — extreme KV cache compression) | P1 | quantization, KV-cache, inference-optimization, ollama, local-llm |
+
 ## Source
 
 `scripts/autoresearch/scholar.py`

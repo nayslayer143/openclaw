@@ -1,0 +1,296 @@
+{
+  "platform": "polymarket",
+  "crawl_id": "pm-bf-90eb924c",
+  "crawled_at": "2026-03-25T03:36:17.183556",
+  "signals": [
+    {
+      "id": "b4e413f6c6e83d7e",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/bitcoin-above-71600-on-march-25-2026-5am-et",
+      "source_author": "polymarket",
+      "title": "Bitcoin above 71,600 on March 25, 5AM ET?",
+      "body": "Price: 0.00 | Vol: $100 | Liq: $6,130",
+      "ticker_or_market": "POLYMARKET:bitcoin-above-71600-on-march-25-2026-5am-et",
+      "direction": "bearish",
+      "confidence": 0.3,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 99.995,
+        "liquidity": 6130.447
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "1714028",
+        "price": 0.0005,
+        "volume": 99.995,
+        "liquidity": 6130.447
+      },
+      "extracted_at": "2026-03-25T10:36:17.179113"
+    },
+    {
+      "id": "423d9475f4d73404",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/trump-margin-of-victory-in-new-hampshire-primary-0-2pt5",
+      "source_author": "polymarket",
+      "title": "Trump margin of victory in New Hampshire Primary 0-2.5%",
+      "body": "Price: 0.00 | Vol: $99,925 | Liq: $41,169",
+      "ticker_or_market": "POLYMARKET:trump-margin-of-victory-in-new-hampshire-primary-0-2pt5",
+      "direction": "bearish",
+      "confidence": 0.47,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 99924.953131,
+        "liquidity": 41168.72563
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "253898",
+        "price": 0.0,
+        "volume": 99924.953131,
+        "liquidity": 41168.72563
+      },
+      "extracted_at": "2026-03-25T10:36:17.179445"
+    },
+    {
+      "id": "04dc9c7c2710bb53",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/highest-temperature-in-houston-on-march-26-2026-74-75f",
+      "source_author": "polymarket",
+      "title": "Will the highest temperature in Houston be between 74-75\u00b0F on March 26?",
+      "body": "Price: 0.01 | Vol: $999 | Liq: $2,054",
+      "ticker_or_market": "POLYMARKET:highest-temperature-in-houston-on-march-26-2026-74-75f",
+      "direction": "bearish",
+      "confidence": 0.33,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 999.0403289999998,
+        "liquidity": 2053.62103
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "1680990",
+        "price": 0.008,
+        "volume": 999.0403289999998,
+        "liquidity": 2053.62103
+      },
+      "extracted_at": "2026-03-25T10:36:17.179524"
+    },
+    {
+      "id": "f79a0bca72948aca",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/will-the-miami-heat-win-the-2026-nba-finals",
+      "source_author": "polymarket",
+      "title": "Will the Miami Heat win the 2026 NBA Finals?",
+      "body": "Price: 0.01 | Vol: $9,988,893 | Liq: $343,826",
+      "ticker_or_market": "POLYMARKET:will-the-miami-heat-win-the-2026-nba-finals",
+      "direction": "bearish",
+      "confidence": 0.95,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 9988892.90173194,
+        "liquidity": 343826.46214
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "553873",
+        "price": 0.0065,
+        "volume": 9988892.90173194,
+        "liquidity": 343826.46214
+      },
+      "extracted_at": "2026-03-25T10:36:17.179623"
+    },
+    {
+      "id": "bd54656bb538e304",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/will-wagner-take-moscow-by-tuesday",
+      "source_author": "polymarket",
+      "title": "Will Wagner take Moscow by Tuesday?",
+      "body": "Price: 0.00 | Vol: $9,987 | Liq: $1,346",
+      "ticker_or_market": "POLYMARKET:will-wagner-take-moscow-by-tuesday",
+      "direction": "bearish",
+      "confidence": 0.82,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 9986.601416000001,
+        "liquidity": 1346.4555
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "251623",
+        "price": 0.0,
+        "volume": 9986.601416000001,
+        "liquidity": 1346.4555
+      },
+      "extracted_at": "2026-03-25T10:36:17.179687"
+    },
+    {
+      "id": "5f558babb8e173fb",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/highest-temperature-in-sao-paulo-on-march-26-2026-24c",
+      "source_author": "polymarket",
+      "title": "Will the highest temperature in Sao Paulo be 24\u00b0C on March 26?",
+      "body": "Price: 0.00 | Vol: $998 | Liq: $4,840",
+      "ticker_or_market": "POLYMARKET:highest-temperature-in-sao-paulo-on-march-26-2026-24c",
+      "direction": "bearish",
+      "confidence": 0.31,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 998.2954540000001,
+        "liquidity": 4840.45412
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "1680649",
+        "price": 0.0025,
+        "volume": 998.2954540000001,
+        "liquidity": 4840.45412
+      },
+      "extracted_at": "2026-03-25T10:36:17.179968"
+    },
+    {
+      "id": "5f558babb8e173fb",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/highest-temperature-in-sao-paulo-on-march-26-2026-24c",
+      "source_author": "polymarket",
+      "title": "Will the highest temperature in Sao Paulo be 24\u00b0C on March 26?",
+      "body": "Price: 0.00 | Vol: $998 | Liq: $4,837",
+      "ticker_or_market": "POLYMARKET:highest-temperature-in-sao-paulo-on-march-26-2026-24c",
+      "direction": "bearish",
+      "confidence": 0.31,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 998.2954540000001,
+        "liquidity": 4837.29688
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "1680649",
+        "price": 0.0025,
+        "volume": 998.2954540000001,
+        "liquidity": 4837.29688
+      },
+      "extracted_at": "2026-03-25T10:36:17.180014"
+    },
+    {
+      "id": "b0b610660c0f2c4a",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/will-washington-nationals-win-the-2026-nl-east-title",
+      "source_author": "polymarket",
+      "title": "Will Washington Nationals win the 2026 NL East title?",
+      "body": "Price: 0.02 | Vol: $998 | Liq: $3,648",
+      "ticker_or_market": "POLYMARKET:will-washington-nationals-win-the-2026-nl-east-title",
+      "direction": "bearish",
+      "confidence": 0.32,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 997.6775190000002,
+        "liquidity": 3648.21604
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "1395774",
+        "price": 0.0245,
+        "volume": 997.6775190000002,
+        "liquidity": 3648.21604
+      },
+      "extracted_at": "2026-03-25T10:36:17.180384"
+    },
+    {
+      "id": "c45c186111b60a23",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/trump-margin-of-victory-in-new-hampshire-primary-15",
+      "source_author": "polymarket",
+      "title": "Trump margin of victory in New Hampshire Primary >15%",
+      "body": "Price: 0.00 | Vol: $997,617 | Liq: $31,908",
+      "ticker_or_market": "POLYMARKET:trump-margin-of-victory-in-new-hampshire-primary-15",
+      "direction": "bearish",
+      "confidence": 0.95,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 997617.2574219999,
+        "liquidity": 31908.400500000003
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "253891",
+        "price": 0.0,
+        "volume": 997617.2574219999,
+        "liquidity": 31908.400500000003
+      },
+      "extracted_at": "2026-03-25T10:36:17.180455"
+    },
+    {
+      "id": "cac16cae3290c446",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/will-trump-say-cookie-this-week-march-29",
+      "source_author": "polymarket",
+      "title": "Will Trump say \"Cookie\" this week? (March 29)",
+      "body": "Price: 0.49 | Vol: $997 | Liq: $1,232",
+      "ticker_or_market": "POLYMARKET:will-trump-say-cookie-this-week-march-29",
+      "direction": "neutral",
+      "confidence": 0.36,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 997.4394729999999,
+        "liquidity": 1232.2527
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "1665154",
+        "price": 0.49,
+        "volume": 997.4394729999999,
+        "liquidity": 1232.2527
+      },
+      "extracted_at": "2026-03-25T10:36:17.183100"
+    },
+    {
+      "id": "aa9b9d4c65e05036",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/will-tsla-reach-503-in-march",
+      "source_author": "polymarket",
+      "title": "Will Tesla reach $503 in March?",
+      "body": "Price: 0.00 | Vol: $9,961 | Liq: $8,170",
+      "ticker_or_market": "POLYMARKET:will-tsla-reach-503-in-march",
+      "direction": "bearish",
+      "confidence": 0.39,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 9960.628766999993,
+        "liquidity": 8169.98272
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "1432270",
+        "price": 0.0025,
+        "volume": 9960.628766999993,
+        "liquidity": 8169.98272
+      },
+      "extracted_at": "2026-03-25T10:36:17.183468"
+    }
+  ],
+  "meta": {
+    "total_signals": 11
+  }
+}
