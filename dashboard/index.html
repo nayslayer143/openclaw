@@ -5044,6 +5044,19 @@ function buildUnifiedFeed(d) {
     }
   }
 
+  // RivalClaw positions (separate DB)
+  for (const p of (d.rivalclaw_positions || [])) {
+    const bot = BOT_COLORS[p.strategy] || {name: 'RIVAL', color: 'rgba(180,140,255,0.9)'}
+    allTrades.push({
+      bot: 'RIVAL', botColor: 'rgba(180,140,255,0.9)',
+      strategy: p.strategy || 'rivalclaw', question: p.question || '', platform: 'KALSHI',
+      direction: p.direction, entry: p.entry_price || 0, current: p.current_price || p.entry_price || 0,
+      pnl: p.pnl || 0, pnlPct: 0, size: p.amount_usd || 0,
+      confidence: p.confidence || 0, closeTime: p.close_time || '',
+      openedAt: p.opened_at || '',
+    })
+  }
+
   // Sort
   const sortKey = document.getElementById('ufSort').value
   const sorters = {

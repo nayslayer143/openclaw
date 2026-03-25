@@ -27,7 +27,7 @@ def _load_env():
                 os.environ.setdefault(k.strip(), v.strip())
 
 # Config
-MAX_TRADES_PER_RUN = 3
+MAX_TRADES_PER_RUN = 6
 POSITION_PCT = 0.04
 MIN_ENTRY = 0.08
 MAX_ENTRY = 0.92
