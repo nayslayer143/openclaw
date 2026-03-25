@@ -1,0 +1,18 @@
+{
+  "allowed_domains": [],
+  "blocked_domains": [
+    "localhost",
+    "127.0.0.1"
+  ],
+  "rate_limit_seconds": [1, 3],
+  "default_timeout_ms": 30000,
+  "stealth_mode": false,
+  "proxy_url": null,
+  "robots_txt_respect": true,
+  "audit_log_dir": "~/openclaw/logs/browser",
+  "session_store_dir": "~/.openclaw/browser-sessions",
+  "vault_path": "~/.openclaw/browser-vault.enc",
+  "captcha_service": "2captcha",
+  "user_agent_stealth": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+  "user_agent_honest": "OpenClaw-BrowserBot/1.0 (+https://openclaw.local)"
+}
