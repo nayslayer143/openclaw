@@ -130,3 +130,34 @@ def test_eyes_hybrid_returns_string():
         result = eyes.extract(mode="auto")
         assert isinstance(result, str)
         assert len(result) > 0
+
+
+# ── browser_tools shim tests ──────────────────────────────────────────────────
+
+from browser.browser_tools import browser_open, browser_screenshot, browser_eval
+
+
+def test_browser_open_returns_dict():
+    result = browser_open("https://example.com")
+    assert result["ok"] is True
+    assert "title" in result
+    assert "url" in result
+
+
+def test_browser_screenshot_returns_png_bytes():
+    result = browser_screenshot("https://example.com")
+    assert result["ok"] is True
+    assert result["bytes"][:4] == b'\x89PNG'
+
+
+def test_browser_eval_executes_js():
+    result = browser_eval("https://example.com", "document.title")
+    assert result["ok"] is True
+    assert "Example Domain" in str(result["value"])
+
+
+def test_package_exports():
+    from browser import BrowserEngine, Eyes, Hands, AuthHandler, CaptchaHandler
+    from browser import browser_open, browser_screenshot, browser_click
+    assert all([BrowserEngine, Eyes, Hands, AuthHandler, CaptchaHandler,
+                browser_open, browser_screenshot, browser_click])
