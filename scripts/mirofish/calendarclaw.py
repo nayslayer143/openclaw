@@ -30,11 +30,11 @@ def _load_env():
                 os.environ.setdefault(k.strip(), v.strip())
 
 # Config
-MAX_TRADES_PER_RUN = 8
-POSITION_PCT = 0.04
-MIN_ENTRY = 0.08
-MAX_ENTRY = 0.92
-MIN_EDGE_SCORE = 0.45
+MAX_TRADES_PER_RUN = 30
+POSITION_PCT = 0.03
+MIN_ENTRY = 0.03
+MAX_ENTRY = 0.97
+MIN_EDGE_SCORE = 0.35
 
 # Event families and their typical windows
 EVENT_FAMILIES = {
@@ -59,13 +59,13 @@ EVENT_FAMILIES = {
         "typical_move": 0.05, "confidence_boost": 0.10,
     },
     "crypto_daily": {
-        "keywords": ["bitcoin price range", "ethereum price", "btc", "eth"],
-        "pre_window_hours": 2, "post_window_hours": 0.25,
+        "keywords": ["bitcoin price range", "ethereum price", "btc", "eth", "bnb", "doge", "solana"],
+        "pre_window_hours": 72, "post_window_hours": 0.25,
         "typical_move": 0.06, "confidence_boost": 0.10,
     },
     "weather": {
         "keywords": ["temperature", "weather", "max temp"],
-        "pre_window_hours": 6, "post_window_hours": 1,
+        "pre_window_hours": 48, "post_window_hours": 1,
         "typical_move": 0.12, "confidence_boost": 0.15,
     },
     "treasury": {
@@ -170,7 +170,7 @@ def scan_calendar_setups(conn, balance, open_ids) -> int:
         except Exception:
             continue
 
-        if hours_to_close < 0.1 or hours_to_close > 168:
+        if hours_to_close < 0.05 or hours_to_close > 168:
             continue
 
         ya = _norm(r["yes_ask"]) or _norm(r["yes_bid"])
@@ -223,6 +223,19 @@ def scan_calendar_setups(conn, balance, open_ids) -> int:
                 entry = na
                 score = 0.45 + config["confidence_boost"]
                 thesis = f"pre-event indecision: {family}, {hours_to_close:.1f}h, price at {ya:.2f} (coin flip → fade)"
+
+            # Cold-start lean: no history but strong price lean away from 50%
+            if not direction and len(history) < 3:
+                if ya > 0 and ya < 0.30:
+                    direction = "NO"
+                    entry = na if na > 0 else (1 - ya)
+                    score = 0.40 + config["confidence_boost"]
+                    thesis = f"pre-event cold-start lean: {family}, {hours_to_close:.1f}h, YES at {ya:.2f} (low → NO)"
+                elif ya > 0.70:
+                    direction = "YES"
+                    entry = ya
+                    score = 0.40 + config["confidence_boost"]
+                    thesis = f"pre-event cold-start lean: {family}, {hours_to_close:.1f}h, YES at {ya:.2f} (high → YES)"
 
         # Strategy B: Near-expiry convergence (within 1 hour)
         if not direction and hours_to_close < 1.0 and hours_to_close > 0.1:
