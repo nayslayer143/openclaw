@@ -4338,113 +4338,7 @@ function renderTrading() {
     equitySection.style.display = 'none'
   }
 
-  // Strategy table
-  const stratBody = document.getElementById('tStrategyBody')
-  const strats = d.strategy_breakdown || []
-  if (strats.length) {
-    stratBody.innerHTML = strats.map(s => {
-      const pnlClass = s.pnl >= 0 ? 't-pnl-pos' : 't-pnl-neg'
-      const tourney = (d.tournament || []).find(t => t.strategy === s.strategy)
-      const alloc = tourney ? (tourney.allocation_pct * 100).toFixed(0) + '%' : '-'
-      return `<tr>
-        <td style="color:var(--orange)">${s.strategy}</td>
-        <td>${s.wins}/${s.losses}</td>
-        <td>${s.win_rate.toFixed(0)}%</td>
-        <td class="${pnlClass}">${s.pnl >= 0 ? '+' : ''}$${s.pnl.toFixed(2)}</td>
-        <td>${alloc}</td>
-      </tr>`
-    }).join('')
-  } else {
-    stratBody.innerHTML = '<tr><td colspan="5" style="color:var(--grey2);text-align:center">no trades yet</td></tr>'
-  }
-
-  // Open positions
-  const openBody = document.getElementById('tOpenBody')
-  if (d.open_positions.length) {
-    openBody.innerHTML = d.open_positions.map(p => {
-      const pnlClass = p.pnl >= 0 ? 't-pnl-pos' : 't-pnl-neg'
-      let platform = 'polymarket'
-      const mid = p.market_id || ''
-      if (mid.startsWith('KX') || mid.startsWith('INX') || mid.startsWith('NAS')) platform = 'kalshi'
-      else if (mid.startsWith('SPOT:')) platform = 'crypto'
-      const platColor = platform === 'kalshi' ? 'var(--neon-cyan)' : (platform === 'crypto' ? 'var(--neon-green)' : 'var(--orange)')
-      return `<tr>
-        <td title="${p.market_id}">${p.question}</td>
-        <td style="color:${platColor};font-weight:600;font-size:0.48rem;letter-spacing:1px">${platform.toUpperCase()}</td>
-        <td>${p.direction}</td>
-        <td>${p.strategy}</td>
-        <td>${p.entry_price.toFixed(3)}</td>
-        <td>${p.current_price.toFixed(3)}</td>
-        <td class="${pnlClass}">${p.pnl >= 0 ? '+' : ''}$${p.pnl.toFixed(2)} (${p.pnl_pct >= 0 ? '+' : ''}${p.pnl_pct}%)</td>
-        <td>$${p.amount_usd.toFixed(0)}</td>
-        <td class="t-countdown" data-close="${p.close_time || ''}">${formatCountdown(p.close_time)}</td>
-      </tr>`
-    }).join('')
-  } else {
-    openBody.innerHTML = '<tr><td colspan="9" style="color:var(--grey2);text-align:center">no open positions</td></tr>'
-  }
-
-  // Recent trades
-  const recentBody = document.getElementById('tRecentBody')
-  const recent = d.recent_trades || []
-  if (recent.length) {
-    recentBody.innerHTML = recent.slice(0, 25).map(t => {
-      const pnl = t.pnl || 0
-      const pnlClass = pnl >= 0 ? 't-pnl-pos' : 't-pnl-neg'
-      const statusClass = t.status === 'closed_win' ? 't-status-win' : (t.status === 'closed_loss' ? 't-status-loss' : '')
-      const statusLabel = t.status === 'closed_win' ? 'WIN' : (t.status === 'closed_loss' ? 'LOSS' : t.status.toUpperCase())
-      return `<tr>
-        <td title="${t.market_id}">${(t.question || '').substring(0, 40)}</td>
-        <td>${t.direction}</td>
-        <td>${t.strategy}</td>
-        <td class="${pnlClass}">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)}</td>
-        <td class="${statusClass}">${statusLabel}</td>
-      </tr>`
-    }).join('')
-  } else {
-    recentBody.innerHTML = '<tr><td colspan="5" style="color:var(--grey2);text-align:center">no closed trades</td></tr>'
-  }
-
-  // Cross-venue arb
-  const arbBody = document.getElementById('tArbBody')
-  const arb = d.cross_venue_arb || []
-  if (arb.length) {
-    arbBody.innerHTML = arb.slice(0, 10).map(a => `<tr>
-      <td>${a.pair_id || '-'}</td>
-      <td>${a.buy_venue} @${(a.buy_price || 0).toFixed(3)}</td>
-      <td>${a.sell_venue} @${(a.sell_price || 0).toFixed(3)}</td>
-      <td>${(a.spread || 0).toFixed(3)}</td>
-      <td class="t-pnl-pos">${(a.estimated_edge || 0).toFixed(3)}</td>
-    </tr>`).join('')
-  } else {
-    arbBody.innerHTML = '<tr><td colspan="5" style="color:var(--grey2);text-align:center">no arb opportunities detected</td></tr>'
-  }
-
-  // Polymarket feed
-  const polyBody = document.getElementById('tPolyBody')
-  const poly = d.polymarket || []
-  document.getElementById('polyCount').textContent = poly.length
-  polyBody.innerHTML = poly.slice(0, 20).map(m => `<tr>
-    <td title="${m.market_id}">${(m.question || '').substring(0, 50)}</td>
-    <td>${(m.yes_price || 0).toFixed(2)}</td>
-    <td>${(m.no_price || 0).toFixed(2)}</td>
-    <td>$${((m.volume || 0) / 1000).toFixed(0)}k</td>
-  </tr>`).join('')
-
-  // Kalshi feed
-  const kalshiBody = document.getElementById('tKalshiBody')
-  const kalshi = d.kalshi || []
-  document.getElementById('kalshiCount').textContent = kalshi.length
-  if (kalshi.length) {
-    kalshiBody.innerHTML = kalshi.slice(0, 20).map(m => `<tr>
-      <td title="${m.ticker}">${(m.title || '').substring(0, 50)}</td>
-      <td>${m.yes_bid != null ? m.yes_bid.toFixed(2) : '-'}</td>
-      <td>${m.yes_ask != null ? m.yes_ask.toFixed(2) : '-'}</td>
-      <td>${((m.volume_24h || 0) / 1000).toFixed(0)}k</td>
-    </tr>`).join('')
-  } else {
-    kalshiBody.innerHTML = '<tr><td colspan="4" style="color:var(--grey2);text-align:center">no Kalshi data — set API keys</td></tr>'
-  }
+  // (Removed sections — all data now in hero cards + unified feed)
 
   // PhantomClaw hero card
   const ph = d.phantom || {}
@@ -4568,132 +4462,36 @@ async function loadExperiment() {
 }
 
 function renderExperiment(d) {
-  // ArbClaw
-  const ac = d.arbclaw
-  if (ac && !ac.error) {
-    const w = ac.wallet
-    const balEl = document.getElementById('acBalance')
-    balEl.textContent = '$' + w.balance.toFixed(2)
-    balEl.style.color = w.balance >= w.starting_balance ? 'var(--neon-green)' : 'var(--neon-red)'
-
-    const pnlEl = document.getElementById('acPnl')
-    pnlEl.textContent = (w.total_pnl >= 0 ? '+' : '') + '$' + w.total_pnl.toFixed(2)
-    pnlEl.style.color = w.total_pnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
-
-    try { document.getElementById('acWinRate').textContent = w.win_rate + '%' } catch(e){}
-    try { document.getElementById('acTrades').textContent = w.total_trades } catch(e){}
-    try { document.getElementById('acOpen').textContent = w.open_positions } catch(e){}
-    try { document.getElementById('acLatency').textContent = w.avg_latency_ms.toFixed(0) + 'ms' } catch(e){}
-
-    // Hero card
-    const acHeroPnl = document.getElementById('acPnlHero')
-    if (acHeroPnl) {
-      acHeroPnl.textContent = (w.total_pnl >= 0 ? '+' : '') + '$' + w.total_pnl.toFixed(2)
-      acHeroPnl.style.color = w.total_pnl >= 0 ? '#00ff88' : '#ff002e'
-    }
-    const acHeroWL = document.getElementById('acWLHero')
-    if (acHeroWL) {
-      acHeroWL.textContent = (w.win_count || 0) + '/' + ((w.total_trades || 0) - (w.win_count || 0))
-    }
-    const acHeroOpen = document.getElementById('acOpenHero')
-    if (acHeroOpen) acHeroOpen.textContent = w.open_positions
-
-    // Hero trade body
-    const acHBody = document.getElementById('acHeroBody')
-    if (acHBody) {
-      const acRows = [...(ac.open_positions || []).map(p => ({m: (p.question||p.market_id||'').substring(0,25), d: p.direction, pnl: p.pnl||0, s: 'OPEN'})),
-                       ...(ac.recent_trades || []).slice(0,5).map(t => ({m: (t.market_id||'').substring(0,25), d: t.direction, pnl: t.pnl||0, s: t.pnl > 0 ? 'WIN' : 'LOSS'}))]
-      if (acRows.length) {
-        acHBody.innerHTML = acRows.slice(0,6).map(r => {
-          const cls = r.s === 'OPEN' ? 'color:var(--neon-cyan)' : (r.pnl >= 0 ? 'color:#00ff88' : 'color:#ff002e')
-          return `<tr><td style="color:rgba(0,255,136,0.7)">${r.m}</td><td>${r.d}</td><td style="${cls}">${r.s==='OPEN'?'':'$'}${r.s==='OPEN'?'OPEN':r.pnl.toFixed(2)}</td><td style="${cls}">${r.s}</td></tr>`
-        }).join('')
-      } else {
-        acHBody.innerHTML = '<tr><td colspan="4" style="color:rgba(0,255,136,0.3);text-align:center">no true arbs found</td></tr>'
+  // RivalClaw hero update (safe — all getElementById calls are null-guarded)
+  try {
+    const rc = d.rivalclaw
+    if (rc && !rc.error) {
+      const w = rc.wallet
+      document.querySelectorAll('#rcPnl').forEach(el => {
+        el.textContent = (w.total_pnl >= 0 ? '+' : '') + '$' + w.total_pnl.toFixed(2)
+        el.style.color = w.total_pnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
+      })
+      document.querySelectorAll('#rcOpen').forEach(el => { el.textContent = w.open_positions })
+      const rcWLel = document.getElementById('rcWL')
+      if (rcWLel) {
+        const rcWins = w.win_count || 0
+        rcWLel.textContent = rcWins + '/' + (w.total_trades - rcWins)
+        rcWLel.style.color = rcWins >= (w.total_trades - rcWins) ? 'var(--neon-green)' : 'var(--neon-red)'
+      }
+      // RivalClaw hero trade body
+      const rcBody = document.getElementById('rcTradesBody')
+      if (rcBody) {
+        const rcRows = [...(rc.open_positions || []).map(p => ({m:(p.question||p.market_id||'').substring(0,30), d:p.direction, pnl:p.pnl||0, lat:p.latency_ms||0, open:true})),
+                        ...(rc.recent_trades || []).slice(0,5).map(t => ({m:(t.market_id||'').substring(0,30), d:t.direction, pnl:t.pnl||0, lat:t.latency_ms||0, open:false}))]
+        if (rcRows.length) {
+          rcBody.innerHTML = rcRows.slice(0,8).map(r => {
+            const cls = r.open ? 'color:var(--neon-cyan)' : (r.pnl>=0?'color:var(--neon-green)':'color:var(--neon-red)')
+            return `<tr><td style="color:rgba(180,140,255,0.7)">${r.m}</td><td>${r.d}</td><td style="${cls}">${r.open?'OPEN':(r.pnl>=0?'+':'')+r.pnl.toFixed(2)}</td><td>${r.lat.toFixed(0)}ms</td></tr>`
+          }).join('')
+        }
       }
     }
-
-    const body = document.getElementById('acTradesBody')
-    const rows = [...(ac.open_positions || []).map(p => ({
-      market: (p.question || p.market_id || '').substring(0, 35),
-      dir: p.direction, pnl: p.pnl, latency: p.latency_ms, open: true
-    })), ...(ac.recent_trades || []).map(t => ({
-      market: (t.market_id || '').substring(0, 35),
-      dir: t.direction, pnl: t.pnl, latency: t.latency_ms, open: false
-    }))]
-    if (rows.length) {
-      body.innerHTML = rows.slice(0, 15).map(r => {
-        const pc = r.pnl >= 0 ? 't-pnl-pos' : 't-pnl-neg'
-        const tag = r.open ? '<span style="color:var(--orange);font-size:0.4rem">OPEN</span> ' : ''
-        return `<tr><td>${tag}${r.market}</td><td>${r.dir}</td><td class="${pc}">${r.pnl >= 0?'+':''}$${r.pnl.toFixed(2)}</td><td>${r.latency.toFixed(0)}ms</td></tr>`
-      }).join('')
-    } else {
-      body.innerHTML = '<tr><td colspan="4" style="color:var(--grey2);text-align:center">scanning for arb...</td></tr>'
-    }
-  }
-
-  // RivalClaw
-  const rc = d.rivalclaw
-  if (rc && !rc.error) {
-    const w = rc.wallet
-    const balEl = document.getElementById('rcBalance')
-    balEl.textContent = '$' + w.balance.toFixed(2)
-    balEl.style.color = w.balance >= w.starting_balance ? 'var(--neon-green)' : 'var(--neon-red)'
-
-    // Update BOTH hero grid and experiment panel
-    document.querySelectorAll('#rcPnl').forEach(el => {
-      el.textContent = (w.total_pnl >= 0 ? '+' : '') + '$' + w.total_pnl.toFixed(2)
-      el.style.color = w.total_pnl >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
-    })
-    document.querySelectorAll('#rcOpen').forEach(el => {
-      el.textContent = w.open_positions
-    })
-    const rcWLel = document.getElementById('rcWL')
-    if (rcWLel) {
-      const rcWins = w.win_count || 0
-      const rcLosses = w.total_trades - rcWins
-      rcWLel.textContent = rcWins + '/' + rcLosses
-      rcWLel.style.color = rcWins >= rcLosses ? 'var(--neon-green)' : 'var(--neon-red)'
-    }
-
-    try { document.getElementById('rcWinRate').textContent = w.win_rate + '%' } catch(e){}
-    try { document.getElementById('rcTrades').textContent = w.total_trades } catch(e){}
-    try { document.getElementById('rcLatency').textContent = w.avg_latency_ms.toFixed(0) + 'ms' } catch(e){}
-
-    const body = document.getElementById('rcTradesBody')
-    const rows = [...(rc.open_positions || []).map(p => ({
-      market: (p.question || p.market_id || '').substring(0, 35),
-      dir: p.direction, pnl: p.pnl, latency: p.latency_ms, open: true
-    })), ...(rc.recent_trades || []).map(t => ({
-      market: (t.market_id || '').substring(0, 35),
-      dir: t.direction, pnl: t.pnl, latency: t.latency_ms, open: false
-    }))]
-    if (rows.length) {
-      body.innerHTML = rows.slice(0, 15).map(r => {
-        const pc = r.pnl >= 0 ? 't-pnl-pos' : 't-pnl-neg'
-        const tag = r.open ? '<span style="color:var(--orange);font-size:0.4rem">OPEN</span> ' : ''
-        return `<tr><td>${tag}${r.market}</td><td>${r.dir}</td><td class="${pc}">${r.pnl >= 0?'+':''}$${r.pnl.toFixed(2)}</td><td>${r.latency.toFixed(0)}ms</td></tr>`
-      }).join('')
-    } else {
-      body.innerHTML = '<tr><td colspan="4" style="color:var(--grey2);text-align:center">scanning for arb...</td></tr>'
-    }
-
-    // Cycle metrics
-    const cycles = rc.cycle_metrics || []
-    if (cycles.length) {
-      document.getElementById('expCycleSection').style.display = 'block'
-      document.getElementById('rcCycleBody').innerHTML = cycles.slice(0, 10).map(c => `<tr>
-        <td style="font-size:0.42rem">${(c.cycle_started_at || '').substring(11, 19)}</td>
-        <td>${c.markets_fetched}</td>
-        <td>${c.opportunities_detected}</td>
-        <td>${c.trades_executed}</td>
-        <td>${Math.round(c.fetch_ms)}ms</td>
-        <td>${Math.round(c.analyze_ms)}ms</td>
-        <td>${Math.round(c.wallet_ms)}ms</td>
-        <td style="color:var(--orange)">${Math.round(c.total_cycle_ms)}ms</td>
-      </tr>`).join('')
-    }
-  }
+  } catch(e) { console.error('RivalClaw render:', e) }
 }
 
 function buildTickerTape(d) {
