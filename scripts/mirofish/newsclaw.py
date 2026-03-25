@@ -27,13 +27,13 @@ def _load_env():
                 os.environ.setdefault(k.strip(), v.strip())
 
 # Config
-MAX_TRADES_PER_RUN = 6
-POSITION_PCT = 0.04
-MIN_ENTRY = 0.08
-MAX_ENTRY = 0.92
+MAX_TRADES_PER_RUN = 20       # was 6
+POSITION_PCT = 0.03           # was 0.04
+MIN_ENTRY = 0.03              # was 0.08
+MAX_ENTRY = 0.97              # was 0.92
 OLLAMA_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
 NEWSCLAW_MODEL = os.environ.get("NEWSCLAW_MODEL", "qwen2.5:7b")
-MIN_EDGE_SCORE = 0.72
+MIN_EDGE_SCORE = 0.40         # was 0.72 (way too high)
 
 # RSS feeds (Tier 1 and 2 sources)
 RSS_FEEDS = [
@@ -41,6 +41,8 @@ RSS_FEEDS = [
     "https://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml",
     "https://feeds.reuters.com/reuters/topNews",
     "https://www.cnbc.com/id/100003114/device/rss/rss.html",
+    "https://cointelegraph.com/rss",
+    "https://www.coindesk.com/arc/outboundfeeds/rss/",
 ]
 
 SEEN_FILE = Path.home() / "openclaw" / "logs" / ".newsclaw_seen.json"
@@ -190,7 +192,7 @@ Return ONLY a JSON array. If no matches, return [].
         resp = requests.post(
             f"{OLLAMA_URL}/api/chat",
             json={"model": NEWSCLAW_MODEL, "messages": [{"role": "user", "content": prompt}], "stream": False},
-            timeout=60,
+            timeout=180,
         )
         resp.raise_for_status()
         text = resp.json().get("message", {}).get("content", "")
@@ -206,6 +208,35 @@ Return ONLY a JSON array. If no matches, return [].
         print(f"[news] LLM error: {e}")
 
     return []
+
+
+def keyword_match_fallback(headlines, markets):
+    """Match headlines to markets by keyword overlap when LLM is unavailable."""
+    stopwords = {"the", "a", "an", "in", "on", "at", "to", "of", "is", "and", "or", "for", "will", "be", "has", "have", "it", "its", "this", "that", "with"}
+    matches = []
+    for h in headlines:
+        h_words = set(h.get("title", "").lower().split()) - stopwords
+        for m in markets:
+            m_title = m.get("title", "") or m.get("question", "") or ""
+            m_words = set(m_title.lower().split()) - stopwords
+            overlap = h_words & m_words
+            if len(overlap) >= 3:
+                # Determine direction from headline sentiment (simple)
+                title_lower = h.get("title", "").lower()
+                direction = "NO" if any(w in title_lower for w in ["fall", "drop", "crash", "decline", "down", "risk", "fear"]) else "YES"
+                ya = float(m.get("yes_ask") or m.get("yes_bid") or 0.5)
+                na = float(m.get("no_ask") or m.get("no_bid") or 0.5)
+                entry = ya if direction == "YES" else na
+                matches.append({
+                    "headline": h["title"],
+                    "market_id": m.get("ticker", m.get("market_id", "")),
+                    "question": m_title,
+                    "direction": direction,
+                    "entry": entry,
+                    "confidence": min(0.5 + len(overlap) * 0.05, 0.85),
+                    "reasoning": f"keyword overlap: {overlap}",
+                })
+    return matches
 
 
 def run():
@@ -243,7 +274,12 @@ def run():
         WHERE (km.yes_ask > 0 OR km.yes_bid > 0) AND km.close_time IS NOT NULL
     """).fetchall()
 
-    matches = match_headlines_to_markets(headlines, [dict(m) for m in markets])
+    try:
+        llm_matches = match_headlines_to_markets(headlines, [dict(m) for m in markets])
+    except Exception as e:
+        print(f"[news] LLM failed ({e}), using keyword fallback")
+        llm_matches = keyword_match_fallback(headlines, [dict(m) for m in markets])
+    matches = llm_matches
     placed = 0
 
     for match in matches:
