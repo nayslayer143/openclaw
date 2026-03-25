@@ -17,5 +17,6 @@
   "_note": "captcha_service and user_agent_stealth are inert unless stealth_mode is true and CAPTCHA_API_KEY is set",
   "captcha_service": "2captcha",
   "user_agent_stealth": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-  "user_agent_honest": "OpenClaw-BrowserBot/1.0 (+https://openclaw.local)"
+  "user_agent_honest": "OpenClaw-BrowserBot/1.0 (+https://openclaw.local)",
+  "pool_max_idle_seconds": 300
 }
