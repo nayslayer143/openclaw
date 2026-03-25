@@ -75,6 +75,26 @@ EVENT_FAMILIES = {
         "pre_window_hours": 2, "post_window_hours": 0.5,
         "typical_move": 0.05, "confidence_boost": 0.10,
     },
+    "gold": {
+        "keywords": ["gold", "gold close", "gold price", "xau"],
+        "pre_window_hours": 24, "post_window_hours": 1,
+        "typical_move": 0.06, "confidence_boost": 0.10,
+    },
+    "equities": {
+        "keywords": ["s&p", "nasdaq", "dow", "s&p 500", "russell"],
+        "pre_window_hours": 24, "post_window_hours": 1,
+        "typical_move": 0.05, "confidence_boost": 0.10,
+    },
+    "forex": {
+        "keywords": ["usd/jpy", "eur/usd", "usd", "forex", "dollar"],
+        "pre_window_hours": 24, "post_window_hours": 1,
+        "typical_move": 0.04, "confidence_boost": 0.08,
+    },
+    "nyc_weather": {
+        "keywords": ["temp in nyc", "nyc", "new york temp"],
+        "pre_window_hours": 24, "post_window_hours": 1,
+        "typical_move": 0.10, "confidence_boost": 0.12,
+    },
 }
 
 
