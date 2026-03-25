@@ -1954,7 +1954,8 @@ body {
           <span class="t-live-dot" style="background:#00d4ff;box-shadow:0 0 6px #00d4ff;width:6px;height:6px"></span>
         </div>
         <div style="font-size:0.38rem;color:rgba(0,200,255,0.4);letter-spacing:1px;margin:-8px 0 8px 0">SIGNAL FUSION · EQUITIES + CRYPTO · SEPARATE DB</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+          <div><div class="t-card-label">BALANCE</div><div class="t-card-value" id="qcBalance" style="font-size:1rem">$10,000</div></div>
           <div><div class="t-card-label">P&L</div><div class="t-card-value" id="qcPnl" style="font-size:1rem">$0</div></div>
           <div><div class="t-card-label">W / L</div><div class="t-card-value" id="qcWL" style="font-size:1rem">0/0</div></div>
           <div><div class="t-card-label">OPEN</div><div class="t-card-value" id="qcOpen" style="font-size:1rem;color:#00d4ff">0</div></div>
@@ -4480,11 +4481,12 @@ function renderTrading() {
   const agents = d.agents || {}
   for (const cfg of agentConfigs) {
     const ag = agents[cfg.name] || {}
-    const agPnl = ag.pnl || 0
+    const agBal = ag.balance != null ? ag.balance : (1000 + (ag.pnl || 0))
+    const agStart = ag.starting_balance || 1000
     const agEl = document.getElementById(cfg.pnl)
     if (agEl) {
-      agEl.textContent = (agPnl >= 0 ? '+' : '') + '$' + agPnl.toFixed(2)
-      agEl.style.color = agPnl >= 0 ? cfg.color : '#ff2d95'
+      agEl.textContent = '$' + agBal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})
+      agEl.style.color = agBal >= agStart ? cfg.color : '#ff2d95'
     }
     const wlEl = document.getElementById(cfg.wl)
     if (wlEl) {
@@ -4517,6 +4519,12 @@ function renderTrading() {
   try {
     const qc = d.quantclaw || {}
     const qcW = qc.wallet || {}
+    const qcBalVal = qcW.balance || 0
+    const qcBalEl = document.getElementById('qcBalance')
+    if (qcBalEl) {
+      qcBalEl.textContent = '$' + qcBalVal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})
+      qcBalEl.style.color = '#00d4ff'
+    }
     const qcPnlVal = qcW.total_pnl || 0
     const qcPnlEl = document.getElementById('qcPnl')
     if (qcPnlEl) {
