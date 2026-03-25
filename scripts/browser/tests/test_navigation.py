@@ -56,3 +56,36 @@ def test_audit_logger_writes_file(tmp_path):
     entry = json.loads(logs[0].read_text().strip())
     assert entry["url"] == "https://example.com"
     assert entry["action"] == "navigate"
+
+
+# ── BrowserEngine tests ───────────────────────────────────────────────────────
+
+import pytest
+from browser.browser_engine import BrowserEngine
+
+
+def test_engine_opens_and_closes():
+    with BrowserEngine() as engine:
+        assert engine.page is not None
+
+
+def test_engine_navigate_returns_title():
+    with BrowserEngine() as engine:
+        title = engine.navigate("https://example.com")
+        assert isinstance(title, str)
+
+
+def test_engine_navigate_blocked_domain_raises():
+    with BrowserEngine(blocked_domains=["example.com"]) as engine:
+        with pytest.raises(PermissionError, match="blocked"):
+            engine.navigate("https://example.com")
+
+
+def test_engine_navigate_respects_rate_limit():
+    import time
+    with BrowserEngine(rate_limit_seconds=(0.1, 0.2)) as engine:
+        engine.navigate("https://example.com")
+        t0 = time.time()
+        engine.navigate("https://example.com")
+        elapsed = time.time() - t0
+        assert elapsed >= 0.1, "rate limit not enforced"
