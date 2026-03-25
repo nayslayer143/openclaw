@@ -2000,7 +2000,7 @@ async def signals_stream(request: Request):
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
 
-@app.get("/{path:path}", response_class=HTMLResponse)
+@app.get("/{path:path}")
 async def spa(path: str, request: Request):
     # Let API routes through
     if path.startswith("api/") or path.startswith("auth/"):
@@ -2008,10 +2008,14 @@ async def spa(path: str, request: Request):
     # Check auth — localhost skips OAuth
     token = request.cookies.get("oc_token")
     if not token or not verify_token(token):
-        if is_localhost(request):
-            return (Path(__file__).parent / "index.html").read_text()
-        return RedirectResponse(url="/login")
-    return (Path(__file__).parent / "index.html").read_text()
+        if not is_localhost(request):
+            return RedirectResponse(url="/login")
+    html = (Path(__file__).parent / "index.html").read_text()
+    return HTMLResponse(content=html, headers={
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        "Pragma": "no-cache",
+        "Expires": "0",
+    })
 
 if __name__ == "__main__":
     import uvicorn
