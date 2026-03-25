@@ -89,3 +89,44 @@ def test_engine_navigate_respects_rate_limit():
         engine.navigate("https://example.com")
         elapsed = time.time() - t0
         assert elapsed >= 0.1, "rate limit not enforced"
+
+
+# ── Eyes tests ────────────────────────────────────────────────────────────────
+
+from browser.eyes import Eyes
+
+
+def test_eyes_screenshot_returns_bytes():
+    with BrowserEngine() as engine:
+        engine.navigate("https://example.com")
+        eyes = Eyes(engine)
+        data = eyes.screenshot()
+        assert isinstance(data, bytes)
+        assert data[:4] == b'\x89PNG'  # PNG magic bytes
+
+
+def test_eyes_screenshot_saves_file(tmp_path):
+    with BrowserEngine() as engine:
+        engine.navigate("https://example.com")
+        eyes = Eyes(engine)
+        path = tmp_path / "shot.png"
+        eyes.screenshot(save_path=path)
+        assert path.exists()
+        assert path.stat().st_size > 0
+
+
+def test_eyes_dom_text_contains_content():
+    with BrowserEngine() as engine:
+        engine.navigate("https://example.com")
+        eyes = Eyes(engine)
+        text = eyes.dom_text()
+        assert "Example Domain" in text
+
+
+def test_eyes_hybrid_returns_string():
+    with BrowserEngine() as engine:
+        engine.navigate("https://example.com")
+        eyes = Eyes(engine)
+        result = eyes.extract(mode="auto")
+        assert isinstance(result, str)
+        assert len(result) > 0
