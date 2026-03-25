@@ -1786,6 +1786,35 @@ body {
       <div id="tradingLastUpdate" style="font-size:0.50rem;color:var(--grey2);letter-spacing:1px;text-align:right"></div>
     </div>
 
+    <!-- RivalClaw Next Report Countdown -->
+    <div style="display:flex;justify-content:center;margin-bottom:10px">
+      <div style="background:linear-gradient(135deg,rgba(180,140,255,0.08),rgba(0,0,0,0.3));border:1px solid rgba(180,140,255,0.3);border-radius:8px;padding:8px 24px;display:flex;align-items:center;gap:12px">
+        <span style="font-size:0.45rem;color:rgba(180,140,255,0.6);letter-spacing:2px">RIVALCLAW NEXT REPORT</span>
+        <span id="rcCountdown" style="font-size:1.1rem;font-weight:bold;color:rgba(180,140,255,0.95);font-family:monospace;min-width:60px;text-align:center">--:--</span>
+        <span style="font-size:0.45rem;color:rgba(180,140,255,0.4);letter-spacing:1px">CYCLE: <span id="rcCycleSpeed">1min</span> | TUNER: <span id="rcTunerSpeed">1hr</span></span>
+      </div>
+    </div>
+    <script>
+    (function(){
+      function updateCountdown(){
+        const now = new Date();
+        const mins = now.getUTCMinutes();
+        const secs = now.getUTCSeconds();
+        const nextHour = 60 - mins;
+        const nextSec = 60 - secs;
+        const mm = String(nextHour - 1).padStart(2,'0');
+        const ss = String(nextSec === 60 ? 0 : nextSec).padStart(2,'0');
+        const el = document.getElementById('rcCountdown');
+        if(el) {
+          el.textContent = mm + ':' + ss;
+          if(nextHour <= 5) el.style.color = '#00ff88';
+        }
+      }
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    })();
+    </script>
+
     <!-- 6-Agent Hero Grid: 3×2 -->
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:14px" id="heroGrid">
 
