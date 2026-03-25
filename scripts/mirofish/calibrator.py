@@ -24,7 +24,7 @@ PARAM_BOUNDS = {
     "MAX_TRADES_PER_RUN": {"min": 5,    "max": 100,  "max_delta": 10},
     "EDGE_THRESHOLD":     {"min": 0.02, "max": 0.25, "max_delta": 0.02},
     "VOLUME_SPIKE_MULT":  {"min": 1.0,  "max": 3.0,  "max_delta": 0.2},
-    "BET_SIZE_USD":       {"min": 1.0,  "max": 20.0, "max_delta": 2.0},
+    "BET_SIZE_USD":       {"min": 1.0,  "max": 150.0, "max_delta": 10.0},
 }
 
 # Which params each bot exposes for tuning
@@ -34,6 +34,7 @@ BOT_PARAMS = {
     "newsclaw":       ["MIN_ENTRY", "MAX_ENTRY", "MIN_EDGE_SCORE", "POSITION_PCT", "MAX_TRADES_PER_RUN"],
     "sentimentclaw":  ["MIN_ENTRY", "MAX_ENTRY", "VOLUME_SPIKE_MULT", "POSITION_PCT", "MAX_TRADES_PER_RUN"],
     "dataharvester":  ["EDGE_THRESHOLD", "BET_SIZE_USD", "MAX_TRADES_PER_RUN"],
+    "lotteryclaw":    ["BET_SIZE_USD", "MAX_TRADES_PER_RUN"],
 }
 
 # Current defaults (before any DB override)
@@ -42,7 +43,8 @@ DEFAULTS = {
     "calendarclaw":   {"MIN_ENTRY": 0.03, "MAX_ENTRY": 0.97, "MIN_EDGE_SCORE": 0.35, "POSITION_PCT": 0.03, "MAX_TRADES_PER_RUN": 30},
     "newsclaw":       {"MIN_ENTRY": 0.03, "MAX_ENTRY": 0.97, "MIN_EDGE_SCORE": 0.40, "POSITION_PCT": 0.03, "MAX_TRADES_PER_RUN": 20},
     "sentimentclaw":  {"MIN_ENTRY": 0.03, "MAX_ENTRY": 0.97, "VOLUME_SPIKE_MULT": 1.2, "POSITION_PCT": 0.03, "MAX_TRADES_PER_RUN": 25},
-    "dataharvester":  {"EDGE_THRESHOLD": 0.08, "BET_SIZE_USD": 4.0, "MAX_TRADES_PER_RUN": 50},
+    "dataharvester":  {"EDGE_THRESHOLD": 0.08, "BET_SIZE_USD": 20.0, "MAX_TRADES_PER_RUN": 50},
+    "lotteryclaw":    {"BET_SIZE_USD": 75.0, "MAX_TRADES_PER_RUN": 30},
 }
 
 
@@ -146,70 +148,82 @@ def analyze_bot(conn, bot, lookback_hours=12):
             buckets[b]["losses"] += 1
         buckets[b]["pnl"] += t["pnl"] or 0
 
+    # Expected Value per trade — THE key metric
+    # EV = (win_rate × avg_win) + (loss_rate × avg_loss)  [avg_loss is negative]
+    ev_per_trade = (win_rate * avg_win) + ((1 - win_rate) * avg_loss) if total > 0 else 0
+
     return {
         "total": total, "wins": wins, "losses": losses,
         "win_rate": win_rate, "total_pnl": total_pnl,
         "avg_win": avg_win, "avg_loss": avg_loss,
+        "ev_per_trade": ev_per_trade,
         "buckets": dict(buckets),
     }
 
 
 def fast_calibrate(conn, bot, stats):
-    """Quick parameter adjustments based on recent performance."""
+    """Quick parameter adjustments based on EV and recent performance."""
     changes = []
     current_params = {p: get_current_param(conn, bot, p) for p in BOT_PARAMS.get(bot, [])}
+    ev = stats.get("ev_per_trade", 0)
 
-    # Rule 1: If win rate < 40% and sample >= 10, tighten MIN_ENTRY
+    # Rule 1: MIN_ENTRY — use EV, not just win rate
+    # Negative EV = tighten (raise floor). Positive EV = loosen (lower floor for more volume)
     if "MIN_ENTRY" in current_params and stats["total"] >= 10:
-        if stats["win_rate"] < 0.40:
+        if ev < -5:  # losing >$5 per trade on average
             old = current_params["MIN_ENTRY"]
             new = clamp_adjustment(old, old + 0.05, "MIN_ENTRY")
             if new != old:
-                changes.append(("MIN_ENTRY", old, new, f"win_rate={stats['win_rate']:.1%} < 40%, tightening"))
-        elif stats["win_rate"] > 0.70 and stats["total"] >= 20:
-            # Winning a lot — can afford to loosen slightly
+                changes.append(("MIN_ENTRY", old, new, f"EV=${ev:.2f}/trade (negative), tightening"))
+        elif ev > 2 and stats["total"] >= 20:  # winning >$2/trade with decent sample
             old = current_params["MIN_ENTRY"]
             new = clamp_adjustment(old, old - 0.02, "MIN_ENTRY")
             if new != old:
-                changes.append(("MIN_ENTRY", old, new, f"win_rate={stats['win_rate']:.1%} > 70%, loosening"))
+                changes.append(("MIN_ENTRY", old, new, f"EV=${ev:.2f}/trade (positive), loosening for volume"))
 
-    # Rule 2: If avg loss > 2x avg win, reduce POSITION_PCT
-    if "POSITION_PCT" in current_params and stats["wins"] > 0 and stats["losses"] > 0:
-        if abs(stats["avg_loss"]) > 2 * stats["avg_win"]:
+    # Rule 2: POSITION_PCT — scale by EV direction
+    # Positive EV = increase size. Negative EV = decrease size.
+    if "POSITION_PCT" in current_params and stats["total"] >= 10:
+        if ev < -3:
             old = current_params["POSITION_PCT"]
             new = clamp_adjustment(old, old - 0.005, "POSITION_PCT")
             if new != old:
-                changes.append(("POSITION_PCT", old, new, f"avg_loss=${stats['avg_loss']:.2f} > 2x avg_win=${stats['avg_win']:.2f}"))
+                changes.append(("POSITION_PCT", old, new, f"EV=${ev:.2f}/trade, reducing size"))
+        elif ev > 5 and stats["total"] >= 15:
+            old = current_params["POSITION_PCT"]
+            new = clamp_adjustment(old, old + 0.005, "POSITION_PCT")
+            if new != old:
+                changes.append(("POSITION_PCT", old, new, f"EV=${ev:.2f}/trade, increasing size"))
 
-    # Rule 3: If MIN_EDGE_SCORE and win rate > 60% with good sample, loosen score
+    # Rule 3: MIN_EDGE_SCORE — loosen if EV positive, tighten if negative
     if "MIN_EDGE_SCORE" in current_params and stats["total"] >= 15:
-        if stats["win_rate"] > 0.60:
+        if ev > 2:
             old = current_params["MIN_EDGE_SCORE"]
             new = clamp_adjustment(old, old - 0.03, "MIN_EDGE_SCORE")
             if new != old:
-                changes.append(("MIN_EDGE_SCORE", old, new, f"win_rate={stats['win_rate']:.1%}, loosening edge threshold"))
-        elif stats["win_rate"] < 0.35:
+                changes.append(("MIN_EDGE_SCORE", old, new, f"EV=${ev:.2f}/trade, loosening for volume"))
+        elif ev < -5:
             old = current_params["MIN_EDGE_SCORE"]
             new = clamp_adjustment(old, old + 0.05, "MIN_EDGE_SCORE")
             if new != old:
-                changes.append(("MIN_EDGE_SCORE", old, new, f"win_rate={stats['win_rate']:.1%}, tightening edge threshold"))
+                changes.append(("MIN_EDGE_SCORE", old, new, f"EV=${ev:.2f}/trade, tightening"))
 
-    # Rule 4: EDGE_THRESHOLD for dataharvester
+    # Rule 4: EDGE_THRESHOLD — EV-based
     if "EDGE_THRESHOLD" in current_params and stats["total"] >= 10:
-        if stats["win_rate"] < 0.40:
+        if ev < -3:
             old = current_params["EDGE_THRESHOLD"]
             new = clamp_adjustment(old, old + 0.02, "EDGE_THRESHOLD")
             if new != old:
-                changes.append(("EDGE_THRESHOLD", old, new, f"win_rate={stats['win_rate']:.1%}, raising threshold"))
-        elif stats["win_rate"] > 0.65:
+                changes.append(("EDGE_THRESHOLD", old, new, f"EV=${ev:.2f}/trade, raising threshold"))
+        elif ev > 2:
             old = current_params["EDGE_THRESHOLD"]
             new = clamp_adjustment(old, old - 0.01, "EDGE_THRESHOLD")
             if new != old:
-                changes.append(("EDGE_THRESHOLD", old, new, f"win_rate={stats['win_rate']:.1%}, lowering threshold"))
+                changes.append(("EDGE_THRESHOLD", old, new, f"EV=${ev:.2f}/trade, lowering for volume"))
 
-    # Rule 5: VOLUME_SPIKE_MULT for sentimentclaw
+    # Rule 5: VOLUME_SPIKE_MULT — EV-based
     if "VOLUME_SPIKE_MULT" in current_params and stats["total"] >= 10:
-        if stats["win_rate"] < 0.40:
+        if ev < -3:
             old = current_params["VOLUME_SPIKE_MULT"]
             new = clamp_adjustment(old, old + 0.2, "VOLUME_SPIKE_MULT")
             if new != old:
@@ -256,8 +270,11 @@ def meta_report(conn):
             print(f"  {bot:20s}  NO DATA")
             continue
 
+        ev = stats.get('ev_per_trade', 0)
+        ev_color = '+' if ev >= 0 else ''
         print(f"  {bot:20s}  {stats['wins']}W {stats['losses']}L  "
               f"WR={stats['win_rate']:.0%}  "
+              f"EV=${ev_color}{ev:.2f}/trade  "
               f"PnL=${stats['total_pnl']:+.2f}  "
               f"AvgW=${stats['avg_win']:.2f}  AvgL=${stats['avg_loss']:.2f}")
 
@@ -318,7 +335,7 @@ def run(mode="fast"):
                 print(f"  {bot}.{param}: {old_val:.4f} → {new_val:.4f} | {reason}")
                 total_changes += 1
         else:
-            print(f"  {bot}: {stats['wins']}W {stats['losses']}L ({stats['win_rate']:.0%}) — no changes needed")
+            print(f"  {bot}: {stats['wins']}W {stats['losses']}L WR={stats['win_rate']:.0%} EV=${stats.get('ev_per_trade',0):+.2f}/trade — no changes needed")
 
     conn.commit()
     conn.close()
