@@ -48,7 +48,7 @@ def fetch_kalshi_markets(conn):
         SELECT ticker, title, yes_bid, yes_ask, no_bid, no_ask,
                volume, close_time, event_ticker
         FROM kalshi_markets
-        WHERE status='open' AND close_time IS NOT NULL
+        WHERE status IN ('open','active') AND close_time IS NOT NULL
         ORDER BY close_time ASC
     """).fetchall()
     return [dict(r) for r in rows]
