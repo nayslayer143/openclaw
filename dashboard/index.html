@@ -1944,170 +1944,18 @@ body {
       </div>
     </div>
 
-    <!-- Graduation Gates -->
-    <div class="t-section">
-      <div class="t-section-title">GRADUATION GATES</div>
-      <div class="t-gates" id="tGates">
+    <!-- Graduation + Status (compact) -->
+    <div class="t-section" style="padding:10px 18px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:0.48rem;letter-spacing:2px;color:var(--orange)">GRADUATION</span>
         <span class="t-gate" id="gateRoi">7d ROI > 0%</span>
         <span class="t-gate" id="gateWin">Win > 55%</span>
         <span class="t-gate" id="gateSharpe">Sharpe > 1.0</span>
         <span class="t-gate" id="gateDD">DD < 25%</span>
+        <span id="tGradStatus" style="font-size:0.44rem;letter-spacing:1px;color:var(--grey2);margin-left:auto">TESTING</span>
       </div>
     </div>
 
-    <!-- P&L Chart (hidden when no data) -->
-    <div class="t-section" id="tEquitySection" style="display:none">
-      <div class="t-section-title">EQUITY CURVE</div>
-      <div class="t-chart-container">
-        <canvas id="pnlChart" height="140"></canvas>
-      </div>
-    </div>
-
-    <!-- Strategy Tournament -->
-    <div class="t-section">
-      <div class="t-section-title">STRATEGY TOURNAMENT</div>
-      <div class="t-table-wrap">
-        <table class="t-table" id="tStrategyTable">
-          <thead>
-            <tr><th>STRATEGY</th><th>W/L</th><th>WIN %</th><th>PnL</th><th>ALLOC</th></tr>
-          </thead>
-          <tbody id="tStrategyBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Open Positions -->
-    <div class="t-section">
-      <div class="t-section-title">OPEN POSITIONS</div>
-      <div class="t-table-wrap">
-        <table class="t-table" id="tOpenTable">
-          <thead>
-            <tr><th>MARKET</th><th>PLATFORM</th><th>DIR</th><th>STRATEGY</th><th>ENTRY</th><th>CURRENT</th><th>PnL</th><th>SIZE</th><th>RESOLVES</th></tr>
-          </thead>
-          <tbody id="tOpenBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Two Column: Recent Trades + Markets -->
-    <div class="t-two-col">
-      <div class="t-section" style="flex:1">
-        <div class="t-section-title">RECENT TRADES</div>
-        <div class="t-table-wrap" style="max-height:400px;overflow-y:auto">
-          <table class="t-table">
-            <thead>
-              <tr><th>MARKET</th><th>DIR</th><th>STRAT</th><th>PnL</th><th>STATUS</th></tr>
-            </thead>
-            <tbody id="tRecentBody"></tbody>
-          </table>
-        </div>
-      </div>
-      <div class="t-section" style="flex:1">
-        <div class="t-section-title">CROSS-VENUE ARB</div>
-        <div class="t-table-wrap" style="max-height:400px;overflow-y:auto">
-          <table class="t-table">
-            <thead>
-              <tr><th>PAIR</th><th>BUY</th><th>SELL</th><th>SPREAD</th><th>EDGE</th></tr>
-            </thead>
-            <tbody id="tArbBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Two Column: Polymarket + Kalshi Feeds -->
-    <div class="t-two-col">
-      <div class="t-section" style="flex:1">
-        <div class="t-section-title">POLYMARKET <span class="t-feed-count" id="polyCount">0</span></div>
-        <div class="t-table-wrap" style="max-height:350px;overflow-y:auto">
-          <table class="t-table">
-            <thead><tr><th>MARKET</th><th>YES</th><th>NO</th><th>VOL</th></tr></thead>
-            <tbody id="tPolyBody"></tbody>
-          </table>
-        </div>
-      </div>
-      <div class="t-section" style="flex:1">
-        <div class="t-section-title">KALSHI <span class="t-feed-count" id="kalshiCount">0</span></div>
-        <div class="t-table-wrap" style="max-height:350px;overflow-y:auto">
-          <table class="t-table">
-            <thead><tr><th>MARKET</th><th>BID</th><th>ASK</th><th>VOL</th></tr></thead>
-            <tbody id="tKalshiBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Missed Opportunities -->
-    <div class="t-section" id="tMissedSection" style="display:none">
-      <div class="t-section-title">MISSED OPPORTUNITIES</div>
-      <div class="t-table-wrap">
-        <table class="t-table">
-          <thead><tr><th>STRATEGY</th><th>MISSED</th><th>WOULD WON</th><th>CF PnL</th></tr></thead>
-          <tbody id="tMissedBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- ══════════════════════════════════════════════════════════════ -->
-    <!-- ARB EXPERIMENT: ARBCLAW vs RIVALCLAW                         -->
-    <!-- ══════════════════════════════════════════════════════════════ -->
-    <div class="t-section" style="margin-top:32px;border-top:2px solid rgba(255,124,26,0.3);padding-top:24px">
-      <div class="ideas-title" style="display:flex;align-items:center;gap:12px;margin-bottom:4px">
-        ARB EXPERIMENT
-        <span style="font-size:0.45rem;color:var(--grey2);letter-spacing:2px;font-weight:400">ARBCLAW vs RIVALCLAW vs CLAWMPSON</span>
-      </div>
-      <div class="ideas-subtitle" style="margin-bottom:16px">14-DAY PAPER TRADING BAKEOFF — SAME ARB LOGIC, DIFFERENT ARCHITECTURE</div>
-    </div>
-
-    <!-- Experiment Comparison Cards -->
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px" id="expGrid">
-      <!-- ArbClaw Card -->
-      <div class="t-section" style="border:1px solid rgba(0,255,136,0.2)">
-        <div class="t-section-title" style="color:rgba(0,255,136,0.9);border-bottom-color:rgba(0,255,136,0.2)">
-          ARBCLAW <span style="font-size:0.4rem;color:var(--grey2);margin-left:8px">LEAN / 4 FILES / */5 CRON</span>
-        </div>
-        <div class="trading-cards" style="grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
-          <div class="t-card"><div class="t-card-label">BALANCE</div><div class="t-card-value" id="acBalance">--</div></div>
-          <div class="t-card"><div class="t-card-label">PnL</div><div class="t-card-value" id="acPnl">--</div></div>
-          <div class="t-card"><div class="t-card-label">WIN RATE</div><div class="t-card-value" id="acWinRate">--</div></div>
-          <div class="t-card"><div class="t-card-label">TRADES</div><div class="t-card-value" id="acTrades">--</div></div>
-          <div class="t-card"><div class="t-card-label">OPEN</div><div class="t-card-value" id="acOpen">--</div></div>
-          <div class="t-card"><div class="t-card-label">AVG LATENCY</div><div class="t-card-value" id="acLatency">--</div></div>
-        </div>
-        <div class="t-table-wrap" style="max-height:250px;overflow-y:auto">
-          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>PnL</th><th>LATENCY</th></tr></thead>
-          <tbody id="acTradesBody"><tr><td colspan="4" style="color:var(--grey2);text-align:center">scanning for arb...</td></tr></tbody></table>
-        </div>
-      </div>
-
-      <!-- RivalClaw Card -->
-      <div class="t-section" style="border:1px solid rgba(180,140,255,0.2)">
-        <div class="t-section-title" style="color:rgba(180,140,255,0.9);border-bottom-color:rgba(180,140,255,0.2)">
-          RIVALCLAW <span style="font-size:0.4rem;color:var(--grey2);margin-left:8px">MIROFISH SKELETON / 6 FILES / */5 CRON</span>
-        </div>
-        <div class="trading-cards" style="grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
-          <div class="t-card"><div class="t-card-label">BALANCE</div><div class="t-card-value" id="rcBalance">--</div></div>
-          <div class="t-card"><div class="t-card-label">PnL</div><div class="t-card-value" id="rcPnl">--</div></div>
-          <div class="t-card"><div class="t-card-label">WIN RATE</div><div class="t-card-value" id="rcWinRate">--</div></div>
-          <div class="t-card"><div class="t-card-label">TRADES</div><div class="t-card-value" id="rcTrades">--</div></div>
-          <div class="t-card"><div class="t-card-label">OPEN</div><div class="t-card-value" id="rcOpen">--</div></div>
-          <div class="t-card"><div class="t-card-label">AVG LATENCY</div><div class="t-card-value" id="rcLatency">--</div></div>
-        </div>
-        <div class="t-table-wrap" style="max-height:250px;overflow-y:auto">
-          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>PnL</th><th>LATENCY</th></tr></thead>
-          <tbody id="rcTradesBody"><tr><td colspan="4" style="color:var(--grey2);text-align:center">scanning for arb...</td></tr></tbody></table>
-        </div>
-      </div>
-    </div>
-
-    <!-- Cycle Metrics (RivalClaw only) -->
-    <div class="t-section" id="expCycleSection" style="display:none">
-      <div class="t-section-title" style="color:rgba(180,140,255,0.8);border-bottom-color:rgba(180,140,255,0.2)">RIVALCLAW CYCLE METRICS</div>
-      <div class="t-table-wrap" style="max-height:200px;overflow-y:auto">
-        <table class="t-table"><thead><tr><th>TIME</th><th>MKTS</th><th>OPPS</th><th>TRADES</th><th>FETCH</th><th>ANALYZE</th><th>WALLET</th><th>TOTAL</th></tr></thead>
-        <tbody id="rcCycleBody"></tbody></table>
-      </div>
-    </div>
 
   </div><!-- /pageTrading -->
 
