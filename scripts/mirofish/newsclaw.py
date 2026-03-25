@@ -279,12 +279,8 @@ def run():
         WHERE (km.yes_ask > 0 OR km.yes_bid > 0) AND km.close_time IS NOT NULL
     """).fetchall()
 
-    try:
-        llm_matches = match_headlines_to_markets(headlines, [dict(m) for m in markets])
-    except Exception as e:
-        print(f"[news] LLM failed ({e}), using keyword fallback")
-        llm_matches = keyword_match_fallback(headlines, [dict(m) for m in markets])
-    matches = llm_matches
+    # LLM matching bypassed — 0W 3L -$131. Keyword-only until prompts are fixed.
+    matches = keyword_match_fallback(headlines, [dict(m) for m in markets])
     placed = 0
 
     for match in matches:
