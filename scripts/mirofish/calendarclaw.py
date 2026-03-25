@@ -330,6 +330,10 @@ def resolve_trades(conn) -> int:
 
 
 def run():
+    from scripts.mirofish.bot_config import is_trading_hours
+    if not is_trading_hours():
+        print("[calendar] Outside trading hours (00-06 UTC) — skipping")
+        return
     try:
         from scripts.mirofish.paper_wallet import check_circuit_breaker, reset_wallet
         breaker = check_circuit_breaker()

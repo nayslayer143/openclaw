@@ -438,6 +438,10 @@ def _get_balance(conn) -> float:
 
 
 def run():
+    from scripts.mirofish.bot_config import is_trading_hours
+    if not is_trading_hours():
+        print("[phantom] Outside trading hours (00-06 UTC) — skipping")
+        return
     # Circuit breaker
     try:
         from scripts.mirofish.paper_wallet import check_circuit_breaker, reset_wallet
