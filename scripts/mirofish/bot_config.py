@@ -72,3 +72,22 @@ def get_all_params(bot_name: str) -> dict:
     ).fetchall()
     conn.close()
     return {r["key"].removeprefix(prefix): r["value"] for r in rows}
+
+
+def confidence_position_pct(confidence: float, base_pct: float = 0.03) -> float:
+    """Scale position size by confidence. Higher confidence = bigger bet.
+
+    Tiers calibrated from 107 resolved trades (2026-03-25):
+    - <0.50: 8.7% WR → cut to 1/3 base (exploratory only)
+    - 0.50-0.70: 33% WR → base rate
+    - 0.70-0.90: 58% WR → 1.5x base (proven edge)
+    - 0.90+: 66% WR → 1.5x base (cap here — was oversizing)
+    """
+    if confidence < 0.50:
+        return base_pct * 0.33
+    elif confidence < 0.70:
+        return base_pct
+    elif confidence < 0.90:
+        return base_pct * 1.5
+    else:
+        return base_pct * 1.5  # cap — very high was losing money from oversizing

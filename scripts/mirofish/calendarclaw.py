@@ -30,7 +30,7 @@ def _load_env():
                 os.environ.setdefault(k.strip(), v.strip())
 
 # Config
-from scripts.mirofish.bot_config import get_param as _p
+from scripts.mirofish.bot_config import get_param as _p, confidence_position_pct
 
 MAX_TRADES_PER_RUN = _p("calendarclaw", "MAX_TRADES_PER_RUN", 30)
 POSITION_PCT       = _p("calendarclaw", "POSITION_PCT", 0.03)
@@ -258,8 +258,9 @@ def scan_calendar_setups(conn, balance, open_ids) -> int:
         if entry < MIN_ENTRY or entry > MAX_ENTRY:
             continue
 
-        # Size
-        amount = min(POSITION_PCT * balance, balance * 0.10)
+        # Size — scale by confidence tier
+        sized_pct = confidence_position_pct(score, POSITION_PCT)
+        amount = min(sized_pct * balance, balance * 0.10)
         if amount < 2:
             continue
 
