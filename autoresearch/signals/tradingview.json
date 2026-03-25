@@ -1,10 +1,10 @@
 {
   "platform": "tradingview",
-  "crawl_id": "tradingview-20260325032822",
-  "crawled_at": "2026-03-25T03:29:17.116103",
+  "crawl_id": "tradingview-20260325033610",
+  "crawled_at": "2026-03-25T03:37:03.459916",
   "signals": [
     {
-      "id": "7216d01137c6aa2d",
+      "id": "c4c62f914f570a6d",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSD/3YjMiY4N-Bitcoin-42k-soon-This-indicator-has-a-100-success-rate/",
       "source_author": "",
@@ -30,10 +30,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:22.858011+00:00"
+      "extracted_at": "2026-03-25T10:36:11.627799+00:00"
     },
     {
-      "id": "56ad53d772515a85",
+      "id": "b8f38f10eb636360",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/yc2hXq0A-XAU-USD-Gold-Crashes-27-Is-4000-the-Next-Target/",
       "source_author": "",
@@ -59,10 +59,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:22.858078+00:00"
+      "extracted_at": "2026-03-25T10:36:11.627868+00:00"
     },
     {
-      "id": "e48ce173931bc259",
+      "id": "233b89f075ea9ae7",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/USDCHF/fF3pNbc8-USDCHF-Weekly-CLS-Model-2/",
       "source_author": "",
@@ -85,10 +85,10 @@
         "patterns": [],
         "all_tickers": []
       },
-      "extracted_at": "2026-03-25T10:28:22.858113+00:00"
+      "extracted_at": "2026-03-25T10:36:11.627903+00:00"
     },
     {
-      "id": "432b0d28c3b45d00",
+      "id": "a8f6afe23b99bcef",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSD/nHFR64fB-BTC-USD-Key-Levels-Potential-Bullish-Setup/",
       "source_author": "",
@@ -114,10 +114,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:22.858159+00:00"
+      "extracted_at": "2026-03-25T10:36:11.627942+00:00"
     },
     {
-      "id": "b662e907238a41f9",
+      "id": "ff35a3defd316919",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/GOLD/cz62CBkr-Gold-Price-Action-Analysis-Key-Support-and-Resistance-Levels/",
       "source_author": "",
@@ -146,10 +146,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:22.858198+00:00"
+      "extracted_at": "2026-03-25T10:36:11.627979+00:00"
     },
     {
-      "id": "cf64c2af9d2d3ffc",
+      "id": "444c9ee99477abca",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/cm4jpmA0-Selena-XAUUSD-30M-Bearish-Structure-with-Corrective-Channe/",
       "source_author": "",
@@ -172,10 +172,10 @@
         "patterns": [],
         "all_tickers": []
       },
-      "extracted_at": "2026-03-25T10:28:22.858234+00:00"
+      "extracted_at": "2026-03-25T10:36:11.628015+00:00"
     },
     {
-      "id": "832c17c5e65dbd9e",
+      "id": "c80b46629dd48d0d",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/PswWd4Kd-XAUUSD-Gold-Market-Analysis-BEARISH/",
       "source_author": "",
@@ -201,10 +201,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:22.858267+00:00"
+      "extracted_at": "2026-03-25T10:36:11.628048+00:00"
     },
     {
-      "id": "da1c409ccdf1aa5f",
+      "id": "7195092bd1a7ef54",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/O9ZS91lt-Gold-at-a-Turning-Point-Break-Above-4536-Could-Ignite-Rally/",
       "source_author": "",
@@ -230,10 +230,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:22.858307+00:00"
+      "extracted_at": "2026-03-25T10:36:11.628090+00:00"
     },
     {
-      "id": "5b731715b1f9a4f1",
+      "id": "a8f1e3d2a063aced",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSDT/CsHOlRPp-Bitcoin-Holding-Demand-Zone-with-Upside-Toward-73-000/",
       "source_author": "",
@@ -259,10 +259,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:22.858338+00:00"
+      "extracted_at": "2026-03-25T10:36:11.628121+00:00"
     },
     {
-      "id": "01662d17d1377a69",
+      "id": "7f8f8233285d31c3",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/YVCKxJJ6-XAUUSD-Bearish-Momentum-Continues-Market-Eyes-Volatility-Ahead/",
       "source_author": "",
@@ -285,10 +285,10 @@
         "patterns": [],
         "all_tickers": []
       },
-      "extracted_at": "2026-03-25T10:28:22.858370+00:00"
+      "extracted_at": "2026-03-25T10:36:11.628153+00:00"
     },
     {
-      "id": "9435f57fa839a688",
+      "id": "6f4b112bbaff74b4",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/NlI4rNLx-Lingrid-GOLD-Further-Bearish-Pressure-May-Occur/",
       "source_author": "",
@@ -314,10 +314,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:22.858400+00:00"
+      "extracted_at": "2026-03-25T10:36:11.628184+00:00"
     },
     {
-      "id": "3edd0a1df230a8c2",
+      "id": "9820b6263acff1eb",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/EURUSD/bPYYDuWC-EURUSD-Price-Action-Signals-Uptrend-Continuation-To-1-1640/",
       "source_author": "",
@@ -340,10 +340,10 @@
         "patterns": [],
         "all_tickers": []
       },
-      "extracted_at": "2026-03-25T10:28:22.858428+00:00"
+      "extracted_at": "2026-03-25T10:36:11.628212+00:00"
     },
     {
-      "id": "6330cb709ef15b2a",
+      "id": "b0eccfc686ff7986",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/USDCAD/34s36fER-USD-CAD-Consolidation-is-Over-Buy/",
       "source_author": "",
@@ -369,10 +369,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:22.858457+00:00"
+      "extracted_at": "2026-03-25T10:36:11.628241+00:00"
     },
     {
-      "id": "19ee02a11bf3e9d0",
+      "id": "c1da7a3d5fc90687",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/EURUSD/9wBCApJH-EURUSD-Bearish-Alert-Safe-Haven-USD-Rising/",
       "source_author": "",
@@ -395,10 +395,10 @@
         "patterns": [],
         "all_tickers": []
       },
-      "extracted_at": "2026-03-25T10:28:22.858485+00:00"
+      "extracted_at": "2026-03-25T10:36:11.628271+00:00"
     },
     {
-      "id": "41845a1c0e47ff96",
+      "id": "751d0446a82e5e8f",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/EURUSD/U7sPMDkK-EURUSD-Bearish-Pullback-from-FVG-After-Bullish-Structure/",
       "source_author": "",
@@ -421,10 +421,10 @@
         "patterns": [],
         "all_tickers": []
       },
-      "extracted_at": "2026-03-25T10:28:22.858514+00:00"
+      "extracted_at": "2026-03-25T10:36:11.628299+00:00"
     },
     {
-      "id": "0c73b93c17490990",
+      "id": "b3f3917b5de6b19f",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/C8kcnkwe-XAUUSD-Breakdown-Structure-Signals-More-Downside-Toward-4-140/",
       "source_author": "",
@@ -450,10 +450,10 @@
         ],
         "all_tickers": []
       },
-      "extracted_at": "2026-03-25T10:28:22.858545+00:00"
+      "extracted_at": "2026-03-25T10:36:11.628330+00:00"
     },
     {
-      "id": "60367dc8ff176315",
+      "id": "2d307ceb1c7cd259",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/EURUSD/yJqyBev7-EURUSD/",
       "source_author": "",
@@ -476,10 +476,10 @@
         "patterns": [],
         "all_tickers": []
       },
-      "extracted_at": "2026-03-25T10:28:22.858568+00:00"
+      "extracted_at": "2026-03-25T10:36:11.628354+00:00"
     },
     {
-      "id": "1383912f722806a2",
+      "id": "243812cdca6121e7",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/aEiilZpv-Gold-Is-a-Manipulated-Panic-Setting-Up-a-Parabolic-Reversal/",
       "source_author": "",
@@ -505,10 +505,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:22.858596+00:00"
+      "extracted_at": "2026-03-25T10:36:11.628387+00:00"
     },
     {
-      "id": "923981b1c5ec5768",
+      "id": "e3ff16cbb5e7999a",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/9hI2wLu1-Gold-Roadmap-Correction-in-Play-or-Support-Holding/",
       "source_author": "",
@@ -537,10 +537,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:22.858626+00:00"
+      "extracted_at": "2026-03-25T10:36:11.628418+00:00"
     },
     {
-      "id": "964a32a57269650e",
+      "id": "19aca6d6c9ae3c27",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/mtGpIDSq-GOLD-Gold-to-continue-dropping-Targeting-3800/",
       "source_author": "",
@@ -566,10 +566,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:22.858654+00:00"
+      "extracted_at": "2026-03-25T10:36:11.628446+00:00"
     },
     {
-      "id": "9e4f704ee682b492",
+      "id": "7879aae50eeddb16",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSDT/CsHOlRPp-Bitcoin-Holding-Demand-Zone-with-Upside-Toward-73-000/",
       "source_author": "",
@@ -594,10 +594,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:27.185787+00:00"
+      "extracted_at": "2026-03-25T10:36:15.668329+00:00"
     },
     {
-      "id": "a2a8618bc53d29f0",
+      "id": "4b398bf5bf386283",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSD/a4aqQPde-BITCOIN-Last-rally-or-straight-lower/",
       "source_author": "",
@@ -622,10 +622,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:27.185837+00:00"
+      "extracted_at": "2026-03-25T10:36:15.668387+00:00"
     },
     {
-      "id": "b279082959a3713d",
+      "id": "76bfa6fd8e610fce",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/ETHUSDT/Mlkaav0R-ETH-USDT-Break-through-the-resistance-READ-THE-CAPTION/",
       "source_author": "",
@@ -653,10 +653,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:27.185870+00:00"
+      "extracted_at": "2026-03-25T10:36:15.668421+00:00"
     },
     {
-      "id": "ce7214ec8c0cee70",
+      "id": "d2f8290619880890",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSD/tjlpe684-Bitcoin-s-Uptrend-Remains-Intact-Sellers-Are-Being-Absorbed/",
       "source_author": "",
@@ -681,10 +681,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:27.185907+00:00"
+      "extracted_at": "2026-03-25T10:36:15.668470+00:00"
     },
     {
-      "id": "06a051d1a37fa804",
+      "id": "70dc9670015899fd",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSDT/5qMWweAv-Bitcoin-looks-good-Name-Your-Altcoin-Top-Altcoin-Choice/",
       "source_author": "",
@@ -709,10 +709,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:27.185936+00:00"
+      "extracted_at": "2026-03-25T10:36:15.668506+00:00"
     },
     {
-      "id": "458ef4c86c3f3833",
+      "id": "c2b06e91bdd9c285",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/BTCUSD/GfdmJBdj-BTC-USD-BTC-Hits-76K-Then-Pulls-Back-Is-66K-the-Key-Support/",
       "source_author": "",
@@ -740,10 +740,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:27.185965+00:00"
+      "extracted_at": "2026-03-25T10:36:15.668536+00:00"
     },
     {
-      "id": "93b6034be641996a",
+      "id": "e89928f649d461ca",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSD/LPGo5wwK-The-most-important-BTC-macro-chart-of-2026/",
       "source_author": "",
@@ -768,10 +768,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:27.185990+00:00"
+      "extracted_at": "2026-03-25T10:36:15.668560+00:00"
     },
     {
-      "id": "e5bc39ca6bedba30",
+      "id": "ec7fea35808b1099",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/BTCUSDT/5nxEv0P9-BTCUSDT-Failed-Breakout-and-Trendline-Loss-Open-Path-to-67-000/",
       "source_author": "",
@@ -799,10 +799,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:27.186018+00:00"
+      "extracted_at": "2026-03-25T10:36:15.668588+00:00"
     },
     {
-      "id": "df64a26167ce56eb",
+      "id": "968c4404a3f85277",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSDT.P/3xZ9TTdc-Bitcoin-Market-Analysis-What-now/",
       "source_author": "",
@@ -827,10 +827,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:27.186042+00:00"
+      "extracted_at": "2026-03-25T10:36:15.668612+00:00"
     },
     {
-      "id": "5f11800cf24e1be5",
+      "id": "0f83e653e9ac60ed",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSDT/mjNnSlIP-Bitcoin-Roadmap-Watch-the-Short-Term-Moves/",
       "source_author": "",
@@ -855,10 +855,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:27.186068+00:00"
+      "extracted_at": "2026-03-25T10:36:15.668636+00:00"
     },
     {
-      "id": "b532341d1881828e",
+      "id": "3a6b9a919b24ab97",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSDT/Mnz19B9C-Liquidity-Trap-Bitcoin-Faces-Downside-Risk/",
       "source_author": "",
@@ -883,10 +883,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:27.186096+00:00"
+      "extracted_at": "2026-03-25T10:36:15.668665+00:00"
     },
     {
-      "id": "d97ffc7efb63ae8f",
+      "id": "962ae43c2f46df6e",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSD/zD2zRQY0-BTCUSD-Two-Scenarios-Pullback-or-Continuation/",
       "source_author": "",
@@ -911,10 +911,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:27.186120+00:00"
+      "extracted_at": "2026-03-25T10:36:15.668689+00:00"
     },
     {
-      "id": "e7da17c6ef113721",
+      "id": "d84e3665b623f21f",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSDT/ya55thE9-Bitcoin-Weekly-Challenging-Final-Barrier-Candlestick-Reading/",
       "source_author": "",
@@ -939,10 +939,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:27.186147+00:00"
+      "extracted_at": "2026-03-25T10:36:15.668718+00:00"
     },
     {
-      "id": "89edfdd84a3de2f9",
+      "id": "b8afb23449a8bb1b",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSDT.P/Dc3WgY4y-Cryptocurrency-market-Open-Interest-OI-analysis/",
       "source_author": "",
@@ -967,10 +967,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:27.186172+00:00"
+      "extracted_at": "2026-03-25T10:36:15.668742+00:00"
     },
     {
-      "id": "1546f1ed79d3a224",
+      "id": "b3b3f994c1efa4fd",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSD/tLJBe3Uc-Bitcoin-Please-do-yourself-a-favor/",
       "source_author": "",
@@ -995,10 +995,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:27.186204+00:00"
+      "extracted_at": "2026-03-25T10:36:15.668765+00:00"
     },
     {
-      "id": "47204cdc84305340",
+      "id": "6d30a50c11bc0fb0",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/vCSHg7LJ-XAU-USD-Sweet-mother-of-Go-l-d-READ-THE-CAPTION/",
       "source_author": "",
@@ -1023,10 +1023,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:27.186228+00:00"
+      "extracted_at": "2026-03-25T10:36:15.668788+00:00"
     },
     {
-      "id": "391e090391b2dc2e",
+      "id": "cbf1e23344a38c03",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSDT/Px7f7M5T-23-03-26-Weekly-Outlook/",
       "source_author": "",
@@ -1051,10 +1051,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:27.186250+00:00"
+      "extracted_at": "2026-03-25T10:36:15.668810+00:00"
     },
     {
-      "id": "96d9d95822057020",
+      "id": "f715cbb59e408958",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSD.MH2026/Cz0BbnXz-Why-Your-Plan-Collapses-the-Moment-Money-Becomes-Real/",
       "source_author": "",
@@ -1079,10 +1079,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:27.186274+00:00"
+      "extracted_at": "2026-03-25T10:36:15.668834+00:00"
     },
     {
-      "id": "efb1289d234b2dca",
+      "id": "52f3b374ab2a210b",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSD/KOgqlSG2-BITCOIN-started-the-final-descent-towards-the-Sweet-Buy-Spot/",
       "source_author": "",
@@ -1107,10 +1107,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:27.186306+00:00"
+      "extracted_at": "2026-03-25T10:36:15.668861+00:00"
     },
     {
-      "id": "57de5de36ba1fd3f",
+      "id": "06cc869474f51510",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSDT/wKXisNUc-Bitcoin-68K-Prime-Location-For-Bullish-Reversal/",
       "source_author": "",
@@ -1135,10 +1135,10 @@
           "BTC"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:27.186331+00:00"
+      "extracted_at": "2026-03-25T10:36:15.668885+00:00"
     },
     {
-      "id": "8dd78cd5bcebf649",
+      "id": "a6a9c1d8b7ea4d48",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/ETHUSDT/Mlkaav0R-ETH-USDT-Break-through-the-resistance-READ-THE-CAPTION/",
       "source_author": "",
@@ -1166,10 +1166,10 @@
           "ETH"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:30.912060+00:00"
+      "extracted_at": "2026-03-25T10:36:19.406385+00:00"
     },
     {
-      "id": "0934038f0655ae12",
+      "id": "a455b18c52860cfd",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/BTCUSD/GfdmJBdj-BTC-USD-BTC-Hits-76K-Then-Pulls-Back-Is-66K-the-Key-Support/",
       "source_author": "",
@@ -1197,10 +1197,10 @@
           "ETH"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:30.912108+00:00"
+      "extracted_at": "2026-03-25T10:36:19.406434+00:00"
     },
     {
-      "id": "7b8712bcba22b80a",
+      "id": "f11f1d95302794b0",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/ETHUSDT/WJJVgbH6-ETH-Key-Levels-Reversal-or-Continuation-Ahead/",
       "source_author": "",
@@ -1225,10 +1225,10 @@
           "ETH"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:30.912139+00:00"
+      "extracted_at": "2026-03-25T10:36:19.406465+00:00"
     },
     {
-      "id": "a32ceaf1d6f85d65",
+      "id": "ec42843fda9bd27d",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSD.MH2026/Cz0BbnXz-Why-Your-Plan-Collapses-the-Moment-Money-Becomes-Real/",
       "source_author": "",
@@ -1253,10 +1253,10 @@
           "ETH"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:30.912168+00:00"
+      "extracted_at": "2026-03-25T10:36:19.406545+00:00"
     },
     {
-      "id": "c5547f8fafca6b54",
+      "id": "182ea878b19d79fc",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/ETHUSD/HybzaN35-ETHUSD-HODOR/",
       "source_author": "",
@@ -1281,10 +1281,10 @@
           "ETH"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:30.912194+00:00"
+      "extracted_at": "2026-03-25T10:36:19.406599+00:00"
     },
     {
-      "id": "96d27ab220f9551d",
+      "id": "34a4f27a5643b075",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/ETHUSDT/oyeq7Ouo-Ethereum-Bullish-bias-persist-bulls-can-buy-3-000-next/",
       "source_author": "",
@@ -1309,10 +1309,10 @@
           "ETH"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:30.912226+00:00"
+      "extracted_at": "2026-03-25T10:36:19.406644+00:00"
     },
     {
-      "id": "737465f22103a7c9",
+      "id": "87705142701960cd",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/ETHUSD/6be69YHl-Ethereum-Trade-Signal-Bullish-Impulse/",
       "source_author": "",
@@ -1337,10 +1337,10 @@
           "ETH"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:30.912253+00:00"
+      "extracted_at": "2026-03-25T10:36:19.406674+00:00"
     },
     {
-      "id": "4c0c71073c10440c",
+      "id": "e828c9bf26a12f36",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/ETHUSD/7shSEwYA-Bullish-bounce-for-the-Bitcoin/",
       "source_author": "",
@@ -1365,10 +1365,10 @@
           "ETH"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:30.912283+00:00"
+      "extracted_at": "2026-03-25T10:36:19.406700+00:00"
     },
     {
-      "id": "8969ef97de241219",
+      "id": "33c7fb0726b2ee15",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/ETHUSD/Ejvx8DKm-Ethereum-Creating-the-bearmarket-bottom/",
       "source_author": "",
@@ -1393,10 +1393,10 @@
           "ETH"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:30.912309+00:00"
+      "extracted_at": "2026-03-25T10:36:19.406728+00:00"
     },
     {
-      "id": "acdefa34a0761ab3",
+      "id": "0d7c91c20c07051c",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSDT/th7EYGv0-Cash-Flow-and-BTC-ETH-Chart-Interpretation/",
       "source_author": "",
@@ -1421,10 +1421,10 @@
           "ETH"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:30.912333+00:00"
+      "extracted_at": "2026-03-25T10:36:19.406753+00:00"
     },
     {
-      "id": "3e2e1ddbc1ec1765",
+      "id": "bc60aa9b247c9195",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/SOLUSDT/jLtU1mLQ-SOL-USDT-Breaking-the-resistance-READ-THE-CAPTION/",
       "source_author": "",
@@ -1452,10 +1452,10 @@
           "ETH"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:30.912359+00:00"
+      "extracted_at": "2026-03-25T10:36:19.406780+00:00"
     },
     {
-      "id": "851446c0e7a948d4",
+      "id": "6ba4d5ba91a75876",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/ETHUSDT/RqckqRwI-ETHUSD-Swing-Trade/",
       "source_author": "",
@@ -1480,10 +1480,10 @@
           "ETH"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:30.912382+00:00"
+      "extracted_at": "2026-03-25T10:36:19.406803+00:00"
     },
     {
-      "id": "24c37c4a8fddae26",
+      "id": "ab2aa0900216f2a3",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSDT/xCp3OPih-BTC-USDT-SSL-sweep-first-or-BSL-READ-THE-CAPTION/",
       "source_author": "",
@@ -1508,10 +1508,10 @@
           "ETH"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:30.912407+00:00"
+      "extracted_at": "2026-03-25T10:36:19.406829+00:00"
     },
     {
-      "id": "af70fa126fbd8413",
+      "id": "043c66da382fa793",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/ETH1!/a2czDs8N-Ethereum-CME-GAP-Will-The-Gaps-Be-Filled/",
       "source_author": "",
@@ -1539,10 +1539,10 @@
           "ETH"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:30.912432+00:00"
+      "extracted_at": "2026-03-25T10:36:19.406854+00:00"
     },
     {
-      "id": "f6a49acdbf678815",
+      "id": "d33e57482d12b019",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/ETHUSDT/l0LM1svC-ETHUSDT-1975-2000-as-a-potential-turning-point/",
       "source_author": "",
@@ -1567,10 +1567,10 @@
           "ETH"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:30.912457+00:00"
+      "extracted_at": "2026-03-25T10:36:19.406878+00:00"
     },
     {
-      "id": "0a0a7c7587fea577",
+      "id": "0a4088bb73b5a6e3",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/ETHUSD/xijglkpW-Could-a-Ceasefire-Trigger-the-Next-ETH-Rally-Analyst-Weighs-In/",
       "source_author": "",
@@ -1595,10 +1595,10 @@
           "ETH"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:30.912483+00:00"
+      "extracted_at": "2026-03-25T10:36:19.406904+00:00"
     },
     {
-      "id": "e314434185591914",
+      "id": "e2eff829b7684e13",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/LTCUSDT.P/Inwbk3jT-Litecoin-sets-up-for-major-breakout/",
       "source_author": "",
@@ -1626,10 +1626,10 @@
           "ETH"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:30.912508+00:00"
+      "extracted_at": "2026-03-25T10:36:19.406929+00:00"
     },
     {
-      "id": "4a1f0b81f22d3d1d",
+      "id": "832c1f6823b9f13c",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/ETHUSDT/6Lt5Wl76-ETHUSDT-Above-2k-support-but-still-exposed-to-further-downside/",
       "source_author": "",
@@ -1657,10 +1657,10 @@
           "ETH"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:30.912533+00:00"
+      "extracted_at": "2026-03-25T10:36:19.406954+00:00"
     },
     {
-      "id": "9b09df1e4d1c58b3",
+      "id": "14e4d0b9edfecde9",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/ETHUSD/9UjmdymG-ETHUSD-Technical-Analysis-Structure-Statistics-MaB-15min/",
       "source_author": "",
@@ -1685,10 +1685,10 @@
           "ETH"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:30.912558+00:00"
+      "extracted_at": "2026-03-25T10:36:19.406979+00:00"
     },
     {
-      "id": "517edf9110f3b991",
+      "id": "f90374a45cc25c04",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/ETHUSD/QxNV67NK-ETHUSD-remains-under-bearish-pressure-below-2-410-level/",
       "source_author": "",
@@ -1713,10 +1713,10 @@
           "ETH"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:30.912585+00:00"
+      "extracted_at": "2026-03-25T10:36:19.407011+00:00"
     },
     {
-      "id": "49768acf76b0709f",
+      "id": "7c7b778051648883",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/a4Eb99SK-SPY-SPX-Market-Moving-Headlines-Wednesday-March-25-2026/",
       "source_author": "",
@@ -1741,10 +1741,10 @@
           "SPY"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:34.573258+00:00"
+      "extracted_at": "2026-03-25T10:36:23.578260+00:00"
     },
     {
-      "id": "09d3b25c54269a8e",
+      "id": "a8ee0b4c0824bd64",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/ES1!/URplp8TH-ES-SPX-SPY-Analysis-Key-Zones-Setup-for-Wed-Mar-25/",
       "source_author": "",
@@ -1769,10 +1769,10 @@
           "SPY"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:34.573324+00:00"
+      "extracted_at": "2026-03-25T10:36:23.578310+00:00"
     },
     {
-      "id": "6e7055148e51f080",
+      "id": "fc36bed7e5e91686",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPX/QbrD7g6J-Heads-Shoulders-Up-A-Bearish-Pattern-Appears-To-Be-Forming/",
       "source_author": "",
@@ -1797,10 +1797,10 @@
           "SPY"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:34.573541+00:00"
+      "extracted_at": "2026-03-25T10:36:23.578351+00:00"
     },
     {
-      "id": "0a6efa07898e83a0",
+      "id": "de442a49a62b1454",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/COIN/SeyVuuHI-COIN-Cascade-Ready-for-Leg-Do/",
       "source_author": "",
@@ -1825,10 +1825,10 @@
           "SPY"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:34.573662+00:00"
+      "extracted_at": "2026-03-25T10:36:23.578378+00:00"
     },
     {
-      "id": "6b430aef0f1deb80",
+      "id": "300cef716d09acfb",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/QHrZkCHf-SPY-SPX-Market-Moving-Headlines-Tuesday-March-24-2026/",
       "source_author": "",
@@ -1853,10 +1853,10 @@
           "SPY"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:34.573733+00:00"
+      "extracted_at": "2026-03-25T10:36:23.578409+00:00"
     },
     {
-      "id": "6df410b190a36b62",
+      "id": "5047ece7799b844e",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/DIA/tfDUtevm-DJI-nearing-The-end-of-WAVE-1-or-A-Crash/",
       "source_author": "",
@@ -1881,10 +1881,10 @@
           "SPY"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:34.573783+00:00"
+      "extracted_at": "2026-03-25T10:36:23.578439+00:00"
     },
     {
-      "id": "b577d248ec55bfc6",
+      "id": "32828665cee05d07",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/Q845vzfZ-SPY-SPX-Weekly-Outlook-Week-12-of-2026-23-27-MAR/",
       "source_author": "",
@@ -1909,10 +1909,10 @@
           "SPY"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:34.573835+00:00"
+      "extracted_at": "2026-03-25T10:36:23.578477+00:00"
     },
     {
-      "id": "60af60f19972059d",
+      "id": "593de9594f26fb07",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/7e0L16m5-SPY-Rollercoaster-3-23-2026/",
       "source_author": "",
@@ -1937,10 +1937,10 @@
           "SPY"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:34.573873+00:00"
+      "extracted_at": "2026-03-25T10:36:23.578503+00:00"
     },
     {
-      "id": "be652c991c06924a",
+      "id": "2cc659e2fdf6afb7",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/ES1!/dIBPg7lb-ES-SPX-SPY-Analysis-Key-Zones-Setup-for-Tue-Mar-24/",
       "source_author": "",
@@ -1965,10 +1965,10 @@
           "SPY"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:34.573909+00:00"
+      "extracted_at": "2026-03-25T10:36:23.578528+00:00"
     },
     {
-      "id": "6cde8997f3f8c9b7",
+      "id": "491cc88133be2319",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/MOVE/IteWnpB8-Credit-event-is-underway-based-on-MOVE-VIX-bonds/",
       "source_author": "",
@@ -1993,10 +1993,10 @@
           "SPY"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:34.574032+00:00"
+      "extracted_at": "2026-03-25T10:36:23.578552+00:00"
     },
     {
-      "id": "6794bac07937b06c",
+      "id": "89d3e47b287a2943",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/ES1!/hwnkAIXe-ES-SPX-SPY-Analysis-Key-Zones-Setup-for-Mon-Mar-23/",
       "source_author": "",
@@ -2021,10 +2021,10 @@
           "SPY"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:34.574278+00:00"
+      "extracted_at": "2026-03-25T10:36:23.578576+00:00"
     },
     {
-      "id": "ad7f790cc8d1c20b",
+      "id": "d6be727430a092e7",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/2jJeW0jc-SPY-SPX-Market-Moving-Headlines-Monday-March-23-2026/",
       "source_author": "",
@@ -2049,10 +2049,10 @@
           "SPY"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:34.574337+00:00"
+      "extracted_at": "2026-03-25T10:36:23.578603+00:00"
     },
     {
-      "id": "9c1560a729254cc0",
+      "id": "b25f8a87cffca1a8",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/MES1!/GkN1jBoA-S-P-500-Key-Decision-Zone-Reversal-or-Continuation/",
       "source_author": "",
@@ -2077,10 +2077,10 @@
           "SPY"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:34.574382+00:00"
+      "extracted_at": "2026-03-25T10:36:23.578630+00:00"
     },
     {
-      "id": "8c43b82f2a974858",
+      "id": "ad6365d2033ab997",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/16HNL0jE-Stock-Market-Forecast-BTC-TSLA-NVDA-AAPL-AMZN-META-MSFT/",
       "source_author": "",
@@ -2105,10 +2105,10 @@
           "SPY"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:34.574420+00:00"
+      "extracted_at": "2026-03-25T10:36:23.578656+00:00"
     },
     {
-      "id": "efe906c3666ed49c",
+      "id": "faf07ff198b7ad23",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/PEXH4y5X-SPY-Long-Trade-Explained/",
       "source_author": "",
@@ -2133,10 +2133,10 @@
           "SPY"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:34.574459+00:00"
+      "extracted_at": "2026-03-25T10:36:23.578681+00:00"
     },
     {
-      "id": "ac881baf813dd154",
+      "id": "b27f8ae07471a61b",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/HOQMpMf3-SPY-Weekly-Outlook-Week-11-of-2026-16-20-MAR/",
       "source_author": "",
@@ -2161,10 +2161,10 @@
           "SPY"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:34.574498+00:00"
+      "extracted_at": "2026-03-25T10:36:23.578708+00:00"
     },
     {
-      "id": "6bd975d852094581",
+      "id": "8c4deafa8ddc5b1d",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPX/YgKP5qid-S-P500-The-stock-market-is-correcting/",
       "source_author": "",
@@ -2189,10 +2189,10 @@
           "SPY"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:34.574533+00:00"
+      "extracted_at": "2026-03-25T10:36:23.578731+00:00"
     },
     {
-      "id": "01af4109c96d4cec",
+      "id": "be145f91f8a48ec5",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/b9bInUrH-SPY-S-P500-Daily/",
       "source_author": "",
@@ -2217,10 +2217,10 @@
           "SPY"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:34.574565+00:00"
+      "extracted_at": "2026-03-25T10:36:23.578752+00:00"
     },
     {
-      "id": "da55ebb4191ff9a6",
+      "id": "04044c9d77fb71f3",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/hCsnDZqZ-Opening-IRA-SPY-May-15th-610-Monied-Covered-Call/",
       "source_author": "",
@@ -2245,10 +2245,10 @@
           "SPY"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:34.574600+00:00"
+      "extracted_at": "2026-03-25T10:36:23.578776+00:00"
     },
     {
-      "id": "b8dd9f0d16e55f9e",
+      "id": "269f5db20889122f",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/isvh9BkQ-SPY-SPX-Market-Moving-Headlines-Friday-March-20-2026/",
       "source_author": "",
@@ -2273,10 +2273,10 @@
           "SPY"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:34.574640+00:00"
+      "extracted_at": "2026-03-25T10:36:23.578804+00:00"
     },
     {
-      "id": "f5a60e23599a3b7e",
+      "id": "5ad0f752f9d6300a",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/COIN/SeyVuuHI-COIN-Cascade-Ready-for-Leg-Do/",
       "source_author": "",
@@ -2301,10 +2301,10 @@
           "QQQ"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:39.231229+00:00"
+      "extracted_at": "2026-03-25T10:36:27.158185+00:00"
     },
     {
-      "id": "1e0e7954f9c4c253",
+      "id": "afd9efcc13fb106a",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/QQQ/WsFUI51F-QQQ-NDX-Weekly-Outlook-Week-12-of-2026-23-27-MAR/",
       "source_author": "",
@@ -2329,10 +2329,10 @@
           "QQQ"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:39.231289+00:00"
+      "extracted_at": "2026-03-25T10:36:27.158236+00:00"
     },
     {
-      "id": "80a41c31937292b4",
+      "id": "1c5d947663daeed7",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/Q845vzfZ-SPY-SPX-Weekly-Outlook-Week-12-of-2026-23-27-MAR/",
       "source_author": "",
@@ -2357,10 +2357,10 @@
           "QQQ"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:39.231329+00:00"
+      "extracted_at": "2026-03-25T10:36:27.158267+00:00"
     },
     {
-      "id": "613e6a5f47d0cf64",
+      "id": "2aa4a660c0a26816",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/NQ1!/MUrPlcnH-Nasdaq-Futures-is-Holding-Support-for-the-Third-Time/",
       "source_author": "",
@@ -2388,10 +2388,10 @@
           "QQQ"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:39.231374+00:00"
+      "extracted_at": "2026-03-25T10:36:27.158310+00:00"
     },
     {
-      "id": "2fe8d59640d37d22",
+      "id": "47d379da336cf1c4",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/16HNL0jE-Stock-Market-Forecast-BTC-TSLA-NVDA-AAPL-AMZN-META-MSFT/",
       "source_author": "",
@@ -2416,10 +2416,10 @@
           "QQQ"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:39.231407+00:00"
+      "extracted_at": "2026-03-25T10:36:27.158338+00:00"
     },
     {
-      "id": "ccc2b66c3fc3152c",
+      "id": "c22dd81886b4883d",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/QQQ/VSxd6ltr-Moment-of-Truth-for-the-QQQ/",
       "source_author": "",
@@ -2444,10 +2444,10 @@
           "QQQ"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:39.231436+00:00"
+      "extracted_at": "2026-03-25T10:36:27.158362+00:00"
     },
     {
-      "id": "52d5ca6f4524eeaf",
+      "id": "ad514e51acd65750",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/QQQ/cEesj5KL-Nasdaq-ETF-QQQ-Liquidity-Sweep-Then-Expansion-Play/",
       "source_author": "",
@@ -2472,10 +2472,10 @@
           "QQQ"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:39.231467+00:00"
+      "extracted_at": "2026-03-25T10:36:27.158387+00:00"
     },
     {
-      "id": "2815de543877e296",
+      "id": "1102f169c266a2d0",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/QQQ/d9ZPPNOV-QQQ-Massive-Long-BUY/",
       "source_author": "",
@@ -2500,10 +2500,10 @@
           "QQQ"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:39.231501+00:00"
+      "extracted_at": "2026-03-25T10:36:27.158412+00:00"
     },
     {
-      "id": "42a84cdef9b3f350",
+      "id": "97ca1b5326c74d19",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/QQQ/BNcJs4mc-QQQ-Weekly-Outlook-Week-11-of-2026-16-20-MAR/",
       "source_author": "",
@@ -2528,10 +2528,10 @@
           "QQQ"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:39.231534+00:00"
+      "extracted_at": "2026-03-25T10:36:27.158439+00:00"
     },
     {
-      "id": "0ec82e3ecb75f5fa",
+      "id": "d47d696444e6dc4b",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/QQQ/UGgi2VNh-QQQ-long-term-TA/",
       "source_author": "",
@@ -2556,10 +2556,10 @@
           "QQQ"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:39.231565+00:00"
+      "extracted_at": "2026-03-25T10:36:27.158462+00:00"
     },
     {
-      "id": "c7521f794b71c18b",
+      "id": "420875e8c9998b2f",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/QQQ/TEIXsOaB-HOW-TO-TRADE-FED-DAY-LIKE-A-BOSS-SIMPLE-STRATEGY-HERE-S-TO-HELP/",
       "source_author": "",
@@ -2584,10 +2584,10 @@
           "QQQ"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:39.231611+00:00"
+      "extracted_at": "2026-03-25T10:36:27.158488+00:00"
     },
     {
-      "id": "0008778393e2dbea",
+      "id": "e1639202385bb126",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/META/0ytMGkbf-AAPL-META-LONG-READ-NOTES/",
       "source_author": "",
@@ -2612,10 +2612,10 @@
           "QQQ"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:39.231722+00:00"
+      "extracted_at": "2026-03-25T10:36:27.158513+00:00"
     },
     {
-      "id": "90ede0172199ee6a",
+      "id": "c3a3b44960671454",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/QQQ/1ctAQfOA-Opening-IRA-QQQ-April-17th-555P/",
       "source_author": "",
@@ -2640,10 +2640,10 @@
           "QQQ"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:39.231770+00:00"
+      "extracted_at": "2026-03-25T10:36:27.158536+00:00"
     },
     {
-      "id": "52be4fb8daec4d4e",
+      "id": "58c92ce81e92c8c8",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/DXY/04QBJG6J-DXY-Short-Mid-Term-Prediction-Read-this-before-buying-assets/",
       "source_author": "",
@@ -2668,10 +2668,10 @@
           "QQQ"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:39.231807+00:00"
+      "extracted_at": "2026-03-25T10:36:27.158562+00:00"
     },
     {
-      "id": "1911c06f91a69941",
+      "id": "b9ad5156bf9be705",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/NQ1!/qC02whw3-30-000-nasdaq/",
       "source_author": "",
@@ -2696,10 +2696,10 @@
           "QQQ"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:39.231835+00:00"
+      "extracted_at": "2026-03-25T10:36:27.158595+00:00"
     },
     {
-      "id": "433949907c3ceff2",
+      "id": "ebd7d00e7f0df0a7",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/US30/zela3ftQ-US-Markets-Down-More-Than-5-What-Should-Investors-Do-Now/",
       "source_author": "",
@@ -2724,10 +2724,10 @@
           "QQQ"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:39.231872+00:00"
+      "extracted_at": "2026-03-25T10:36:27.158623+00:00"
     },
     {
-      "id": "94e07d09b57288d6",
+      "id": "030d3760606234f9",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/OcSIo4N7-SPY-WEEKLY-15-20TH-MARCH-2026/",
       "source_author": "",
@@ -2752,10 +2752,10 @@
           "QQQ"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:39.231901+00:00"
+      "extracted_at": "2026-03-25T10:36:27.158646+00:00"
     },
     {
-      "id": "231e3e2c01b3a745",
+      "id": "9fa626fce2900b1c",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/QQQ/bt4X5rU1-QQQ-Growth-Bullish-Forecast/",
       "source_author": "",
@@ -2780,10 +2780,10 @@
           "QQQ"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:39.231933+00:00"
+      "extracted_at": "2026-03-25T10:36:27.158670+00:00"
     },
     {
-      "id": "0dc5d831e8b8928a",
+      "id": "549663054c916f76",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/HIcJstu1-Stock-Market-Forecast-BTC-TSLA-NVDA-AAPL-AMZN-META-MSFT/",
       "source_author": "",
@@ -2808,10 +2808,10 @@
           "QQQ"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:39.231964+00:00"
+      "extracted_at": "2026-03-25T10:36:27.158695+00:00"
     },
     {
-      "id": "b6b6d840f5b38e31",
+      "id": "0ea56f349a35feb0",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/QQQ/fAwRCOmZ-QQQ-Weekly-Outlook-Week-10-of-2026-09-13-MAR/",
       "source_author": "",
@@ -2836,10 +2836,10 @@
           "QQQ"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:39.231997+00:00"
+      "extracted_at": "2026-03-25T10:36:27.158722+00:00"
     },
     {
-      "id": "c7744b7cf0704d99",
+      "id": "25a7ed07d956c3a3",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/AAPL/HKJXeZ6z-APPLE-Bullish-Continuation-Long-Signal/",
       "source_author": "",
@@ -2864,10 +2864,10 @@
           "AAPL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:43.511340+00:00"
+      "extracted_at": "2026-03-25T10:36:31.506093+00:00"
     },
     {
-      "id": "d7cebb31d80363d5",
+      "id": "b0615fec009e1961",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/16HNL0jE-Stock-Market-Forecast-BTC-TSLA-NVDA-AAPL-AMZN-META-MSFT/",
       "source_author": "",
@@ -2892,10 +2892,10 @@
           "AAPL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:43.511396+00:00"
+      "extracted_at": "2026-03-25T10:36:31.506222+00:00"
     },
     {
-      "id": "ca36cc2153af9774",
+      "id": "be6c0e76d97d34e6",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/META/0ytMGkbf-AAPL-META-LONG-READ-NOTES/",
       "source_author": "",
@@ -2920,10 +2920,10 @@
           "AAPL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:43.511435+00:00"
+      "extracted_at": "2026-03-25T10:36:31.506271+00:00"
     },
     {
-      "id": "708d57034b30ee13",
+      "id": "ed269b539ec290b7",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/AAPL/hDZ3k5Qg-Apple-Interim-Correction-Underway/",
       "source_author": "",
@@ -2948,10 +2948,10 @@
           "AAPL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:43.511469+00:00"
+      "extracted_at": "2026-03-25T10:36:31.506449+00:00"
     },
     {
-      "id": "48962a71d473ce2d",
+      "id": "2ee39a708b37087d",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/AAPL/cwsfOq0z-AAPL-at-Full-ATR-Trade-Smart-Not-Late/",
       "source_author": "",
@@ -2976,10 +2976,10 @@
           "AAPL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:43.511505+00:00"
+      "extracted_at": "2026-03-25T10:36:31.506493+00:00"
     },
     {
-      "id": "9242a469e400a146",
+      "id": "acff04aebd1377e4",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/AAPL/fozCSqAu-AAPL-Order-Flow-Pullback-Within-Weekly-Fractal-Range-169-21-28/",
       "source_author": "",
@@ -3004,10 +3004,10 @@
           "AAPL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:43.511542+00:00"
+      "extracted_at": "2026-03-25T10:36:31.506528+00:00"
     },
     {
-      "id": "49be849335a3851c",
+      "id": "ff45a3cbb98b1f84",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/AAPL/p5Vb8UwZ-AAPL-Incoming-50-Drop-Even-Apples-Eventually-Rot-SHORT/",
       "source_author": "",
@@ -3032,10 +3032,10 @@
           "AAPL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:43.511578+00:00"
+      "extracted_at": "2026-03-25T10:36:31.506562+00:00"
     },
     {
-      "id": "d6c0f327d03a92c9",
+      "id": "6e37f305f99d7918",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/AAPL/hGjtCzqy-Apple-Dip-Opportunity/",
       "source_author": "",
@@ -3060,10 +3060,10 @@
           "AAPL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:43.511606+00:00"
+      "extracted_at": "2026-03-25T10:36:31.506587+00:00"
     },
     {
-      "id": "12504d866b7e8630",
+      "id": "bff997e715664ab0",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/AAPL/dmrpYalo-Waiting-for-Trendline-Support/",
       "source_author": "",
@@ -3091,10 +3091,10 @@
           "AAPL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:43.511639+00:00"
+      "extracted_at": "2026-03-25T10:36:31.506614+00:00"
     },
     {
-      "id": "2f0a3075e696cdf3",
+      "id": "d652e82981e2b1fb",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/AAPL/NUX2gJ2m-APPLE-Long-Trade-Explained/",
       "source_author": "",
@@ -3119,10 +3119,10 @@
           "AAPL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:43.511676+00:00"
+      "extracted_at": "2026-03-25T10:36:31.506639+00:00"
     },
     {
-      "id": "605af0ed1b7999a3",
+      "id": "4c8e92522bd789ab",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/HIcJstu1-Stock-Market-Forecast-BTC-TSLA-NVDA-AAPL-AMZN-META-MSFT/",
       "source_author": "",
@@ -3147,10 +3147,10 @@
           "AAPL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:43.511706+00:00"
+      "extracted_at": "2026-03-25T10:36:31.506664+00:00"
     },
     {
-      "id": "8fa56f8fa740e205",
+      "id": "17bb0de80cefa706",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/AAPL/Cq8jpYZ3-APPLE-Trading-Opportunity-BUY/",
       "source_author": "",
@@ -3175,10 +3175,10 @@
           "AAPL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:43.511735+00:00"
+      "extracted_at": "2026-03-25T10:36:31.506689+00:00"
     },
     {
-      "id": "7d70e42bc07c90ed",
+      "id": "724a9b3b758c599b",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/AAPL/fpmhN5SP-APPLE-Forecast-Trading-Plan/",
       "source_author": "",
@@ -3203,10 +3203,10 @@
           "AAPL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:43.511836+00:00"
+      "extracted_at": "2026-03-25T10:36:31.506712+00:00"
     },
     {
-      "id": "d6786ef1fbe65478",
+      "id": "85c93887dc78ee36",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/QQQ/8A5WXeHj-QQQ-Crash-Update-Thursday-Plan-Working-ref-to-previous-post/",
       "source_author": "",
@@ -3231,10 +3231,10 @@
           "AAPL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:43.511946+00:00"
+      "extracted_at": "2026-03-25T10:36:31.506739+00:00"
     },
     {
-      "id": "e09a44a809c8a666",
+      "id": "d5bdc1f4fb43f533",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/KWdqtQe4-Stock-Market-Forecast-BTC-TSLA-NVDA-AAPL-AMZN-META-MSFT/",
       "source_author": "",
@@ -3259,10 +3259,10 @@
           "AAPL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:43.511987+00:00"
+      "extracted_at": "2026-03-25T10:36:31.506763+00:00"
     },
     {
-      "id": "0b1eddba52328a0a",
+      "id": "b133bada3a07df34",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/AAPL/yX3z6I5O-APPLE-The-Target-Is-UP-BUY/",
       "source_author": "",
@@ -3287,10 +3287,10 @@
           "AAPL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:43.512024+00:00"
+      "extracted_at": "2026-03-25T10:36:31.506787+00:00"
     },
     {
-      "id": "70552d988828664f",
+      "id": "c4313e4a2c2214ef",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/AAPL/D5DdfkIE-APPLE-formed-the-worst-Bearish-Cross-that-can-crash-it-to-205/",
       "source_author": "",
@@ -3315,10 +3315,10 @@
           "AAPL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:43.512059+00:00"
+      "extracted_at": "2026-03-25T10:36:31.506820+00:00"
     },
     {
-      "id": "099d98b6476f6f5c",
+      "id": "e85b6d45a06db1ed",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/AAPL/AtASISTa-AAPL-Apple-Inc-Launch-Week-Sparks-AI-Ecosystem-Push/",
       "source_author": "",
@@ -3343,10 +3343,10 @@
           "AAPL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:43.512097+00:00"
+      "extracted_at": "2026-03-25T10:36:31.506848+00:00"
     },
     {
-      "id": "3f6d38a048286d14",
+      "id": "5dd5a28f59beb0c8",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/AAPL/0BWLMDda-APPLE-Massive-Long-BUY/",
       "source_author": "",
@@ -3371,10 +3371,10 @@
           "AAPL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:43.512129+00:00"
+      "extracted_at": "2026-03-25T10:36:31.506874+00:00"
     },
     {
-      "id": "da0528f0df7119f8",
+      "id": "d315b4f787b07231",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/AUDUSD/lDkqa7YL-DXY-EXY-BXY-LMT-S-P500-EURUSD-FTSE100-2-6-February-2026/",
       "source_author": "",
@@ -3399,10 +3399,10 @@
           "AAPL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:43.512159+00:00"
+      "extracted_at": "2026-03-25T10:36:31.506908+00:00"
     },
     {
-      "id": "1dc23498f2e059e8",
+      "id": "f87bf9f4651a769a",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/TSLA/hbLpy5ja-WHAT-WILL-HAPPEN-3RD-AUGUST/",
       "source_author": "",
@@ -3427,10 +3427,10 @@
           "TSLA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:47.657746+00:00"
+      "extracted_at": "2026-03-25T10:36:35.002561+00:00"
     },
     {
-      "id": "200b82629b163495",
+      "id": "bf871037381288d9",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/TSLA/SaqxsVcw-TSLA-Dead-Cat-Bounce-Into-Resistance/",
       "source_author": "",
@@ -3458,10 +3458,10 @@
           "TSLA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:47.657917+00:00"
+      "extracted_at": "2026-03-25T10:36:35.002613+00:00"
     },
     {
-      "id": "5a2be82f5d26b27f",
+      "id": "f88e17ca317011ac",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/TSLA/Bjpgmv8a-TESLA-Long-Trading-Opportunity/",
       "source_author": "",
@@ -3486,10 +3486,10 @@
           "TSLA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:47.657977+00:00"
+      "extracted_at": "2026-03-25T10:36:35.002650+00:00"
     },
     {
-      "id": "86a807ae83cf3ec3",
+      "id": "b7cc1b3659a407dd",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/7S0jqzw1-Gold-s-starts-to-move-below-4-000-then-lower/",
       "source_author": "",
@@ -3514,10 +3514,10 @@
           "TSLA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:47.658008+00:00"
+      "extracted_at": "2026-03-25T10:36:35.002678+00:00"
     },
     {
-      "id": "f3391b3eaf96318b",
+      "id": "08279c3040b4f85f",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/16HNL0jE-Stock-Market-Forecast-BTC-TSLA-NVDA-AAPL-AMZN-META-MSFT/",
       "source_author": "",
@@ -3542,10 +3542,10 @@
           "TSLA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:47.658037+00:00"
+      "extracted_at": "2026-03-25T10:36:35.002705+00:00"
     },
     {
-      "id": "a6934239b9216713",
+      "id": "c9eeb23272071e83",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/TSLA/XBpRwz3e-Tesla-Inc-TSLA-Bullish-Technical-Outlook/",
       "source_author": "",
@@ -3570,10 +3570,10 @@
           "TSLA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:47.658066+00:00"
+      "extracted_at": "2026-03-25T10:36:35.002733+00:00"
     },
     {
-      "id": "ff876b5070413da8",
+      "id": "b394c54941c394d0",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/TSLA/pUAxeh0p-TESLA-The-Target-Is-UP-BUY/",
       "source_author": "",
@@ -3598,10 +3598,10 @@
           "TSLA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:47.658092+00:00"
+      "extracted_at": "2026-03-25T10:36:35.002760+00:00"
     },
     {
-      "id": "24474127adb38e82",
+      "id": "a3df36158c5944f8",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/META/0ytMGkbf-AAPL-META-LONG-READ-NOTES/",
       "source_author": "",
@@ -3626,10 +3626,10 @@
           "TSLA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:47.658117+00:00"
+      "extracted_at": "2026-03-25T10:36:35.002784+00:00"
     },
     {
-      "id": "6c1f1dc973af569b",
+      "id": "275c13d686888930",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/TSLA/sgEbsL5r-Tesla-goes-bearish-long-term-double-top-vs-bullish-altcoins/",
       "source_author": "",
@@ -3654,10 +3654,10 @@
           "TSLA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:47.658146+00:00"
+      "extracted_at": "2026-03-25T10:36:35.002813+00:00"
     },
     {
-      "id": "2bfd79f5a90d5ce8",
+      "id": "c2a44fc503f70e5d",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/TSLA/zG8mIqFh-Tesla-H4-Selling-Pressure-Persists/",
       "source_author": "",
@@ -3682,10 +3682,10 @@
           "TSLA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:47.658171+00:00"
+      "extracted_at": "2026-03-25T10:36:35.002838+00:00"
     },
     {
-      "id": "98bc34b2c3720928",
+      "id": "f9c4d625f2620d21",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/VELO/YhpxP8nn-Velo3D-Price-Action-Contracts-Debt-Reduction/",
       "source_author": "",
@@ -3710,10 +3710,10 @@
           "TSLA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:47.658279+00:00"
+      "extracted_at": "2026-03-25T10:36:35.002864+00:00"
     },
     {
-      "id": "42539d86d2e35e19",
+      "id": "defd654e8a24c420",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/TSLA/RVP1ik21-Tesla-We-will-see-new-all-time-highs/",
       "source_author": "",
@@ -3738,10 +3738,10 @@
           "TSLA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:47.658327+00:00"
+      "extracted_at": "2026-03-25T10:36:35.002888+00:00"
     },
     {
-      "id": "3b19af4738cb3b3f",
+      "id": "6d714b6ab02950f2",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/TSLA/5dRiFF8o-TSLA-4H-The-Golden-Pocket-Test/",
       "source_author": "",
@@ -3766,10 +3766,10 @@
           "TSLA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:47.658357+00:00"
+      "extracted_at": "2026-03-25T10:36:35.002912+00:00"
     },
     {
-      "id": "cbbded287ee5b456",
+      "id": "ac51d1d5c5e19b2d",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/TSLA/UlGEAhZA-Tesla-Inc-TSLA-H4-Potential-Wave-3-Formation/",
       "source_author": "",
@@ -3794,10 +3794,10 @@
           "TSLA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:47.658418+00:00"
+      "extracted_at": "2026-03-25T10:36:35.002939+00:00"
     },
     {
-      "id": "8bd6d36db6b1743e",
+      "id": "5ecaa59057d41b12",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/OcSIo4N7-SPY-WEEKLY-15-20TH-MARCH-2026/",
       "source_author": "",
@@ -3822,10 +3822,10 @@
           "TSLA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:47.658449+00:00"
+      "extracted_at": "2026-03-25T10:36:35.002962+00:00"
     },
     {
-      "id": "d6e2b0d6e05c7a3c",
+      "id": "498a997a048b1d23",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/HIcJstu1-Stock-Market-Forecast-BTC-TSLA-NVDA-AAPL-AMZN-META-MSFT/",
       "source_author": "",
@@ -3850,10 +3850,10 @@
           "TSLA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:47.658480+00:00"
+      "extracted_at": "2026-03-25T10:36:35.002988+00:00"
     },
     {
-      "id": "71cef234b28e2219",
+      "id": "5d35e2c818996cdf",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/TSLA/1pfcFy1O-TESLA-Long-Signal-Explained/",
       "source_author": "",
@@ -3878,10 +3878,10 @@
           "TSLA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:47.658539+00:00"
+      "extracted_at": "2026-03-25T10:36:35.003017+00:00"
     },
     {
-      "id": "eb4056d98a4909c4",
+      "id": "0c224770112e8d7c",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/TSLA/lreJUBrC-Tesla-short-remains-active-perfect-downtrend/",
       "source_author": "",
@@ -3906,10 +3906,10 @@
           "TSLA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:47.658572+00:00"
+      "extracted_at": "2026-03-25T10:36:35.003051+00:00"
     },
     {
-      "id": "d47d0da9a61cc3c6",
+      "id": "bb3426519d3fea58",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPX/8oORu4Tx-The-S-P-500-Index-vs-Bitcoin-the-Cryptocurrency-market/",
       "source_author": "",
@@ -3934,10 +3934,10 @@
           "TSLA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:47.658599+00:00"
+      "extracted_at": "2026-03-25T10:36:35.003076+00:00"
     },
     {
-      "id": "f3a12ada7f52f01d",
+      "id": "223c5056276589d5",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/2xxD0s7r-SPY-LIVE-PRICE-ACTION-10TH-MARCH-2026/",
       "source_author": "",
@@ -3962,10 +3962,10 @@
           "TSLA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:47.658624+00:00"
+      "extracted_at": "2026-03-25T10:36:35.003100+00:00"
     },
     {
-      "id": "588d4ee3638dee7e",
+      "id": "c38e9affe6a1f2f8",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/NVDA/PoQPkE79-Nvidia-and-Emerald-AI-Forge-Strategic-Alliance-with-Major-Energy/",
       "source_author": "",
@@ -3990,10 +3990,10 @@
           "NVDA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:51.759631+00:00"
+      "extracted_at": "2026-03-25T10:36:39.124106+00:00"
     },
     {
-      "id": "9bab914316aa0a9c",
+      "id": "138616a0e2c5f241",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/7S0jqzw1-Gold-s-starts-to-move-below-4-000-then-lower/",
       "source_author": "",
@@ -4018,10 +4018,10 @@
           "NVDA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:51.759686+00:00"
+      "extracted_at": "2026-03-25T10:36:39.124155+00:00"
     },
     {
-      "id": "963c2f8b3f7e46c7",
+      "id": "8b2671927db9ef95",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/16HNL0jE-Stock-Market-Forecast-BTC-TSLA-NVDA-AAPL-AMZN-META-MSFT/",
       "source_author": "",
@@ -4046,10 +4046,10 @@
           "NVDA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:51.759845+00:00"
+      "extracted_at": "2026-03-25T10:36:39.124187+00:00"
     },
     {
-      "id": "38ddf30eb11cd2a2",
+      "id": "52f32d0cafe49b0b",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/NVDA/XwRFBNQN-NVDA-Bullish-Setup-Structure-Momentum-Risk-Defined/",
       "source_author": "",
@@ -4074,10 +4074,10 @@
           "NVDA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:51.759951+00:00"
+      "extracted_at": "2026-03-25T10:36:39.124222+00:00"
     },
     {
-      "id": "afd0623c2cfb2474",
+      "id": "1be1c89dc1231b0c",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/NVDA/87n7Nln3-NVDIA-When-perfection-corrects-the-market-creates-opportunity/",
       "source_author": "",
@@ -4102,10 +4102,10 @@
           "NVDA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:51.760001+00:00"
+      "extracted_at": "2026-03-25T10:36:39.124250+00:00"
     },
     {
-      "id": "92634cb15dfacce3",
+      "id": "51c7556a2a48ddfe",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/NVDA/pQ0mqMI2-NVDA-long-term-TA/",
       "source_author": "",
@@ -4130,10 +4130,10 @@
           "NVDA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:51.760105+00:00"
+      "extracted_at": "2026-03-25T10:36:39.124276+00:00"
     },
     {
-      "id": "2d63caa18725d34d",
+      "id": "abff5045ca1e9e43",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XRPUSD/1fxCimni-8-YEAR-XRP-COMPRESSION-AGAINST-THE-WORLD-S-STRONGEST-ASSET/",
       "source_author": "",
@@ -4158,10 +4158,10 @@
           "NVDA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:51.760188+00:00"
+      "extracted_at": "2026-03-25T10:36:39.124304+00:00"
     },
     {
-      "id": "48d6e3a2694fb936",
+      "id": "c3bc937a107774d7",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/NVDA/Z6F8YVcU-Chips-are-Made-for-Dipping-Right-Is-NVDA-Ready-to-Fall-Again/",
       "source_author": "",
@@ -4186,10 +4186,10 @@
           "NVDA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:51.760297+00:00"
+      "extracted_at": "2026-03-25T10:36:39.124329+00:00"
     },
     {
-      "id": "660be17f3319e2c6",
+      "id": "a61379ddf2c5b43a",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/HIcJstu1-Stock-Market-Forecast-BTC-TSLA-NVDA-AAPL-AMZN-META-MSFT/",
       "source_author": "",
@@ -4214,10 +4214,10 @@
           "NVDA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:51.760408+00:00"
+      "extracted_at": "2026-03-25T10:36:39.124354+00:00"
     },
     {
-      "id": "204efaa7a68bbae2",
+      "id": "004e38b5c9d6fff9",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/NVDA/mZfJukmX-Nvidia-Starting-the-final-15-correction/",
       "source_author": "",
@@ -4242,10 +4242,10 @@
           "NVDA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:51.760460+00:00"
+      "extracted_at": "2026-03-25T10:36:39.124378+00:00"
     },
     {
-      "id": "88b84a455ac2681c",
+      "id": "62cb8f0941d2cf26",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/NVDA/BgBLyneG-Why-Jensen-Huang-s-5th-Layer-of-AI-Matters/",
       "source_author": "",
@@ -4270,10 +4270,10 @@
           "NVDA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:51.760502+00:00"
+      "extracted_at": "2026-03-25T10:36:39.124407+00:00"
     },
     {
-      "id": "7aeebd9d95b79128",
+      "id": "f81d3ecc6f403b7d",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPX/8oORu4Tx-The-S-P-500-Index-vs-Bitcoin-the-Cryptocurrency-market/",
       "source_author": "",
@@ -4298,10 +4298,10 @@
           "NVDA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:51.760536+00:00"
+      "extracted_at": "2026-03-25T10:36:39.124433+00:00"
     },
     {
-      "id": "21e925a466a935af",
+      "id": "e7aa3efe29d74e2f",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/NVDA/PMV7D0ua-NVIDIA-NVDA-Overview-March-9-2026/",
       "source_author": "",
@@ -4326,10 +4326,10 @@
           "NVDA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:51.760570+00:00"
+      "extracted_at": "2026-03-25T10:36:39.124459+00:00"
     },
     {
-      "id": "8ecf89a4049cdbf8",
+      "id": "9b582277cd85868b",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/NVDA/3lKDqcmK-NVIDIA-Double-test-on-the-1W-MA200-after-10-months-targets-115/",
       "source_author": "",
@@ -4354,10 +4354,10 @@
           "NVDA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:51.760718+00:00"
+      "extracted_at": "2026-03-25T10:36:39.124484+00:00"
     },
     {
-      "id": "404149430b96c812",
+      "id": "2d664f14d1f3d1e8",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/NVDA/8VjWvXyt-NVDA-1H-Update-After-the-Perfect-Rejection-What-Comes-Next/",
       "source_author": "",
@@ -4382,10 +4382,10 @@
           "NVDA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:51.760819+00:00"
+      "extracted_at": "2026-03-25T10:36:39.124509+00:00"
     },
     {
-      "id": "507679ddf6623c30",
+      "id": "cf3e820cb9b23e0b",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/NVDA/jZW8prxr-Updated-Paths/",
       "source_author": "",
@@ -4410,10 +4410,10 @@
           "NVDA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:51.760910+00:00"
+      "extracted_at": "2026-03-25T10:36:39.124531+00:00"
     },
     {
-      "id": "233a2d5b8be3f428",
+      "id": "49fe7422a20b8ede",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/QQQ/8A5WXeHj-QQQ-Crash-Update-Thursday-Plan-Working-ref-to-previous-post/",
       "source_author": "",
@@ -4438,10 +4438,10 @@
           "NVDA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:51.760951+00:00"
+      "extracted_at": "2026-03-25T10:36:39.124559+00:00"
     },
     {
-      "id": "de9b67c7d85d174a",
+      "id": "eb6dd3794b441025",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPY/KWdqtQe4-Stock-Market-Forecast-BTC-TSLA-NVDA-AAPL-AMZN-META-MSFT/",
       "source_author": "",
@@ -4466,10 +4466,10 @@
           "NVDA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:51.760984+00:00"
+      "extracted_at": "2026-03-25T10:36:39.124583+00:00"
     },
     {
-      "id": "d42dc6b62bb4f96d",
+      "id": "9716e3aa7ea22b5a",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/NVDA/z9EghGtO-NVDA-can-continue-ping-pong-sideways-till-end-of-2027/",
       "source_author": "",
@@ -4494,10 +4494,10 @@
           "NVDA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:51.761015+00:00"
+      "extracted_at": "2026-03-25T10:36:39.124608+00:00"
     },
     {
-      "id": "d33d9327f9b51b6b",
+      "id": "fdf9b51df53179b0",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/NVDA/f8drkek4-NVDA-7-day-forecast-points-to-upside/",
       "source_author": "",
@@ -4522,10 +4522,10 @@
           "NVDA"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:51.761174+00:00"
+      "extracted_at": "2026-03-25T10:36:39.124634+00:00"
     },
     {
-      "id": "fc2d56ccb5c21025",
+      "id": "209012cc0dff220f",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/ETHUSDT/Mlkaav0R-ETH-USDT-Break-through-the-resistance-READ-THE-CAPTION/",
       "source_author": "",
@@ -4553,10 +4553,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:56.180777+00:00"
+      "extracted_at": "2026-03-25T10:36:43.118192+00:00"
     },
     {
-      "id": "40797725fb2d3af1",
+      "id": "ed7f0b7e1a2a28bc",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/BTCUSD/GfdmJBdj-BTC-USD-BTC-Hits-76K-Then-Pulls-Back-Is-66K-the-Key-Support/",
       "source_author": "",
@@ -4584,10 +4584,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:56.180893+00:00"
+      "extracted_at": "2026-03-25T10:36:43.118242+00:00"
     },
     {
-      "id": "eefe21792d359c55",
+      "id": "87071661069a825f",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SOLUSD/BnrJ2DK9-SOLANA-target-drop/",
       "source_author": "",
@@ -4612,10 +4612,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:56.180951+00:00"
+      "extracted_at": "2026-03-25T10:36:43.118271+00:00"
     },
     {
-      "id": "62958fae49cca72c",
+      "id": "b71915f5a7372fbf",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/SOLUSDT/jLtU1mLQ-SOL-USDT-Breaking-the-resistance-READ-THE-CAPTION/",
       "source_author": "",
@@ -4643,10 +4643,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:56.180994+00:00"
+      "extracted_at": "2026-03-25T10:36:43.118301+00:00"
     },
     {
-      "id": "759c01f6487e113d",
+      "id": "74d00f951a4b22bc",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SOLUSDT.P/Vr6gTg8Z-SOL-Setting-Up-for-100/",
       "source_author": "",
@@ -4671,10 +4671,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:56.181030+00:00"
+      "extracted_at": "2026-03-25T10:36:43.118330+00:00"
     },
     {
-      "id": "b5f893e993c89392",
+      "id": "86bed66634e3eeb7",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SOLUSDT/9DIvaRj1-SOLANA-NEW-BULLRUN/",
       "source_author": "",
@@ -4699,10 +4699,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:56.181065+00:00"
+      "extracted_at": "2026-03-25T10:36:43.118357+00:00"
     },
     {
-      "id": "22128907d0f8fef1",
+      "id": "49221ced00eda7a7",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/LTCUSDT.P/Inwbk3jT-Litecoin-sets-up-for-major-breakout/",
       "source_author": "",
@@ -4730,10 +4730,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:56.181098+00:00"
+      "extracted_at": "2026-03-25T10:36:43.118384+00:00"
     },
     {
-      "id": "40bc005036c89fcb",
+      "id": "4207a619e0842dd4",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSDT.P/zQVTVjvn-LEVERAGE-The-Most-Genius-Financial-Product-Ever-Designed/",
       "source_author": "",
@@ -4758,10 +4758,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:56.181130+00:00"
+      "extracted_at": "2026-03-25T10:36:43.118410+00:00"
     },
     {
-      "id": "685ff589103fbc1a",
+      "id": "cbb2c45eeeff3f6b",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/71h3enXm-XAU-USD-Bearish-run-continues-READ-THE-CAPTION/",
       "source_author": "",
@@ -4786,10 +4786,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:56.181162+00:00"
+      "extracted_at": "2026-03-25T10:36:43.118438+00:00"
     },
     {
-      "id": "491f18f4d4e2d3ed",
+      "id": "51f7d430883ecd82",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/ORCAUSDT/es3pRfPD-Orca-Token-goes-bullish-with-336-PP-short-term/",
       "source_author": "",
@@ -4814,10 +4814,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:56.181197+00:00"
+      "extracted_at": "2026-03-25T10:36:43.118465+00:00"
     },
     {
-      "id": "735673d983ce691b",
+      "id": "86ec46ae0540ac75",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/SOLUSDT.P/wzz4Bee6-Solana-Price-Trading-Channel/",
       "source_author": "",
@@ -4845,10 +4845,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:56.181270+00:00"
+      "extracted_at": "2026-03-25T10:36:43.118489+00:00"
     },
     {
-      "id": "763cdb692725cb89",
+      "id": "d24c24338931ae1e",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SOLUSD/ey8ys9nl-Solana-SOLUSD-Faces-Sharp-Decline-Within-Wave-C/",
       "source_author": "",
@@ -4873,10 +4873,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:56.181883+00:00"
+      "extracted_at": "2026-03-25T10:36:43.118514+00:00"
     },
     {
-      "id": "56169474d3cb9a4a",
+      "id": "ca803105aef2e22a",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/BTCUSDT/cZmRXHy6-BTC-USDT-Retest-support-and-resistance-READ-THE-CAPTION/",
       "source_author": "",
@@ -4904,10 +4904,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:56.182212+00:00"
+      "extracted_at": "2026-03-25T10:36:43.118541+00:00"
     },
     {
-      "id": "4e0a1cf6d2f2ac83",
+      "id": "74bb7a916422e355",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SOLUSDT/jYkYe3aX-SOL-USDT-Liquidities-above-and-below-READ-THE-CAPTION/",
       "source_author": "",
@@ -4932,10 +4932,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:56.182392+00:00"
+      "extracted_at": "2026-03-25T10:36:43.118567+00:00"
     },
     {
-      "id": "62f8262788b7419e",
+      "id": "d9dbbbf3749a792c",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/CELOUSDT/IFBo69bg-Everyone-Forgot-About-CELO-After-A-98-Crash-60x/",
       "source_author": "",
@@ -4960,10 +4960,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:56.182452+00:00"
+      "extracted_at": "2026-03-25T10:36:43.118592+00:00"
     },
     {
-      "id": "4a0e710c244b60e7",
+      "id": "8a31377e0961f5b1",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/8DECTpva-XAU-USD-Further-drop-and-liquidity-sweep-READ-THE-CAPTION/",
       "source_author": "",
@@ -4988,10 +4988,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:56.182490+00:00"
+      "extracted_at": "2026-03-25T10:36:43.118617+00:00"
     },
     {
-      "id": "32e844db93543ea5",
+      "id": "9b0aa569709c8bcf",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSDT/p19YVbBW-BTC-USDT-Bearish-for-now-READ-THE-CAPTION/",
       "source_author": "",
@@ -5016,10 +5016,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:56.182526+00:00"
+      "extracted_at": "2026-03-25T10:36:43.118642+00:00"
     },
     {
-      "id": "bca588e125c18c77",
+      "id": "e4277bad7edad412",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SOLUSDT.P/5QhYTk6b-SOL-is-still-under-the-dominance-of-the-bears-4H/",
       "source_author": "",
@@ -5044,10 +5044,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:56.182563+00:00"
+      "extracted_at": "2026-03-25T10:36:43.118667+00:00"
     },
     {
-      "id": "d25ced216ccb698d",
+      "id": "07973c4ce6bffbb2",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSDT/T5pTj4eO-BTC-USDT-To-the-77-000-level-READ-THE-CAPTION/",
       "source_author": "",
@@ -5072,10 +5072,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:56.182593+00:00"
+      "extracted_at": "2026-03-25T10:36:43.118693+00:00"
     },
     {
-      "id": "a68c8cd31ee048e4",
+      "id": "9463378f63255b9e",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/PARTIUSDT/bVc4RJ0v-PARTI-USDT-Forming-Falling-Wedge-Breakout-Setup-or-Reversal/",
       "source_author": "",
@@ -5105,10 +5105,10 @@
           "SOL"
         ]
       },
-      "extracted_at": "2026-03-25T10:28:56.182635+00:00"
+      "extracted_at": "2026-03-25T10:36:43.118727+00:00"
     },
     {
-      "id": "43a0f9fa6215364f",
+      "id": "a70a99618c7b40f8",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/XRPUSDT/mW4ImQpY-XRP-Triple-Confluence-Support-Bounce-or-Breakdown/",
       "source_author": "",
@@ -5138,10 +5138,10 @@
           "XRP"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:00.163726+00:00"
+      "extracted_at": "2026-03-25T10:36:47.449446+00:00"
     },
     {
-      "id": "fde7287c3ac73784",
+      "id": "5c0805df39d4d091",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XRPUSD/xttwWEo6-XRPUSD-Liquidity-Below-1-1180-Remains-in-Focus-1-00-Critical/",
       "source_author": "",
@@ -5166,10 +5166,10 @@
           "XRP"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:00.163782+00:00"
+      "extracted_at": "2026-03-25T10:36:47.449497+00:00"
     },
     {
-      "id": "f6cd27a76a7e4baf",
+      "id": "00767dba176c68a2",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XRPUSDT/b8mhQnO3-Overall-Picture-1H-XRP-USDT-Short-Term/",
       "source_author": "",
@@ -5194,10 +5194,10 @@
           "XRP"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:00.163883+00:00"
+      "extracted_at": "2026-03-25T10:36:47.449532+00:00"
     },
     {
-      "id": "585c52155580f82c",
+      "id": "bf5166dc39cd0ccc",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XRPUSD/1fAuwkIz-XRP-TAKES-A-DIVE-AND-TENSIONS-RISE/",
       "source_author": "",
@@ -5222,10 +5222,10 @@
           "XRP"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:00.163979+00:00"
+      "extracted_at": "2026-03-25T10:36:47.449563+00:00"
     },
     {
-      "id": "7a3b23eb8d3705a8",
+      "id": "4e8cf037a9be2de5",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XRPUSD/eAilMygK-Still-upward-still-resting-on-the-4hr/",
       "source_author": "",
@@ -5250,10 +5250,10 @@
           "XRP"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:00.164014+00:00"
+      "extracted_at": "2026-03-25T10:36:47.449589+00:00"
     },
     {
-      "id": "423be490b1290fed",
+      "id": "e67c8f5c1d004fc2",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XRPUSDT/LyhfdETU-XRP-still-early-back-within-entry-5X-Trade-setup-included/",
       "source_author": "",
@@ -5278,10 +5278,10 @@
           "XRP"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:00.164043+00:00"
+      "extracted_at": "2026-03-25T10:36:47.449617+00:00"
     },
     {
-      "id": "6cc59d1751b833e2",
+      "id": "c5862d0a1768dfc8",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/ETHUSD/qnuH48n1-Eth-DoubleTop-Elliott-Wave-Outlook-Macro-Bear-Path-into-2030/",
       "source_author": "",
@@ -5309,10 +5309,10 @@
           "XRP"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:00.164074+00:00"
+      "extracted_at": "2026-03-25T10:36:47.449647+00:00"
     },
     {
-      "id": "135c3a1dabeea3e8",
+      "id": "f4ef7677cf19d249",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XRPUSD/704XmEjA-XRP-BACK-AT-1-43-WHAT-NOW/",
       "source_author": "",
@@ -5337,10 +5337,10 @@
           "XRP"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:00.164098+00:00"
+      "extracted_at": "2026-03-25T10:36:47.449671+00:00"
     },
     {
-      "id": "3b03a42371104203",
+      "id": "e32401c37dd158a6",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XRPUSD/LL8bqkPZ-XRPUSD-This-is-where-the-Bear-Cycle-bottoms/",
       "source_author": "",
@@ -5365,10 +5365,10 @@
           "XRP"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:00.164125+00:00"
+      "extracted_at": "2026-03-25T10:36:47.449698+00:00"
     },
     {
-      "id": "85de31953271f77e",
+      "id": "ae46a11c8233f02c",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XRPUSDT/T9Q1LfMT-XRPUSDT-Flat-potential-1-39-1-51/",
       "source_author": "",
@@ -5393,10 +5393,10 @@
           "XRP"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:00.164149+00:00"
+      "extracted_at": "2026-03-25T10:36:47.449722+00:00"
     },
     {
-      "id": "96c738ae22ac4cf2",
+      "id": "570a2b8af03c8124",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XRPUSD/ito8h6oz-XRP-s-61-8-Rejection-Points-To-Deeper-Retracement/",
       "source_author": "",
@@ -5421,10 +5421,10 @@
           "XRP"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:00.164175+00:00"
+      "extracted_at": "2026-03-25T10:36:47.449748+00:00"
     },
     {
-      "id": "4c9f736c2bb00b76",
+      "id": "905463b54428a8b6",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSD/Z6pvmSae-Dow-theory-Supply-to-Demand/",
       "source_author": "",
@@ -5449,10 +5449,10 @@
           "XRP"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:00.164387+00:00"
+      "extracted_at": "2026-03-25T10:36:47.449772+00:00"
     },
     {
-      "id": "e2a31c0de19f424a",
+      "id": "50e40ffa06e30303",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/XRPUSDT/XH5kBU5G-XRP-BREAKOUT-ALERT-The-Real-Move-Is-About-to-Start/",
       "source_author": "",
@@ -5480,10 +5480,10 @@
           "XRP"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:00.164506+00:00"
+      "extracted_at": "2026-03-25T10:36:47.449803+00:00"
     },
     {
-      "id": "89bf92324efec3da",
+      "id": "69c4a6ced23b62ac",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XRPUSDT/7RZ22yNW-Ripple-XRP-price-analysis/",
       "source_author": "",
@@ -5508,10 +5508,10 @@
           "XRP"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:00.164646+00:00"
+      "extracted_at": "2026-03-25T10:36:47.449828+00:00"
     },
     {
-      "id": "74d594cc67d039aa",
+      "id": "107026c38c416d42",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XRPUSD/1fxCimni-8-YEAR-XRP-COMPRESSION-AGAINST-THE-WORLD-S-STRONGEST-ASSET/",
       "source_author": "",
@@ -5536,10 +5536,10 @@
           "XRP"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:00.164742+00:00"
+      "extracted_at": "2026-03-25T10:36:47.449853+00:00"
     },
     {
-      "id": "44c086e13c34f306",
+      "id": "257ebb26dd4d4825",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/XRPUSDT/MswHjoDE-XRP-Breakout-or-Bull-Trap-Key-Levels-to-Watch/",
       "source_author": "",
@@ -5567,10 +5567,10 @@
           "XRP"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:00.164800+00:00"
+      "extracted_at": "2026-03-25T10:36:47.449883+00:00"
     },
     {
-      "id": "fc93c59746784fb5",
+      "id": "27458c8aca96bd77",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/XRPUSD/KfUL2P19-XRP-Elliott-Wave-Thesis-Across-Four-Degrees-of-Trend/",
       "source_author": "",
@@ -5598,10 +5598,10 @@
           "XRP"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:00.164832+00:00"
+      "extracted_at": "2026-03-25T10:36:47.449909+00:00"
     },
     {
-      "id": "5bceebb9f174ea81",
+      "id": "ff78ecb2e48cdd29",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XRPUSD/BKVh5bI0-XRP-RESTESTS-1-45-AND-BREAKS-OUT/",
       "source_author": "",
@@ -5626,10 +5626,10 @@
           "XRP"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:00.164860+00:00"
+      "extracted_at": "2026-03-25T10:36:47.449932+00:00"
     },
     {
-      "id": "5c0b28c20a6a6335",
+      "id": "e73439e3e9e63d99",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XRPUSDT/lYCOnAMy-XRP-5X-Long-with-610-potential-Fast-moving-instant-profits/",
       "source_author": "",
@@ -5654,10 +5654,10 @@
           "XRP"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:00.164894+00:00"
+      "extracted_at": "2026-03-25T10:36:47.449960+00:00"
     },
     {
-      "id": "8bced61a860aa708",
+      "id": "81992a88a15cda3a",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XRPUSD/6wdGBrVm-XRP-PUSHES-BUT-WHAT-ABOUT-THE-MARKET/",
       "source_author": "",
@@ -5682,10 +5682,10 @@
           "XRP"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:00.164921+00:00"
+      "extracted_at": "2026-03-25T10:36:47.449984+00:00"
     },
     {
-      "id": "e803da784f487974",
+      "id": "b5ca7af27967f9b2",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/yc2hXq0A-XAU-USD-Gold-Crashes-27-Is-4000-the-Next-Target/",
       "source_author": "",
@@ -5710,10 +5710,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:04.769442+00:00"
+      "extracted_at": "2026-03-25T10:36:51.891546+00:00"
     },
     {
-      "id": "4733aa605b1f0540",
+      "id": "5a8b35b1fdefca56",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/EURUSD/U7sPMDkK-EURUSD-Bearish-Pullback-from-FVG-After-Bullish-Structure/",
       "source_author": "",
@@ -5738,10 +5738,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:04.769490+00:00"
+      "extracted_at": "2026-03-25T10:36:51.891594+00:00"
     },
     {
-      "id": "229d616d842127c5",
+      "id": "8f0864beee04e85e",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/C8kcnkwe-XAUUSD-Breakdown-Structure-Signals-More-Downside-Toward-4-140/",
       "source_author": "",
@@ -5769,10 +5769,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:04.769695+00:00"
+      "extracted_at": "2026-03-25T10:36:51.891630+00:00"
     },
     {
-      "id": "e9ae09d1090d8b3a",
+      "id": "47ff430a1f011a18",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/9hI2wLu1-Gold-Roadmap-Correction-in-Play-or-Support-Holding/",
       "source_author": "",
@@ -5800,10 +5800,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:04.769774+00:00"
+      "extracted_at": "2026-03-25T10:36:51.891660+00:00"
     },
     {
-      "id": "5da6b6bdf3a282bd",
+      "id": "f9d12821368b6da9",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/8mdHH09T-XAUUSD-Long-Stabilizes-Above-Support-Eyes-4-500-Retest/",
       "source_author": "",
@@ -5831,10 +5831,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:04.769822+00:00"
+      "extracted_at": "2026-03-25T10:36:51.891688+00:00"
     },
     {
-      "id": "85805c06ac39417c",
+      "id": "feb63a2a5e861d69",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/JXF5sm2n-Hellena-GOLD-4H-SHORT-to-MIN-wave-3-4100-area/",
       "source_author": "",
@@ -5859,10 +5859,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:04.769861+00:00"
+      "extracted_at": "2026-03-25T10:36:51.891715+00:00"
     },
     {
-      "id": "0f17b48afd0a2957",
+      "id": "b324ac7fe2b08414",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/sRfRQjtB-GOLD-A-correction-ahead-of-a-potential-decline/",
       "source_author": "",
@@ -5887,10 +5887,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:04.769918+00:00"
+      "extracted_at": "2026-03-25T10:36:51.891740+00:00"
     },
     {
-      "id": "0aff2cbf34128bb4",
+      "id": "a193c6fce8f4c645",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/yC57G9NO-Gold-Under-Pressure-Bears-Take-Control/",
       "source_author": "",
@@ -5915,10 +5915,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:04.769971+00:00"
+      "extracted_at": "2026-03-25T10:36:51.891768+00:00"
     },
     {
-      "id": "0f9dfcf594d1853c",
+      "id": "859fedf06695f390",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/GOLD/M8Z9VXRM-Gold-30Min-Engaged-Bearish-Entry-Detected/",
       "source_author": "",
@@ -5943,10 +5943,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:04.770002+00:00"
+      "extracted_at": "2026-03-25T10:36:51.891794+00:00"
     },
     {
-      "id": "00f29e1a9907d89e",
+      "id": "9726695b1713d9d7",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/UKOIL/8c973naQ-UKOIL-Oil-Reacts-Again-at-119-Distribution-Before-Major-Drop/",
       "source_author": "",
@@ -5971,10 +5971,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:04.770030+00:00"
+      "extracted_at": "2026-03-25T10:36:51.891820+00:00"
     },
     {
-      "id": "b950ffd0c862d995",
+      "id": "7bcac449ee13a8f5",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/1XpbaiSg-WHEN-MARKETS-PANIC-BIG-PLAYERS-MAKE-THEIR-MOVE/",
       "source_author": "",
@@ -5999,10 +5999,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:04.770056+00:00"
+      "extracted_at": "2026-03-25T10:36:51.891845+00:00"
     },
     {
-      "id": "0f80ceed0896134d",
+      "id": "672a309c2d59a2de",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/s4UV8itS-GOLD-4H-CHART-ROUTE-MAP-UPDATE-TRADING-PLAN-FOR-THE-WEEK/",
       "source_author": "",
@@ -6027,10 +6027,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:04.770082+00:00"
+      "extracted_at": "2026-03-25T10:36:51.891870+00:00"
     },
     {
-      "id": "7a971230333d240e",
+      "id": "a8b97a703ca3dc81",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/GOLD/jt8ihBSX-Gold-30Min-Engaged-Bearish-Entry-Detected/",
       "source_author": "",
@@ -6055,10 +6055,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:04.770109+00:00"
+      "extracted_at": "2026-03-25T10:36:51.891894+00:00"
     },
     {
-      "id": "433a63866a3a5bb5",
+      "id": "c39b8caad55d0283",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/OIxvgYnC-Gold-Bearish-Breakdown-After-Double-Top/",
       "source_author": "",
@@ -6088,10 +6088,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:04.770136+00:00"
+      "extracted_at": "2026-03-25T10:36:51.891924+00:00"
     },
     {
-      "id": "b399a3b6e491fd1f",
+      "id": "0a64fdb8c96f7685",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/enACEBlj-XAUUSD/",
       "source_author": "",
@@ -6116,10 +6116,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:04.770158+00:00"
+      "extracted_at": "2026-03-25T10:36:51.891945+00:00"
     },
     {
-      "id": "a35db51ffecb86cb",
+      "id": "5f3ab3c5181b79c7",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/eTRa8ktO-GOLD-MARKET-UPDATE-AND-DIRECTION/",
       "source_author": "",
@@ -6144,10 +6144,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:04.770182+00:00"
+      "extracted_at": "2026-03-25T10:36:51.891969+00:00"
     },
     {
-      "id": "334d1fedc8b791d0",
+      "id": "d3810bf924e9082f",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/GBPJPY/rT0RW2ER-GBP-JPY-Supply-zone-retest-READ-THE-CAPTION/",
       "source_author": "",
@@ -6172,10 +6172,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:04.770290+00:00"
+      "extracted_at": "2026-03-25T10:36:51.891993+00:00"
     },
     {
-      "id": "ecbba2dc0c33306d",
+      "id": "9d72b95d8761b657",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/USDJPY/ipAHpvuk-USD-JPY-End-of-bullish-run-READ-THE-CAPTION/",
       "source_author": "",
@@ -6200,10 +6200,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:04.770319+00:00"
+      "extracted_at": "2026-03-25T10:36:51.892018+00:00"
     },
     {
-      "id": "ea2a0b6c9883160f",
+      "id": "818b1dc2cb4a55e2",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/KTz3JfJZ-CASH-FLOW-IS-BUYING-UP-IS-THAT-WHAT-THE-WHALES-REALLY-WANT/",
       "source_author": "",
@@ -6228,10 +6228,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:04.770350+00:00"
+      "extracted_at": "2026-03-25T10:36:51.892047+00:00"
     },
     {
-      "id": "5b0b0e8cdcf27f6c",
+      "id": "c61454bc293c69ac",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/8uoiI1RV-Gold-Holds-Key-Breakout-Upside-Now-in-Play/",
       "source_author": "",
@@ -6259,10 +6259,10 @@
           "GOLD"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:04.770380+00:00"
+      "extracted_at": "2026-03-25T10:36:51.892075+00:00"
     },
     {
-      "id": "2e2de405b6e2163c",
+      "id": "f578508ab89ca613",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAGUSD/VYkR2Dqn-Silver-Analysis-Which-Direction-Is-Next/",
       "source_author": "",
@@ -6287,10 +6287,10 @@
           "SILVER"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:09.462463+00:00"
+      "extracted_at": "2026-03-25T10:36:55.980033+00:00"
     },
     {
-      "id": "e48677f004f5dd4f",
+      "id": "5846760dc744c596",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAGUSD/JtNBOYfR-Silver-Holds-Structure-Better-Than-Gold-Eyes-on-75-80/",
       "source_author": "",
@@ -6315,10 +6315,10 @@
           "SILVER"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:09.462530+00:00"
+      "extracted_at": "2026-03-25T10:36:55.980089+00:00"
     },
     {
-      "id": "a29bde2f4bf405d3",
+      "id": "8c8e9554796d7f67",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/GBPJPY/rT0RW2ER-GBP-JPY-Supply-zone-retest-READ-THE-CAPTION/",
       "source_author": "",
@@ -6343,10 +6343,10 @@
           "SILVER"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:09.462575+00:00"
+      "extracted_at": "2026-03-25T10:36:55.980123+00:00"
     },
     {
-      "id": "60420dd3c73ce0a7",
+      "id": "25c3edb7ba920d74",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/USDJPY/ipAHpvuk-USD-JPY-End-of-bullish-run-READ-THE-CAPTION/",
       "source_author": "",
@@ -6371,10 +6371,10 @@
           "SILVER"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:09.462622+00:00"
+      "extracted_at": "2026-03-25T10:36:55.980160+00:00"
     },
     {
-      "id": "5fa6a28dbd42fa59",
+      "id": "e2509d0beae60de8",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/XAGUSD/8pi7jEU4-XAGUSD-H1-Bearish-Reaction-Off-Pullback-Resistance/",
       "source_author": "",
@@ -6402,10 +6402,10 @@
           "SILVER"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:09.462664+00:00"
+      "extracted_at": "2026-03-25T10:36:55.980191+00:00"
     },
     {
-      "id": "095a275bfcb1efb1",
+      "id": "72aa77bf450de29c",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/XAGUSD/u8Ey2l3L-XAGUSD-M30-Bullish-Bounce-Off-Key-Support/",
       "source_author": "",
@@ -6433,10 +6433,10 @@
           "SILVER"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:09.462703+00:00"
+      "extracted_at": "2026-03-25T10:36:55.980220+00:00"
     },
     {
-      "id": "912dd83788b75e2d",
+      "id": "da91b97bd4739e74",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/vCSHg7LJ-XAU-USD-Sweet-mother-of-Go-l-d-READ-THE-CAPTION/",
       "source_author": "",
@@ -6461,10 +6461,10 @@
           "SILVER"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:09.462740+00:00"
+      "extracted_at": "2026-03-25T10:36:55.980246+00:00"
     },
     {
-      "id": "a6ae6d4af42bec9e",
+      "id": "9a5b404f6214620f",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAGUSD/MEhJd7QB-SILVER-XAGUSD-Demand-Zone-Holds/",
       "source_author": "",
@@ -6489,10 +6489,10 @@
           "SILVER"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:09.462775+00:00"
+      "extracted_at": "2026-03-25T10:36:55.980270+00:00"
     },
     {
-      "id": "4ae20a87d00e720b",
+      "id": "c01065c43a8de859",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/GC1!/fcUx8QPO-Gold-Intraday-Bullish-Continuation-Targeting-Buy-Side-Liquidit/",
       "source_author": "",
@@ -6517,10 +6517,10 @@
           "SILVER"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:09.462816+00:00"
+      "extracted_at": "2026-03-25T10:36:55.980299+00:00"
     },
     {
-      "id": "3aeea1f347514453",
+      "id": "468c8a7b7d4754ef",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAGUSD/DcvgLFSY-LONG-ON-SILVER-XAG-USD/",
       "source_author": "",
@@ -6545,10 +6545,10 @@
           "SILVER"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:09.462850+00:00"
+      "extracted_at": "2026-03-25T10:36:55.980324+00:00"
     },
     {
-      "id": "2496372445bf8b00",
+      "id": "c9d3746fb188c159",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/jXUVTNk1-Stop-Loss-Market-View-GOLD/",
       "source_author": "",
@@ -6573,10 +6573,10 @@
           "SILVER"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:09.462883+00:00"
+      "extracted_at": "2026-03-25T10:36:55.980348+00:00"
     },
     {
-      "id": "98a34483051ef730",
+      "id": "3bc42f61a2edb0e0",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAGUSD/kfKrXLWJ-XAG-USD-Back-on-track-or-further-fall-READ-THE-CAPTION/",
       "source_author": "",
@@ -6601,10 +6601,10 @@
           "SILVER"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:09.462919+00:00"
+      "extracted_at": "2026-03-25T10:36:55.980373+00:00"
     },
     {
-      "id": "48e5778ea3387253",
+      "id": "6469e53034121bb4",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/NZDUSD/nDeC0uvV-NZD-USD-0-5900-again-or-below-0-5800-READ-THE-CAPTION/",
       "source_author": "",
@@ -6629,10 +6629,10 @@
           "SILVER"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:09.462954+00:00"
+      "extracted_at": "2026-03-25T10:36:55.980398+00:00"
     },
     {
-      "id": "42c48ce6054ed00e",
+      "id": "cba9f6997010683a",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/COIN/SeyVuuHI-COIN-Cascade-Ready-for-Leg-Do/",
       "source_author": "",
@@ -6657,10 +6657,10 @@
           "SILVER"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:09.463115+00:00"
+      "extracted_at": "2026-03-25T10:36:55.980421+00:00"
     },
     {
-      "id": "bccba1345692481a",
+      "id": "2591573187797094",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAGUSD/B2L8YUd9-SILVER-Will-Go-Lower-Sell/",
       "source_author": "",
@@ -6685,10 +6685,10 @@
           "SILVER"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:09.463309+00:00"
+      "extracted_at": "2026-03-25T10:36:55.980445+00:00"
     },
     {
-      "id": "1006f88d8360030b",
+      "id": "db1722258cfd74d6",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SI1!/BD3k6hIA-Silver-XAG-USD-Update-Bottom-In/",
       "source_author": "",
@@ -6713,10 +6713,10 @@
           "SILVER"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:09.463477+00:00"
+      "extracted_at": "2026-03-25T10:36:55.980467+00:00"
     },
     {
-      "id": "49c2bae150bb455a",
+      "id": "e300f4310e97a5a7",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/GC1!/h1JV0W1O-Gold-Bullish-Reversal-Targeting-Buy-Side-Liquidity/",
       "source_author": "",
@@ -6741,10 +6741,10 @@
           "SILVER"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:09.463544+00:00"
+      "extracted_at": "2026-03-25T10:36:55.980492+00:00"
     },
     {
-      "id": "db474718a158bec8",
+      "id": "7e005e478d618021",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/GBPUSD/8zzk65Ha-GBP-USD-Retests-and-failures-READ-THE-CAPTION/",
       "source_author": "",
@@ -6769,10 +6769,10 @@
           "SILVER"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:09.463769+00:00"
+      "extracted_at": "2026-03-25T10:36:55.980516+00:00"
     },
     {
-      "id": "23675b829e9ec52c",
+      "id": "f1df1502c74ad51d",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAGUSD/pO7QLHlc-Silver-Facing-Rejection-Below-3-Month-High-Sellside-Target/",
       "source_author": "",
@@ -6797,10 +6797,10 @@
           "SILVER"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:09.464036+00:00"
+      "extracted_at": "2026-03-25T10:36:55.980543+00:00"
     },
     {
-      "id": "3167fd1be5fd098e",
+      "id": "bd306c6e480ccc5c",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/FogvJ0N2-XAUUSD-Gold-Monthly-Outlook-Count-2-Supercycle-wave-III/",
       "source_author": "",
@@ -6825,10 +6825,10 @@
           "SILVER"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:09.464097+00:00"
+      "extracted_at": "2026-03-25T10:36:55.980671+00:00"
     },
     {
-      "id": "5135b3126708fb68",
+      "id": "37838afca63cd7af",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/yc2hXq0A-XAU-USD-Gold-Crashes-27-Is-4000-the-Next-Target/",
       "source_author": "",
@@ -6853,10 +6853,10 @@
           "OIL"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:14.021930+00:00"
+      "extracted_at": "2026-03-25T10:37:00.416514+00:00"
     },
     {
-      "id": "3a7626b57608541b",
+      "id": "d6de18e417c86de5",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/UKOIL/8c973naQ-UKOIL-Oil-Reacts-Again-at-119-Distribution-Before-Major-Drop/",
       "source_author": "",
@@ -6881,10 +6881,10 @@
           "OIL"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:14.022046+00:00"
+      "extracted_at": "2026-03-25T10:37:00.416558+00:00"
     },
     {
-      "id": "2ebf9f824bb1c462",
+      "id": "a7d6bcacd9402d7d",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BTCUSDT.P/3xZ9TTdc-Bitcoin-Market-Analysis-What-now/",
       "source_author": "",
@@ -6909,10 +6909,10 @@
           "OIL"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:14.022153+00:00"
+      "extracted_at": "2026-03-25T10:37:00.416589+00:00"
     },
     {
-      "id": "e3d3913290166b56",
+      "id": "fa0c5399801d1f9c",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/BRENT/34asHRM1-140-Brent/",
       "source_author": "",
@@ -6937,10 +6937,10 @@
           "OIL"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:14.022199+00:00"
+      "extracted_at": "2026-03-25T10:37:00.416614+00:00"
     },
     {
-      "id": "b1b6105cc9238492",
+      "id": "9fda69ca5c093965",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/USOIL/kRtpOEIP-Oil-Finally-Giving-Bearish-Confirmations-500-Pips-Waiting/",
       "source_author": "",
@@ -6965,10 +6965,10 @@
           "OIL"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:14.022251+00:00"
+      "extracted_at": "2026-03-25T10:37:00.416645+00:00"
     },
     {
-      "id": "e2563436f8893f5f",
+      "id": "94e93b319496a921",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/GBPUSD/sWhbH3mY-kvmev-GBPUSD-entry/",
       "source_author": "",
@@ -6993,10 +6993,10 @@
           "OIL"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:14.022288+00:00"
+      "extracted_at": "2026-03-25T10:37:00.416668+00:00"
     },
     {
-      "id": "c55e86c824d76cb1",
+      "id": "9e1c716ec0836fae",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/USDJPY/iTKWUbVm-USDJPY-Pullback-Opportunity-Fed-Macro-Support-USD/",
       "source_author": "",
@@ -7024,10 +7024,10 @@
           "OIL"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:14.022330+00:00"
+      "extracted_at": "2026-03-25T10:37:00.416696+00:00"
     },
     {
-      "id": "c5ab748d750a3d14",
+      "id": "7bc30e4a8315364f",
       "type": "strategy",
       "source_url": "https://www.tradingview.com/chart/USOIL/0pQleZOy-CRUDE-OIL-WTI-Pullback-From-Resistance/",
       "source_author": "",
@@ -7055,10 +7055,10 @@
           "OIL"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:14.022369+00:00"
+      "extracted_at": "2026-03-25T10:37:00.416724+00:00"
     },
     {
-      "id": "c54a94c9d59d1e9b",
+      "id": "bc24f8977d58e672",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/CL1!/5kH8l9kF-Crude-Oil-Pushing-Higher/",
       "source_author": "",
@@ -7083,10 +7083,10 @@
           "OIL"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:14.022403+00:00"
+      "extracted_at": "2026-03-25T10:37:00.416748+00:00"
     },
     {
-      "id": "3a4868430314648f",
+      "id": "b598706032ef92a1",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPOTCRUDE/T2wxkPvm-Hellena-Oil-4H-LONG-to-max-wave-1-102-000/",
       "source_author": "",
@@ -7111,10 +7111,10 @@
           "OIL"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:14.022499+00:00"
+      "extracted_at": "2026-03-25T10:37:00.416773+00:00"
     },
     {
-      "id": "0ef2d6aa3d0375cf",
+      "id": "bc34f712be755377",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/CL1!/B0mUTYxo-Crude-One-More-Push-To-104-110-Then-Lower/",
       "source_author": "",
@@ -7139,10 +7139,10 @@
           "OIL"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:14.022860+00:00"
+      "extracted_at": "2026-03-25T10:37:00.416797+00:00"
     },
     {
-      "id": "ed3cce04d1e0263e",
+      "id": "65c10e1f8dbdfb90",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/USOIL/bkMSRaU5-USOIL-BEST-PLACE-TO-SELL-FROM-SHORT/",
       "source_author": "",
@@ -7167,10 +7167,10 @@
           "OIL"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:14.023101+00:00"
+      "extracted_at": "2026-03-25T10:37:00.416824+00:00"
     },
     {
-      "id": "a9c66d2a515f5e6f",
+      "id": "487f4f86e13353fe",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/US10Y/LieUeHrA-The-4-5-Percent-Danger-Zone/",
       "source_author": "",
@@ -7195,10 +7195,10 @@
           "OIL"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:14.023538+00:00"
+      "extracted_at": "2026-03-25T10:37:00.416846+00:00"
     },
     {
-      "id": "60d2f7b2d3d538a1",
+      "id": "b9b3237f02a6186b",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/SPOTCRUDE/0gpDzHyM-Hellena-Oil-4H-LONG-to-max-wave-1-103-260/",
       "source_author": "",
@@ -7223,10 +7223,10 @@
           "OIL"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:14.023664+00:00"
+      "extracted_at": "2026-03-25T10:37:00.416871+00:00"
     },
     {
-      "id": "8fa0ca43d1eb6ace",
+      "id": "220060b26fb53a85",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/AUDCHF/xA8rUYtd-kvmev-AUDCHF-entry/",
       "source_author": "",
@@ -7251,10 +7251,10 @@
           "OIL"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:14.023703+00:00"
+      "extracted_at": "2026-03-25T10:37:00.416893+00:00"
     },
     {
-      "id": "316db42e9b3bdaf0",
+      "id": "1e296aa36e8193c9",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/USOIL/ZDtO9ShK-The-opportunity-has-been-presented-now-it-s-up-to-execution/",
       "source_author": "",
@@ -7279,10 +7279,10 @@
           "OIL"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:14.023739+00:00"
+      "extracted_at": "2026-03-25T10:37:00.416917+00:00"
     },
     {
-      "id": "30e71afd30130c8c",
+      "id": "168f6d8d7db4fb0d",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/USOIL/Ei9DGO2i-Range-bound-trading-becomes-the-main-theme/",
       "source_author": "",
@@ -7307,10 +7307,10 @@
           "OIL"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:14.023822+00:00"
+      "extracted_at": "2026-03-25T10:37:00.416941+00:00"
     },
     {
-      "id": "87e9971f539e5811",
+      "id": "c5ef4e31cefbf3b6",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/XAUUSD/vgWa99S7-If-4100-Is-Not-the-Bottom-Where-Is-Gold-Headed-Next/",
       "source_author": "",
@@ -7335,10 +7335,10 @@
           "OIL"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:14.023854+00:00"
+      "extracted_at": "2026-03-25T10:37:00.416971+00:00"
     },
     {
-      "id": "281b9f9e52a76b7a",
+      "id": "6fdc95736b892d11",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/OILUSD/omLtIBxL-OIL-WEAK/",
       "source_author": "",
@@ -7363,10 +7363,10 @@
           "OIL"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:14.023890+00:00"
+      "extracted_at": "2026-03-25T10:37:00.416992+00:00"
     },
     {
-      "id": "05ce212051b858f1",
+      "id": "1793989ced1764b2",
       "type": "sentiment",
       "source_url": "https://www.tradingview.com/chart/UKOIL/eIH1L5oR-Bullish-Oil-Alternative-Count/",
       "source_author": "",
@@ -7391,7 +7391,7 @@
           "OIL"
         ]
       },
-      "extracted_at": "2026-03-25T10:29:14.023923+00:00"
+      "extracted_at": "2026-03-25T10:37:00.417017+00:00"
     }
   ],
   "meta": {
