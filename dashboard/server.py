@@ -874,6 +874,7 @@ async def trading_notify():
     """Called by simulator to signal a trade was placed or closed."""
     global _trading_version
     _trading_version += 1
+    _trading_cache["data"] = None  # invalidate cache on trade events
     return {"version": _trading_version}
 
 @app.get("/api/trading/stream")
@@ -914,9 +915,15 @@ def _trading_db():
     conn.row_factory = sqlite3.Row
     return conn
 
+_trading_cache = {"data": None, "ts": 0}
+
 @app.get("/api/trading/dashboard")
 async def get_trading_dashboard(user: str = Depends(get_current_user)):
-    """Comprehensive trading dashboard data for the TRADING tab."""
+    """Comprehensive trading dashboard data for the TRADING tab. Cached 5s."""
+    now = time.time()
+    if _trading_cache["data"] and (now - _trading_cache["ts"]) < 5:
+        return _trading_cache["data"]
+
     conn = _trading_db()
     if not conn:
         return {"error": "Database not found"}
@@ -1169,7 +1176,7 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
         except Exception:
             pass
 
-        return {
+        result = {
             "wallet": {
                 "balance": round(balance, 2),
                 "starting_balance": starting,
@@ -1194,6 +1201,9 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
             "agents": agent_stats,
             "missed_opportunities": missed_summary,
         }
+        _trading_cache["data"] = result
+        _trading_cache["ts"] = time.time()
+        return result
     finally:
         conn.close()
 
@@ -1861,6 +1871,109 @@ async def intel_stats(user: str = Depends(get_current_user)):
     stats["crawl_date"] = data.get("crawl_date", "")
     stats["analyzed_at"] = data.get("analyzed_at", "")
     return stats
+
+
+# ── Crawler Signal Bus ────────────────────────────────────────────────────────
+SIGNALS_DIR = OPENCLAW_ROOT / "autoresearch" / "signals"
+
+SIGNAL_PLATFORMS = [
+    "github", "polymarket", "kalshi", "reddit", "x", "discord", "telegram",
+    "stocktwits", "tradingview", "seekingalpha", "unusualwhales",
+    "linkedin", "facebook", "instagram", "tiktok", "moltbook",
+]
+
+def _read_signal(platform: str) -> dict:
+    f = SIGNALS_DIR / f"{platform}.json"
+    if f.exists():
+        try:
+            return json.loads(f.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return {"platform": platform, "signals": [], "meta": {"total_signals": 0}}
+
+@app.get("/api/intel/signals")
+async def signals_all(user: str = Depends(get_current_user)):
+    """All platforms, latest signals combined."""
+    combined = []
+    for p in SIGNAL_PLATFORMS:
+        data = _read_signal(p)
+        for s in data.get("signals", []):
+            s["_platform"] = p
+            combined.append(s)
+    combined.sort(key=lambda s: s.get("extracted_at", ""), reverse=True)
+    return {"platforms": SIGNAL_PLATFORMS, "signals": combined[:200], "total": len(combined)}
+
+@app.get("/api/intel/signals/{platform}")
+async def signals_platform(platform: str, user: str = Depends(get_current_user)):
+    """Signals for one platform."""
+    if platform not in SIGNAL_PLATFORMS:
+        raise HTTPException(404, f"Unknown platform: {platform}")
+    return _read_signal(platform)
+
+@app.get("/api/intel/signals/{platform}/history")
+async def signals_history(platform: str, user: str = Depends(get_current_user)):
+    """Historical signal counts from SQLite if available."""
+    # Check crawler's local DB
+    crawler_db = OPENCLAW_ROOT / "crawlers" / f"openclaw-{platform}-crawler" / "data" / "signals.db"
+    if not crawler_db.exists():
+        crawler_db = OPENCLAW_ROOT / "crawlers" / f"openclaw-{platform}-feed" / "data" / "signals.db"
+    if not crawler_db.exists():
+        return {"platform": platform, "history": [], "total": 0}
+    try:
+        import sqlite3 as _sql
+        conn = _sql.connect(str(crawler_db))
+        rows = conn.execute(
+            "SELECT date(extracted_at) as d, COUNT(*) as c FROM signals WHERE platform=? GROUP BY d ORDER BY d DESC LIMIT 30",
+            (platform,)
+        ).fetchall()
+        conn.close()
+        return {"platform": platform, "history": [{"date": r[0], "count": r[1]} for r in rows], "total": sum(r[1] for r in rows)}
+    except Exception:
+        return {"platform": platform, "history": [], "total": 0}
+
+@app.get("/api/intel/signals/overview/stats")
+async def signals_stats(user: str = Depends(get_current_user)):
+    """Cross-platform signal stats."""
+    stats = {}
+    total = 0
+    for p in SIGNAL_PLATFORMS:
+        data = _read_signal(p)
+        count = len(data.get("signals", []))
+        stats[p] = {"count": count, "crawled_at": data.get("crawled_at", "")}
+        total += count
+    return {"platforms": stats, "total_signals": total, "active_platforms": sum(1 for v in stats.values() if v["count"] > 0)}
+
+@app.get("/api/intel/signals/stream/live")
+async def signals_stream(request: Request):
+    """SSE for real-time signal updates across all platforms."""
+    token = request.cookies.get("oc_token") or request.query_params.get("token")
+    if not token or not verify_token(token):
+        if not is_localhost(request):
+            raise HTTPException(401, "Not authenticated")
+
+    async def event_gen():
+        last_mtimes = {}
+        while True:
+            try:
+                changed = []
+                for p in SIGNAL_PLATFORMS:
+                    f = SIGNALS_DIR / f"{p}.json"
+                    if f.exists():
+                        mt = f.stat().st_mtime
+                        if mt != last_mtimes.get(p, 0):
+                            last_mtimes[p] = mt
+                            changed.append(p)
+                if changed:
+                    payload = json.dumps({"updated": changed, "ts": datetime.now().isoformat()})
+                    yield f"data: {payload}\n\n"
+                else:
+                    yield ": heartbeat\n\n"
+            except Exception as e:
+                yield f"data: {json.dumps({'error': str(e)})}\n\n"
+            await asyncio.sleep(5)
+
+    return StreamingResponse(event_gen(), media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
 
 
 @app.get("/{path:path}", response_class=HTMLResponse)

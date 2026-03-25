@@ -662,6 +662,48 @@ body {
 .intel-status-rejected { background:rgba(255,0,46,0.08); color:var(--neon-red); }
 .intel-status-bookmarked { background:rgba(0,212,255,0.08); color:var(--neon-cyan); }
 
+/* ── Signal Tabs ──────────────────────────────────────────────── */
+.signal-tabs {
+  display:flex; gap:0; overflow-x:auto; margin-bottom:14px;
+  border-bottom:1px solid var(--border); scrollbar-width:thin;
+}
+.signal-tabs::-webkit-scrollbar { height:3px; }
+.signal-tabs::-webkit-scrollbar-thumb { background:var(--grey3); }
+.signal-tab {
+  font-size:0.44rem; letter-spacing:1.5px; padding:7px 14px 6px;
+  border:none; background:none; color:var(--grey2); cursor:pointer;
+  white-space:nowrap; position:relative; font-family:inherit;
+  transition:color 0.2s;
+}
+.signal-tab:hover { color:var(--offwhite); }
+.signal-tab.active { color:var(--orange-hi); }
+.signal-tab.active::after {
+  content:''; position:absolute; bottom:-1px; left:0; right:0;
+  height:2px; background:var(--orange);
+}
+.signal-tab-badge {
+  display:inline-block; font-size:0.34rem; min-width:14px; text-align:center;
+  padding:1px 4px; margin-left:4px; border-radius:8px;
+  background:var(--orange-dim); color:var(--orange); font-weight:700;
+}
+.signal-tab-badge:empty { display:none; }
+.signal-content { display:none; }
+.signal-content.active { display:block; }
+.signal-card {
+  border:1px solid var(--border); border-radius:2px;
+  background:var(--surface); padding:12px 16px; margin-bottom:8px;
+}
+.signal-card:hover { border-color:var(--border-mid); }
+.signal-card-title { font-size:0.56rem; color:var(--offwhite); letter-spacing:0.5px; }
+.signal-card-body { font-size:0.46rem; color:var(--grey1); margin-top:4px; line-height:1.5; }
+.signal-card-meta { display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
+.signal-card-meta span { font-size:0.4rem; letter-spacing:1px; color:var(--grey2); }
+.signal-dir-bullish { color:var(--neon-green) !important; }
+.signal-dir-bearish { color:var(--neon-red) !important; }
+.signal-dir-neutral { color:var(--neon-cyan) !important; }
+.signal-urgency-realtime { color:var(--neon-red) !important; }
+.signal-urgency-hours { color:var(--orange) !important; }
+
 /* ── Nav tabs ──────────────────────────────────────────────────── */
 .nav-tabs {
   display: flex; gap: 2px; margin-left: 24px;
@@ -2130,6 +2172,30 @@ body {
         <button class="tw-btn primary" onclick="intelRunCrawl()" id="intelCrawlBtn" style="font-size:0.5rem;padding:5px 14px;">RUN CRAWL NOW</button>
       </div>
 
+      <!-- Signal Platform Tabs -->
+      <div class="signal-tabs" id="signalTabs">
+        <button class="signal-tab active" data-platform="github" onclick="switchSignalTab('github')">GITHUB<span class="signal-tab-badge" id="badge-github"></span></button>
+        <button class="signal-tab" data-platform="polymarket" onclick="switchSignalTab('polymarket')">POLYMARKET<span class="signal-tab-badge" id="badge-polymarket"></span></button>
+        <button class="signal-tab" data-platform="kalshi" onclick="switchSignalTab('kalshi')">KALSHI<span class="signal-tab-badge" id="badge-kalshi"></span></button>
+        <button class="signal-tab" data-platform="reddit" onclick="switchSignalTab('reddit')">REDDIT<span class="signal-tab-badge" id="badge-reddit"></span></button>
+        <button class="signal-tab" data-platform="x" onclick="switchSignalTab('x')">X<span class="signal-tab-badge" id="badge-x"></span></button>
+        <button class="signal-tab" data-platform="discord" onclick="switchSignalTab('discord')">DISCORD<span class="signal-tab-badge" id="badge-discord"></span></button>
+        <button class="signal-tab" data-platform="telegram" onclick="switchSignalTab('telegram')">TELEGRAM<span class="signal-tab-badge" id="badge-telegram"></span></button>
+        <button class="signal-tab" data-platform="stocktwits" onclick="switchSignalTab('stocktwits')">STOCKTWITS<span class="signal-tab-badge" id="badge-stocktwits"></span></button>
+        <button class="signal-tab" data-platform="tradingview" onclick="switchSignalTab('tradingview')">TRADINGVIEW<span class="signal-tab-badge" id="badge-tradingview"></span></button>
+        <button class="signal-tab" data-platform="seekingalpha" onclick="switchSignalTab('seekingalpha')">SEEKINGALPHA<span class="signal-tab-badge" id="badge-seekingalpha"></span></button>
+        <button class="signal-tab" data-platform="unusualwhales" onclick="switchSignalTab('unusualwhales')">UNUSUAL WHALES<span class="signal-tab-badge" id="badge-unusualwhales"></span></button>
+        <button class="signal-tab" data-platform="linkedin" onclick="switchSignalTab('linkedin')">LINKEDIN<span class="signal-tab-badge" id="badge-linkedin"></span></button>
+        <button class="signal-tab" data-platform="facebook" onclick="switchSignalTab('facebook')">FACEBOOK<span class="signal-tab-badge" id="badge-facebook"></span></button>
+        <button class="signal-tab" data-platform="instagram" onclick="switchSignalTab('instagram')">INSTAGRAM<span class="signal-tab-badge" id="badge-instagram"></span></button>
+        <button class="signal-tab" data-platform="tiktok" onclick="switchSignalTab('tiktok')">TIKTOK<span class="signal-tab-badge" id="badge-tiktok"></span></button>
+        <button class="signal-tab" data-platform="moltbook" onclick="switchSignalTab('moltbook')">MOLTBOOK<span class="signal-tab-badge" id="badge-moltbook"></span></button>
+        <button class="signal-tab" data-platform="all" onclick="switchSignalTab('all')">ALL<span class="signal-tab-badge" id="badge-all"></span></button>
+      </div>
+
+      <!-- GitHub Intel Content (default tab) -->
+      <div class="signal-content active" id="signalContent-github">
+
       <!-- Filter/Sort Bar -->
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
         <select class="intel-filter-select" id="intelFilterStatus" onchange="renderIntelCards()">
@@ -2171,6 +2237,35 @@ body {
       <div id="intelApprovedSection" style="margin-top:28px;display:none;">
         <div class="panel-hdr"><span class="panel-hdr-title">APPROVED & DISPATCHED</span></div>
         <div id="intelApprovedList" style="display:flex;flex-direction:column;gap:8px;margin-top:10px;"></div>
+      </div>
+
+      </div><!-- /signalContent-github -->
+
+      <!-- Platform Signal Content (lazy-loaded) -->
+      <div class="signal-content" id="signalContent-platform">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
+          <select class="intel-filter-select" id="signalFilterDir" onchange="renderSignalCards()">
+            <option value="all">All Directions</option>
+            <option value="bullish">Bullish</option>
+            <option value="bearish">Bearish</option>
+            <option value="neutral">Neutral</option>
+          </select>
+          <select class="intel-filter-select" id="signalFilterUrgency" onchange="renderSignalCards()">
+            <option value="all">All Urgency</option>
+            <option value="realtime">Real-time</option>
+            <option value="hours">Hours</option>
+            <option value="days">Days</option>
+            <option value="weeks">Weeks</option>
+          </select>
+          <select class="intel-filter-select" id="signalSortBy" onchange="renderSignalCards()">
+            <option value="recency">Most Recent</option>
+            <option value="confidence">Highest Confidence</option>
+            <option value="engagement">Most Engagement</option>
+          </select>
+        </div>
+        <div id="signalCards" style="display:flex;flex-direction:column;gap:8px;">
+          <div class="empty"><span class="empty-char">⌬</span>no signals yet — crawler not running</div>
+        </div>
       </div>
 
     </div>
@@ -4278,7 +4373,10 @@ async function submitNote(ideaId) {
 let tradingData = null
 let pnlChartInstance = null
 
+let _tradingLoading = false
 async function loadTrading() {
+  if (_tradingLoading) return
+  _tradingLoading = true
   try {
     const r = await fetch('/api/trading/dashboard')
     if (!r.ok) throw new Error('failed')
@@ -4286,6 +4384,8 @@ async function loadTrading() {
     renderTrading()
   } catch(e) {
     console.error('Trading load error:', e)
+  } finally {
+    _tradingLoading = false
   }
 }
 
@@ -5657,6 +5757,137 @@ function intelConnectSSE() {
     if (intelSSE) { intelSSE.close(); intelSSE = null }
     setTimeout(intelConnectSSE, 10000)
   }
+}
+
+// ══════════════════════════════════════════════════════════════════
+// SIGNAL PLATFORM TABS
+// ══════════════════════════════════════════════════════════════════
+let signalCache = {} // platform -> data
+let activeSignalTab = 'github'
+let signalSSE = null
+
+function switchSignalTab(platform) {
+  activeSignalTab = platform
+  document.querySelectorAll('.signal-tab').forEach(t => t.classList.remove('active'))
+  document.querySelector(`.signal-tab[data-platform="${platform}"]`).classList.add('active')
+
+  if (platform === 'github') {
+    document.getElementById('signalContent-github').classList.add('active')
+    document.getElementById('signalContent-platform').classList.remove('active')
+  } else {
+    document.getElementById('signalContent-github').classList.remove('active')
+    document.getElementById('signalContent-platform').classList.add('active')
+    loadSignalPlatform(platform)
+  }
+}
+
+async function loadSignalPlatform(platform) {
+  const container = document.getElementById('signalCards')
+  if (platform === 'all') {
+    if (!signalCache._all || Date.now() - (signalCache._allTs || 0) > 30000) {
+      container.innerHTML = '<div class="empty"><span class="empty-char">⟳</span>loading all signals...</div>'
+      try {
+        const res = await fetch('/api/intel/signals')
+        if (res.ok) {
+          signalCache._all = await res.json()
+          signalCache._allTs = Date.now()
+        }
+      } catch (e) { console.error('Signal load error:', e) }
+    }
+    renderSignalCards()
+    return
+  }
+  if (!signalCache[platform] || Date.now() - (signalCache[platform]._ts || 0) > 30000) {
+    container.innerHTML = `<div class="empty"><span class="empty-char">⟳</span>loading ${platform} signals...</div>`
+    try {
+      const res = await fetch(`/api/intel/signals/${platform}`)
+      if (res.ok) {
+        signalCache[platform] = await res.json()
+        signalCache[platform]._ts = Date.now()
+      }
+    } catch (e) { console.error('Signal load error:', e) }
+  }
+  renderSignalCards()
+}
+
+function renderSignalCards() {
+  const container = document.getElementById('signalCards')
+  const dirFilter = document.getElementById('signalFilterDir').value
+  const urgFilter = document.getElementById('signalFilterUrgency').value
+  const sortBy = document.getElementById('signalSortBy').value
+  const platform = activeSignalTab
+
+  let signals = []
+  if (platform === 'all') {
+    signals = (signalCache._all || {}).signals || []
+  } else {
+    signals = (signalCache[platform] || {}).signals || []
+  }
+
+  // Filter
+  if (dirFilter !== 'all') signals = signals.filter(s => s.direction === dirFilter)
+  if (urgFilter !== 'all') signals = signals.filter(s => s.urgency === urgFilter)
+
+  // Sort
+  if (sortBy === 'confidence') signals.sort((a, b) => (b.confidence || 0) - (a.confidence || 0))
+  else if (sortBy === 'engagement') signals.sort((a, b) => {
+    const ea = (a.engagement || {}); const eb = (b.engagement || {})
+    return ((eb.upvotes || 0) + (eb.comments || 0)) - ((ea.upvotes || 0) + (ea.comments || 0))
+  })
+  else signals.sort((a, b) => (b.extracted_at || '').localeCompare(a.extracted_at || ''))
+
+  if (!signals.length) {
+    container.innerHTML = `<div class="empty"><span class="empty-char">⌬</span>no signals from ${platform} — crawler may not be running</div>`
+    return
+  }
+
+  container.innerHTML = signals.slice(0, 100).map(s => {
+    const dirClass = s.direction === 'bullish' ? 'signal-dir-bullish' : s.direction === 'bearish' ? 'signal-dir-bearish' : 'signal-dir-neutral'
+    const urgClass = s.urgency === 'realtime' ? 'signal-urgency-realtime' : s.urgency === 'hours' ? 'signal-urgency-hours' : ''
+    const eng = s.engagement || {}
+    const engStr = (eng.upvotes || eng.comments) ? `${eng.upvotes || 0}▲ ${eng.comments || 0}💬` : ''
+    const plat = s._platform || platform
+    return `<div class="signal-card">
+      <div class="signal-card-title">${esc(s.title || 'Untitled signal')}</div>
+      <div class="signal-card-body">${esc((s.body || '').slice(0, 300))}</div>
+      <div class="signal-card-meta">
+        <span class="${dirClass}">${(s.direction || 'unknown').toUpperCase()}</span>
+        <span class="${urgClass}">${(s.urgency || '').toUpperCase()}</span>
+        <span>${s.ticker_or_market || ''}</span>
+        <span>CONF: ${((s.confidence || 0) * 100).toFixed(0)}%</span>
+        ${engStr ? `<span>${engStr}</span>` : ''}
+        <span>${plat.toUpperCase()}</span>
+        <span>${s.extracted_at ? new Date(s.extracted_at).toLocaleString() : ''}</span>
+        ${s.source_url ? `<a href="${esc(s.source_url)}" target="_blank" style="font-size:0.4rem;color:var(--neon-cyan);text-decoration:none;">SOURCE →</a>` : ''}
+      </div>
+    </div>`
+  }).join('')
+}
+
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML }
+
+async function loadSignalBadges() {
+  try {
+    const res = await fetch('/api/intel/signals/overview/stats')
+    if (!res.ok) return
+    const data = await res.json()
+    const platforms = data.platforms || {}
+    let total = 0
+    for (const [p, info] of Object.entries(platforms)) {
+      const badge = document.getElementById(`badge-${p}`)
+      if (badge) badge.textContent = info.count > 0 ? info.count : ''
+      total += info.count
+    }
+    const allBadge = document.getElementById('badge-all')
+    if (allBadge) allBadge.textContent = total > 0 ? total : ''
+  } catch (e) {}
+}
+
+// Load badges when Intel page opens
+const origLoadIntel = loadIntel
+loadIntel = async function() {
+  await origLoadIntel()
+  loadSignalBadges()
 }
 
 </script>
