@@ -24,6 +24,8 @@ LOGS_DIR       = OPENCLAW_ROOT / "logs"
 IDEAS_DIR      = OPENCLAW_ROOT / "ideas"
 IDEAS_MEDIA    = IDEAS_DIR / "media"
 PROJECTS_FILE  = OPENCLAW_ROOT / "projects" / "projects.json"
+CHATGPT_REPORTS_DIR = OPENCLAW_ROOT / "outputs" / "chatgpt-reports"
+REPO_MAN_API = os.environ.get("REPO_MAN_API", "https://research.asdfghjk.lol")
 
 ENV_FILE = OPENCLAW_ROOT / ".env"
 def load_env():
@@ -2185,6 +2187,337 @@ async def signals_stream(request: Request):
 
     return StreamingResponse(event_gen(), media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
+
+
+# ══════════════════════════════════════════════════════════════════
+# CHATGPT ANALYSIS — Send research to GPT-4o, get recommendations
+# ══════════════════════════════════════════════════════════════════
+
+_CHATGPT_SYSTEM_PROMPT = """You are a strategic advisor for OpenClaw, a web business operating system with three deployed trading instances:
+
+1. **Clawmpson** (clawmpson) — Primary instance. Full business OS with 4 trading strategies, 5 data feeds, graduation engine, 13 agents. Handles trading, software dev, agentic ops, marketing, content, research.
+2. **RivalClaw** (rivalclaw) — Lightweight 8-strategy quant engine with hedge engine and self-tuner. Polymarket-centric, mechanical execution.
+3. **QuantumentalClaw** (quantumentalclaw) — Signal fusion engine for asymmetric opportunities across equities and prediction markets. 5 independent signal types.
+
+You are analyzing research items that were collected and pre-analyzed by Repo Man (a research ingestion pipeline).
+
+For each batch, provide a JSON response with:
+1. executive_summary: 2-3 sentence overview of all findings
+2. recommendations: array of actionable strategies/integrations/improvements
+3. meta_observations: cross-cutting patterns you noticed
+
+Each recommendation MUST include:
+- title: concise action title (under 80 chars)
+- summary: what this is and why it matters (2-3 sentences)
+- category: one of trading_signal, integration, research, infrastructure, content
+- confidence: 0.0-1.0 (how confident this is actionable and valuable)
+- urgency: immediate, this_week, or backlog
+- recommended_target: which instance should handle this (clawmpson, rivalclaw, or quantumentalclaw)
+- recommended_target_name: human-readable instance name (Lobster S. Clawmpson, RivalClaw, QuantumentalClaw)
+- action_plan: step-by-step markdown plan (concrete enough for an AI coding agent to execute)
+- source_items: list of item IDs this recommendation is based on
+- risk: low, medium, or high
+- risk_notes: specific risk concerns (null if low risk)
+
+Respond ONLY with valid JSON. No markdown fences, no commentary outside the JSON."""
+
+
+@app.post("/api/chatgpt/analyze")
+async def chatgpt_analyze(request: Request, user: str = Depends(get_current_user)):
+    """Fetch research from Repo Man, send to GPT-4o, save report."""
+    openai_key = os.environ.get("OPENAI_API_KEY", "")
+    if not openai_key:
+        raise HTTPException(500, "OPENAI_API_KEY not configured")
+
+    body = {}
+    try:
+        body = await request.json()
+    except Exception:
+        pass
+    item_limit = body.get("item_limit", 20)
+
+    # 1. Fetch completed items from Repo Man
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.get(f"{REPO_MAN_API}/api/inbox", params={"limit": item_limit})
+            resp.raise_for_status()
+            inbox = resp.json()
+    except Exception as exc:
+        raise HTTPException(502, f"Failed to fetch from Repo Man: {exc}")
+
+    items = inbox.get("items", [])
+    if not items:
+        raise HTTPException(400, "No completed research items to analyze")
+
+    # 2. Build prompt from items
+    item_blocks = []
+    input_items_summary = []
+    for item in items:
+        item_id = item.get("id", "unknown")
+        title = item.get("title", "Untitled")
+        source_type = item.get("source_type", "unknown")
+        novelty = item.get("novelty_score", 0)
+        action_rec = item.get("action_recommendation", "")
+
+        # Get best available analysis summary
+        analysis_summary = ""
+        for key in ("claude_analysis", "openai_analysis", "ollama_analysis"):
+            a = item.get(key)
+            if a and isinstance(a, dict) and a.get("summary"):
+                analysis_summary = a["summary"]
+                break
+
+        key_ideas = []
+        for key in ("claude_analysis", "openai_analysis", "ollama_analysis"):
+            a = item.get(key)
+            if a and isinstance(a, dict) and a.get("key_ideas"):
+                key_ideas = a["key_ideas"][:5]
+                break
+
+        routing = item.get("openclaw_routing") or {}
+        route_target = routing.get("recommended_instance", "")
+        route_reason = routing.get("reasoning", "")
+
+        item_blocks.append(
+            f"---\nITEM: {item_id}\nTITLE: {title}\nSOURCE: {source_type}\n"
+            f"NOVELTY: {novelty}\nACTION REC: {action_rec}\n"
+            f"ANALYSIS: {analysis_summary[:500]}\n"
+            f"KEY IDEAS: {', '.join(str(k) for k in key_ideas)}\n"
+            f"ROUTING: {route_target} ({route_reason[:200]})\n---"
+        )
+        input_items_summary.append({
+            "id": item_id, "title": title,
+            "source_type": source_type, "novelty_score": novelty,
+            "action_recommendation": action_rec,
+        })
+
+    user_message = (
+        f"Analyze these {len(items)} completed research items and provide strategic recommendations:\n\n"
+        + "\n\n".join(item_blocks)
+    )
+
+    # 3. Call OpenAI API (with retry for 429 rate limits)
+    oai_data = None
+    last_err = None
+    for attempt in range(3):
+        try:
+            async with httpx.AsyncClient(timeout=90) as client:
+                oai_resp = await client.post(
+                    "https://api.openai.com/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {openai_key}",
+                        "Content-Type": "application/json",
+                    },
+                    json={
+                        "model": os.environ.get("CHATGPT_RESEARCH_MODEL", "gpt-4o"),
+                        "max_tokens": 4096,
+                        "temperature": 0.3,
+                        "response_format": {"type": "json_object"},
+                        "messages": [
+                            {"role": "system", "content": _CHATGPT_SYSTEM_PROMPT},
+                            {"role": "user", "content": user_message},
+                        ],
+                    },
+                )
+                if oai_resp.status_code == 429 and attempt < 2:
+                    wait = int(oai_resp.headers.get("retry-after", 20 * (attempt + 1)))
+                    await asyncio.sleep(wait)
+                    continue
+                oai_resp.raise_for_status()
+                oai_data = oai_resp.json()
+                break
+        except Exception as exc:
+            last_err = exc
+            if attempt < 2:
+                await asyncio.sleep(10 * (attempt + 1))
+            continue
+    if oai_data is None:
+        raise HTTPException(502, f"OpenAI API call failed after 3 attempts: {last_err}")
+
+    # 4. Parse response
+    tokens_used = oai_data.get("usage", {}).get("total_tokens", 0)
+    raw_content = oai_data["choices"][0]["message"]["content"]
+    try:
+        parsed = json.loads(raw_content)
+    except json.JSONDecodeError:
+        raise HTTPException(502, "OpenAI returned invalid JSON")
+
+    # 5. Build report
+    now = datetime.now()
+    report_id = f"rpt-{now.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:4]}"
+
+    # Ensure recommendations have all required fields
+    recs = parsed.get("recommendations", [])
+    for rec in recs:
+        rec.setdefault("deployed", False)
+        rec.setdefault("deployed_at", None)
+        rec.setdefault("task_id", None)
+        rec.setdefault("risk_notes", None)
+
+    report = {
+        "id": report_id,
+        "created_at": now.isoformat(),
+        "model": os.environ.get("CHATGPT_RESEARCH_MODEL", "gpt-4o"),
+        "tokens_used": tokens_used,
+        "item_count": len(items),
+        "input_items": input_items_summary,
+        "executive_summary": parsed.get("executive_summary", ""),
+        "recommendations": recs,
+        "meta_observations": parsed.get("meta_observations", ""),
+        "status": "complete",
+    }
+
+    # 6. Save
+    CHATGPT_REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    report_file = CHATGPT_REPORTS_DIR / f"{report_id}.json"
+    report_file.write_text(json.dumps(report, indent=2), encoding="utf-8")
+
+    return report
+
+
+@app.get("/api/chatgpt/reports")
+async def chatgpt_list_reports(user: str = Depends(get_current_user)):
+    """List all saved ChatGPT analysis reports."""
+    CHATGPT_REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    reports = []
+    for f in sorted(CHATGPT_REPORTS_DIR.glob("*.json"), reverse=True):
+        try:
+            data = json.loads(f.read_text(encoding="utf-8"))
+            reports.append({
+                "id": data["id"],
+                "created_at": data["created_at"],
+                "item_count": data.get("item_count", 0),
+                "recommendation_count": len(data.get("recommendations", [])),
+                "status": data.get("status", "complete"),
+            })
+        except Exception:
+            pass
+    return {"reports": reports}
+
+
+@app.get("/api/chatgpt/reports/{report_id}")
+async def chatgpt_get_report(report_id: str, user: str = Depends(get_current_user)):
+    """Return a full ChatGPT analysis report."""
+    report_file = CHATGPT_REPORTS_DIR / f"{report_id}.json"
+    if not report_file.exists():
+        raise HTTPException(404, "Report not found")
+    return json.loads(report_file.read_text(encoding="utf-8"))
+
+
+@app.post("/api/chatgpt/deploy")
+async def chatgpt_deploy(request: Request, user: str = Depends(get_current_user)):
+    """Deploy a single ChatGPT recommendation to the task queue."""
+    body = await request.json()
+    report_id = body.get("report_id", "")
+    rec_index = body.get("rec_index", -1)
+
+    report_file = CHATGPT_REPORTS_DIR / f"{report_id}.json"
+    if not report_file.exists():
+        raise HTTPException(404, "Report not found")
+
+    report = json.loads(report_file.read_text(encoding="utf-8"))
+    recs = report.get("recommendations", [])
+    if rec_index < 0 or rec_index >= len(recs):
+        raise HTTPException(400, "Invalid recommendation index")
+
+    rec = recs[rec_index]
+    if rec.get("deployed"):
+        raise HTTPException(400, "Already deployed")
+
+    target = rec.get("recommended_target", "clawmpson")
+    valid_targets = {"clawmpson", "arbclaw", "rivalclaw", "quantumentalclaw"}
+    if target not in valid_targets:
+        target = "clawmpson"
+
+    task_id = f"chatgpt-{uuid.uuid4().hex[:8]}"
+    task = {
+        "id": task_id,
+        "type": "chatgpt-strategy-deploy",
+        "title": f"[ChatGPT] {rec.get('title', 'Untitled')[:80]}",
+        "description": rec.get("summary", ""),
+        "strategy_details": rec.get("action_plan", ""),
+        "confidence": rec.get("confidence", 0),
+        "targets": [target],
+        "priority": "high" if rec.get("confidence", 0) >= 0.8 else "medium",
+        "status": "pending",
+        "created_at": datetime.now().isoformat(),
+        "approved_by": user,
+        "source_report": report_id,
+        "source_rec_index": rec_index,
+    }
+
+    pending = []
+    if PENDING_JSON.exists():
+        try:
+            pending = json.loads(PENDING_JSON.read_text(encoding="utf-8"))
+        except Exception:
+            pending = []
+    pending.append(task)
+    PENDING_JSON.write_text(json.dumps(pending, indent=2), encoding="utf-8")
+
+    rec["deployed"] = True
+    rec["deployed_at"] = datetime.now().isoformat()
+    rec["task_id"] = task_id
+    report_file.write_text(json.dumps(report, indent=2), encoding="utf-8")
+
+    return {"ok": True, "task_id": task_id, "targets": [target]}
+
+
+@app.post("/api/chatgpt/deploy-all")
+async def chatgpt_deploy_all(request: Request, user: str = Depends(get_current_user)):
+    """Deploy all undeployed recommendations from a report."""
+    body = await request.json()
+    report_id = body.get("report_id", "")
+
+    report_file = CHATGPT_REPORTS_DIR / f"{report_id}.json"
+    if not report_file.exists():
+        raise HTTPException(404, "Report not found")
+
+    report = json.loads(report_file.read_text(encoding="utf-8"))
+
+    pending = []
+    if PENDING_JSON.exists():
+        try:
+            pending = json.loads(PENDING_JSON.read_text(encoding="utf-8"))
+        except Exception:
+            pending = []
+
+    task_ids = []
+    for i, rec in enumerate(report.get("recommendations", [])):
+        if rec.get("deployed"):
+            continue
+        target = rec.get("recommended_target", "clawmpson")
+        valid_targets = {"clawmpson", "arbclaw", "rivalclaw", "quantumentalclaw"}
+        if target not in valid_targets:
+            target = "clawmpson"
+
+        task_id = f"chatgpt-{uuid.uuid4().hex[:8]}"
+        task = {
+            "id": task_id,
+            "type": "chatgpt-strategy-deploy",
+            "title": f"[ChatGPT] {rec.get('title', 'Untitled')[:80]}",
+            "description": rec.get("summary", ""),
+            "strategy_details": rec.get("action_plan", ""),
+            "confidence": rec.get("confidence", 0),
+            "targets": [target],
+            "priority": "high" if rec.get("confidence", 0) >= 0.8 else "medium",
+            "status": "pending",
+            "created_at": datetime.now().isoformat(),
+            "approved_by": user,
+            "source_report": report_id,
+            "source_rec_index": i,
+        }
+        pending.append(task)
+        task_ids.append(task_id)
+
+        rec["deployed"] = True
+        rec["deployed_at"] = datetime.now().isoformat()
+        rec["task_id"] = task_id
+
+    PENDING_JSON.write_text(json.dumps(pending, indent=2), encoding="utf-8")
+    report_file.write_text(json.dumps(report, indent=2), encoding="utf-8")
+
+    return {"ok": True, "task_ids": task_ids, "deployed_count": len(task_ids)}
 
 
 @app.get("/{path:path}")

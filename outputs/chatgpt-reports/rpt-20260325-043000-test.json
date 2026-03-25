@@ -1,0 +1,91 @@
+{
+  "id": "rpt-20260325-043000-test",
+  "created_at": "2026-03-25T04:30:00Z",
+  "model": "gpt-4o",
+  "tokens_used": 2847,
+  "item_count": 3,
+  "input_items": [
+    {
+      "id": "item-001",
+      "title": "NVDA Bullish Setup | Structure, Momentum & Risk Defined",
+      "source_type": "url",
+      "novelty_score": 0.72,
+      "action_recommendation": "DEEP_DIVE"
+    },
+    {
+      "id": "item-002",
+      "title": "Tesla Inc. (TSLA) | Bullish Technical Outlook",
+      "source_type": "url",
+      "novelty_score": 0.65,
+      "action_recommendation": "MONITOR"
+    },
+    {
+      "id": "item-003",
+      "title": "APPLE Massive Long! BUY!",
+      "source_type": "url",
+      "novelty_score": 0.58,
+      "action_recommendation": "STUDY"
+    }
+  ],
+  "executive_summary": "Three bullish equity setups detected across major tech names (NVDA, TSLA, AAPL). The NVDA setup has the strongest structural backing with clear risk definition, while TSLA and AAPL are more momentum-driven. Cross-referencing with prediction markets could identify sentiment divergences worth exploiting.",
+  "recommendations": [
+    {
+      "title": "Deploy NVDA momentum signal via QuantumentalClaw",
+      "summary": "The NVDA setup shows a well-defined structure with clear entry/stop/target levels. QuantumentalClaw's signal fusion engine can cross-reference this with options flow data and prediction market sentiment for a high-conviction trade.",
+      "category": "trading_signal",
+      "confidence": 0.85,
+      "urgency": "immediate",
+      "recommended_target": "quantumentalclaw",
+      "recommended_target_name": "QuantumentalClaw",
+      "action_plan": "1. Ingest NVDA technical levels into QuantumentalClaw signal pipeline\n2. Cross-reference with Unusual Whales options flow for NVDA\n3. Check Polymarket for any NVDA-correlated prediction markets\n4. If 2+ signals align, generate paper trade entry\n5. Set stop-loss at defined risk level from the analysis",
+      "source_items": [
+        "item-001"
+      ],
+      "risk": "medium",
+      "risk_notes": "Single-source technical analysis without fundamental confirmation",
+      "deployed": true,
+      "deployed_at": "2026-03-25T04:40:35.893327",
+      "task_id": "chatgpt-9a99cb89"
+    },
+    {
+      "title": "Create tech-sector sentiment composite for Clawmpson",
+      "summary": "Three simultaneous bullish setups in mega-cap tech suggests a sector-wide momentum shift. Clawmpson's multi-feed architecture is well-suited to build a composite sentiment score across NVDA, TSLA, and AAPL.",
+      "category": "integration",
+      "confidence": 0.72,
+      "urgency": "this_week",
+      "recommended_target": "clawmpson",
+      "recommended_target_name": "Lobster S. Clawmpson",
+      "action_plan": "1. Add sector-composite calculation to Clawmpson's trading brain\n2. Pull technical signals from all three stocks\n3. Weight by novelty score and source confidence\n4. Feed composite into the graduation engine for paper testing\n5. Review after 7-day evaluation window",
+      "source_items": [
+        "item-001",
+        "item-002",
+        "item-003"
+      ],
+      "risk": "low",
+      "risk_notes": null,
+      "deployed": true,
+      "deployed_at": "2026-03-25T04:40:41.563770",
+      "task_id": "chatgpt-babb8f4e"
+    },
+    {
+      "title": "Backtest TSLA momentum pattern against RivalClaw strategies",
+      "summary": "RivalClaw's self-tuner can evaluate whether TSLA momentum patterns align with its existing 8-strategy quant engine. This tests if the signal adds edge to RivalClaw's existing playbook.",
+      "category": "research",
+      "confidence": 0.61,
+      "urgency": "backlog",
+      "recommended_target": "rivalclaw",
+      "recommended_target_name": "RivalClaw",
+      "action_plan": "1. Extract TSLA pattern parameters from the research\n2. Feed into RivalClaw's Strategy Lab backtest module\n3. Compare against existing momentum strategy performance\n4. If Sharpe improvement >0.1, propose adding to live rotation\n5. Document findings in daily report",
+      "source_items": [
+        "item-002"
+      ],
+      "risk": "low",
+      "risk_notes": null,
+      "deployed": true,
+      "deployed_at": "2026-03-25T04:40:41.563783",
+      "task_id": "chatgpt-be16304f"
+    }
+  ],
+  "meta_observations": "All three research items point to bullish tech sentiment, but originate from TradingView technical analysis \u2014 a single-source bias. Cross-validation with fundamental data (earnings, macro) and prediction market pricing would significantly increase confidence. The strongest signal is NVDA due to defined risk parameters; AAPL's 'Massive Long! BUY!' framing is notably less rigorous.",
+  "status": "complete"
+}
