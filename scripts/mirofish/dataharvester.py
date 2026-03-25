@@ -10,14 +10,16 @@ from datetime import datetime, timezone
 
 DB_PATH = Path(os.environ.get("CLAWMSON_DB_PATH", Path.home() / ".openclaw" / "clawmson.db"))
 
-MAX_TRADES_PER_RUN = 50
-BET_SIZE_USD = 4.0
-MIN_ENTRY = 0.03
+from scripts.mirofish.bot_config import get_param as _p
+
+MAX_TRADES_PER_RUN = _p("dataharvester", "MAX_TRADES_PER_RUN", 50)
+BET_SIZE_USD       = _p("dataharvester", "BET_SIZE_USD", 4.0)
+EDGE_THRESHOLD     = _p("dataharvester", "EDGE_THRESHOLD", 0.08)
+MIN_ENTRY = 0.03   # not auto-tuned
 MAX_ENTRY = 0.97
 MIN_HOURS_TO_CLOSE = 0.05
 MAX_HOURS_TO_CLOSE = 168
 FAIR_VALUE = 0.50
-EDGE_THRESHOLD = 0.08
 DASHBOARD_URL = "http://127.0.0.1:7080/api/trading/notify"
 
 

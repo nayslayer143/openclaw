@@ -27,13 +27,15 @@ def _load_env():
                 os.environ.setdefault(k.strip(), v.strip())
 
 # Config
-MAX_TRADES_PER_RUN = 20       # was 6
-POSITION_PCT = 0.03           # was 0.04
-MIN_ENTRY = 0.03              # was 0.08
-MAX_ENTRY = 0.97              # was 0.92
+from scripts.mirofish.bot_config import get_param as _p
+
+MAX_TRADES_PER_RUN = _p("newsclaw", "MAX_TRADES_PER_RUN", 20)
+POSITION_PCT       = _p("newsclaw", "POSITION_PCT", 0.03)
+MIN_ENTRY          = _p("newsclaw", "MIN_ENTRY", 0.03)
+MAX_ENTRY          = _p("newsclaw", "MAX_ENTRY", 0.97)
 OLLAMA_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
 NEWSCLAW_MODEL = os.environ.get("NEWSCLAW_MODEL", "qwen2.5:7b")
-MIN_EDGE_SCORE = 0.40         # was 0.72 (way too high)
+MIN_EDGE_SCORE     = _p("newsclaw", "MIN_EDGE_SCORE", 0.40)
 
 # RSS feeds (Tier 1 and 2 sources)
 RSS_FEEDS = [

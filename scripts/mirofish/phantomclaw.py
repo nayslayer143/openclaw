@@ -54,13 +54,15 @@ def _load_env():
 # ---------------------------------------------------------------------------
 # Config (from RivalClaw's proven parameters)
 # ---------------------------------------------------------------------------
-MAX_POSITION_PCT = 0.05
-MIN_FV_EDGE = 0.01          # 2% base edge threshold
+from scripts.mirofish.bot_config import get_param as _p
+
+MAX_POSITION_PCT = _p("phantomclaw_fv", "MAX_POSITION_PCT", 0.05)
+MIN_FV_EDGE = _p("phantomclaw_fv", "MIN_FV_EDGE", 0.01)
 KELLY_PROVEN = 1.0
 KELLY_NEW = 0.50
-MAX_TRADES_PER_RUN = 12
+MAX_TRADES_PER_RUN = _p("phantomclaw_fv", "MAX_TRADES_PER_RUN", 12)
 SLIPPAGE_BPS = 30
-MIN_ENTRY = 0.55
+MIN_ENTRY = _p("phantomclaw_fv", "MIN_ENTRY", 0.55)
 NO_STOP_LOSS_MINUTES = 60   # no stops on contracts expiring < 60 min
 
 # Price bucket multipliers (calibrated from 87 PhantomClaw trades)

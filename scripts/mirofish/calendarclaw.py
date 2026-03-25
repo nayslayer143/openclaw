@@ -30,11 +30,13 @@ def _load_env():
                 os.environ.setdefault(k.strip(), v.strip())
 
 # Config
-MAX_TRADES_PER_RUN = 30
-POSITION_PCT = 0.03
-MIN_ENTRY = 0.03
-MAX_ENTRY = 0.97
-MIN_EDGE_SCORE = 0.35
+from scripts.mirofish.bot_config import get_param as _p
+
+MAX_TRADES_PER_RUN = _p("calendarclaw", "MAX_TRADES_PER_RUN", 30)
+POSITION_PCT       = _p("calendarclaw", "POSITION_PCT", 0.03)
+MIN_ENTRY          = _p("calendarclaw", "MIN_ENTRY", 0.03)
+MAX_ENTRY          = _p("calendarclaw", "MAX_ENTRY", 0.97)
+MIN_EDGE_SCORE     = _p("calendarclaw", "MIN_EDGE_SCORE", 0.35)
 
 # Event families and their typical windows
 EVENT_FAMILIES = {
