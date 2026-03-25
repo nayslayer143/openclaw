@@ -2023,6 +2023,7 @@ body {
         <span class="t-gate" id="gateDD">DD < 25%</span>
         <span id="tGradStatus" style="font-size:0.44rem;letter-spacing:1px;color:var(--grey2);margin-left:auto">TESTING</span>
       </div>
+      <div id="calibrationStatus" style="font-size:0.38rem;color:var(--grey2);letter-spacing:1px;margin:4px 0;padding:0 12px"></div>
     </div>
 
 
@@ -4399,6 +4400,21 @@ function renderTrading() {
       if (el) el.className = 't-gate ' + (g.has_min_history ? (pass ? 'pass' : 'fail') : '')
     })
   } catch(e) { console.error('Gates:', e) }
+
+  // Calibration status
+  try {
+    const cal = d.calibration || []
+    const calEl = document.getElementById('calibrationStatus')
+    if (calEl) {
+      if (cal.length > 0) {
+        const last = cal[0]
+        const ago = Math.round((Date.now() - new Date(last.logged_at + 'Z').getTime()) / 60000)
+        calEl.innerHTML = `<span style="color:var(--orange)">AUTO-CALIBRATION</span> <span style="color:var(--grey1)">last: ${ago}m ago</span> | <span style="color:var(--orange)">${last.bot}.${last.param}</span>: ${Number(last.old_value).toFixed(3)} → ${Number(last.new_value).toFixed(3)} <span style="color:var(--grey2)">| ${cal.length} recent changes</span>`
+      } else {
+        calEl.innerHTML = '<span style="color:var(--grey2)">AUTO-CALIBRATION: awaiting first cycle (runs every 30min)</span>'
+      }
+    }
+  } catch(e) {}
 
   // PhantomClaw hero card
   try {
