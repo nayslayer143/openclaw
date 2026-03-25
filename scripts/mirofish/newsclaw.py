@@ -71,11 +71,10 @@ def _norm(v):
 
 
 def _get_balance(conn) -> float:
+    """NewsClaw's own $1000 virtual wallet — only counts its own trades."""
     try:
-        ctx = conn.execute("SELECT value FROM context WHERE chat_id='mirofish' AND key='starting_balance'").fetchone()
-        starting = float(ctx[0]) if ctx else 1000.0
-        pnl = conn.execute("SELECT COALESCE(SUM(pnl), 0) FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')").fetchone()[0]
-        return starting + pnl
+        pnl = conn.execute("SELECT COALESCE(SUM(pnl), 0) FROM paper_trades WHERE strategy='newsclaw' AND status IN ('closed_win','closed_loss','expired')").fetchone()[0]
+        return 1000.0 + pnl
     except Exception:
         return 1000.0
 
