@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 
 DB_PATH = Path(os.environ.get("CLAWMSON_DB_PATH", Path.home() / ".openclaw" / "clawmson.db"))
 
-from scripts.mirofish.bot_config import get_param as _p
+from scripts.mirofish.bot_config import get_param as _p, confidence_position_pct
 
 MAX_TRADES_PER_RUN = _p("dataharvester", "MAX_TRADES_PER_RUN", 50)
 BET_SIZE_USD       = _p("dataharvester", "BET_SIZE_USD", 4.0)
@@ -128,7 +128,8 @@ def score_polymarket(m):
 
 
 def place_trade(conn, market_id, question, direction, entry, confidence, thesis, balance):
-    amount = min(BET_SIZE_USD, balance * 0.05)
+    scaled_bet = BET_SIZE_USD * (1 + confidence - 0.5)  # scale $4 base by confidence
+    amount = min(scaled_bet, balance * 0.05)
     if amount < 1:
         return False
     shares = amount / entry if entry > 0 else 0

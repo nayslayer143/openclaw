@@ -24,7 +24,7 @@ def _load_env():
                 os.environ.setdefault(k.strip(), v.strip())
 
 # Config
-from scripts.mirofish.bot_config import get_param as _p
+from scripts.mirofish.bot_config import get_param as _p, confidence_position_pct
 
 MAX_TRADES_PER_RUN    = _p("sentimentclaw", "MAX_TRADES_PER_RUN", 25)
 POSITION_PCT          = _p("sentimentclaw", "POSITION_PCT", 0.03)
@@ -202,7 +202,8 @@ def scan_volume_attention_gaps(conn, balance, open_ids) -> int:
             except Exception:
                 continue
 
-        amount = min(POSITION_PCT * balance, balance * 0.10)
+        sized_pct = confidence_position_pct(score, POSITION_PCT)
+        amount = min(sized_pct * balance, balance * 0.10)
         if amount < 2:
             continue
 

@@ -27,7 +27,7 @@ def _load_env():
                 os.environ.setdefault(k.strip(), v.strip())
 
 # Config
-from scripts.mirofish.bot_config import get_param as _p
+from scripts.mirofish.bot_config import get_param as _p, confidence_position_pct
 
 MAX_TRADES_PER_RUN = _p("newsclaw", "MAX_TRADES_PER_RUN", 20)
 POSITION_PCT       = _p("newsclaw", "POSITION_PCT", 0.03)
@@ -312,7 +312,8 @@ def run():
         if entry < MIN_ENTRY or entry > MAX_ENTRY:
             continue
 
-        amount = min(POSITION_PCT * balance, balance * 0.10)
+        sized_pct = confidence_position_pct(confidence, POSITION_PCT)
+        amount = min(sized_pct * balance, balance * 0.10)
         if amount < 2:
             continue
 
