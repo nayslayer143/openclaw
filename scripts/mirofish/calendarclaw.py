@@ -30,11 +30,11 @@ def _load_env():
                 os.environ.setdefault(k.strip(), v.strip())
 
 # Config
-MAX_TRADES_PER_RUN = 4
+MAX_TRADES_PER_RUN = 8
 POSITION_PCT = 0.04
 MIN_ENTRY = 0.08
 MAX_ENTRY = 0.92
-MIN_EDGE_SCORE = 0.60
+MIN_EDGE_SCORE = 0.45
 
 # Event families and their typical windows
 EVENT_FAMILIES = {
@@ -204,13 +204,13 @@ def scan_calendar_setups(conn, balance, open_ids) -> int:
 
                 drift = recent_avg - older_avg
 
-                if drift > 0.03:
+                if drift > 0.01:
                     # Price drifting up → momentum into catalyst
                     direction = "YES"
                     entry = ya
                     score = 0.5 + config["confidence_boost"]
                     thesis = f"pre-event momentum: {family}, {hours_to_close:.1f}h to close, price drifting up"
-                elif drift < -0.03:
+                elif drift < -0.01:
                     direction = "NO"
                     entry = na
                     score = 0.5 + config["confidence_boost"]

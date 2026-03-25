@@ -24,11 +24,11 @@ def _load_env():
                 os.environ.setdefault(k.strip(), v.strip())
 
 # Config
-MAX_TRADES_PER_RUN = 3
+MAX_TRADES_PER_RUN = 6
 POSITION_PCT = 0.03
 MIN_ENTRY = 0.08
 MAX_ENTRY = 0.92
-VOLUME_SPIKE_MULT = 2.5    # volume must be 2.5x recent average
+VOLUME_SPIKE_MULT = 1.5    # volume must be 2.5x recent average
 PRICE_STALE_THRESHOLD = 0.02  # price moved less than 2% while volume spiked
 
 

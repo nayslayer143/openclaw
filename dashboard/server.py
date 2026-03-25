@@ -1162,6 +1162,29 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
             except Exception:
                 agent_stats[agent_name] = {"trades": 0, "wins": 0, "losses": 0, "pnl": 0, "open": 0, "win_rate": 0, "positions": []}
 
+        # 10c. RivalClaw open positions (separate DB) for unified feed
+        rivalclaw_positions = []
+        try:
+            rc_db = Path.home() / "rivalclaw" / "rivalclaw.db"
+            if rc_db.exists():
+                rc_conn = sqlite3.connect(str(rc_db))
+                rc_conn.row_factory = sqlite3.Row
+                rc_open = rc_conn.execute("""
+                    SELECT market_id, question, direction, strategy, entry_price, amount_usd,
+                           confidence, opened_at, pnl
+                    FROM paper_trades WHERE status='open' ORDER BY opened_at DESC
+                """).fetchall()
+                for ro in rc_open:
+                    rd = dict(ro)
+                    # Try to get close_time from rivalclaw's kalshi data or our kalshi_markets
+                    km = conn.execute("SELECT close_time FROM kalshi_markets WHERE ticker=? ORDER BY fetched_at DESC LIMIT 1", (ro["market_id"],)).fetchone()
+                    rd["close_time"] = km["close_time"] if km and km["close_time"] else None
+                    rd["current_price"] = ro["entry_price"]
+                    rivalclaw_positions.append(rd)
+                rc_conn.close()
+        except Exception:
+            pass
+
         # 11. Missed opportunities summary
         missed_summary = []
         try:
@@ -1199,6 +1222,7 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
             "cross_venue_arb": xv_arb,
             "phantom": phantom_stats,
             "agents": agent_stats,
+            "rivalclaw_positions": rivalclaw_positions,
             "missed_opportunities": missed_summary,
         }
         _trading_cache["data"] = result

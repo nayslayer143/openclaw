@@ -55,10 +55,10 @@ def _load_env():
 # Config (from RivalClaw's proven parameters)
 # ---------------------------------------------------------------------------
 MAX_POSITION_PCT = 0.05
-MIN_FV_EDGE = 0.02          # 2% base edge threshold
+MIN_FV_EDGE = 0.01          # 2% base edge threshold
 KELLY_PROVEN = 1.0
 KELLY_NEW = 0.50
-MAX_TRADES_PER_RUN = 8
+MAX_TRADES_PER_RUN = 12
 SLIPPAGE_BPS = 30
 MIN_ENTRY = 0.05
 NO_STOP_LOSS_MINUTES = 60   # no stops on contracts expiring < 60 min
