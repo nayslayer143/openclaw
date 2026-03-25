@@ -2200,7 +2200,10 @@ body {
         </div>
         <button class="tw-btn primary" onclick="intelRunCrawl()" id="intelCrawlBtn" style="font-size:0.5rem;padding:5px 14px;">RUN CRAWL NOW</button>
         <button onclick="intelPushToRepoMan()" id="intelPushRepoManBtn" style="font-size:0.5rem;padding:5px 14px;background:transparent;border:1px solid var(--cyan,#00e5ff);color:var(--cyan,#00e5ff);font-family:inherit;cursor:pointer;letter-spacing:1px;transition:all 0.2s;" onmouseover="this.style.background='var(--cyan,#00e5ff)';this.style.color='#000'" onmouseout="this.style.background='transparent';this.style.color='var(--cyan,#00e5ff)'">→ PUSH TO REPO MAN</button>
+        <button onclick="intelPushAllGithub()" id="intelPushAllGithubBtn" style="font-size:0.5rem;padding:5px 14px;background:transparent;border:1px solid var(--neon-green,#00ff88);color:var(--neon-green,#00ff88);font-family:inherit;cursor:pointer;letter-spacing:1px;transition:all 0.2s;" onmouseover="this.style.background='var(--neon-green,#00ff88)';this.style.color='#000'" onmouseout="this.style.background='transparent';this.style.color='var(--neon-green,#00ff88)'">⚡ PUSH ALL GITHUB</button>
       </div>
+      <!-- Crawler health notification bar -->
+      <div id="intelCrawlerAlert" style="display:none;padding:8px 16px;background:rgba(255,0,46,0.08);border:1px solid rgba(255,0,46,0.2);border-radius:2px;margin:8px 0;font-size:0.46rem;color:var(--neon-red);letter-spacing:0.5px;"></div>
 
       <!-- Signal Platform Tabs -->
       <div class="signal-tabs" id="signalTabs">
@@ -2508,6 +2511,7 @@ function showPage(page) {
     document.getElementById('pageIntel').classList.add('active')
     document.getElementById('tabIntel').classList.add('active')
     loadIntel()
+    intelCheckCrawlerHealth()
   } else if (page === 'research') {
     document.getElementById('pageResearch').classList.add('active')
     document.getElementById('tabResearch').classList.add('active')
@@ -6103,6 +6107,78 @@ async function intelPushToRepoMan() {
   }
 }
 
+// ── INTEL PAGE — push ALL crawled GitHub repos to Repo Man ─────────────────
+async function intelPushAllGithub() {
+  const btn = document.getElementById('intelPushAllGithubBtn')
+  btn.disabled = true
+  btn.textContent = '⟳ PUSHING ALL...'
+
+  try {
+    const resp = await fetch('/api/intel/push-all-github', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    })
+    const data = await resp.json()
+    if (resp.ok) {
+      btn.textContent = '\u2713 ' + data.queued + '/' + data.new_repos + ' PUSHED'
+      btn.style.borderColor = 'var(--neon-green)'
+      btn.style.color = 'var(--neon-green)'
+      setTimeout(function() {
+        btn.textContent = '\u26a1 PUSH ALL GITHUB'
+        btn.style.borderColor = ''
+        btn.style.color = ''
+        btn.disabled = false
+      }, 5000)
+    } else {
+      btn.textContent = data.detail || 'ERROR'
+      btn.style.borderColor = '#ff4444'
+      btn.style.color = '#ff4444'
+      setTimeout(function() { btn.textContent = '\u26a1 PUSH ALL GITHUB'; btn.disabled = false }, 3000)
+    }
+  } catch(e) {
+    btn.textContent = 'UNREACHABLE'
+    setTimeout(function() { btn.textContent = '\u26a1 PUSH ALL GITHUB'; btn.disabled = false }, 3000)
+  }
+}
+
+// ── INTEL PAGE — crawler health check + drying-up notification ─────────────
+async function intelCheckCrawlerHealth() {
+  try {
+    const resp = await fetch('/api/intel/crawler-health')
+    if (!resp.ok) return
+    const data = await resp.json()
+    const alert = document.getElementById('intelCrawlerAlert')
+    if (!alert) return
+
+    var messages = []
+    if (!data.crawler_running) {
+      messages.push('\u26a0 Crawler is NOT running (PID ' + (data.crawler_pid || '?') + ' dead)')
+    }
+    if (data.drying_up) {
+      messages.push('\u26a0 Results drying up \u2014 last crawl found only ' + data.last_crawl_count + ' repos. Consider evolving scraper parameters.')
+    }
+    if (data.last_crawl_time) {
+      var ago = Math.round((Date.now() - new Date(data.last_crawl_time).getTime()) / 60000)
+      if (ago > 120) {
+        messages.push('\u26a0 Last crawl was ' + ago + ' minutes ago \u2014 crawler may be stalled')
+      }
+    }
+
+    if (messages.length > 0) {
+      alert.innerHTML = messages.join('<br>')
+      alert.style.display = 'block'
+    } else {
+      alert.style.display = 'none'
+    }
+
+    // Update last crawl timestamp in toolbar
+    var lastCrawlEl = document.getElementById('intelLastCrawl')
+    if (lastCrawlEl && data.last_crawl_time) {
+      lastCrawlEl.textContent = 'LAST CRAWL: ' + new Date(data.last_crawl_time).toLocaleString() + ' (' + data.last_crawl_count + ' repos)'
+    }
+  } catch(e) {}
+}
+
 // ── RESEARCH TAB — Repo Man embed ─────────────────────────────────────────
 function pollResearchBadge() {
   fetch('https://research.asdfghjk.lol/api/inbox')
@@ -6268,6 +6344,7 @@ function chatgptRenderReport(report) {
       + '<span style="color:' + riskColor + '">RISK: ' + _esc((rec.risk || 'low').toUpperCase()) + '</span>'
       + (rec.risk_notes ? '<span style="color:var(--grey2)">\u26a0 ' + _esc(rec.risk_notes) + '</span>' : '')
       + '</div>'
+      + (rec.source_links && rec.source_links.length ? '<div style="margin-top:6px;font-size:0.42rem;">' + rec.source_links.map(function(l){ return '<a href="' + _esc(l) + '" target="_blank" rel="noopener" style="color:var(--neon-cyan);text-decoration:none;margin-right:10px;letter-spacing:0.5px;">\u2197 ' + _esc(l.replace(/https?:\/\/(www\.)?/,'').split('/').slice(0,2).join('/')) + '</a>' }).join('') + '</div>' : '')
       + (rec.action_plan ? '<div class="intel-readme-toggle" onclick="this.nextElementSibling.classList.toggle(\'open\')" style="margin-top:8px;">\u25b8 Action Plan</div><div class="gpt-action-plan">' + _esc(rec.action_plan) + '</div>' : '')
       + '<div class="gpt-rec-actions">' + deployBtn + '</div>'
       + '</div>'

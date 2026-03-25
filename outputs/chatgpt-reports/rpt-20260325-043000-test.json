@@ -8,6 +8,7 @@
     {
       "id": "item-001",
       "title": "NVDA Bullish Setup | Structure, Momentum & Risk Defined",
+      "url": "https://www.tradingview.com/chart/NVDA/XwRFBNQN-NVDA-Bullish-Setup-Structure-Momentum-Risk-Defined/",
       "source_type": "url",
       "novelty_score": 0.72,
       "action_recommendation": "DEEP_DIVE"
@@ -15,6 +16,7 @@
     {
       "id": "item-002",
       "title": "Tesla Inc. (TSLA) | Bullish Technical Outlook",
+      "url": "https://www.tradingview.com/chart/TSLA/XBpRwz3e-Tesla-Inc-TSLA-Bullish-Technical-Outlook/",
       "source_type": "url",
       "novelty_score": 0.65,
       "action_recommendation": "MONITOR"
@@ -22,6 +24,7 @@
     {
       "id": "item-003",
       "title": "APPLE Massive Long! BUY!",
+      "url": "https://www.tradingview.com/chart/AAPL/0BWLMDda-APPLE-Massive-Long-BUY/",
       "source_type": "url",
       "novelty_score": 0.58,
       "action_recommendation": "STUDY"
@@ -40,6 +43,9 @@
       "action_plan": "1. Ingest NVDA technical levels into QuantumentalClaw signal pipeline\n2. Cross-reference with Unusual Whales options flow for NVDA\n3. Check Polymarket for any NVDA-correlated prediction markets\n4. If 2+ signals align, generate paper trade entry\n5. Set stop-loss at defined risk level from the analysis",
       "source_items": [
         "item-001"
+      ],
+      "source_links": [
+        "https://www.tradingview.com/chart/NVDA/XwRFBNQN-NVDA-Bullish-Setup-Structure-Momentum-Risk-Defined/"
       ],
       "risk": "medium",
       "risk_notes": "Single-source technical analysis without fundamental confirmation",
@@ -61,6 +67,11 @@
         "item-002",
         "item-003"
       ],
+      "source_links": [
+        "https://www.tradingview.com/chart/NVDA/XwRFBNQN-NVDA-Bullish-Setup-Structure-Momentum-Risk-Defined/",
+        "https://www.tradingview.com/chart/TSLA/XBpRwz3e-Tesla-Inc-TSLA-Bullish-Technical-Outlook/",
+        "https://www.tradingview.com/chart/AAPL/0BWLMDda-APPLE-Massive-Long-BUY/"
+      ],
       "risk": "low",
       "risk_notes": null,
       "deployed": true,
@@ -78,6 +89,9 @@
       "action_plan": "1. Extract TSLA pattern parameters from the research\n2. Feed into RivalClaw's Strategy Lab backtest module\n3. Compare against existing momentum strategy performance\n4. If Sharpe improvement >0.1, propose adding to live rotation\n5. Document findings in daily report",
       "source_items": [
         "item-002"
+      ],
+      "source_links": [
+        "https://www.tradingview.com/chart/TSLA/XBpRwz3e-Tesla-Inc-TSLA-Bullish-Technical-Outlook/"
       ],
       "risk": "low",
       "risk_notes": null,
