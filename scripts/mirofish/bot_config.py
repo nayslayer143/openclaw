@@ -102,3 +102,27 @@ def is_trading_hours() -> bool:
     if hour < 6:
         return False
     return True
+
+
+def should_early_exit(entry_price: float, current_price: float, direction: str, hours_to_close: float) -> bool:
+    """Check if a trade should be closed early for profit.
+
+    Rules (calibrated 2026-03-25):
+    - Up 30%+ with >1hr left → take profit
+    - Up 50%+ with >15min left → take profit
+    - Down 40%+ with >2hr left → cut losses early
+    """
+    if direction == "YES":
+        pnl_pct = (current_price - entry_price) / entry_price if entry_price > 0 else 0
+    else:
+        pnl_pct = (entry_price - current_price) / entry_price if entry_price > 0 else 0
+
+    # Take profit
+    if pnl_pct >= 0.50 and hours_to_close > 0.25:
+        return True
+    if pnl_pct >= 0.30 and hours_to_close > 1.0:
+        return True
+    # Cut losses
+    if pnl_pct <= -0.40 and hours_to_close > 2.0:
+        return True
+    return False
