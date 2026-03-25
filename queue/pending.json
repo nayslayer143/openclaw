@@ -1,1 +1,53 @@
-[]
+[
+  {
+    "id": "chatgpt-9a99cb89",
+    "type": "chatgpt-strategy-deploy",
+    "title": "[ChatGPT] Deploy NVDA momentum signal via QuantumentalClaw",
+    "description": "The NVDA setup shows a well-defined structure with clear entry/stop/target levels. QuantumentalClaw's signal fusion engine can cross-reference this with options flow data and prediction market sentiment for a high-conviction trade.",
+    "strategy_details": "1. Ingest NVDA technical levels into QuantumentalClaw signal pipeline\n2. Cross-reference with Unusual Whales options flow for NVDA\n3. Check Polymarket for any NVDA-correlated prediction markets\n4. If 2+ signals align, generate paper trade entry\n5. Set stop-loss at defined risk level from the analysis",
+    "confidence": 0.85,
+    "targets": [
+      "quantumentalclaw"
+    ],
+    "priority": "high",
+    "status": "pending",
+    "created_at": "2026-03-25T04:40:35.892597",
+    "approved_by": "nayslayer",
+    "source_report": "rpt-20260325-043000-test",
+    "source_rec_index": 0
+  },
+  {
+    "id": "chatgpt-babb8f4e",
+    "type": "chatgpt-strategy-deploy",
+    "title": "[ChatGPT] Create tech-sector sentiment composite for Clawmpson",
+    "description": "Three simultaneous bullish setups in mega-cap tech suggests a sector-wide momentum shift. Clawmpson's multi-feed architecture is well-suited to build a composite sentiment score across NVDA, TSLA, and AAPL.",
+    "strategy_details": "1. Add sector-composite calculation to Clawmpson's trading brain\n2. Pull technical signals from all three stocks\n3. Weight by novelty score and source confidence\n4. Feed composite into the graduation engine for paper testing\n5. Review after 7-day evaluation window",
+    "confidence": 0.72,
+    "targets": [
+      "clawmpson"
+    ],
+    "priority": "medium",
+    "status": "pending",
+    "created_at": "2026-03-25T04:40:41.563755",
+    "approved_by": "nayslayer",
+    "source_report": "rpt-20260325-043000-test",
+    "source_rec_index": 1
+  },
+  {
+    "id": "chatgpt-be16304f",
+    "type": "chatgpt-strategy-deploy",
+    "title": "[ChatGPT] Backtest TSLA momentum pattern against RivalClaw strategies",
+    "description": "RivalClaw's self-tuner can evaluate whether TSLA momentum patterns align with its existing 8-strategy quant engine. This tests if the signal adds edge to RivalClaw's existing playbook.",
+    "strategy_details": "1. Extract TSLA pattern parameters from the research\n2. Feed into RivalClaw's Strategy Lab backtest module\n3. Compare against existing momentum strategy performance\n4. If Sharpe improvement >0.1, propose adding to live rotation\n5. Document findings in daily report",
+    "confidence": 0.61,
+    "targets": [
+      "rivalclaw"
+    ],
+    "priority": "medium",
+    "status": "pending",
+    "created_at": "2026-03-25T04:40:41.563780",
+    "approved_by": "nayslayer",
+    "source_report": "rpt-20260325-043000-test",
+    "source_rec_index": 2
+  }
+]
