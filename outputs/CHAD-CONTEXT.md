@@ -1,9 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> Auto-generated 2026-03-25T04:21:14-07:00. Do not edit manually.
+> Auto-generated 2026-03-25T05:07:00-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-03-25T04:21:14-07:00
+Generated: 2026-03-25T05:07:00-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -1163,16 +1163,16 @@ pytest-asyncio>=0.23
 ### openclaw
 ```
 Branch: feat/intel-signal-tabs
-Last commit: 9f3f52d Gonzo narration overhaul: trading, research, all 3 instances
-Uncommitted files: 10
+Last commit: f5fbd41 auto: 2026-03-25 05:00 state snapshot
+Uncommitted files: 11
 Remote: https://github.com/nayslayer143/openclaw.git
 ```
 
 ### rivalclaw
 ```
 Branch: main
-Last commit: 2cf08db daily report 2026-03-25 — day 2 | bal=$11055.6413529175 pnl=$11951.24 trades=405
-Uncommitted files: 20
+Last commit: 05ba883 fix: reduce Telegram to hourly only — per-cycle alerts + 15-min pings removed
+Uncommitted files: 19
 Remote: https://github.com/nayslayer143/rivalclaw.git
 ```
 
@@ -1187,7 +1187,7 @@ Remote: https://github.com/nayslayer143/arbclaw.git
 ### quantumentalclaw
 ```
 Branch: main
-Last commit: 676802e feat: crank up horizon slots for max data throughput
+Last commit: db29a2c hourly: 2026-03-25 12:00 | $10,000 | 0W/0closed | $+0 | quiet
 Uncommitted files: 0
 Remote: https://github.com/nayslayer143/quantumentalclaw.git
 ```
@@ -1287,5 +1287,5 @@ Remote: https://github.com/nayslayer143/shiny-new.git
 ```
 
 ---
-End of context. Generated 2026-03-25T04:21:14-07:00.
+End of context. Generated 2026-03-25T05:07:00-07:00.
 For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw

@@ -2031,6 +2031,170 @@ async def intel_run_crawl(user: str = Depends(get_current_user)):
     )
     return {"ok": True, "message": "Crawl started in background"}
 
+
+@app.post("/api/intel/push-all-github")
+async def intel_push_all_github(request: Request, user: str = Depends(get_current_user)):
+    """Push ALL unique GitHub repos from crawl files to Repo Man for analysis."""
+    import glob as _glob
+
+    datasets_dir = OPENCLAW_ROOT / "autoresearch" / "outputs" / "datasets"
+    crawl_files = sorted(_glob.glob(str(datasets_dir / "crawl_*.json")))
+
+    # Collect unique repos by URL
+    seen = {}
+    for filepath in crawl_files:
+        try:
+            items = json.loads(Path(filepath).read_text(encoding="utf-8"))
+            if not isinstance(items, list):
+                continue
+            for item in items:
+                url = item.get("url") or item.get("html_url") or ""
+                if url and "github.com" in url and url not in seen:
+                    seen[url] = {
+                        "url": url,
+                        "name": item.get("full_name") or item.get("name", ""),
+                        "stars": item.get("stars", 0),
+                        "description": (item.get("description") or "")[:200],
+                        "language": item.get("language", ""),
+                        "signal_score": item.get("signal_score", 0),
+                        "category": item.get("category", ""),
+                    }
+        except Exception:
+            continue
+
+    if not seen:
+        raise HTTPException(400, "No GitHub repos found in crawl data")
+
+    # Check which are already in Repo Man (by querying recommendations.json for pushed URLs)
+    already_pushed = set()
+    if INTEL_RECS.exists():
+        try:
+            data = json.loads(INTEL_RECS.read_text(encoding="utf-8"))
+            for r in data.get("recommendations", []):
+                if r.get("repo_url"):
+                    already_pushed.add(r["repo_url"])
+        except Exception:
+            pass
+
+    # Filter to only new repos
+    new_repos = {url: info for url, info in seen.items() if url not in already_pushed}
+
+    if not new_repos:
+        return {"ok": True, "queued": 0, "total_unique": len(seen),
+                "already_pushed": len(already_pushed),
+                "message": "All repos already pushed to Repo Man"}
+
+    # Push to Repo Man via /api/run in batches of 10 (no auth needed, same as manual bucket)
+    repoman_url = REPO_MAN_API.rstrip("/")
+    total_queued = 0
+    errors = []
+
+    batch_size = 10
+    repo_list = list(new_repos.values())
+
+    async with httpx.AsyncClient(timeout=60) as client:
+        for i in range(0, len(repo_list), batch_size):
+            batch = repo_list[i:i + batch_size]
+            # /api/run takes newline-separated URLs as "inputs" string
+            urls_text = "\n".join(
+                f"{repo['url']}  # {repo['name']} | {repo['stars']}★"
+                for repo in batch
+            )
+            try:
+                resp = await client.post(
+                    f"{repoman_url}/api/run",
+                    headers={"Content-Type": "application/json"},
+                    json={
+                        "inputs": urls_text,
+                        "notes": "github-intel-bulk — pushed from Gonzoclaw dashboard",
+                    },
+                )
+                if resp.status_code in (200, 202):
+                    data = resp.json()
+                    total_queued += data.get("item_count", len(batch))
+                else:
+                    errors.append(f"Batch {i//batch_size}: {resp.status_code} {resp.text[:200]}")
+            except Exception as exc:
+                errors.append(f"Batch {i//batch_size}: {exc}")
+            # Delay between batches so Repo Man can process
+            await asyncio.sleep(2)
+
+    return {
+        "ok": total_queued > 0,
+        "queued": total_queued,
+        "total_unique": len(seen),
+        "already_pushed": len(already_pushed),
+        "new_repos": len(new_repos),
+        "errors": errors[:5] if errors else [],
+        "message": f"Pushed {total_queued} of {len(new_repos)} new repos to Repo Man",
+    }
+
+
+@app.get("/api/intel/crawler-health")
+async def intel_crawler_health(user: str = Depends(get_current_user)):
+    """Check crawler status: is it running, when was last crawl, did it find results?"""
+    import glob as _glob
+
+    # Check if continuous crawler PID is alive
+    pid_file = LOGS_DIR / "github-intel-continuous.pid"
+    crawler_running = False
+    crawler_pid = None
+    if pid_file.exists():
+        try:
+            crawler_pid = int(pid_file.read_text().strip())
+            os.kill(crawler_pid, 0)  # Signal 0 = check if alive
+            crawler_running = True
+        except (ValueError, OSError):
+            crawler_running = False
+
+    # Find latest crawl file and its results
+    datasets_dir = OPENCLAW_ROOT / "autoresearch" / "outputs" / "datasets"
+    crawl_files = sorted(_glob.glob(str(datasets_dir / "crawl_*.json")))
+    last_crawl_file = crawl_files[-1] if crawl_files else None
+    last_crawl_count = 0
+    last_crawl_time = None
+
+    if last_crawl_file:
+        try:
+            last_crawl_count = len(json.loads(Path(last_crawl_file).read_text()))
+        except Exception:
+            pass
+        try:
+            last_crawl_time = datetime.fromtimestamp(
+                Path(last_crawl_file).stat().st_mtime
+            ).isoformat()
+        except Exception:
+            pass
+
+    # Check last 2 crawls to detect drying up
+    recent_counts = []
+    for f in crawl_files[-5:]:
+        try:
+            recent_counts.append(len(json.loads(Path(f).read_text())))
+        except Exception:
+            recent_counts.append(0)
+
+    # Detect if results are drying up (last crawl found <10 new repos or declining trend)
+    drying_up = False
+    if recent_counts:
+        drying_up = recent_counts[-1] < 10
+        if len(recent_counts) >= 3:
+            # Check for declining trend
+            avg_recent = sum(recent_counts[-2:]) / 2
+            avg_earlier = sum(recent_counts[:-2]) / max(len(recent_counts) - 2, 1)
+            if avg_earlier > 0 and avg_recent / avg_earlier < 0.3:
+                drying_up = True
+
+    return {
+        "crawler_running": crawler_running,
+        "crawler_pid": crawler_pid,
+        "last_crawl_time": last_crawl_time,
+        "last_crawl_count": last_crawl_count,
+        "recent_counts": recent_counts,
+        "total_crawl_files": len(crawl_files),
+        "drying_up": drying_up,
+    }
+
 @app.get("/api/intel/stream")
 async def intel_stream(request: Request):
     """SSE stream for new recommendations."""
@@ -2199,7 +2363,7 @@ _CHATGPT_SYSTEM_PROMPT = """You are a strategic advisor for OpenClaw, a web busi
 2. **RivalClaw** (rivalclaw) — Lightweight 8-strategy quant engine with hedge engine and self-tuner. Polymarket-centric, mechanical execution.
 3. **QuantumentalClaw** (quantumentalclaw) — Signal fusion engine for asymmetric opportunities across equities and prediction markets. 5 independent signal types.
 
-You are analyzing research items that were collected and pre-analyzed by Repo Man (a research ingestion pipeline).
+You are analyzing research items that were collected and pre-analyzed by Repo Man (a research ingestion pipeline). Each item includes its original LINK — use these links to inform your analysis and include them in your recommendations so the human operator can verify sources.
 
 For each batch, provide a JSON response with:
 1. executive_summary: 2-3 sentence overview of all findings
@@ -2216,6 +2380,7 @@ Each recommendation MUST include:
 - recommended_target_name: human-readable instance name (Lobster S. Clawmpson, RivalClaw, QuantumentalClaw)
 - action_plan: step-by-step markdown plan (concrete enough for an AI coding agent to execute)
 - source_items: list of item IDs this recommendation is based on
+- source_links: list of original URLs/links for the source items (so operator can verify)
 - risk: low, medium, or high
 - risk_notes: specific risk concerns (null if low risk)
 
@@ -2249,51 +2414,94 @@ async def chatgpt_analyze(request: Request, user: str = Depends(get_current_user
     if not items:
         raise HTTPException(400, "No completed research items to analyze")
 
-    # 2. Build prompt from items
-    item_blocks = []
-    input_items_summary = []
-    for item in items:
-        item_id = item.get("id", "unknown")
-        title = item.get("title", "Untitled")
-        source_type = item.get("source_type", "unknown")
-        novelty = item.get("novelty_score", 0)
-        action_rec = item.get("action_recommendation", "")
-
-        # Get best available analysis summary
-        analysis_summary = ""
-        for key in ("claude_analysis", "openai_analysis", "ollama_analysis"):
-            a = item.get(key)
-            if a and isinstance(a, dict) and a.get("summary"):
-                analysis_summary = a["summary"]
-                break
-
+    # 2. Predigest: extract essentials, cluster similar items, compress
+    def _extract_item(item):
+        """Pull only the fields GPT needs, aggressively truncated."""
+        analysis = ""
         key_ideas = []
         for key in ("claude_analysis", "openai_analysis", "ollama_analysis"):
             a = item.get(key)
-            if a and isinstance(a, dict) and a.get("key_ideas"):
-                key_ideas = a["key_ideas"][:5]
-                break
-
+            if a and isinstance(a, dict):
+                if not analysis and a.get("summary"):
+                    analysis = a["summary"][:250]
+                if not key_ideas and a.get("key_ideas"):
+                    key_ideas = [str(k)[:60] for k in a["key_ideas"][:3]]
         routing = item.get("openclaw_routing") or {}
-        route_target = routing.get("recommended_instance", "")
-        route_reason = routing.get("reasoning", "")
+        return {
+            "id": item.get("id", "unknown"),
+            "title": item.get("title", "Untitled")[:100],
+            "url": item.get("raw_input", ""),
+            "source": item.get("source_type", "unknown"),
+            "novelty": round(item.get("novelty_score", 0), 2),
+            "action": item.get("action_recommendation", ""),
+            "analysis": analysis,
+            "ideas": key_ideas,
+            "target": routing.get("recommended_instance", ""),
+            "route_reason": routing.get("reasoning", "")[:100],
+        }
 
-        item_blocks.append(
-            f"---\nITEM: {item_id}\nTITLE: {title}\nSOURCE: {source_type}\n"
-            f"NOVELTY: {novelty}\nACTION REC: {action_rec}\n"
-            f"ANALYSIS: {analysis_summary[:500]}\n"
-            f"KEY IDEAS: {', '.join(str(k) for k in key_ideas)}\n"
-            f"ROUTING: {route_target} ({route_reason[:200]})\n---"
-        )
-        input_items_summary.append({
-            "id": item_id, "title": title,
-            "source_type": source_type, "novelty_score": novelty,
-            "action_recommendation": action_rec,
-        })
+    digested = [_extract_item(i) for i in items]
+
+    # Cluster by source type to reduce redundancy
+    clusters = {}
+    for d in digested:
+        key = d["source"]
+        clusters.setdefault(key, []).append(d)
+
+    # Build compressed prompt
+    item_blocks = []
+    input_items_summary = []
+    for source_type, cluster in clusters.items():
+        if len(cluster) > 3:
+            # Summarize cluster: keep top 3 by novelty, note the rest
+            cluster.sort(key=lambda x: x["novelty"], reverse=True)
+            top = cluster[:3]
+            rest_count = len(cluster) - 3
+            for d in top:
+                item_blocks.append(
+                    f"[{d['id']}] {d['title']} | novelty={d['novelty']} | {d['action']}\n"
+                    f"  LINK: {d['url']}\n"
+                    f"  {d['analysis']}\n  Ideas: {', '.join(d['ideas'])}\n  → {d['target']} ({d['route_reason']})"
+                )
+            if rest_count:
+                # Still include links for omitted items so GPT can investigate
+                rest_links = [f"  - {d['url']}" for d in cluster[3:] if d.get("url")]
+                omit_block = f"(+{rest_count} more {source_type} items, lower novelty)"
+                if rest_links:
+                    omit_block += "\n  Links:\n" + "\n".join(rest_links)
+                item_blocks.append(omit_block)
+            for d in cluster:
+                input_items_summary.append({
+                    "id": d["id"], "title": d["title"], "url": d["url"],
+                    "source_type": d["source"], "novelty_score": d["novelty"],
+                    "action_recommendation": d["action"],
+                })
+        else:
+            for d in cluster:
+                item_blocks.append(
+                    f"[{d['id']}] {d['title']} | novelty={d['novelty']} | {d['action']}\n"
+                    f"  LINK: {d['url']}\n"
+                    f"  {d['analysis']}\n  Ideas: {', '.join(d['ideas'])}\n  → {d['target']} ({d['route_reason']})"
+                )
+                input_items_summary.append({
+                    "id": d["id"], "title": d["title"], "url": d["url"],
+                    "source_type": d["source"], "novelty_score": d["novelty"],
+                    "action_recommendation": d["action"],
+                })
 
     user_message = (
-        f"Analyze these {len(items)} completed research items and provide strategic recommendations:\n\n"
+        f"Analyze these {len(items)} research items ({len(clusters)} source types) "
+        f"and provide strategic recommendations:\n\n"
         + "\n\n".join(item_blocks)
+    )
+
+    # Log prompt size for observability
+    prompt_chars = len(_CHATGPT_SYSTEM_PROMPT) + len(user_message)
+    est_tokens = prompt_chars // 4
+    import logging
+    logging.getLogger("dashboard").info(
+        f"ChatGPT analyze: {len(items)} items → {len(item_blocks)} blocks, "
+        f"~{est_tokens} input tokens, {prompt_chars} chars"
     )
 
     # 3. Call OpenAI API (with retry for 429 rate limits)
@@ -2310,7 +2518,7 @@ async def chatgpt_analyze(request: Request, user: str = Depends(get_current_user
                     },
                     json={
                         "model": os.environ.get("CHATGPT_RESEARCH_MODEL", "gpt-4o"),
-                        "max_tokens": 4096,
+                        "max_tokens": int(os.environ.get("CHATGPT_RESEARCH_MAX_TOKENS", "2048")),
                         "temperature": 0.3,
                         "response_format": {"type": "json_object"},
                         "messages": [
