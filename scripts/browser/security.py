@@ -25,7 +25,8 @@ def _derive_key() -> bytes:
     Uses hostname + username + a fixed salt — never leaves the machine.
     """
     import socket
-    entropy = f"{socket.gethostname()}:{os.getlogin()}:openclaw-browser-vault-v1"
+    username = os.environ.get("USER") or os.environ.get("USERNAME") or "openclaw"
+    entropy = f"{socket.gethostname()}:{username}:openclaw-browser-vault-v1"
     raw = hashlib.sha256(entropy.encode()).digest()
     import base64
     return base64.urlsafe_b64encode(raw)
@@ -153,22 +154,25 @@ def check_robots_txt(url: str, user_agent: str = "*") -> bool:
     """
     parsed = urllib.parse.urlparse(url)
     base = f"{parsed.scheme}://{parsed.netloc}"
-    cache_key = f"{base}:{parsed.path}"
+    # Cache key is domain-only so all paths on same domain share one robots.txt fetch
+    domain_key = base
 
-    if cache_key in _robots_cache:
-        return _robots_cache[cache_key]
+    if domain_key in _robots_cache:
+        # Cached robots.txt text — just evaluate this path
+        return _robots_cache[domain_key] if isinstance(_robots_cache[domain_key], bool) else \
+               _parse_robots(_robots_cache[domain_key], parsed.path, user_agent)
 
     try:
         robots_url = f"{base}/robots.txt"
         req = urllib.request.Request(robots_url, headers={"User-Agent": user_agent})
         with urllib.request.urlopen(req, timeout=5) as resp:
             robots_text = resp.read().decode("utf-8", errors="replace")
+        _robots_cache[domain_key] = robots_text
     except Exception:
-        _robots_cache[cache_key] = True
+        _robots_cache[domain_key] = True  # type: ignore[assignment]
         return True
 
     result = _parse_robots(robots_text, parsed.path, user_agent)
-    _robots_cache[cache_key] = result
     return result
 
 
