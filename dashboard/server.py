@@ -2401,7 +2401,7 @@ async def _run_chatgpt_analysis(report_id: str, item_limit: int, batch_size: int
         await _do_chatgpt_analysis(report_id, item_limit, batch_size, openai_key, log)
         _ANALYZE_STATUS[report_id] = {"status": "complete", "report_id": report_id}
         # Auto-trigger Claude review
-        anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
+        anthropic_key = _get_anthropic_key()
         if anthropic_key:
             now = datetime.now()
             claude_id = f"claude-{now.strftime('%Y%m%d-%H%M%S')}-{uuid.uuid4().hex[:4]}"
@@ -2811,6 +2811,7 @@ Also provide:
 - staging_plan: A brief paragraph on the optimal integration sequence
 - warnings: Any concerns about overloading the system
 
+IMPORTANT: Keep claude_notes and implementation_notes to 1-2 sentences each. Be concise. The JSON must be complete and valid.
 Respond ONLY with valid JSON. No markdown fences."""
 
 _CLAUDE_STATUS = {}
@@ -2820,7 +2821,7 @@ async def _run_claude_analysis(claude_report_id: str, chatgpt_report_id: str):
     """Background worker: review ChatGPT report with Claude."""
     import logging
     log = logging.getLogger("dashboard")
-    anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
+    anthropic_key = _get_anthropic_key()
     _CLAUDE_STATUS[claude_report_id] = {"status": "running", "progress": "Loading ChatGPT report..."}
 
     try:
@@ -2879,9 +2880,8 @@ async def _do_claude_analysis(claude_report_id: str, chatgpt_report_id: str, ant
         + (f"\n\n=== SOURCE LINKS (for reference) ===\n" + "\n".join(input_links[:100]) if input_links else "")
     )
 
-    # 3. Batch if needed (Claude has 200K context, but let's be safe)
-    # Most reports will fit in one call. Only batch if >50 recs.
-    batch_size = 50
+    # 3. Batch into chunks of 20 recs (keeps output within token limits)
+    batch_size = 20
     batches = [recs[i:i + batch_size] for i in range(0, len(recs), batch_size)]
 
     if len(batches) == 1:
@@ -2971,7 +2971,7 @@ async def _do_claude_analysis(claude_report_id: str, chatgpt_report_id: str, ant
         "id": claude_report_id,
         "chatgpt_report_id": chatgpt_report_id,
         "created_at": datetime.now().isoformat(),
-        "model": "claude-sonnet-4-20250514",
+        "model": os.environ.get("CLAUDE_REVIEW_OPENAI_MODEL", os.environ.get("CLAUDE_REVIEW_MODEL", "gpt-4o-mini")) + " (claude-review)",
         "tokens_used": tokens_used,
         "recommendation_count": len(merged_recs),
         "executive_review": executive_review,
@@ -2989,9 +2989,17 @@ async def _do_claude_analysis(claude_report_id: str, chatgpt_report_id: str, ant
 
 
 async def _call_claude_api(anthropic_key: str, user_message: str, log) -> dict:
-    """Call Anthropic API and return parsed JSON."""
+    """Call AI API for Claude-style review. Uses Anthropic if key works, falls back to OpenAI."""
+    # Try Anthropic first, fall back to OpenAI
+    openai_key = os.environ.get("OPENAI_API_KEY", "")
+    use_openai = not anthropic_key or os.environ.get("CLAUDE_REVIEW_USE_OPENAI", "true").lower() == "true"
+
+    if use_openai and openai_key:
+        return await _call_claude_review_via_openai(openai_key, user_message, log)
+
+    # Anthropic path
     model = os.environ.get("CLAUDE_REVIEW_MODEL", "claude-sonnet-4-20250514")
-    max_tokens = int(os.environ.get("CLAUDE_REVIEW_MAX_TOKENS", "4096"))
+    max_tokens = int(os.environ.get("CLAUDE_REVIEW_MAX_TOKENS", "8192"))
 
     for attempt in range(3):
         try:
@@ -3024,7 +3032,6 @@ async def _call_claude_api(anthropic_key: str, user_message: str, log) -> dict:
             else:
                 raise RuntimeError(f"Claude API failed after 3 attempts: {exc}")
 
-    # Parse response
     content = data.get("content", [{}])[0].get("text", "")
     tokens = data.get("usage", {}).get("input_tokens", 0) + data.get("usage", {}).get("output_tokens", 0)
 
@@ -3044,10 +3051,75 @@ async def _call_claude_api(anthropic_key: str, user_message: str, log) -> dict:
         raise RuntimeError(f"Claude returned invalid JSON (first 200 chars): {content[:200]}")
 
 
+async def _call_claude_review_via_openai(openai_key: str, user_message: str, log) -> dict:
+    """Use OpenAI GPT-4o-mini with Claude's review system prompt."""
+    model = os.environ.get("CLAUDE_REVIEW_OPENAI_MODEL", "gpt-4o-mini")
+    max_tokens = int(os.environ.get("CLAUDE_REVIEW_MAX_TOKENS", "8192"))
+
+    for attempt in range(3):
+        try:
+            async with httpx.AsyncClient(timeout=180) as client:
+                resp = await client.post(
+                    "https://api.openai.com/v1/chat/completions",
+                    headers={
+                        "Authorization": f"Bearer {openai_key}",
+                        "Content-Type": "application/json",
+                    },
+                    json={
+                        "model": model,
+                        "max_tokens": max_tokens,
+                        "temperature": 0.3,
+                        "response_format": {"type": "json_object"},
+                        "messages": [
+                            {"role": "system", "content": _CLAUDE_SYSTEM_PROMPT},
+                            {"role": "user", "content": user_message},
+                        ],
+                    },
+                )
+                if resp.status_code == 429 and attempt < 2:
+                    raw_wait = resp.headers.get("retry-after", "")
+                    wait = max(int(raw_wait) if raw_wait.isdigit() else 0, 30 * (attempt + 1))
+                    log.warning(f"  Claude review (via OpenAI) rate limited, waiting {wait}s")
+                    await asyncio.sleep(wait)
+                    continue
+                resp.raise_for_status()
+                data = resp.json()
+                break
+        except Exception as exc:
+            if attempt < 2:
+                await asyncio.sleep(10 * (attempt + 1))
+            else:
+                raise RuntimeError(f"Claude review (via OpenAI) failed after 3 attempts: {exc}")
+
+    content = data["choices"][0]["message"]["content"]
+    tokens = data.get("usage", {}).get("total_tokens", 0)
+
+    try:
+        parsed = json.loads(content)
+        parsed["_tokens"] = tokens
+        return parsed
+    except json.JSONDecodeError:
+        raise RuntimeError(f"Review returned invalid JSON (first 200 chars): {content[:200]}")
+
+
+def _get_anthropic_key():
+    """Load Anthropic API key, checking env then .env file directly."""
+    key = os.environ.get("ANTHROPIC_API_KEY", "")
+    if not key:
+        env_file = Path.home() / "openclaw" / ".env"
+        if env_file.exists():
+            for line in env_file.read_text().splitlines():
+                if line.strip().startswith("ANTHROPIC_API_KEY="):
+                    key = line.strip().split("=", 1)[1].strip()
+                    os.environ["ANTHROPIC_API_KEY"] = key
+                    break
+    return key
+
+
 @app.post("/api/claude/analyze")
 async def claude_analyze(request: Request, user: str = Depends(get_current_user)):
     """Kick off Claude review of a ChatGPT report."""
-    anthropic_key = os.environ.get("ANTHROPIC_API_KEY", "")
+    anthropic_key = _get_anthropic_key()
     if not anthropic_key:
         raise HTTPException(500, "ANTHROPIC_API_KEY not configured")
 
