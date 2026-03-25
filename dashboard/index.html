@@ -4595,10 +4595,10 @@ function renderTrading() {
     phBody.innerHTML = '<tr><td colspan="4" style="color:rgba(255,0,200,0.3);text-align:center">scanning...</td></tr>'
   }
 
-  // Clawmpson hero card — open positions + recent trades
+  // Clawmpson hero card — open positions + recent trades (exclude phantom)
   const clawBody = document.getElementById('clawmpsonBody')
-  const clawOpen = d.open_positions || []
-  const clawRecent = d.recent_trades || []
+  const clawOpen = (d.open_positions || []).filter(p => !(p.strategy||'').startsWith('phantomclaw'))
+  const clawRecent = (d.recent_trades || []).filter(t => !(t.strategy||'').startsWith('phantomclaw'))
   const clawAll = [...clawOpen.map(p => ({...p, _status: 'OPEN'})), ...clawRecent.slice(0,5).map(t => ({...t, _status: t.status === 'closed_win' ? 'WIN' : 'LOSS'}))]
   if (clawAll.length) {
     clawBody.innerHTML = clawAll.slice(0,8).map(p => {
@@ -5000,25 +5000,30 @@ function getBotInfo(strategy) {
 function buildUnifiedFeed(d) {
   const allTrades = []
 
-  // MiroFish/Clawmpson open positions
+  // MiroFish/Clawmpson open positions (exclude phantom — they're added separately)
+  const seenIds = new Set()
   for (const p of (d.open_positions || [])) {
+    if ((p.strategy || '').startsWith('phantomclaw')) continue // handled below
     const bot = getBotInfo(p.strategy)
     const mid = p.market_id || ''
     let platform = 'POLY'
     if (mid.startsWith('KX') || mid.startsWith('INX') || mid.startsWith('NAS')) platform = 'KALSHI'
     else if (mid.startsWith('SPOT:')) platform = 'CRYPTO'
+    seenIds.add(p.id)
     allTrades.push({
       bot: bot.name, botColor: bot.color, strategy: p.strategy,
       question: p.question || '', platform, direction: p.direction,
       entry: p.entry_price || 0, current: p.current_price || p.entry_price || 0,
       pnl: p.pnl || 0, pnlPct: p.pnl_pct || 0, size: p.amount_usd || 0,
       confidence: p.confidence || 0, closeTime: p.close_time || '',
-      openedAt: p.opened_at || '',
+      openedAt: p.opened_at || '', id: p.id,
     })
   }
 
-  // PhantomClaw positions
+  // PhantomClaw positions (dedup by id)
   for (const p of ((d.phantom || {}).positions || [])) {
+    if (seenIds.has(p.id)) continue
+    seenIds.add(p.id)
     allTrades.push({
       bot: 'PHANTOM', botColor: '#ff00c8', strategy: 'phantomclaw_fv',
       question: p.question || '', platform: 'KALSHI', direction: p.direction,
