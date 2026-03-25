@@ -1234,6 +1234,17 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
         except Exception:
             pass
 
+        # 12. Calibration status
+        calibration = []
+        try:
+            cal_rows = conn.execute(
+                "SELECT bot, param, old_value, new_value, reason, mode, win_rate, sample_size, logged_at "
+                "FROM calibration_log ORDER BY logged_at DESC LIMIT 10"
+            ).fetchall()
+            calibration = [dict(r) for r in cal_rows]
+        except Exception:
+            pass
+
         result = {
             "wallet": {
                 "balance": round(balance, 2),
@@ -1260,6 +1271,7 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
             "rivalclaw_positions": rivalclaw_positions,
             "quantclaw": quantclaw_data,
             "missed_opportunities": missed_summary,
+            "calibration": calibration,
         }
         _trading_cache["data"] = result
         _trading_cache["ts"] = time.time()
