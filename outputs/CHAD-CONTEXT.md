@@ -1,10 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> This file is auto-generated. Do not edit manually.
-> Use as orientation for research sessions, not as source of truth for live code.
+> Auto-generated 2026-03-25T04:21:14-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-03-25T03:58:08-07:00
+Generated: 2026-03-25T04:21:14-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -21,7 +20,6 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 **Gonzoclaw Dashboard:** FastAPI + HTML at localhost:7080, exposed via Cloudflare tunnel at https://www.asdfghjk.lol
 **Database:** ~/.openclaw/clawmson.db (SQLite, 8 tables)
 **GitHub:** https://github.com/nayslayer143/openclaw
-
 
 ## Directory Structure
 
@@ -156,9 +154,12 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/rivalclaw/README.md
 ~/rivalclaw/auto_changelog.py
 ~/rivalclaw/daily
+~/rivalclaw/daily-update.log
 ~/rivalclaw/daily-update.sh
+~/rivalclaw/daily/2026-03-25.md
 ~/rivalclaw/daily/hourly-latest.md
 ~/rivalclaw/daily/hourly-log.md
+~/rivalclaw/daily/strategy-lab-2026-03-25.md
 ~/rivalclaw/docs
 ~/rivalclaw/docs/superpowers
 ~/rivalclaw/event_logger.py
@@ -1162,16 +1163,16 @@ pytest-asyncio>=0.23
 ### openclaw
 ```
 Branch: feat/intel-signal-tabs
-Last commit: 86f91d3 feat: AutoScholar watchlist system + Repo Man inbox integration
-Uncommitted files: 21
+Last commit: 9f3f52d Gonzo narration overhaul: trading, research, all 3 instances
+Uncommitted files: 10
 Remote: https://github.com/nayslayer143/openclaw.git
 ```
 
 ### rivalclaw
 ```
 Branch: main
-Last commit: 252c53f feat: 6 new strategies — road to 10 winners (cookie party!)
-Uncommitted files: 15
+Last commit: 2cf08db daily report 2026-03-25 — day 2 | bal=$11055.6413529175 pnl=$11951.24 trades=405
+Uncommitted files: 20
 Remote: https://github.com/nayslayer143/rivalclaw.git
 ```
 
@@ -1186,8 +1187,8 @@ Remote: https://github.com/nayslayer143/arbclaw.git
 ### quantumentalclaw
 ```
 Branch: main
-Last commit: d1ea965 feat: per-horizon trade slots — unblock sprint/day trades
-Uncommitted files: 1
+Last commit: 676802e feat: crank up horizon slots for max data throughput
+Uncommitted files: 0
 Remote: https://github.com/nayslayer143/quantumentalclaw.git
 ```
 
@@ -1286,5 +1287,5 @@ Remote: https://github.com/nayslayer143/shiny-new.git
 ```
 
 ---
-End of context. Generated 2026-03-25T03:58:08-07:00.
+End of context. Generated 2026-03-25T04:21:14-07:00.
 For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw
