@@ -26,7 +26,7 @@ def test_captcha_config_defaults():
 def test_tier1_apply_does_not_raise():
     from browser.browser_engine import BrowserEngine
     with BrowserEngine() as engine:
-        engine.navigate("https://example.com")
+        engine.page.set_content("<html><body>test page</body></html>")
         handler = CaptchaHandler(engine, CaptchaConfig())
         handler.apply_tier1_avoidance()  # should not raise
 

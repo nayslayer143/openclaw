@@ -84,6 +84,7 @@ class BrowserEngine:
         ctx_kwargs: dict = {
             "user_agent": self._user_agent,
             "viewport": {"width": 1280, "height": 800},
+            "ignore_https_errors": True,
         }
         self._context = self._browser.new_context(**ctx_kwargs)
         self._context.set_default_timeout(self._timeout_ms)
