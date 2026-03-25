@@ -1,9 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> Auto-generated 2026-03-25T05:07:00-07:00. Do not edit manually.
+> Auto-generated 2026-03-25T16:07:00-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-03-25T05:07:00-07:00
+Generated: 2026-03-25T16:07:00-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -122,6 +122,7 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/openclaw/scripts
 ~/openclaw/scripts/.pytest_cache
 ~/openclaw/scripts/autoresearch
+~/openclaw/scripts/browser
 ~/openclaw/scripts/clawteam
 ~/openclaw/scripts/mirofish
 ~/openclaw/scripts/ralph-templates
@@ -252,6 +253,7 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/quantumentalclaw/execution
 ~/quantumentalclaw/execution/__init__.py
 ~/quantumentalclaw/execution/equity_wallet.py
+~/quantumentalclaw/execution/live_prices.py
 ~/quantumentalclaw/execution/paper_wallet.py
 ~/quantumentalclaw/execution/router.py
 ~/quantumentalclaw/feeds
@@ -1162,17 +1164,17 @@ pytest-asyncio>=0.23
 
 ### openclaw
 ```
-Branch: feat/intel-signal-tabs
-Last commit: f5fbd41 auto: 2026-03-25 05:00 state snapshot
-Uncommitted files: 11
+Branch: main
+Last commit: d975b8f auto: 2026-03-25 16:00 state snapshot
+Uncommitted files: 10
 Remote: https://github.com/nayslayer143/openclaw.git
 ```
 
 ### rivalclaw
 ```
 Branch: main
-Last commit: 05ba883 fix: reduce Telegram to hourly only — per-cycle alerts + 15-min pings removed
-Uncommitted files: 19
+Last commit: 9fd3b9d feat: 3 new strategies + wipeout protection — 16 total, chasing 10 winners
+Uncommitted files: 20
 Remote: https://github.com/nayslayer143/rivalclaw.git
 ```
 
@@ -1187,7 +1189,7 @@ Remote: https://github.com/nayslayer143/arbclaw.git
 ### quantumentalclaw
 ```
 Branch: main
-Last commit: db29a2c hourly: 2026-03-25 12:00 | $10,000 | 0W/0closed | $+0 | quiet
+Last commit: 9cf7bd3 fix: size positions off STARTING_BALANCE, not compounding paper gains
 Uncommitted files: 0
 Remote: https://github.com/nayslayer143/quantumentalclaw.git
 ```
@@ -1212,7 +1214,7 @@ Remote: https://github.com/nayslayer143/punch-my-baby.git
 ```
 Branch: main
 Last commit: ac64d70 feat: SHINY.NEW v3 — LaChapelle flash, phosphor trail, full-bleed §7, oracle reveal, manifesto inversion, OMEGA easter egg
-Uncommitted files: 2
+Uncommitted files: 3
 Remote: https://github.com/nayslayer143/shiny-new.git
 ```
 
@@ -1287,5 +1289,5 @@ Remote: https://github.com/nayslayer143/shiny-new.git
 ```
 
 ---
-End of context. Generated 2026-03-25T05:07:00-07:00.
+End of context. Generated 2026-03-25T16:07:00-07:00.
 For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw

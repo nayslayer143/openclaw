@@ -1,77 +1,89 @@
 #!/usr/bin/env python3
-"""Live demo of Browser Eyes & Hands — run with HEADED=1 to watch."""
+"""Live demo of Browser Eyes & Hands v2 — persistent session + multi-tab."""
 
 import sys, time
 from pathlib import Path
-
-# Add scripts/ to path so `browser.x` imports work
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from browser.browser_engine import BrowserEngine
+from browser.pool import BrowserPool
+from browser.tab_manager import TabManager
 from browser.eyes import Eyes
 from browser.hands import Hands
 
-DEMO_URL = "https://news.ycombinator.com"
-
 def main():
-    print("\n🦞 Browser Eyes & Hands — Live Demo\n")
+    print("\n🦞 Browser Eyes & Hands v2 — Persistent + Multi-Tab Demo\n")
 
-    with BrowserEngine(headless=False, rate_limit_seconds=(0.5, 1.0)) as engine:
-        eyes = Eyes(engine)
-        hands = Hands(engine)
+    pool = BrowserPool(headless=False)
+    engine = pool.get()
+    tabs = TabManager(engine)
 
-        # --- Navigate ---
-        print(f"📍 Navigating to {DEMO_URL}...")
-        title = engine.navigate(DEMO_URL)
-        print(f"   Title: {title}")
+    try:
+        # --- Tab 1: Hacker News ---
+        print("📍 Opening Tab 1: Hacker News...")
+        news_page = tabs.create("news")
+        news_page.goto("https://news.ycombinator.com", wait_until="domcontentloaded")
+        news_eyes = Eyes(engine, page=news_page)
+        print(f"   Title: {news_eyes.title()}")
         time.sleep(1)
 
-        # --- Eyes: read the page ---
-        print("\n👁️  Reading page title...")
-        print(f"   Title via eyes: {eyes.title()}")
+        # --- Tab 2: Example.com ---
+        print("\n📍 Opening Tab 2: Example.com...")
+        example_page = tabs.create("example")
+        example_page.goto("https://example.com", wait_until="domcontentloaded")
+        example_eyes = Eyes(engine, page=example_page)
+        print(f"   Title: {example_eyes.title()}")
+        time.sleep(1)
 
-        print("\n👁️  Extracting top links...")
-        links = eyes.links()[:10]
-        for i, link in enumerate(links, 1):
+        # --- Read from both tabs without switching ---
+        print(f"\n👁️  Tab count: {tabs.count()}")
+        print(f"   Tabs open: {tabs.list_tabs()}")
+        print(f"\n👁️  News tab title: {news_eyes.title()}")
+        print(f"   Example tab title: {example_eyes.title()}")
+
+        # --- Switch and interact ---
+        print("\n🤚 Switching to news tab and scrolling...")
+        tabs.switch("news")
+        news_hands = Hands(engine, page=news_page)
+        news_hands.scroll(x=0, y=600)
+        time.sleep(1)
+
+        # --- Links from news tab ---
+        print("\n👁️  Top 5 HN links:")
+        links = news_eyes.links()[:10]
+        count = 0
+        for link in links:
             text = link.get("text", "").strip()[:60]
-            href = link.get("href", "")[:80]
-            if text:
-                print(f"   {i}. {text}")
-                print(f"      → {href}")
+            if text and count < 5:
+                print(f"   • {text}")
+                count += 1
 
-        # --- Eyes: DOM text ---
-        print("\n👁️  Extracting DOM text (first 500 chars)...")
-        text = eyes.dom_text()
-        print(f"   {text[:500]}...")
-
-        time.sleep(1)
-
-        # --- Hands: scroll down ---
-        print("\n🤚 Scrolling down the page...")
-        hands.scroll(x=0, y=800)
-        time.sleep(1)
-
-        # --- Hands: scroll back up ---
-        print("\n🤚 Scrolling back up...")
-        hands.scroll(x=0, y=-800)
-        time.sleep(1)
-
-        # --- Eyes: screenshot ---
+        # --- Screenshot both tabs ---
         out_dir = Path(__file__).parent / "demo_output"
         out_dir.mkdir(exist_ok=True)
-        print(f"\n📸 Taking screenshot...")
-        path = eyes.screenshot_timestamped(out_dir=str(out_dir))
-        print(f"   Saved to: {path}")
 
-        # --- Eyes: hybrid extract ---
-        print("\n🔍 Running hybrid extract (auto mode)...")
-        result = eyes.extract(mode="auto")
-        print(f"   Mode used: {'DOM text' if isinstance(result, str) else 'screenshot'}")
-        if isinstance(result, str):
-            print(f"   Content preview: {result[:300]}...")
+        print("\n📸 Screenshotting both tabs...")
+        news_shot = out_dir / "demo-news.png"
+        news_eyes.screenshot(save_path=news_shot)
+        print(f"   News → {news_shot}")
+
+        example_shot = out_dir / "demo-example.png"
+        example_eyes.screenshot(save_path=example_shot)
+        print(f"   Example → {example_shot}")
+
+        # --- Demonstrate pool persistence ---
+        print("\n♻️  Browser is still alive (persistent pool)...")
+        print(f"   Pool alive: {pool.is_alive()}")
+
+        # --- Close one tab ---
+        print("\n🗑️  Closing example tab...")
+        tabs.close("example")
+        print(f"   Remaining tabs: {tabs.list_tabs()}")
 
         time.sleep(2)
-        print("\n✅ Demo complete. Browser closing.\n")
+        print("\n✅ Demo complete. Shutting down pool.\n")
+
+    finally:
+        pool.shutdown()
 
 
 if __name__ == "__main__":
