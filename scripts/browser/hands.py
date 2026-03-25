@@ -91,6 +91,7 @@ class Hands:
         """Scroll element into viewport."""
         self._page.locator(selector).first.scroll_into_view_if_needed()
         _human_delay()
+        self._audit.log(self._engine.current_url(), "scroll_to_element", {"selector": selector})
 
     def press_key(self, selector_or_key: str, key: str = None):
         """Press a keyboard key (e.g. 'Enter', 'Tab', 'Escape').
