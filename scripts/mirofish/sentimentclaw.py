@@ -24,12 +24,12 @@ def _load_env():
                 os.environ.setdefault(k.strip(), v.strip())
 
 # Config
-MAX_TRADES_PER_RUN = 6
+MAX_TRADES_PER_RUN = 25       # was 6
 POSITION_PCT = 0.03
-MIN_ENTRY = 0.08
-MAX_ENTRY = 0.92
-VOLUME_SPIKE_MULT = 1.5    # volume must be 2.5x recent average
-PRICE_STALE_THRESHOLD = 0.02  # price moved less than 2% while volume spiked
+MIN_ENTRY = 0.03              # was 0.08
+MAX_ENTRY = 0.97              # was 0.92
+VOLUME_SPIKE_MULT = 1.2       # was 1.5 (easier to trigger)
+PRICE_STALE_THRESHOLD = 0.05  # was 0.02 (more permissive)
 
 
 def _get_conn():
@@ -103,13 +103,16 @@ def scan_volume_attention_gaps(conn, balance, open_ids) -> int:
             WHERE ticker = ? ORDER BY fetched_at DESC LIMIT 10
         """, (ticker,)).fetchall()
 
-        if len(vol_history) < 3:
+        if len(vol_history) < 1:
             continue
 
         # Compute volume baseline (average of older snapshots)
         volumes = [v["volume_24h"] or 0 for v in vol_history]
         current_vol = volumes[0]
-        baseline_vol = sum(volumes[1:]) / len(volumes[1:]) if len(volumes) > 1 else 0
+        if len(volumes) > 1:
+            baseline_vol = sum(volumes[1:]) / len(volumes[1:])
+        else:
+            baseline_vol = 5000  # single snapshot: use $5k as "normal" baseline
 
         if baseline_vol <= 0:
             continue
@@ -118,10 +121,12 @@ def scan_volume_attention_gaps(conn, balance, open_ids) -> int:
 
         # Compute price change
         prices = [_norm(v["yes_bid"]) for v in vol_history if v["yes_bid"]]
-        if len(prices) < 2:
-            continue
+        price_change = abs(prices[0] - prices[-1]) if len(prices) >= 2 else 0
 
-        price_change = abs(prices[0] - prices[-1])
+        direction = None
+        entry = None
+        score = 0.0
+        thesis = ""
 
         # ATTENTION-PRICE GAP: volume spiked but price barely moved
         if vol_spike >= VOLUME_SPIKE_MULT and price_change < PRICE_STALE_THRESHOLD:
@@ -152,43 +157,73 @@ def scan_volume_attention_gaps(conn, balance, open_ids) -> int:
                 direction = "NO"
                 entry = na
 
-            if entry < MIN_ENTRY or entry > MAX_ENTRY:
-                continue
-
-            # Spread filter
-            yb = _norm(r["yes_bid"])
-            if yb > 0 and ya > 0:
-                spread = (ya - yb) / ya
-                if spread > 0.30:
-                    continue
-
             edge = min(vol_spike / 10.0, 0.20)  # normalize
-            amount = min(POSITION_PCT * balance, balance * 0.10)
-            if amount < 2:
+            score = min(0.5 + edge, 0.85)
+            thesis = f"sentimentclaw: vol_spike={vol_spike:.1f}x price_stale={price_change:.3f} drift={micro_drift:.4f}"
+
+        # Fallback: extreme pricing strategy (no history needed)
+        # Uses latest market row (r) for price data — vol_history only has volume_24h + yes_bid
+        if len(vol_history) >= 1 and not direction:
+            ya = _norm(r["yes_ask"]) or _norm(r["yes_bid"])
+            na = _norm(r["no_ask"]) or _norm(r["no_bid"])
+            if ya < 0.15 and ya >= MIN_ENTRY:
+                direction = "YES"
+                entry = ya
+                score = 0.55
+                thesis = f"extreme low price {ya:.2f} — mean-reversion bet"
+            elif ya > 0.85 and na >= MIN_ENTRY:
+                direction = "NO"
+                entry = na
+                score = 0.55
+                thesis = f"extreme high price {ya:.2f} — fade to fair value"
+
+        if not direction or entry is None:
+            continue
+
+        if entry < MIN_ENTRY or entry > MAX_ENTRY:
+            continue
+
+        # Spread filter
+        ya_f = _norm(r["yes_ask"]) or _norm(r["yes_bid"])
+        yb_f = _norm(r["yes_bid"])
+        if yb_f > 0 and ya_f > 0:
+            spread = (ya_f - yb_f) / ya_f
+            if spread > 0.30:
                 continue
 
-            shares = amount / entry
-            confidence = min(0.5 + edge, 0.85)
-
+        # Check expiry (for fallback path — vol-spike path already checked above)
+        if vol_spike < VOLUME_SPIKE_MULT:
             try:
-                conn.execute("""
-                    INSERT INTO paper_trades
-                    (market_id, question, direction, shares, entry_price, amount_usd,
-                     status, confidence, reasoning, strategy, opened_at)
-                    VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?)
-                """, (
-                    ticker, (r["title"] or "")[:200], direction, shares, entry, amount,
-                    confidence,
-                    f"sentimentclaw: vol_spike={vol_spike:.1f}x price_stale={price_change:.3f} drift={micro_drift:.4f}",
-                    "sentimentclaw", now.isoformat(),
-                ))
-                conn.commit()
-                placed += 1
-                open_ids.add(ticker)
-                events_seen.add(evt)
-                print(f"[sentiment] {direction} ${amount:.0f} '{r['title'][:40]}' vol={vol_spike:.1f}x price_stale")
-            except Exception as e:
-                print(f"[sentiment] Error: {e}")
+                ct = datetime.datetime.fromisoformat(r["close_time"].replace("Z", "+00:00"))
+                hours_left = (ct.replace(tzinfo=None) - now).total_seconds() / 3600
+                if hours_left < 0.5 or hours_left > 168:
+                    continue
+            except Exception:
+                continue
+
+        amount = min(POSITION_PCT * balance, balance * 0.10)
+        if amount < 2:
+            continue
+
+        shares = amount / entry
+
+        try:
+            conn.execute("""
+                INSERT INTO paper_trades
+                (market_id, question, direction, shares, entry_price, amount_usd,
+                 status, confidence, reasoning, strategy, opened_at)
+                VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?)
+            """, (
+                ticker, (r["title"] or "")[:200], direction, shares, entry, amount,
+                score, thesis, "sentimentclaw", now.isoformat(),
+            ))
+            conn.commit()
+            placed += 1
+            open_ids.add(ticker)
+            events_seen.add(evt)
+            print(f"[sentiment] {direction} ${amount:.0f} '{r['title'][:40]}' | {thesis[:60]}")
+        except Exception as e:
+            print(f"[sentiment] Error: {e}")
 
     return placed
 
