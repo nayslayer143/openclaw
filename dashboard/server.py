@@ -1140,21 +1140,41 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
                     FROM paper_trades WHERE strategy=? AND status IN ('closed_win','closed_loss','expired')
                 """, (agent_name,)).fetchone()
                 ao = conn.execute("""
-                    SELECT id, market_id, question, direction, entry_price, amount_usd, opened_at
+                    SELECT id, market_id, question, direction, entry_price, shares, amount_usd, opened_at
                     FROM paper_trades WHERE strategy=? AND status='open' ORDER BY opened_at DESC
                 """, (agent_name,)).fetchall()
                 positions = []
+                agent_unrealized = 0.0
                 for po in ao:
                     pd = dict(po)
-                    km = conn.execute("SELECT close_time FROM kalshi_markets WHERE ticker=? ORDER BY fetched_at DESC LIMIT 1", (po["market_id"],)).fetchone()
-                    pd["close_time"] = km["close_time"] if km and km["close_time"] else None
-                    pd["pnl"] = 0
+                    # Mark-to-market: get current price from kalshi_markets or market_data
+                    current_price = po["entry_price"]
+                    km = conn.execute("SELECT yes_ask, no_ask, yes_bid, no_bid, close_time FROM kalshi_markets WHERE ticker=? ORDER BY fetched_at DESC LIMIT 1", (po["market_id"],)).fetchone()
+                    if km:
+                        pd["close_time"] = km["close_time"] if km["close_time"] else None
+                        if po["direction"] == "YES":
+                            current_price = km["yes_bid"] or km["yes_ask"] or po["entry_price"]
+                        else:
+                            current_price = km["no_bid"] or km["no_ask"] or po["entry_price"]
+                    else:
+                        # Try polymarket market_data
+                        md = conn.execute("SELECT yes_price, no_price, end_date FROM market_data WHERE market_id=? ORDER BY fetched_at DESC LIMIT 1", (po["market_id"],)).fetchone()
+                        if md:
+                            pd["close_time"] = md["end_date"] if md["end_date"] else None
+                            current_price = md["yes_price"] if po["direction"] == "YES" else md["no_price"]
+                        else:
+                            pd["close_time"] = None
+                    pnl = (po["shares"] or 0) * (current_price - po["entry_price"])
+                    pd["pnl"] = round(pnl, 2)
+                    pd["current_price"] = current_price
+                    agent_unrealized += pnl
                     positions.append(pd)
                 n = ac["n"] or 0
                 w = ac["w"] or 0
+                realized = ac["p"] or 0
                 agent_stats[agent_name] = {
                     "trades": n, "wins": w, "losses": n - w,
-                    "pnl": round(ac["p"] or 0, 2),
+                    "pnl": round(realized + agent_unrealized, 2),
                     "open": len(ao),
                     "win_rate": round(w / n * 100, 1) if n > 0 else 0,
                     "positions": positions,
