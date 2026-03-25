@@ -2099,6 +2099,24 @@ body {
         </div>
       </div>
 
+      <!-- LotteryClaw -->
+      <div class="t-section" style="border-color:rgba(255,215,0,0.25);background:linear-gradient(135deg,rgba(15,12,0,0.95),rgba(8,6,0,0.98));margin-bottom:0">
+        <div class="t-section-title" style="color:#ffd700;border-bottom-color:rgba(255,215,0,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
+          LOTTERYCLAW
+          <span class="t-live-dot" style="background:#ffd700;box-shadow:0 0 6px #ffd700;width:6px;height:6px"></span>
+        </div>
+        <div style="font-size:0.38rem;color:rgba(255,215,0,0.4);letter-spacing:1px;margin:-8px 0 8px 0">ULTRA-CHEAP · $75 BETS · 5:1+ PAYOFF · */5</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:8px">
+          <div><div class="t-card-label">BALANCE</div><div class="t-card-value" id="lcPnl" style="font-size:1rem">$1,000</div></div>
+          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="lcWL" style="font-size:1rem">0/0</div></div>
+          <div><div class="t-card-label">OPEN</div><div class="t-card-value" id="lcOpen" style="font-size:1rem;color:#ffd700">0</div></div>
+        </div>
+        <div class="t-table-wrap" style="max-height:160px;overflow-y:auto">
+          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>P&L</th><th>RESOLVES</th></tr></thead>
+          <tbody id="lcBody"><tr><td colspan="4" style="color:rgba(255,215,0,0.3);text-align:center">buying lottery tickets...</td></tr></tbody></table>
+        </div>
+      </div>
+
       <!-- QuantumentalClaw -->
       <div class="t-section" style="border-color:rgba(0,200,255,0.25);background:linear-gradient(135deg,rgba(0,5,15,0.95),rgba(0,2,10,0.98));margin-bottom:0">
         <div class="t-section-title" style="color:#00d4ff;border-bottom-color:rgba(0,200,255,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
@@ -4677,7 +4695,9 @@ function renderTrading() {
   const lossCount = (w.total_trades||0) - winCount
   const wlEl = document.getElementById('tWinLoss')
   if (wlEl) {
-    wlEl.innerHTML = `<span style="color:var(--neon-green)">${winCount}W</span> <span style="color:var(--neon-red)">${lossCount}L</span>`
+    const clawTotal = winCount + lossCount
+    const clawWR = clawTotal > 0 ? Math.round(winCount / clawTotal * 100) : 0
+    wlEl.innerHTML = `<span style="color:var(--neon-green)">${winCount}W</span> <span style="color:var(--neon-red)">${lossCount}L</span><div style="font-size:0.38rem;color:var(--grey2);margin-top:2px">${clawTotal > 0 ? clawWR + '% WR' : ''}</div>`
   }
   const wrEl = document.getElementById('tWinRate')
   if (wrEl) wrEl.textContent = (w.win_rate||0).toFixed(0) + '% win rate'
@@ -4751,7 +4771,9 @@ function renderTrading() {
     }
     const phWLEl = document.getElementById('phWL')
     if (phWLEl) {
-      phWLEl.innerHTML = `<span style="color:#00e5ff">${ph.wins||0}W</span> <span style="color:#ff2d95">${ph.losses||0}L</span>`
+      const phTotal = (ph.wins||0) + (ph.losses||0)
+      const phWR = phTotal > 0 ? Math.round((ph.wins||0) / phTotal * 100) : 0
+      phWLEl.innerHTML = `<span style="color:#00e5ff">${ph.wins||0}W</span> <span style="color:#ff2d95">${ph.losses||0}L</span><div style="font-size:0.38rem;color:var(--grey2);margin-top:2px">${phTotal > 0 ? phWR + '% WR' : ''}</div>`
     }
     document.querySelectorAll('#phWR, #phWR2').forEach(el => { el.textContent = (ph.win_rate || 0).toFixed(0) + '%' })
     const phOpenEl = document.getElementById('phOpen')
@@ -4815,6 +4837,7 @@ function renderTrading() {
     {name: 'newsclaw', pnl: 'newsPnl', wl: 'newsWL', open: 'newsOpen', body: 'newsBody', color: '#ffc800'},
     {name: 'sentimentclaw', pnl: 'sentPnl', wl: 'sentWL', open: 'sentOpen', body: 'sentBody', color: '#00ff88'},
     {name: 'dataharvester', pnl: 'dhPnl', wl: 'dhWL', open: 'dhOpen', body: 'dhBody', color: '#ff6600'},
+    {name: 'lotteryclaw', pnl: 'lcPnl', wl: 'lcWL', open: 'lcOpen', body: 'lcBody', color: '#ffd700'},
   ]
   const agents = d.agents || {}
   for (const cfg of agentConfigs) {
@@ -4828,7 +4851,9 @@ function renderTrading() {
     }
     const wlEl = document.getElementById(cfg.wl)
     if (wlEl) {
-      wlEl.innerHTML = `<span style="color:${cfg.color}">${ag.wins||0}W</span> <span style="color:#ff2d95">${ag.losses||0}L</span>`
+      const w = ag.wins || 0, l = ag.losses || 0, total = w + l
+      const wr = total > 0 ? Math.round(w / total * 100) : 0
+      wlEl.innerHTML = `<span style="color:${cfg.color}">${w}W</span> <span style="color:#ff2d95">${l}L</span><div style="font-size:0.38rem;color:var(--grey2);margin-top:2px">${total > 0 ? wr + '% WR' : ''}</div>`
     }
     const oEl = document.getElementById(cfg.open)
     if (oEl) {
@@ -4872,7 +4897,9 @@ function renderTrading() {
     const qcWLEl = document.getElementById('qcWL')
     if (qcWLEl) {
       const qcLosses = (qcW.total_trades || 0) - (qcW.wins || 0)
-      qcWLEl.innerHTML = `<span style="color:#00d4ff">${qcW.wins||0}W</span> <span style="color:#ff2d95">${qcLosses}L</span>`
+      const qcTotal = (qcW.wins||0) + qcLosses
+      const qcWR = qcTotal > 0 ? Math.round((qcW.wins||0) / qcTotal * 100) : 0
+      qcWLEl.innerHTML = `<span style="color:#00d4ff">${qcW.wins||0}W</span> <span style="color:#ff2d95">${qcLosses}L</span><div style="font-size:0.38rem;color:var(--grey2);margin-top:2px">${qcTotal > 0 ? qcWR + '% WR' : ''}</div>`
     }
     const qcOpenEl = document.getElementById('qcOpen')
     if (qcOpenEl) qcOpenEl.textContent = qcW.open_positions || 0
@@ -4951,7 +4978,9 @@ function renderExperiment(d) {
       const rcWLel = document.getElementById('rcWL')
       if (rcWLel) {
         const rcWins = w.win_count || 0
-        rcWLel.innerHTML = `<span style="color:var(--neon-green)">${rcWins}W</span> <span style="color:var(--neon-red)">${w.total_trades - rcWins}L</span>`
+        const rcLosses = w.total_trades - rcWins
+        const rcWR = w.total_trades > 0 ? Math.round(rcWins / w.total_trades * 100) : 0
+        rcWLel.innerHTML = `<span style="color:var(--neon-green)">${rcWins}W</span> <span style="color:var(--neon-red)">${rcLosses}L</span><div style="font-size:0.38rem;color:var(--grey2);margin-top:2px">${w.total_trades > 0 ? rcWR + '% WR' : ''}</div>`
       }
       // RivalClaw hero trade body
       const rcBody = document.getElementById('rcTradesBody')
@@ -5124,6 +5153,7 @@ const BOT_COLORS = {
   'newsclaw': {name: 'NEWS', color: '#ffc800'},
   'sentimentclaw': {name: 'SENTIMENT', color: '#00ff88'},
   'dataharvester': {name: 'HARVESTER', color: '#ff6600'},
+  'lotteryclaw': {name: 'LOTTERY', color: '#ffd700'},
   'quantclaw': {name: 'QUANT', color: '#00d4ff'},
   'contrarian': {name: 'CLAWMPSON', color: '#e86800'},
   'momentum': {name: 'CLAWMPSON', color: '#e86800'},
@@ -5187,7 +5217,7 @@ function buildUnifiedFeed(d) {
   }
 
   // Agent positions (calendar, news, sentiment)
-  for (const [name, cfg] of [['calendarclaw','#00c8ff'],['newsclaw','#ffc800'],['sentimentclaw','#00ff88'],['dataharvester','#ff6600']]) {
+  for (const [name, cfg] of [['calendarclaw','#00c8ff'],['newsclaw','#ffc800'],['sentimentclaw','#00ff88'],['dataharvester','#ff6600'],['lotteryclaw','#ffd700']]) {
     const ag = (d.agents || {})[name] || {}
     for (const p of (ag.positions || [])) {
       allTrades.push({
