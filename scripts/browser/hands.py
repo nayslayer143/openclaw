@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Optional, Union
 
 from browser.browser_engine import BrowserEngine
+from playwright.sync_api import Page
 
 
 def _human_delay(lo: float = 0.05, hi: float = 0.15):
@@ -24,10 +25,10 @@ class Hands:
     All methods log to the engine's audit logger.
     """
 
-    def __init__(self, engine: BrowserEngine):
+    def __init__(self, engine: BrowserEngine, page: Optional[Page] = None):
         self._engine = engine
         self._audit = engine._audit
-        self._page = engine.page
+        self._page = page or engine.page
 
     def click(self, selector: str, timeout: int = 10000):
         """Click the first element matching selector."""

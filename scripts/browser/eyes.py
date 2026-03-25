@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Optional, Literal
 
 from browser.browser_engine import BrowserEngine
+from playwright.sync_api import Page
 
 
 # Pages with these URL patterns are considered "structured" → prefer DOM extraction
@@ -24,8 +25,9 @@ class Eyes:
     Attaches to a BrowserEngine and provides perception methods.
     """
 
-    def __init__(self, engine: BrowserEngine):
+    def __init__(self, engine: BrowserEngine, page: Optional[Page] = None):
         self._engine = engine
+        self._page = page or engine.page
         self._audit = engine._audit
 
     def screenshot(
@@ -39,7 +41,7 @@ class Eyes:
         If save_path is given, also writes to disk.
         If element_selector given, captures only that element.
         """
-        page = self._engine.page
+        page = self._page
         kwargs: dict = {"full_page": full_page, "type": "png"}
 
         if element_selector:
@@ -76,7 +78,7 @@ class Eyes:
         Extract visible text from DOM. Faster than screenshot for text-heavy pages.
         Strips script/style content. Returns clean text.
         """
-        page = self._engine.page
+        page = self._page
         # Remove script and style tags before extracting text
         page.evaluate("""
             document.querySelectorAll('script, style, noscript').forEach(el => el.remove());
@@ -87,7 +89,7 @@ class Eyes:
 
     def dom_html(self, selector: str = "body") -> str:
         """Return raw HTML of selected element."""
-        return self._engine.page.locator(selector).inner_html()
+        return self._page.locator(selector).inner_html()
 
     def extract(self, mode: Literal["auto", "screenshot", "dom"] = "auto") -> str:
         """
@@ -109,7 +111,7 @@ class Eyes:
             return self.dom_text()
 
         # Check if page has significant visual content or minimal text
-        text = self._engine.page.locator("body").inner_text()
+        text = self._page.locator("body").inner_text()
         if len(text.strip()) < 200:
             # Sparse text — likely visual, use screenshot
             import base64
@@ -119,7 +121,7 @@ class Eyes:
 
     def links(self) -> list[dict]:
         """Extract all links from current page. Returns list of {text, href}."""
-        page = self._engine.page
+        page = self._page
         anchors = page.locator("a[href]").all()
         result = []
         for a in anchors:
@@ -133,11 +135,11 @@ class Eyes:
         return result
 
     def title(self) -> str:
-        return self._engine.page.title()
+        return self._page.title()
 
     def meta(self) -> dict:
         """Extract meta tags as key/value dict."""
-        page = self._engine.page
+        page = self._page
         metas = page.locator("meta").all()
         result = {}
         for m in metas:
