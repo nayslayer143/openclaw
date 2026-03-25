@@ -1,0 +1,452 @@
+{
+  "platform": "polymarket",
+  "crawl_id": "pm-bf-3118759f",
+  "crawled_at": "2026-03-24T19:18:52.017654",
+  "signals": [
+    {
+      "id": "088ce49867627c14",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/iran-x-israelus-conflict-ends-by-may-15-562-372-916-721-496",
+      "source_author": "polymarket",
+      "title": "Iran x Israel/US conflict ends by May 15?",
+      "body": "Price: 0.59 | Vol: $999,798 | Liq: $54,908",
+      "ticker_or_market": "POLYMARKET:iran-x-israelus-conflict-ends-by-may-15-562-372-916-721-496",
+      "direction": "neutral",
+      "confidence": 0.95,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 999798.3057269981,
+        "liquidity": 54908.2025
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "1484914",
+        "price": 0.59,
+        "volume": 999798.3057269981,
+        "liquidity": 54908.2025
+      },
+      "extracted_at": "2026-03-25T02:18:52.016526"
+    },
+    {
+      "id": "a9991d776211f98d",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/anthropic-500b-valuation-in-2026",
+      "source_author": "polymarket",
+      "title": "Anthropic $500B+ valuation in 2026?",
+      "body": "Price: 0.85 | Vol: $9,997 | Liq: $5,723",
+      "ticker_or_market": "POLYMARKET:anthropic-500b-valuation-in-2026",
+      "direction": "bullish",
+      "confidence": 0.42,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 9996.618699999994,
+        "liquidity": 5722.5188
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "1294391",
+        "price": 0.855,
+        "volume": 9996.618699999994,
+        "liquidity": 5722.5188
+      },
+      "extracted_at": "2026-03-25T02:18:52.016588"
+    },
+    {
+      "id": "98fdbe0b16e358f6",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/nhl-min-tb-2026-03-24-total-4pt5",
+      "source_author": "polymarket",
+      "title": "Wild vs. Lightning: O/U 4.5",
+      "body": "Price: 1.00 | Vol: $999 | Liq: $31,788",
+      "ticker_or_market": "POLYMARKET:nhl-min-tb-2026-03-24-total-4pt5",
+      "direction": "bullish",
+      "confidence": 0.3,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 999.287345,
+        "liquidity": 31788.27341
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "1436067",
+        "price": 0.9995,
+        "volume": 999.287345,
+        "liquidity": 31788.27341
+      },
+      "extracted_at": "2026-03-25T02:18:52.016703"
+    },
+    {
+      "id": "423d9475f4d73404",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/trump-margin-of-victory-in-new-hampshire-primary-0-2pt5",
+      "source_author": "polymarket",
+      "title": "Trump margin of victory in New Hampshire Primary 0-2.5%",
+      "body": "Price: 0.00 | Vol: $99,925 | Liq: $41,169",
+      "ticker_or_market": "POLYMARKET:trump-margin-of-victory-in-new-hampshire-primary-0-2pt5",
+      "direction": "bearish",
+      "confidence": 0.47,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 99924.953131,
+        "liquidity": 41168.72563
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "253898",
+        "price": 0.0,
+        "volume": 99924.953131,
+        "liquidity": 41168.72563
+      },
+      "extracted_at": "2026-03-25T02:18:52.016735"
+    },
+    {
+      "id": "39ef8e7ef9b8f9ca",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/will-st-pauli-be-relegated-from-the-bundesliga-after-the-202526-season-863",
+      "source_author": "polymarket",
+      "title": "Will St. Pauli be relegated from the Bundesliga after the 2025\u201326 season?",
+      "body": "Price: 0.43 | Vol: $9,992 | Liq: $2,336",
+      "ticker_or_market": "POLYMARKET:will-st-pauli-be-relegated-from-the-bundesliga-after-the-202526-season-863",
+      "direction": "neutral",
+      "confidence": 0.6,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 9992.139997999999,
+        "liquidity": 2336.3628
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "576806",
+        "price": 0.435,
+        "volume": 9992.139997999999,
+        "liquidity": 2336.3628
+      },
+      "extracted_at": "2026-03-25T02:18:52.016762"
+    },
+    {
+      "id": "817152738051d9f1",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/mojtaba-khamenei-seen-in-public-by-april-30",
+      "source_author": "polymarket",
+      "title": "Mojtaba Khamenei seen in public by April 30?",
+      "body": "Price: 0.23 | Vol: $99,908 | Liq: $21,289",
+      "ticker_or_market": "POLYMARKET:mojtaba-khamenei-seen-in-public-by-april-30",
+      "direction": "bearish",
+      "confidence": 0.63,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 99907.81413999984,
+        "liquidity": 21289.4553
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "1576159",
+        "price": 0.225,
+        "volume": 99907.81413999984,
+        "liquidity": 21289.4553
+      },
+      "extracted_at": "2026-03-25T02:18:52.016803"
+    },
+    {
+      "id": "53f5af152c9d8190",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/will-solana-reach-95-on-march-24",
+      "source_author": "polymarket",
+      "title": "Will Solana reach $95 on March 24?",
+      "body": "Price: 0.01 | Vol: $999 | Liq: $5,767",
+      "ticker_or_market": "POLYMARKET:will-solana-reach-95-on-march-24",
+      "direction": "bearish",
+      "confidence": 0.31,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 998.6986380000001,
+        "liquidity": 5766.59021
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "1698976",
+        "price": 0.0095,
+        "volume": 998.6986380000001,
+        "liquidity": 5766.59021
+      },
+      "extracted_at": "2026-03-25T02:18:52.016924"
+    },
+    {
+      "id": "bd54656bb538e304",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/will-wagner-take-moscow-by-tuesday",
+      "source_author": "polymarket",
+      "title": "Will Wagner take Moscow by Tuesday?",
+      "body": "Price: 0.00 | Vol: $9,987 | Liq: $1,346",
+      "ticker_or_market": "POLYMARKET:will-wagner-take-moscow-by-tuesday",
+      "direction": "bearish",
+      "confidence": 0.82,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 9986.601416000001,
+        "liquidity": 1346.4555
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "251623",
+        "price": 0.0,
+        "volume": 9986.601416000001,
+        "liquidity": 1346.4555
+      },
+      "extracted_at": "2026-03-25T02:18:52.016950"
+    },
+    {
+      "id": "c45c186111b60a23",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/trump-margin-of-victory-in-new-hampshire-primary-15",
+      "source_author": "polymarket",
+      "title": "Trump margin of victory in New Hampshire Primary >15%",
+      "body": "Price: 0.00 | Vol: $997,617 | Liq: $31,908",
+      "ticker_or_market": "POLYMARKET:trump-margin-of-victory-in-new-hampshire-primary-15",
+      "direction": "bearish",
+      "confidence": 0.95,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 997617.2574219999,
+        "liquidity": 31908.400500000003
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "253891",
+        "price": 0.0,
+        "volume": 997617.2574219999,
+        "liquidity": 31908.400500000003
+      },
+      "extracted_at": "2026-03-25T02:18:52.017138"
+    },
+    {
+      "id": "7179d5ebb2e167cb",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/highest-temperature-in-lucknow-on-march-26-2026-42c",
+      "source_author": "polymarket",
+      "title": "Will the highest temperature in Lucknow be 42\u00b0C on March 26?",
+      "body": "Price: 0.00 | Vol: $997 | Liq: $3,855",
+      "ticker_or_market": "POLYMARKET:highest-temperature-in-lucknow-on-march-26-2026-42c",
+      "direction": "bearish",
+      "confidence": 0.32,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 997.2087319999998,
+        "liquidity": 3855.33244
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "1680792",
+        "price": 0.004,
+        "volume": 997.2087319999998,
+        "liquidity": 3855.33244
+      },
+      "extracted_at": "2026-03-25T02:18:52.017222"
+    },
+    {
+      "id": "b22ed6b209c845af",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/nflx-above-60-on-march-27-2026",
+      "source_author": "polymarket",
+      "title": "Will Netflix (NFLX) finish week of March 23 above $60?",
+      "body": "Price: 1.00 | Vol: $997 | Liq: $4,208",
+      "ticker_or_market": "POLYMARKET:nflx-above-60-on-march-27-2026",
+      "direction": "bullish",
+      "confidence": 0.32,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 997.076,
+        "liquidity": 4207.79347
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "1666149",
+        "price": 0.9955,
+        "volume": 997.076,
+        "liquidity": 4207.79347
+      },
+      "extracted_at": "2026-03-25T02:18:52.017259"
+    },
+    {
+      "id": "655847cb554e8930",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/based-fdv-above-75m-one-day-after-launch-694-126",
+      "source_author": "polymarket",
+      "title": "Based FDV above $75M one day after launch?",
+      "body": "Price: 0.39 | Vol: $997 | Liq: $5,046",
+      "ticker_or_market": "POLYMARKET:based-fdv-above-75m-one-day-after-launch-694-126",
+      "direction": "neutral",
+      "confidence": 0.31,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 996.8085380000001,
+        "liquidity": 5046.4166
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "1627967",
+        "price": 0.39,
+        "volume": 996.8085380000001,
+        "liquidity": 5046.4166
+      },
+      "extracted_at": "2026-03-25T02:18:52.017331"
+    },
+    {
+      "id": "9e217f92f06d9dca",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/wta-bencic-gauff-2026-03-24-match-total-23pt5",
+      "source_author": "polymarket",
+      "title": "Bencic vs. Gauff: Match O/U 23.5",
+      "body": "Price: 1.00 | Vol: $100 | Liq: $8,358",
+      "ticker_or_market": "POLYMARKET:wta-bencic-gauff-2026-03-24-match-total-23pt5",
+      "direction": "bullish",
+      "confidence": 0.3,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 99.66382,
+        "liquidity": 8357.74756
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "1699539",
+        "price": 0.9995,
+        "volume": 99.66382,
+        "liquidity": 8357.74756
+      },
+      "extracted_at": "2026-03-25T02:18:52.017390"
+    },
+    {
+      "id": "a01bcd68c919b793",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/highest-temperature-in-seoul-on-march-27-2026-11c",
+      "source_author": "polymarket",
+      "title": "Will the highest temperature in Seoul be 11\u00b0C on March 27?",
+      "body": "Price: 0.07 | Vol: $997 | Liq: $1,775",
+      "ticker_or_market": "POLYMARKET:highest-temperature-in-seoul-on-march-27-2026-11c",
+      "direction": "bearish",
+      "confidence": 0.34,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 996.5252380000003,
+        "liquidity": 1774.5542
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "1690077",
+        "price": 0.065,
+        "volume": 996.5252380000003,
+        "liquidity": 1774.5542
+      },
+      "extracted_at": "2026-03-25T02:18:52.017434"
+    },
+    {
+      "id": "f79a0bca72948aca",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/will-the-miami-heat-win-the-2026-nba-finals",
+      "source_author": "polymarket",
+      "title": "Will the Miami Heat win the 2026 NBA Finals?",
+      "body": "Price: 0.01 | Vol: $9,964,875 | Liq: $345,068",
+      "ticker_or_market": "POLYMARKET:will-the-miami-heat-win-the-2026-nba-finals",
+      "direction": "bearish",
+      "confidence": 0.95,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 9964874.833695939,
+        "liquidity": 345068.0765
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "553873",
+        "price": 0.008,
+        "volume": 9964874.833695939,
+        "liquidity": 345068.0765
+      },
+      "extracted_at": "2026-03-25T02:18:52.017462"
+    },
+    {
+      "id": "89a246123bac3113",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/will-there-be-between-0-and-10-average-daily-transits-of-the-strait-of-hormuz-on-march-31",
+      "source_author": "polymarket",
+      "title": "Will there be between 0 and 10 average daily transits of the Strait of Hormuz on March 31?",
+      "body": "Price: 0.69 | Vol: $99,628 | Liq: $7,790",
+      "ticker_or_market": "POLYMARKET:will-there-be-between-0-and-10-average-daily-transits-of-the-strait-of-hormuz-on-march-31",
+      "direction": "neutral",
+      "confidence": 0.95,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 99628.19871300006,
+        "liquidity": 7789.796
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "1541749",
+        "price": 0.685,
+        "volume": 99628.19871300006,
+        "liquidity": 7789.796
+      },
+      "extracted_at": "2026-03-25T02:18:52.017517"
+    },
+    {
+      "id": "deeaa91cafc5a40f",
+      "type": "prediction",
+      "source_url": "https://polymarket.com/event/will-meituan-have-the-3-ai-model-at-the-end-of-march-2026",
+      "source_author": "polymarket",
+      "title": "Will Meituan have the #3 AI model at the end of March 2026?",
+      "body": "Price: 0.00 | Vol: $9,961 | Liq: $9,831",
+      "ticker_or_market": "POLYMARKET:will-meituan-have-the-3-ai-model-at-the-end-of-march-2026",
+      "direction": "bearish",
+      "confidence": 0.37,
+      "urgency": "hours",
+      "engagement": {
+        "volume": 9960.843329000005,
+        "liquidity": 9831.02786
+      },
+      "tags": [
+        "prediction-market"
+      ],
+      "raw_data": {
+        "market_id": "801193",
+        "price": 0.0015,
+        "volume": 9960.843329000005,
+        "liquidity": 9831.02786
+      },
+      "extracted_at": "2026-03-25T02:18:52.017576"
+    }
+  ],
+  "meta": {
+    "total_signals": 17
+  }
+}

@@ -1,0 +1,59 @@
+<h2>Where should repo-man live?</h2>
+<p class="subtitle">Pick the home that fits best</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>~/openclaw/repo-man/ <span style="font-size:0.75em;opacity:0.6">⭐ recommended</span></h3>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Consistent with every other OpenClaw project</li>
+          <li>openclaw_profile.json, .env, and scripts all adjacent</li>
+          <li>Agents/Lobster workflows can reference it by simple relative path</li>
+          <li>Shows up naturally in repo-queue triage</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>Adds one more root-level dir to openclaw (already has ~20)</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>~/openclaw/projects/repo-man/</h3>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Keeps root cleaner if you intend lots of projects</li>
+          <li>Logical grouping under a "projects" namespace</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li><code>projects/</code> currently only has projects.json — not a real project dir</li>
+          <li>Breaks the pattern every other project uses</li>
+          <li>Adds an extra path hop for agent references</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>~/repo-man/ <span style="font-size:0.75em;opacity:0.6">(standalone, outside openclaw)</span></h3>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Fully independent — clean git repo, own lifecycle</li>
+          <li>Makes Phase 2 (hosted SaaS) easier to extract and deploy</li>
+          <li>No openclaw dependency if you ever spin it out</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>openclaw_profile.json needs explicit path config to find openclaw data</li>
+          <li>Agents can't reference it without absolute paths or env vars</li>
+          <li>Friction if you want openclaw crons or Lobster to trigger it</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+</div>
