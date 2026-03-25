@@ -34,16 +34,11 @@ def get_open_ids(conn):
 
 
 def get_balance(conn):
-    starting = 1000.0
-    ctx = conn.execute(
-        "SELECT value FROM context WHERE chat_id='mirofish' AND key='starting_balance'"
-    ).fetchone()
-    if ctx:
-        starting = float(ctx[0])
+    """DataHarvester's own $1000 virtual wallet — only counts its own trades."""
     closed_pnl = conn.execute(
-        "SELECT COALESCE(SUM(pnl), 0) FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')"
+        "SELECT COALESCE(SUM(pnl), 0) FROM paper_trades WHERE strategy='dataharvester' AND status IN ('closed_win','closed_loss','expired')"
     ).fetchone()[0]
-    return starting + closed_pnl
+    return 1000.0 + closed_pnl
 
 
 def fetch_kalshi_markets(conn):
