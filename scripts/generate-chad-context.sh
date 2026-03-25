@@ -1,18 +1,15 @@
 #!/bin/bash
-# ============================================================
 # OPENCLAW CONTEXT GENERATOR FOR CHATGPT (CHAD)
-# Scans all claw instances + projects on Jordan's Mac
-# Outputs: ~/openclaw/outputs/CHAD-CONTEXT.md
-# Usage: chad-context (alias) or bash ~/openclaw/scripts/generate-chad-context.sh
-# ============================================================
+# Outputs ~/openclaw/outputs/CHAD-CONTEXT.md — Usage: chad-context
 
 OUTPUT="$HOME/openclaw/outputs/CHAD-CONTEXT.md"
 TIMESTAMP=$(date -Iseconds)
+MAX_DEPTH=2
+MAX_CHARS=2000
 
-# Directories to scan (add any that exist)
+# Directories to scan (only those that exist)
 SCAN_DIRS=()
-for d in "$HOME/openclaw" "$HOME/rivalclaw" "$HOME/arbclaw" \
-         "$HOME/quantumentalclaw" \
+for d in "$HOME/openclaw" "$HOME/rivalclaw" "$HOME/arbclaw" "$HOME/quantumentalclaw" \
          "$HOME/doctor-claw" "$HOME/openclaw/doctor-claw" \
          "$HOME/punch-my-baby" "$HOME/openclaw/punch-my-baby" \
          "$HOME/shiny-new" "$HOME/openclaw/shiny-new" \
@@ -20,24 +17,26 @@ for d in "$HOME/openclaw" "$HOME/rivalclaw" "$HOME/arbclaw" \
     [ -d "$d" ] && SCAN_DIRS+=("$d")
 done
 
-MAX_DEPTH=2
-MAX_README_CHARS=2000
+EXCLUDES=(-not -path "*/.git/*" -not -path "*/node_modules/*" -not -path "*/dist/*" \
+  -not -path "*/__pycache__/*" -not -path "*/venv/*" -not -path "*/.next/*" \
+  -not -path "*/logs/*" -not -path "*/.env*" -not -path "*/build-results/*" \
+  -not -path "*/repo-queue/*" -not -path "*/outputs/*" -not -path "*/archive/*" \
+  -not -path "*/.claude/*" -not -path "*/chatgpt-mcp/*" -not -path "*/.mypy_cache/*" \
+  -not -path "*/.pytest_cache/*" -not -path "*/coverage/*" -not -path "*/.DS_Store")
 
-cat > "$OUTPUT" << 'HEADER'
+cat > "$OUTPUT" << HEADER
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> This file is auto-generated. Do not edit manually.
-> Use as orientation for research sessions, not as source of truth for live code.
+> Auto-generated $TIMESTAMP. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
+
+Generated: $TIMESTAMP
+Machine: Jordan's MacBook Pro M2 Max (96GB)
+User: nayslayer
 
 HEADER
 
-echo "Generated: $TIMESTAMP" >> "$OUTPUT"
-echo "Machine: Jordan's MacBook Pro M2 Max (96GB)" >> "$OUTPUT"
-echo "User: nayslayer" >> "$OUTPUT"
-echo "" >> "$OUTPUT"
-
-# ── SECTION 1: System Overview ──
+# ── System Overview ──
 cat >> "$OUTPUT" << 'OVERVIEW'
 ## System Overview
 
@@ -55,166 +54,93 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 
 OVERVIEW
 
-# ── SECTION 2: Directory Trees ──
-echo "" >> "$OUTPUT"
+# ── Directory Trees ──
 echo "## Directory Structure" >> "$OUTPUT"
-
-EXCLUDE_ARGS=(
-    -not -path "*/node_modules/*" -not -path "*/.git/*"
-    -not -path "*/dist/*" -not -path "*/__pycache__/*"
-    -not -path "*/venv/*" -not -path "*/.next/*"
-    -not -path "*/logs/*" -not -path "*/.env*"
-    -not -path "*/build-results/*" -not -path "*/repo-queue/*"
-    -not -path "*/outputs/*" -not -path "*/archive/*"
-    -not -path "*/.claude/*" -not -path "*/chatgpt-mcp/*"
-    -not -path "*/.mypy_cache/*" -not -path "*/.pytest_cache/*"
-    -not -path "*/coverage/*" -not -path "*/.DS_Store"
-)
-
 for dir in "${SCAN_DIRS[@]}"; do
+    case "$dir" in "$HOME/openclaw/"*) continue ;; esac  # skip openclaw subdirs
     BASENAME=$(basename "$dir")
-    # Skip subdirs of openclaw that are separate SCAN_DIRS entries
-    case "$dir" in
-        "$HOME/openclaw/"*) continue ;;
-    esac
-    echo "" >> "$OUTPUT"
-    echo "### $BASENAME ($dir)" >> "$OUTPUT"
-    echo '```' >> "$OUTPUT"
+    echo -e "\n### $BASENAME ($dir)\n\`\`\`" >> "$OUTPUT"
     if [ "$dir" = "$HOME/openclaw" ]; then
-        # For the main openclaw dir, list only directories (too many files)
-        find "$dir" -maxdepth $MAX_DEPTH -type d \
-            "${EXCLUDE_ARGS[@]}" \
-            2>/dev/null | \
-            sed "s|$HOME|~|g" | \
-            sort >> "$OUTPUT"
+        find "$dir" -maxdepth $MAX_DEPTH -type d "${EXCLUDES[@]}" 2>/dev/null
     else
-        find "$dir" -maxdepth $MAX_DEPTH \
-            "${EXCLUDE_ARGS[@]}" \
-            \( -type f -o -type d \) \
-            2>/dev/null | \
-            sed "s|$HOME|~|g" | \
-            sort >> "$OUTPUT"
-    fi
+        find "$dir" -maxdepth $MAX_DEPTH \( -type f -o -type d \) "${EXCLUDES[@]}" 2>/dev/null
+    fi | sed "s|$HOME|~|g" | sort >> "$OUTPUT"
     echo '```' >> "$OUTPUT"
 done
 
-# ── SECTION 3: CLAUDE.md Files ──
-echo "" >> "$OUTPUT"
-echo "## Project Instructions (CLAUDE.md files)" >> "$OUTPUT"
-
+# ── CLAUDE.md Files ──
+echo -e "\n## Project Instructions (CLAUDE.md files)" >> "$OUTPUT"
 for dir in "${SCAN_DIRS[@]}"; do
-    if [ -f "$dir/CLAUDE.md" ]; then
-        REL=$(echo "$dir/CLAUDE.md" | sed "s|$HOME|~|g")
-        echo "" >> "$OUTPUT"
-        echo "### $REL" >> "$OUTPUT"
-        echo '```' >> "$OUTPUT"
-        head -c $MAX_README_CHARS "$dir/CLAUDE.md" >> "$OUTPUT"
-        echo "" >> "$OUTPUT"
-        echo '```' >> "$OUTPUT"
-    fi
+    [ -f "$dir/CLAUDE.md" ] || continue
+    REL=$(echo "$dir/CLAUDE.md" | sed "s|$HOME|~|g")
+    echo -e "\n### $REL\n\`\`\`" >> "$OUTPUT"
+    head -c $MAX_CHARS "$dir/CLAUDE.md" >> "$OUTPUT"
+    echo -e "\n\`\`\`" >> "$OUTPUT"
 done
 
-# ── SECTION 4: README Files ──
-echo "" >> "$OUTPUT"
-echo "## README Files" >> "$OUTPUT"
-
-# Collect all READMEs, deduplicate by realpath
-TMPREADMES=$(mktemp)
+# ── README Files (deduplicated) ──
+echo -e "\n## README Files" >> "$OUTPUT"
+TMP=$(mktemp)
 for dir in "${SCAN_DIRS[@]}"; do
-    find "$dir" -maxdepth 2 -name "README.md" \
-        -not -path "*/node_modules/*" \
-        -not -path "*/.git/*" \
-        2>/dev/null
-done | sort -u > "$TMPREADMES"
+    find "$dir" -maxdepth 2 -name "README.md" -not -path "*/.git/*" -not -path "*/node_modules/*" 2>/dev/null
+done | sort -u > "$TMP"
+while read -r f; do
+    REL=$(echo "$f" | sed "s|$HOME|~|g")
+    echo -e "\n### $REL\n\`\`\`" >> "$OUTPUT"
+    head -c $MAX_CHARS "$f" >> "$OUTPUT"
+    echo -e "\n\`\`\`" >> "$OUTPUT"
+done < "$TMP"
+rm -f "$TMP"
 
-while read -r readme; do
-    REL=$(echo "$readme" | sed "s|$HOME|~|g")
-    echo "" >> "$OUTPUT"
-    echo "### $REL" >> "$OUTPUT"
-    echo '```' >> "$OUTPUT"
-    head -c $MAX_README_CHARS "$readme" >> "$OUTPUT"
-    echo "" >> "$OUTPUT"
-    echo '```' >> "$OUTPUT"
-done < "$TMPREADMES"
-rm -f "$TMPREADMES"
-
-# ── SECTION 5: Tech Stack Fingerprint ──
-echo "" >> "$OUTPUT"
-echo "## Tech Stack Fingerprint" >> "$OUTPUT"
-
-TMPPKGS=$(mktemp)
+# ── Tech Stack Fingerprint (deduplicated) ──
+echo -e "\n## Tech Stack Fingerprint" >> "$OUTPUT"
+TMP=$(mktemp)
 for dir in "${SCAN_DIRS[@]}"; do
     find "$dir" -maxdepth 2 \( -name "package.json" -o -name "pyproject.toml" -o -name "requirements.txt" \) \
         -not -path "*/node_modules/*" 2>/dev/null
-done | sort -u > "$TMPPKGS"
+done | sort -u > "$TMP"
+while read -r f; do
+    REL=$(echo "$f" | sed "s|$HOME|~|g")
+    echo -e "\n### $REL\n\`\`\`" >> "$OUTPUT"
+    head -c 2000 "$f" >> "$OUTPUT"
+    echo -e "\n\`\`\`" >> "$OUTPUT"
+done < "$TMP"
+rm -f "$TMP"
 
-while read -r pkgfile; do
-    REL=$(echo "$pkgfile" | sed "s|$HOME|~|g")
-    echo "" >> "$OUTPUT"
-    echo "### $REL" >> "$OUTPUT"
-    echo '```' >> "$OUTPUT"
-    head -c 2000 "$pkgfile" >> "$OUTPUT"
-    echo "" >> "$OUTPUT"
-    echo '```' >> "$OUTPUT"
-done < "$TMPPKGS"
-rm -f "$TMPPKGS"
-
-# ── SECTION 6: Git Status Summary ──
-echo "" >> "$OUTPUT"
-echo "## Git Status" >> "$OUTPUT"
-
+# ── Git Status ──
+echo -e "\n## Git Status" >> "$OUTPUT"
 for dir in "${SCAN_DIRS[@]}"; do
-    if [ -d "$dir/.git" ]; then
-        BASENAME=$(basename "$dir")
-        echo "" >> "$OUTPUT"
-        echo "### $BASENAME" >> "$OUTPUT"
-        echo '```' >> "$OUTPUT"
-        (
-            cd "$dir"
-            echo "Branch: $(git branch --show-current 2>/dev/null)"
-            echo "Last commit: $(git log -1 --oneline 2>/dev/null)"
-            echo "Uncommitted files: $(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')"
-            echo "Remote: $(git remote get-url origin 2>/dev/null)"
-        ) >> "$OUTPUT"
-        echo '```' >> "$OUTPUT"
-    fi
+    [ -d "$dir/.git" ] || continue
+    echo -e "\n### $(basename "$dir")\n\`\`\`" >> "$OUTPUT"
+    (cd "$dir"
+     echo "Branch: $(git branch --show-current 2>/dev/null)"
+     echo "Last commit: $(git log -1 --oneline 2>/dev/null)"
+     echo "Uncommitted files: $(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')"
+     echo "Remote: $(git remote get-url origin 2>/dev/null)"
+    ) >> "$OUTPUT"
+    echo '```' >> "$OUTPUT"
 done
 
-# ── SECTION 7: Active .env filenames (NOT values — safety) ──
-echo "" >> "$OUTPUT"
-echo "## Environment Files (names only, NO values)" >> "$OUTPUT"
-echo '```' >> "$OUTPUT"
+# ── .env filenames (NOT values) ──
+echo -e "\n## Environment Files (names only, NO values)\n\`\`\`" >> "$OUTPUT"
 for dir in "${SCAN_DIRS[@]}"; do
-    find "$dir" -maxdepth 2 -name ".env*" \
-        -not -path "*/node_modules/*" \
-        2>/dev/null | sed "s|$HOME|~|g"
+    find "$dir" -maxdepth 2 -name ".env*" -not -path "*/node_modules/*" 2>/dev/null | sed "s|$HOME|~|g"
 done >> "$OUTPUT"
 echo '```' >> "$OUTPUT"
 
-# ── SECTION 8: Trading State Snapshot ──
-echo "" >> "$OUTPUT"
-echo "## Trading State (if available)" >> "$OUTPUT"
-
+# ── Trading State ──
+echo -e "\n## Trading State (if available)" >> "$OUTPUT"
 if [ -f "$HOME/openclaw/trading/dashboard.json" ]; then
-    echo "" >> "$OUTPUT"
-    echo "### Clawmpson Trading Dashboard" >> "$OUTPUT"
-    echo '```json' >> "$OUTPUT"
+    echo -e "\n### Clawmpson Trading Dashboard\n\`\`\`json" >> "$OUTPUT"
     head -c 3000 "$HOME/openclaw/trading/dashboard.json" >> "$OUTPUT"
-    echo "" >> "$OUTPUT"
-    echo '```' >> "$OUTPUT"
+    echo -e "\n\`\`\`" >> "$OUTPUT"
 fi
 
-echo "" >> "$OUTPUT"
-echo "---" >> "$OUTPUT"
-echo "End of context. Generated $TIMESTAMP." >> "$OUTPUT"
-echo "For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw" >> "$OUTPUT"
+echo -e "\n---\nEnd of context. Generated $TIMESTAMP.\nFor live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw" >> "$OUTPUT"
 
-# ── Safety check: no secrets leaked ──
-LEAKS=$(grep -cE '(sk-[a-zA-Z0-9]{20}|ghp_[a-zA-Z0-9]{36}|xoxb-|xoxp-|AKIA[A-Z0-9]{16}|password=[^ ]+|token=[^ ]+)' "$OUTPUT" 2>/dev/null)
-LEAKS=${LEAKS:-0}
-if [ "$LEAKS" -gt 0 ]; then
-    echo "WARNING: $LEAKS potential secret patterns found in output. Review before uploading!"
-fi
+# ── Safety check ──
+LEAKS=$(grep -cE '(sk-[a-zA-Z0-9]{20}|ghp_[a-zA-Z0-9]{36}|xoxb-|xoxp-|AKIA[A-Z0-9]{16})' "$OUTPUT" 2>/dev/null)
+[ "${LEAKS:-0}" -gt 0 ] && echo "WARNING: $LEAKS potential secret patterns found. Review before uploading!"
 
 # Report
 LINES=$(wc -l < "$OUTPUT")
