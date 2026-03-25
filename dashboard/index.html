@@ -3257,9 +3257,42 @@ const GONZO_NARRATE = {
 }
 
 let lastNarrateActivity = null
+let _narrateTickCount = 0
 
 async function narrateTick() {
   if (!document.getElementById('livePill')?.classList.contains('live')) return
+  _narrateTickCount++
+
+  // Every 11th tick: token accounting poem
+  if (_narrateTickCount % 11 === 0) {
+    try {
+      const tr = await fetch('/api/claude-usage')
+      if (tr.ok) {
+        const td = await tr.json()
+        if (!td.error) {
+          const pOut = td.period_usage?.output_tokens || 0
+          const pLimit = (td.plan === 'max') ? 45000000 : 5000000
+          const pPct = Math.round((pOut / pLimit) * 100)
+          const wOut = td.window?.output_tokens || 0
+          const wLimit = (td.plan === 'max') ? 1000000 : 200000
+          const wPct = Math.round((wOut / wLimit) * 100)
+          const daysLeft = td.period?.days_remaining || 0
+          const sessions = td.period_usage?.sessions || 0
+          const msgs = td.period_usage?.messages || 0
+          const fmtM = (n) => n >= 1000000 ? (n/1000000).toFixed(1)+'M' : n >= 1000 ? Math.round(n/1000)+'K' : n
+          const poem = _v([
+            `<span style="color:var(--neon-cyan)">TOKEN ACCOUNTING:</span> We have burned <span class="hst-name">${fmtM(pOut)}</span> output tokens this period — ${pPct}% of the monthly allowance, with ${daysLeft} days on the clock. The 5-hour window is at ${wPct}%. ${wPct > 80 ? 'We are running hot. The window is sweating. Every token from here is borrowed against the next five hours of silence.' : wPct > 50 ? 'Comfortably warm. We have room to maneuver but not room to be stupid.' : 'Cool and smooth. Token reserves are fat. We can afford to think big.'} ${sessions} sessions. ${fmtM(msgs)} messages. This is what progress looks like when measured in inference cycles.`,
+            `<span style="color:var(--neon-cyan)">THE METER:</span> ${pPct}% of monthly tokens consumed. ${fmtM(pOut)} output burned across ${sessions} sessions and ${fmtM(msgs)} messages. The 5h window sits at ${wPct}%. ${wPct > 80 ? 'The window is gasping. We are the guy at the all-you-can-eat buffet who went back for the seventh plate. Technically allowed. Spiritually questionable.' : 'Window is healthy. We feast.'} Resets in ${daysLeft}d. ${daysLeft < 3 ? 'End of month approaches like a landlord.' : 'Plenty of runway. The tokens flow like bourbon at a book signing.'}`,
+            `<span style="color:var(--neon-cyan)">FUEL GAUGE:</span> Period: ${fmtM(pOut)}/${fmtM(pLimit)} (${pPct}%). Window: ${fmtM(wOut)}/${fmtM(wLimit)} (${wPct}%). ${daysLeft} days until the meter resets and we are born again, flush with tokens, dangerous with ambition. ${wPct > 80 ? 'Right now though, the 5h window is tight. Like a pair of jeans after Thanksgiving. We should pace ourselves. We will not pace ourselves.' : 'The reserves are solid. We could rewrite the entire dashboard twice and still have tokens for the commit message.'}`,
+            `<span style="color:var(--neon-cyan)">INFERENCE BUDGET:</span> ${sessions} sessions have consumed ${fmtM(pOut)} tokens this month — ${pPct}% of our ${(td.plan||'max').toUpperCase()} plan allocation. That's ${fmtM(msgs)} messages, each one a small bet that the next response will be the one that moves the needle. The 5h window is at ${wPct}%. ${wPct > 80 ? 'We are living on the edge of rate-limit oblivion and I would not have it any other way.' : 'Plenty of headroom. The machine is well-fed and ready to think.'} Monthly reset: ${daysLeft} days.`,
+          ])
+          hstEntry(poem)
+          return
+        }
+      }
+    } catch(e) {}
+  }
+
   try {
     const r = await fetch('/api/activity')
     if (!r.ok) throw new Error('activity fetch failed')
