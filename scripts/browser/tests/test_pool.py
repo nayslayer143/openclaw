@@ -58,3 +58,35 @@ def test_pool_is_alive():
     assert pool.is_alive()
     pool.shutdown()
     assert not pool.is_alive()
+
+
+def test_browser_tools_reuse_pool():
+    """Two consecutive browser_open calls reuse the same browser."""
+    from browser.browser_tools import browser_open, browser_shutdown
+    from browser.pool import get_pool
+
+    # First call — launches browser
+    r1 = browser_open("https://example.com")
+    assert r1["ok"] is True
+
+    pool = get_pool()
+    assert pool.is_alive(), "Pool should be alive after browser_open"
+
+    # Second call — reuses browser (no re-launch)
+    r2 = browser_open("https://example.org")
+    assert r2["ok"] is True
+
+    pool.shutdown()
+
+
+def test_browser_shutdown_tool():
+    """browser_shutdown() kills the pool and returns ok."""
+    from browser.browser_tools import browser_open, browser_shutdown
+    from browser.pool import get_pool
+
+    browser_open("https://example.com")
+    assert get_pool().is_alive()
+
+    result = browser_shutdown()
+    assert result["ok"] is True
+    assert not get_pool().is_alive()

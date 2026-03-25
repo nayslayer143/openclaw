@@ -8,6 +8,8 @@ from browser.hands import Hands
 from browser.auth_handler import AuthHandler, SessionStore
 from browser.captcha_handler import CaptchaHandler, CaptchaConfig
 from browser.security import CredentialVault, AuditLogger, DomainScope
+from browser.pool import BrowserPool, get_pool
+from browser.tab_manager import TabManager
 from browser.browser_tools import (
     browser_open,
     browser_screenshot,
@@ -15,6 +17,7 @@ from browser.browser_tools import (
     browser_fill,
     browser_eval,
     browser_login,
+    browser_shutdown,
 )
 
 __all__ = [
@@ -22,6 +25,8 @@ __all__ = [
     "AuthHandler", "SessionStore",
     "CaptchaHandler", "CaptchaConfig",
     "CredentialVault", "AuditLogger", "DomainScope",
+    "BrowserPool", "get_pool", "TabManager",
     "browser_open", "browser_screenshot", "browser_click",
     "browser_fill", "browser_eval", "browser_login",
+    "browser_shutdown",
 ]
