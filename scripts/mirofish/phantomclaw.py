@@ -376,6 +376,45 @@ def resolve_trades(conn, new_ids: set) -> int:
     except ImportError:
         return 0
 
+    # --- Early exit check: close profitable trades before expiry ---
+    try:
+        from scripts.mirofish.bot_config import should_early_exit
+        open_trades = conn.execute(
+            "SELECT id, market_id, direction, entry_price, shares FROM paper_trades WHERE strategy LIKE 'phantomclaw%' AND status='open'"
+        ).fetchall()
+        for t in open_trades:
+            km = conn.execute(
+                "SELECT yes_bid, no_bid, close_time FROM kalshi_markets WHERE ticker=? ORDER BY fetched_at DESC LIMIT 1",
+                (t["market_id"],)
+            ).fetchone()
+            if not km:
+                continue
+            current = km["yes_bid"] if t["direction"] == "YES" else km["no_bid"]
+            if not current:
+                continue
+            hours_left = None
+            if km["close_time"]:
+                try:
+                    ct = datetime.datetime.fromisoformat(km["close_time"].replace("Z", "+00:00"))
+                    if ct.tzinfo is None:
+                        ct = ct.replace(tzinfo=datetime.timezone.utc)
+                    hours_left = (ct - datetime.datetime.now(datetime.timezone.utc)).total_seconds() / 3600
+                except Exception:
+                    pass
+            if hours_left and should_early_exit(t["entry_price"], current, t["direction"], hours_left):
+                pnl = t["shares"] * (current - t["entry_price"]) if t["direction"] == "YES" else t["shares"] * (t["entry_price"] - current)
+                status = "closed_win" if pnl > 0 else "closed_loss"
+                conn.execute(
+                    "UPDATE paper_trades SET status=?, exit_price=?, pnl=?, closed_at=? WHERE id=?",
+                    (status, current, round(pnl, 2), datetime.datetime.now(datetime.timezone.utc).isoformat(), t["id"])
+                )
+                sign = "+" if pnl >= 0 else ""
+                print(f"  [EARLY EXIT] {t['direction']} {t['market_id'][:30]} entry={t['entry_price']:.3f} exit={current:.3f} pnl={sign}${pnl:.2f} hours_left={hours_left:.1f}")
+        conn.commit()
+    except Exception as e:
+        print(f"  [EARLY EXIT] check failed: {e}")
+    # --- End early exit check ---
+
     trades = conn.execute("""
         SELECT id, market_id, direction, entry_price, shares FROM paper_trades
         WHERE status='open' AND strategy LIKE 'phantomclaw%'
