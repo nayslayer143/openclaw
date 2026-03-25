@@ -13,7 +13,8 @@ for d in "$HOME/openclaw" "$HOME/rivalclaw" "$HOME/arbclaw" "$HOME/quantumentalc
          "$HOME/doctor-claw" "$HOME/openclaw/doctor-claw" \
          "$HOME/punch-my-baby" "$HOME/openclaw/punch-my-baby" \
          "$HOME/shiny-new" "$HOME/openclaw/shiny-new" \
-         "$HOME/cinema-lab" "$HOME/openclaw/cinema-lab"; do
+         "$HOME/cinema-lab" "$HOME/openclaw/cinema-lab" \
+         "$HOME/openclaw-mission-control"; do
     [ -d "$d" ] && SCAN_DIRS+=("$d")
 done
 

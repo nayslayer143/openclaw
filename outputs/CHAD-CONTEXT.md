@@ -1,9 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> Auto-generated 2026-03-25T14:07:00-07:00. Do not edit manually.
+> Auto-generated 2026-03-25T15:26:30-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-03-25T14:07:00-07:00
+Generated: 2026-03-25T15:26:30-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -254,6 +254,7 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/quantumentalclaw/execution
 ~/quantumentalclaw/execution/__init__.py
 ~/quantumentalclaw/execution/equity_wallet.py
+~/quantumentalclaw/execution/live_prices.py
 ~/quantumentalclaw/execution/paper_wallet.py
 ~/quantumentalclaw/execution/router.py
 ~/quantumentalclaw/feeds
@@ -315,6 +316,49 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/quantumentalclaw/utils/ticker_map.py
 ~/quantumentalclaw/utils/types.py
 ~/quantumentalclaw/venv
+```
+
+### openclaw-mission-control (/Users/nayslayer/openclaw-mission-control)
+```
+~/openclaw-mission-control
+~/openclaw-mission-control/.dashboard.err.log
+~/openclaw-mission-control/.dashboard.log
+~/openclaw-mission-control/.git
+~/openclaw-mission-control/.github
+~/openclaw-mission-control/.github/workflows
+~/openclaw-mission-control/.gitignore
+~/openclaw-mission-control/.next
+~/openclaw-mission-control/.npmignore
+~/openclaw-mission-control/LICENSE
+~/openclaw-mission-control/README.md
+~/openclaw-mission-control/bin
+~/openclaw-mission-control/bin/cli.mjs
+~/openclaw-mission-control/components.json
+~/openclaw-mission-control/eslint.config.mjs
+~/openclaw-mission-control/instrumentation.ts
+~/openclaw-mission-control/next-env.d.ts
+~/openclaw-mission-control/next.config.ts
+~/openclaw-mission-control/node_modules
+~/openclaw-mission-control/package-lock.json
+~/openclaw-mission-control/package.json
+~/openclaw-mission-control/playwright.config.ts
+~/openclaw-mission-control/postcss.config.mjs
+~/openclaw-mission-control/public
+~/openclaw-mission-control/public/file.svg
+~/openclaw-mission-control/public/globe.svg
+~/openclaw-mission-control/public/icons
+~/openclaw-mission-control/public/manifest.json
+~/openclaw-mission-control/public/next.svg
+~/openclaw-mission-control/public/sw.js
+~/openclaw-mission-control/public/vercel.svg
+~/openclaw-mission-control/public/window.svg
+~/openclaw-mission-control/setup.sh
+~/openclaw-mission-control/src
+~/openclaw-mission-control/src/app
+~/openclaw-mission-control/src/components
+~/openclaw-mission-control/src/hooks
+~/openclaw-mission-control/src/lib
+~/openclaw-mission-control/tsconfig.json
 ```
 
 ## Project Instructions (CLAUDE.md files)
@@ -571,6 +615,37 @@ Auto-generated daily performance reports are posted to `daily/` by cron at 11:50
 ## Status
 
 **Experiment start:
+```
+
+### ~/openclaw-mission-control/README.md
+```
+![Mission Control — OpenClaw GUI & AI Agent Dashboard](cover.png)
+
+# Mission Control
+
+**Your command center for [OpenClaw](https://github.com/openclaw). See everything, control everything, from one screen.**
+
+Monitor your AI agents in real time. Chat with them. Schedule jobs. Track costs. Manage memory. All from your browser, all running on your machine.
+
+## Please, consider supporting me and buy me a Claude Code Subscription!
+[![Buy Me a Claude Code Subscription!](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-orange?logo=buy-me-a-coffee)](https://www.buymeacoffee.com/robsanna)
+
+
+**你的 [OpenClaw](https://github.com/openclaw) 指挥中心。一屏总览，一键掌控。**
+
+实时监控你的 AI 智能体、对话、调度任务、追踪费用、管理记忆 —— 一切在浏览器中完成，一切在你的设备上运行。
+
+[![OpenClaw GUI](https://img.shields.io/badge/OpenClaw-GUI-7c3aed?style=flat-square&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCI+PHRleHQgeT0iMjAiIGZvbnQtc2l6ZT0iMjAiPjwvdGV4dD48L3N2Zz4=)](https://github.com/openclaw) ![AI Dashboard](https://img.shields.io/badge/AI_Agent-Dashboard-22c55e?style=flat-square) ![Self-Hosted](https://img.shields.io/badge/Self--Hosted-Local_AI-f59e0b?style=flat-square) ![License](https://img.shields.io/badge/License-MIT-blue?style=flat-square)
+
+---
+
+## Why Mission Control?
+
+**Stop juggling terminals.** If you're running OpenClaw, you already know the power. Mission Control gives you the picture — a single place to see what your agents are doing, how much they're costing, and whether things are healthy.
+
+**Your data never leaves your machine.** Mission Control runs 100% locally. No cloud, no telemetry, no accounts. It's just a window into the OpenClaw system already running on your computer.
+
+**Works instantly.** Install it, open your browser, done. Mission Control automatically finds your OpenClaw setup — no configuration, no environ
 ```
 
 ### ~/openclaw/.pytest_cache/README.md
@@ -987,6 +1062,86 @@ These are the "arch
 
 ## Tech Stack Fingerprint
 
+### ~/openclaw-mission-control/.next/package.json
+```
+{"type": "commonjs"}
+```
+
+### ~/openclaw-mission-control/package.json
+```
+{
+  "name": "@openclaw/dashboard",
+  "version": "0.4.6",
+  "description": "Mission Control — open-source OpenClaw GUI and AI agent dashboard for managing local AI agents, models, memory, and skills",
+  "keywords": [
+    "openclaw",
+    "openclaw-gui",
+    "ai-agent-dashboard",
+    "local-ai-management-tool",
+    "ai-dashboard",
+    "ai-agents",
+    "mission-control",
+    "self-hosted-ai",
+    "llm-management",
+    "ai-model-manager",
+    "vector-memory",
+    "ai-cron-jobs",
+    "open-source-ai",
+    "private-ai",
+    "developer-tools"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/robsannaa/openclaw-mission-control.git"
+  },
+  "homepage": "https://github.com/robsannaa/openclaw-mission-control",
+  "bin": {
+    "openclaw-dashboard": "./bin/cli.mjs"
+  },
+  "scripts": {
+    "dev": "next dev -H 127.0.0.1 -p 3000 --webpack",
+    "build": "next build --webpack",
+    "start": "next start",
+    "lint": "eslint",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "dashboard": "node bin/cli.mjs",
+    "setup": "./setup.sh",
+    "setup:dev": "./setup.sh --dev --no-service"
+  },
+  "dependencies": {
+    "@ai-sdk/react": "^3.0.88",
+    "@base-ui/react": "^1.2.0",
+    "@monaco-editor/react": "^4.7.0",
+    "@types/turndown": "^5.0.6",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/addon-web-links": "^0.12.0",
+    "@xterm/xterm": "^6.0.0",
+    "@xyflow/react": "^12.10.0",
+    "ai": "^6.0.86",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "dagre": "^0.8.5",
+    "lucide-react": "^0.564.0",
+    "marked": "^17.0.2",
+    "next": "16.1.6",
+    "next-themes": "^0.4.6",
+    "radix-ui": "^1.4.3",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-markdown": "^10.1.0",
+    "recharts": "^2.15.4",
+    "remark-gfm": "^4.0.1",
+    "tailwind-merge": "^2.6.0",
+    "turndown": "^7.2.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@tailwindcss/postcss": "^4",
+   
+```
+
 ### ~/openclaw/chatgpt-mcp/package.json
 ```
 {
@@ -1165,16 +1320,16 @@ pytest-asyncio>=0.23
 ### openclaw
 ```
 Branch: feat/intel-signal-tabs
-Last commit: 34d7670 auto: 2026-03-25 14:00 state snapshot
-Uncommitted files: 11
+Last commit: d9b7d34 LotteryClaw card + win rate on ALL bot cards
+Uncommitted files: 22
 Remote: https://github.com/nayslayer143/openclaw.git
 ```
 
 ### rivalclaw
 ```
 Branch: main
-Last commit: 05ba883 fix: reduce Telegram to hourly only — per-cycle alerts + 15-min pings removed
-Uncommitted files: 19
+Last commit: 9fd3b9d feat: 3 new strategies + wipeout protection — 16 total, chasing 10 winners
+Uncommitted files: 20
 Remote: https://github.com/nayslayer143/rivalclaw.git
 ```
 
@@ -1189,7 +1344,7 @@ Remote: https://github.com/nayslayer143/arbclaw.git
 ### quantumentalclaw
 ```
 Branch: main
-Last commit: 3f53cdf hourly: 2026-03-25 21:00 | $10,000 | 0W/28closed | $+0 | calm
+Last commit: f740295 hourly: 2026-03-25 22:00 | $2,563,488 | 87W/154closed | $+2,553,488 | calm
 Uncommitted files: 0
 Remote: https://github.com/nayslayer143/quantumentalclaw.git
 ```
@@ -1216,6 +1371,14 @@ Branch: main
 Last commit: ac64d70 feat: SHINY.NEW v3 — LaChapelle flash, phosphor trail, full-bleed §7, oracle reveal, manifesto inversion, OMEGA easter egg
 Uncommitted files: 2
 Remote: https://github.com/nayslayer143/shiny-new.git
+```
+
+### openclaw-mission-control
+```
+Branch: main
+Last commit: 7ee7f2b Add scoped in-app Mission Control self-update flow
+Uncommitted files: 2
+Remote: https://github.com/nayslayer143/openclaw-mission-control.git
 ```
 
 ## Environment Files (names only, NO values)
@@ -1289,5 +1452,5 @@ Remote: https://github.com/nayslayer143/shiny-new.git
 ```
 
 ---
-End of context. Generated 2026-03-25T14:07:00-07:00.
+End of context. Generated 2026-03-25T15:26:30-07:00.
 For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw

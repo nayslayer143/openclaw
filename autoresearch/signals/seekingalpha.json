@@ -1,7 +1,7 @@
 {
   "platform": "seekingalpha",
-  "crawl_id": "seekingalpha-20260325033613",
-  "crawled_at": "2026-03-25T03:36:41.291770",
+  "crawl_id": "seekingalpha-20260325151801",
+  "crawled_at": "2026-03-25T15:18:28.744345",
   "signals": [
     {
       "id": "ccc775473a333761",
@@ -30,7 +30,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.228432+00:00"
+      "extracted_at": "2026-03-25T22:18:28.695565+00:00"
     },
     {
       "id": "97d311b7d7dcad61",
@@ -59,7 +59,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.228497+00:00"
+      "extracted_at": "2026-03-25T22:18:28.695664+00:00"
     },
     {
       "id": "6124f2f8db5aba06",
@@ -88,7 +88,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.228543+00:00"
+      "extracted_at": "2026-03-25T22:18:28.695759+00:00"
     },
     {
       "id": "428d8a271eca490f",
@@ -117,7 +117,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.228585+00:00"
+      "extracted_at": "2026-03-25T22:18:28.695822+00:00"
     },
     {
       "id": "a1a31b9a3418bbff",
@@ -146,7 +146,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.228628+00:00"
+      "extracted_at": "2026-03-25T22:18:28.695954+00:00"
     },
     {
       "id": "280b752e0821fa91",
@@ -175,7 +175,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.228669+00:00"
+      "extracted_at": "2026-03-25T22:18:28.696129+00:00"
     },
     {
       "id": "c4f6daef65a8ea0e",
@@ -204,7 +204,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.228708+00:00"
+      "extracted_at": "2026-03-25T22:18:28.696201+00:00"
     },
     {
       "id": "c29e52c4eff44053",
@@ -233,7 +233,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.228750+00:00"
+      "extracted_at": "2026-03-25T22:18:28.696257+00:00"
     },
     {
       "id": "523ef1cc67b4b8eb",
@@ -262,7 +262,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.228791+00:00"
+      "extracted_at": "2026-03-25T22:18:28.696308+00:00"
     },
     {
       "id": "2637fe66d90c8f00",
@@ -291,7 +291,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.228832+00:00"
+      "extracted_at": "2026-03-25T22:18:28.696358+00:00"
     },
     {
       "id": "1b61993fc4f37875",
@@ -320,7 +320,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.228869+00:00"
+      "extracted_at": "2026-03-25T22:18:28.696407+00:00"
     },
     {
       "id": "76d001da4b53452a",
@@ -349,7 +349,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.228910+00:00"
+      "extracted_at": "2026-03-25T22:18:28.696456+00:00"
     },
     {
       "id": "8cd9a8f80f846ae9",
@@ -378,7 +378,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.228950+00:00"
+      "extracted_at": "2026-03-25T22:18:28.696502+00:00"
     },
     {
       "id": "fa306ed9e6639745",
@@ -407,7 +407,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.228998+00:00"
+      "extracted_at": "2026-03-25T22:18:28.696560+00:00"
     },
     {
       "id": "421fe1fbb050e48e",
@@ -436,7 +436,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229037+00:00"
+      "extracted_at": "2026-03-25T22:18:28.696606+00:00"
     },
     {
       "id": "9d66aaa96e8467d9",
@@ -468,7 +468,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229075+00:00"
+      "extracted_at": "2026-03-25T22:18:28.696652+00:00"
     },
     {
       "id": "1720cf999f3bfed9",
@@ -497,7 +497,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229115+00:00"
+      "extracted_at": "2026-03-25T22:18:28.696719+00:00"
     },
     {
       "id": "4878bef6f4981da9",
@@ -526,7 +526,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229156+00:00"
+      "extracted_at": "2026-03-25T22:18:28.696901+00:00"
     },
     {
       "id": "5782d65b013277a9",
@@ -555,7 +555,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229197+00:00"
+      "extracted_at": "2026-03-25T22:18:28.696985+00:00"
     },
     {
       "id": "63ec8bd51a1d18c3",
@@ -584,7 +584,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229242+00:00"
+      "extracted_at": "2026-03-25T22:18:28.697050+00:00"
     },
     {
       "id": "a97991d7056e5e0f",
@@ -613,7 +613,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229282+00:00"
+      "extracted_at": "2026-03-25T22:18:28.697114+00:00"
     },
     {
       "id": "911d56fd2aebedaa",
@@ -642,7 +642,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229322+00:00"
+      "extracted_at": "2026-03-25T22:18:28.697176+00:00"
     },
     {
       "id": "3cf5495a154595df",
@@ -671,7 +671,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229360+00:00"
+      "extracted_at": "2026-03-25T22:18:28.697233+00:00"
     },
     {
       "id": "75833029255371de",
@@ -700,7 +700,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229396+00:00"
+      "extracted_at": "2026-03-25T22:18:28.697289+00:00"
     },
     {
       "id": "47ab47ad04d1e1ea",
@@ -729,7 +729,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229459+00:00"
+      "extracted_at": "2026-03-25T22:18:28.697655+00:00"
     },
     {
       "id": "87b12fc762160bf3",
@@ -758,7 +758,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229495+00:00"
+      "extracted_at": "2026-03-25T22:18:28.697774+00:00"
     },
     {
       "id": "3f573259643e9f3c",
@@ -787,7 +787,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229527+00:00"
+      "extracted_at": "2026-03-25T22:18:28.697843+00:00"
     },
     {
       "id": "2364d044dd896926",
@@ -816,7 +816,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229563+00:00"
+      "extracted_at": "2026-03-25T22:18:28.697945+00:00"
     },
     {
       "id": "4dc3d8384efe0d75",
@@ -845,7 +845,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229601+00:00"
+      "extracted_at": "2026-03-25T22:18:28.698341+00:00"
     },
     {
       "id": "145833b1feca2c2c",
@@ -874,7 +874,94 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229641+00:00"
+      "extracted_at": "2026-03-25T22:18:28.698471+00:00"
+    },
+    {
+      "id": "1033d39a2b282de5",
+      "type": "news",
+      "source_url": "https://seekingalpha.com/symbol/TSLA/news?source=feed_symbol_TSLA",
+      "source_author": "",
+      "title": "10th xAI cofounder departs ahead of SpaceX IPO: report",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 15:07:52 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.698866+00:00"
+    },
+    {
+      "id": "8143991c82a4477b",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/symbol/TSLA/news?source=feed_symbol_TSLA",
+      "source_author": "",
+      "title": "Tesla and SpaceX's Terafab project likely signals first step toward merger: Wedbush",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 11:58:42 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.698992+00:00"
+    },
+    {
+      "id": "a982a9de1e9f132a",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/article/4885714-tesla-optimus-is-a-distraction?source=feed_symbol_TSLA",
+      "source_author": "",
+      "title": "Tesla: Optimus Is A Distraction",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 09:17:53 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.699102+00:00"
     },
     {
       "id": "0b60ee935ad9bb59",
@@ -906,7 +993,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229679+00:00"
+      "extracted_at": "2026-03-25T22:18:28.699207+00:00"
     },
     {
       "id": "65275fe261757e99",
@@ -935,7 +1022,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229720+00:00"
+      "extracted_at": "2026-03-25T22:18:28.699270+00:00"
     },
     {
       "id": "3e9447659ab0af09",
@@ -964,7 +1051,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229759+00:00"
+      "extracted_at": "2026-03-25T22:18:28.699322+00:00"
     },
     {
       "id": "ea54d109ce88e14c",
@@ -993,7 +1080,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229800+00:00"
+      "extracted_at": "2026-03-25T22:18:28.699373+00:00"
     },
     {
       "id": "386b91ca744eb9a8",
@@ -1022,7 +1109,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229834+00:00"
+      "extracted_at": "2026-03-25T22:18:28.699417+00:00"
     },
     {
       "id": "291b6a1fc7be81ff",
@@ -1051,7 +1138,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229876+00:00"
+      "extracted_at": "2026-03-25T22:18:28.699561+00:00"
     },
     {
       "id": "c1369a8e2bac7610",
@@ -1080,7 +1167,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229915+00:00"
+      "extracted_at": "2026-03-25T22:18:28.699776+00:00"
     },
     {
       "id": "a8f7bfb849fe4d25",
@@ -1109,7 +1196,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229952+00:00"
+      "extracted_at": "2026-03-25T22:18:28.699889+00:00"
     },
     {
       "id": "027cfcbd3f86af80",
@@ -1138,7 +1225,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.229989+00:00"
+      "extracted_at": "2026-03-25T22:18:28.700053+00:00"
     },
     {
       "id": "a32429808d317654",
@@ -1167,7 +1254,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.230027+00:00"
+      "extracted_at": "2026-03-25T22:18:28.700130+00:00"
     },
     {
       "id": "0efc42f9988665b6",
@@ -1196,7 +1283,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.230065+00:00"
+      "extracted_at": "2026-03-25T22:18:28.700192+00:00"
     },
     {
       "id": "4e8d5d9504493483",
@@ -1225,7 +1312,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.230105+00:00"
+      "extracted_at": "2026-03-25T22:18:28.700254+00:00"
     },
     {
       "id": "8597ccdb99ac99be",
@@ -1254,7 +1341,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.230141+00:00"
+      "extracted_at": "2026-03-25T22:18:28.700337+00:00"
     },
     {
       "id": "63a4aa46d8d0ceff",
@@ -1283,7 +1370,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.230180+00:00"
+      "extracted_at": "2026-03-25T22:18:28.700586+00:00"
     },
     {
       "id": "f5ba65aad167ef61",
@@ -1312,7 +1399,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.230217+00:00"
+      "extracted_at": "2026-03-25T22:18:28.700646+00:00"
     },
     {
       "id": "7c2c14c5512d413e",
@@ -1344,7 +1431,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.230253+00:00"
+      "extracted_at": "2026-03-25T22:18:28.700702+00:00"
     },
     {
       "id": "e7a3e5fef39a72d5",
@@ -1373,7 +1460,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.230290+00:00"
+      "extracted_at": "2026-03-25T22:18:28.700765+00:00"
     },
     {
       "id": "04814cfecacfa0d3",
@@ -1402,7 +1489,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.230332+00:00"
+      "extracted_at": "2026-03-25T22:18:28.700817+00:00"
     },
     {
       "id": "706fa73de3bbb3f4",
@@ -1431,7 +1518,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.230371+00:00"
+      "extracted_at": "2026-03-25T22:18:28.700892+00:00"
     },
     {
       "id": "630825ed0ce89897",
@@ -1460,7 +1547,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.230406+00:00"
+      "extracted_at": "2026-03-25T22:18:28.700972+00:00"
     },
     {
       "id": "14709f3c70817c07",
@@ -1489,7 +1576,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.230636+00:00"
+      "extracted_at": "2026-03-25T22:18:28.701064+00:00"
     },
     {
       "id": "2a33bec0298ff277",
@@ -1518,7 +1605,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.230948+00:00"
+      "extracted_at": "2026-03-25T22:18:28.701123+00:00"
     },
     {
       "id": "1750bd59a856ba9d",
@@ -1547,7 +1634,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231032+00:00"
+      "extracted_at": "2026-03-25T22:18:28.701182+00:00"
     },
     {
       "id": "b81adce13ef178ff",
@@ -1576,7 +1663,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231068+00:00"
+      "extracted_at": "2026-03-25T22:18:28.701233+00:00"
     },
     {
       "id": "1027cf7cf6d78fcb",
@@ -1605,7 +1692,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231110+00:00"
+      "extracted_at": "2026-03-25T22:18:28.701294+00:00"
     },
     {
       "id": "f6eca40bc3db1cda",
@@ -1637,7 +1724,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231150+00:00"
+      "extracted_at": "2026-03-25T22:18:28.701351+00:00"
     },
     {
       "id": "c0db5c7c15358c2e",
@@ -1666,14 +1753,14 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231187+00:00"
+      "extracted_at": "2026-03-25T22:18:28.701404+00:00"
     },
     {
-      "id": "3518b347a5650516",
+      "id": "02375d7b32749ea2",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/TSLA/news?source=feed_symbol_TSLA",
+      "source_url": "https://seekingalpha.com/article/4885905-nvidia-sky-isnt-the-limit-anymore?source=feed_symbol_NVDA",
       "source_author": "",
-      "title": "China's auto sales fall sharply in February as subsidies fade",
+      "title": "Nvidia: Sky Isn't The Limit... Anymore",
       "body": "",
       "ticker_or_market": "",
       "direction": "neutral",
@@ -1690,23 +1777,23 @@
       "raw_data": {
         "all_tickers": [],
         "author": "",
-        "published": "Wed, 11 Mar 2026 05:55:18 -0400",
+        "published": "Wed, 25 Mar 2026 17:10:53 -0400",
         "source": "rss",
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231225+00:00"
+      "extracted_at": "2026-03-25T22:18:28.701454+00:00"
     },
     {
-      "id": "4d4f2e11cf2f477f",
+      "id": "3c7ff182102c4623",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4880921-tesla-stock-2026-2028-window-will-determine-its-fate?source=feed_symbol_TSLA",
+      "source_url": "https://seekingalpha.com/article/4885851-wall-street-lunch-huang-zuckerberg-ellison-join-trumps-tech-council?source=feed_symbol_NVDA",
       "source_author": "",
-      "title": "Tesla: 2026-2028 Window Should Determine Its Fate (Downgrade)",
+      "title": "Wall Street Lunch: Huang, Zuckerberg, Ellison Join Trump's Tech Council",
       "body": "",
       "ticker_or_market": "",
-      "direction": "bearish",
-      "confidence": 0.56,
+      "direction": "neutral",
+      "confidence": 0.1,
       "urgency": "days",
       "engagement": {
         "comments": 0,
@@ -1719,23 +1806,23 @@
       "raw_data": {
         "all_tickers": [],
         "author": "",
-        "published": "Wed, 11 Mar 2026 05:27:38 -0400",
+        "published": "Wed, 25 Mar 2026 14:27:21 -0400",
         "source": "rss",
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231265+00:00"
+      "extracted_at": "2026-03-25T22:18:28.701582+00:00"
     },
     {
-      "id": "6cbcc16085cad6ae",
-      "type": "earnings",
-      "source_url": "https://seekingalpha.com/symbol/TSLA/news?source=feed_symbol_TSLA",
+      "id": "6c582f9fd47e079a",
+      "type": "news",
+      "source_url": "https://seekingalpha.com/symbol/NVDA/news?source=feed_symbol_NVDA",
       "source_author": "",
-      "title": "xAI secures permit to build gas-fired plant in Mississippi to power data centers: report",
+      "title": "AMD, Intel lead chip stocks higher amid reports of price hikes",
       "body": "",
       "ticker_or_market": "",
-      "direction": "bearish",
-      "confidence": 0.56,
+      "direction": "neutral",
+      "confidence": 0.1,
       "urgency": "days",
       "engagement": {
         "comments": 0,
@@ -1743,18 +1830,104 @@
         "shares": 0
       },
       "tags": [
-        "earnings",
         "seekingalpha"
       ],
       "raw_data": {
         "all_tickers": [],
         "author": "",
-        "published": "Tue, 10 Mar 2026 15:59:43 -0400",
+        "published": "Wed, 25 Mar 2026 11:22:14 -0400",
         "source": "rss",
-        "earnings_related": true,
+        "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231305+00:00"
+      "extracted_at": "2026-03-25T22:18:28.701662+00:00"
+    },
+    {
+      "id": "003be2f624f4315e",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/symbol/NVDA/news?source=feed_symbol_NVDA",
+      "source_author": "",
+      "title": "Jensen Huang, Mark Zuckerberg among Trump's tech council",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 10:41:38 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.701708+00:00"
+    },
+    {
+      "id": "3695904edf0cefff",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/symbol/NVDA/news?source=feed_symbol_NVDA",
+      "source_author": "",
+      "title": "SLB, Nvidia expand partnership to develop AI for energy industry",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 09:57:46 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.701754+00:00"
+    },
+    {
+      "id": "62e3018f0bc63c85",
+      "type": "strategy",
+      "source_url": "https://seekingalpha.com/symbol/NVDA/news?source=feed_symbol_NVDA",
+      "source_author": "",
+      "title": "Exxon Mobil tops Nvidia in valuation amid the ongoing Middle East conflict",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 09:20:06 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.701799+00:00"
     },
     {
       "id": "39f34d34095cc631",
@@ -1783,7 +1956,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231345+00:00"
+      "extracted_at": "2026-03-25T22:18:28.701849+00:00"
     },
     {
       "id": "4433b432b0a131ee",
@@ -1812,7 +1985,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231379+00:00"
+      "extracted_at": "2026-03-25T22:18:28.701893+00:00"
     },
     {
       "id": "c177676538b08b48",
@@ -1841,7 +2014,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231417+00:00"
+      "extracted_at": "2026-03-25T22:18:28.701953+00:00"
     },
     {
       "id": "a4bc0a15064b90b4",
@@ -1873,7 +2046,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231455+00:00"
+      "extracted_at": "2026-03-25T22:18:28.702042+00:00"
     },
     {
       "id": "27a18adcfbb96bfb",
@@ -1902,7 +2075,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231493+00:00"
+      "extracted_at": "2026-03-25T22:18:28.702148+00:00"
     },
     {
       "id": "ee2f5c899b7b9058",
@@ -1931,7 +2104,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231531+00:00"
+      "extracted_at": "2026-03-25T22:18:28.702209+00:00"
     },
     {
       "id": "f562605efa7f08d9",
@@ -1960,7 +2133,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231570+00:00"
+      "extracted_at": "2026-03-25T22:18:28.702306+00:00"
     },
     {
       "id": "c663bd8b3033962f",
@@ -1989,7 +2162,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231608+00:00"
+      "extracted_at": "2026-03-25T22:18:28.702374+00:00"
     },
     {
       "id": "62cbde2383d27146",
@@ -2018,7 +2191,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231646+00:00"
+      "extracted_at": "2026-03-25T22:18:28.702422+00:00"
     },
     {
       "id": "d4cf7f1d2210e448",
@@ -2047,7 +2220,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231685+00:00"
+      "extracted_at": "2026-03-25T22:18:28.702475+00:00"
     },
     {
       "id": "4454fc2b74b1144a",
@@ -2076,7 +2249,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231725+00:00"
+      "extracted_at": "2026-03-25T22:18:28.702525+00:00"
     },
     {
       "id": "7a1503872ea5e033",
@@ -2105,7 +2278,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231760+00:00"
+      "extracted_at": "2026-03-25T22:18:28.702638+00:00"
     },
     {
       "id": "be44e047bc4c5365",
@@ -2134,7 +2307,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231804+00:00"
+      "extracted_at": "2026-03-25T22:18:28.702745+00:00"
     },
     {
       "id": "f0bb5ee93130ad4a",
@@ -2163,7 +2336,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231841+00:00"
+      "extracted_at": "2026-03-25T22:18:28.702817+00:00"
     },
     {
       "id": "68e1b1c2873e4b82",
@@ -2192,7 +2365,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231905+00:00"
+      "extracted_at": "2026-03-25T22:18:28.702908+00:00"
     },
     {
       "id": "96ceb58782fc9096",
@@ -2221,7 +2394,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231945+00:00"
+      "extracted_at": "2026-03-25T22:18:28.702970+00:00"
     },
     {
       "id": "3d505df4607dec76",
@@ -2250,7 +2423,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.231982+00:00"
+      "extracted_at": "2026-03-25T22:18:28.703026+00:00"
     },
     {
       "id": "c11a5456cee5b583",
@@ -2279,7 +2452,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.232023+00:00"
+      "extracted_at": "2026-03-25T22:18:28.703122+00:00"
     },
     {
       "id": "1ac622261c3c252f",
@@ -2308,7 +2481,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.232061+00:00"
+      "extracted_at": "2026-03-25T22:18:28.703191+00:00"
     },
     {
       "id": "b8be3f12f64a9dfa",
@@ -2337,7 +2510,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.232096+00:00"
+      "extracted_at": "2026-03-25T22:18:28.703321+00:00"
     },
     {
       "id": "956edc8f5c9a9ba8",
@@ -2369,7 +2542,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.232135+00:00"
+      "extracted_at": "2026-03-25T22:18:28.703611+00:00"
     },
     {
       "id": "5f2f51088a0c8fe3",
@@ -2398,43 +2571,14 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.232172+00:00"
+      "extracted_at": "2026-03-25T22:18:28.703666+00:00"
     },
     {
-      "id": "7ba8fa23f3b2b38b",
+      "id": "95e1c5aa4bfbbf9b",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/NVDA/news?source=feed_symbol_NVDA",
+      "source_url": "https://seekingalpha.com/symbol/MSFT/news?source=feed_symbol_MSFT",
       "source_author": "",
-      "title": "Nvidia in spotlight as BofA reiterates Buy rating after analyst session at GTC",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "bullish",
-      "confidence": 0.56,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Wed, 18 Mar 2026 09:26:39 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.232215+00:00"
-    },
-    {
-      "id": "fd32b2d1a42b807a",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/NVDA/news?source=feed_symbol_NVDA",
-      "source_author": "",
-      "title": "Nvidia may have replaced Amphenol in Kyber product with Foxconn Interconnect: GF",
+      "title": "Microsoft 365, Copilot narratives need to improve for stock to move higher: UBS",
       "body": "",
       "ticker_or_market": "",
       "direction": "neutral",
@@ -2451,106 +2595,19 @@
       "raw_data": {
         "all_tickers": [],
         "author": "",
-        "published": "Wed, 18 Mar 2026 08:42:32 -0400",
+        "published": "Wed, 25 Mar 2026 13:32:15 -0400",
         "source": "rss",
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.232256+00:00"
+      "extracted_at": "2026-03-25T22:18:28.703749+00:00"
     },
     {
-      "id": "019dda035f296a9c",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4883436-nvidia-why-this-stock-refuses-to-go-up-and-what-you-can-do-about-it?source=feed_symbol_NVDA",
-      "source_author": "",
-      "title": "Nvidia: Why This Stock Refuses To Go Up And What You Can Do About It",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Wed, 18 Mar 2026 07:15:14 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.232441+00:00"
-    },
-    {
-      "id": "76a6c897f49b4e58",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4883532-chart-of-day-why-wasnt-1-trillion-enough?source=feed_symbol_NVDA",
-      "source_author": "",
-      "title": "Chart Of The Day: Why Wasn't $1 Trillion Enough?",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Wed, 18 Mar 2026 06:30:00 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.232608+00:00"
-    },
-    {
-      "id": "3a6eda6e8c0e21a4",
+      "id": "6f30322c059ad75a",
       "type": "news",
-      "source_url": "https://seekingalpha.com/symbol/NVDA/news?source=feed_symbol_NVDA",
+      "source_url": "https://seekingalpha.com/symbol/MSFT/news?source=feed_symbol_MSFT",
       "source_author": "",
-      "title": "Nvidia gets China's approval to sell H200 chips: report",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "bearish",
-      "confidence": 0.56,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Wed, 18 Mar 2026 05:21:12 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.232697+00:00"
-    },
-    {
-      "id": "7588abea2924275a",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/NVDA/news?source=feed_symbol_NVDA",
-      "source_author": "",
-      "title": "Nvidia CEO Jensen Huang: OpenClaw is \u201cdefinitely the next ChatGPT,\u201d China stocks respond",
+      "title": "Microsoft revamps HR department: report",
       "body": "",
       "ticker_or_market": "",
       "direction": "neutral",
@@ -2567,12 +2624,41 @@
       "raw_data": {
         "all_tickers": [],
         "author": "",
-        "published": "Wed, 18 Mar 2026 01:56:37 -0400",
+        "published": "Wed, 25 Mar 2026 12:16:59 -0400",
         "source": "rss",
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.232777+00:00"
+      "extracted_at": "2026-03-25T22:18:28.703816+00:00"
+    },
+    {
+      "id": "4c1e57254acc2833",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/article/4885361-microsoft-fortress-balance-sheet-deep-value?source=feed_symbol_MSFT",
+      "source_author": "",
+      "title": "Microsoft: Fortress Balance Sheet, Deep Value",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 08:00:00 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.703870+00:00"
     },
     {
       "id": "7ac8cd9f42ea4f33",
@@ -2601,7 +2687,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.232853+00:00"
+      "extracted_at": "2026-03-25T22:18:28.703971+00:00"
     },
     {
       "id": "96993dfa11b471cd",
@@ -2630,7 +2716,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.232902+00:00"
+      "extracted_at": "2026-03-25T22:18:28.704069+00:00"
     },
     {
       "id": "8e051fffe6d4af9e",
@@ -2659,7 +2745,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.232943+00:00"
+      "extracted_at": "2026-03-25T22:18:28.704183+00:00"
     },
     {
       "id": "7808467cb6c6b8ff",
@@ -2688,7 +2774,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.232986+00:00"
+      "extracted_at": "2026-03-25T22:18:28.704364+00:00"
     },
     {
       "id": "ab57714be3f3d4d8",
@@ -2717,7 +2803,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233031+00:00"
+      "extracted_at": "2026-03-25T22:18:28.704463+00:00"
     },
     {
       "id": "9d93d40ccbd78961",
@@ -2746,7 +2832,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233079+00:00"
+      "extracted_at": "2026-03-25T22:18:28.704580+00:00"
     },
     {
       "id": "e014abc866f6c65f",
@@ -2775,7 +2861,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233113+00:00"
+      "extracted_at": "2026-03-25T22:18:28.704633+00:00"
     },
     {
       "id": "7ea690a67e8217e3",
@@ -2804,7 +2890,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233152+00:00"
+      "extracted_at": "2026-03-25T22:18:28.704681+00:00"
     },
     {
       "id": "d5c8cbd7c999d229",
@@ -2833,7 +2919,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233188+00:00"
+      "extracted_at": "2026-03-25T22:18:28.704727+00:00"
     },
     {
       "id": "163160dae409dcb5",
@@ -2862,7 +2948,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233229+00:00"
+      "extracted_at": "2026-03-25T22:18:28.704775+00:00"
     },
     {
       "id": "7f65e46030e37e82",
@@ -2891,7 +2977,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233269+00:00"
+      "extracted_at": "2026-03-25T22:18:28.704851+00:00"
     },
     {
       "id": "0d70c894a07feb96",
@@ -2920,7 +3006,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233308+00:00"
+      "extracted_at": "2026-03-25T22:18:28.704904+00:00"
     },
     {
       "id": "fa0ce3f5d718fcd6",
@@ -2949,7 +3035,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233350+00:00"
+      "extracted_at": "2026-03-25T22:18:28.705023+00:00"
     },
     {
       "id": "90d717fb4fa4610a",
@@ -2978,7 +3064,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233382+00:00"
+      "extracted_at": "2026-03-25T22:18:28.705080+00:00"
     },
     {
       "id": "226060257b48e913",
@@ -3007,7 +3093,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233440+00:00"
+      "extracted_at": "2026-03-25T22:18:28.705138+00:00"
     },
     {
       "id": "c9c5e11d223e8462",
@@ -3036,7 +3122,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233500+00:00"
+      "extracted_at": "2026-03-25T22:18:28.705200+00:00"
     },
     {
       "id": "5a973258a74f381e",
@@ -3065,7 +3151,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233544+00:00"
+      "extracted_at": "2026-03-25T22:18:28.705260+00:00"
     },
     {
       "id": "d6d94f7e9c704906",
@@ -3094,7 +3180,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233598+00:00"
+      "extracted_at": "2026-03-25T22:18:28.705337+00:00"
     },
     {
       "id": "dbb7eba5e03bc49c",
@@ -3123,7 +3209,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233641+00:00"
+      "extracted_at": "2026-03-25T22:18:28.705402+00:00"
     },
     {
       "id": "5952e52f52f73ecc",
@@ -3152,7 +3238,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233684+00:00"
+      "extracted_at": "2026-03-25T22:18:28.705463+00:00"
     },
     {
       "id": "5dce7660baa622f0",
@@ -3181,7 +3267,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233723+00:00"
+      "extracted_at": "2026-03-25T22:18:28.705521+00:00"
     },
     {
       "id": "30afc7f5d0264007",
@@ -3213,7 +3299,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233763+00:00"
+      "extracted_at": "2026-03-25T22:18:28.705577+00:00"
     },
     {
       "id": "62ce18f5625271cf",
@@ -3242,7 +3328,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233804+00:00"
+      "extracted_at": "2026-03-25T22:18:28.705634+00:00"
     },
     {
       "id": "c520577af965ee49",
@@ -3271,7 +3357,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233844+00:00"
+      "extracted_at": "2026-03-25T22:18:28.705692+00:00"
     },
     {
       "id": "a8d3adab50decc57",
@@ -3300,7 +3386,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233886+00:00"
+      "extracted_at": "2026-03-25T22:18:28.705753+00:00"
     },
     {
       "id": "2f5360c3d17ac48a",
@@ -3329,7 +3415,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233921+00:00"
+      "extracted_at": "2026-03-25T22:18:28.705804+00:00"
     },
     {
       "id": "580b5338e196fde8",
@@ -3358,14 +3444,48 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.233967+00:00"
+      "extracted_at": "2026-03-25T22:18:28.705863+00:00"
     },
     {
-      "id": "6ef7fed183840e25",
+      "id": "d1974967910ad54c",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4882369-microsoft-the-bears-get-one-thing-right-but-one-totally-wrong?source=feed_symbol_MSFT",
+      "source_url": "https://seekingalpha.com/symbol/GOOGL/news?source=feed_symbol_GOOGL",
       "source_author": "",
-      "title": "Microsoft: The Bears Get One Thing Right But One Totally Wrong",
+      "title": "LA jury finds Meta, Google liable for inducing social media addiction in young woman",
+      "body": "",
+      "ticker_or_market": "GOOGL",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "$GOOGL",
+        "$META",
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [
+          "GOOGL",
+          "META"
+        ],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 14:16:40 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.705969+00:00"
+    },
+    {
+      "id": "7cabee9e1b4f6d1d",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/article/4885800-alphabet-quietly-entered-a-multibillion-dollar-market-last-week?source=feed_symbol_GOOGL",
+      "source_author": "",
+      "title": "Alphabet Quietly Entered A Multibillion-Dollar Market Last Week",
       "body": "",
       "ticker_or_market": "",
       "direction": "neutral",
@@ -3382,21 +3502,21 @@
       "raw_data": {
         "all_tickers": [],
         "author": "",
-        "published": "Sat, 14 Mar 2026 09:00:00 -0400",
+        "published": "Wed, 25 Mar 2026 12:22:33 -0400",
         "source": "rss",
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.234005+00:00"
+      "extracted_at": "2026-03-25T22:18:28.706040+00:00"
     },
     {
-      "id": "cccd0fc38157ac18",
+      "id": "88d73333c43648ce",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/MSFT/news?source=feed_symbol_MSFT",
+      "source_url": "https://seekingalpha.com/symbol/GOOGL/news?source=feed_symbol_GOOGL",
       "source_author": "",
-      "title": "Microsoft becomes first cloud provider to begin validating Nvidia's Vera Rubin NVL72 system",
+      "title": "SentinelOne collabs with Google Cloud to provide AI-powered security on global scale",
       "body": "",
-      "ticker_or_market": "",
+      "ticker_or_market": "GOOGL",
       "direction": "neutral",
       "confidence": 0.1,
       "urgency": "days",
@@ -3406,26 +3526,29 @@
         "shares": 0
       },
       "tags": [
+        "$GOOGL",
         "seekingalpha"
       ],
       "raw_data": {
-        "all_tickers": [],
+        "all_tickers": [
+          "GOOGL"
+        ],
         "author": "",
-        "published": "Fri, 13 Mar 2026 15:34:46 -0400",
+        "published": "Wed, 25 Mar 2026 12:21:45 -0400",
         "source": "rss",
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.234047+00:00"
+      "extracted_at": "2026-03-25T22:18:28.706105+00:00"
     },
     {
-      "id": "c5fec8ffae23b92b",
+      "id": "29a2aae74513c2d4",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4881901-microsoft-saascloud-winner-with-rule-of-37-3-percent-outperformance?source=feed_symbol_MSFT",
+      "source_url": "https://seekingalpha.com/symbol/GOOGL/news?source=feed_symbol_GOOGL",
       "source_author": "",
-      "title": "Microsoft: SaaS/Cloud Winner With Rule Of 37.3% Outperformance",
+      "title": "Google boosts music-focused Lyria AI models with ability to create longer music",
       "body": "",
-      "ticker_or_market": "",
+      "ticker_or_market": "GOOGL",
       "direction": "bullish",
       "confidence": 0.56,
       "urgency": "days",
@@ -3435,17 +3558,115 @@
         "shares": 0
       },
       "tags": [
+        "$GOOGL",
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [
+          "GOOGL"
+        ],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 12:15:59 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.706171+00:00"
+    },
+    {
+      "id": "cca1789f1b955178",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/symbol/GOOGL/news?source=feed_symbol_GOOGL",
+      "source_author": "",
+      "title": "Google reveals algorithms to address AI memory challenges; memory and storage stocks drop",
+      "body": "",
+      "ticker_or_market": "GOOGL",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "$GOOGL",
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [
+          "GOOGL"
+        ],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 10:10:23 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.706263+00:00"
+    },
+    {
+      "id": "4f7c66b607823fa1",
+      "type": "news",
+      "source_url": "https://seekingalpha.com/symbol/GOOGL/news?source=feed_symbol_GOOGL",
+      "source_author": "",
+      "title": "Adani in talks with Meta, Google for data center partnerships: report",
+      "body": "",
+      "ticker_or_market": "GOOGL",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "$GOOGL",
+        "$META",
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [
+          "GOOGL",
+          "META"
+        ],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 10:10:05 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.706885+00:00"
+    },
+    {
+      "id": "a0206a078e888853",
+      "type": "prediction",
+      "source_url": "https://seekingalpha.com/symbol/GOOGL/news?source=feed_symbol_GOOGL",
+      "source_author": "",
+      "title": "Broadcom in focus as GF Securities ups price target on higher TPU shipments",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
         "seekingalpha"
       ],
       "raw_data": {
         "all_tickers": [],
         "author": "",
-        "published": "Fri, 13 Mar 2026 09:00:00 -0400",
+        "published": "Wed, 25 Mar 2026 07:41:15 -0400",
         "source": "rss",
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.234085+00:00"
+      "extracted_at": "2026-03-25T22:18:28.706955+00:00"
     },
     {
       "id": "7a87169598041bfa",
@@ -3474,7 +3695,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.234124+00:00"
+      "extracted_at": "2026-03-25T22:18:28.707127+00:00"
     },
     {
       "id": "eb9cfe3a24fae4ba",
@@ -3506,7 +3727,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.234162+00:00"
+      "extracted_at": "2026-03-25T22:18:28.707487+00:00"
     },
     {
       "id": "93fedec70a02e2fd",
@@ -3535,7 +3756,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.234200+00:00"
+      "extracted_at": "2026-03-25T22:18:28.707570+00:00"
     },
     {
       "id": "4e6004f80a7d41eb",
@@ -3567,7 +3788,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.234239+00:00"
+      "extracted_at": "2026-03-25T22:18:28.707714+00:00"
     },
     {
       "id": "d1b9455f2103d644",
@@ -3596,7 +3817,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.234285+00:00"
+      "extracted_at": "2026-03-25T22:18:28.707827+00:00"
     },
     {
       "id": "5d59549e66217b83",
@@ -3628,7 +3849,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.234325+00:00"
+      "extracted_at": "2026-03-25T22:18:28.707942+00:00"
     },
     {
       "id": "bcbac8961052db3c",
@@ -3660,7 +3881,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.234368+00:00"
+      "extracted_at": "2026-03-25T22:18:28.708030+00:00"
     },
     {
       "id": "c870fbaa404a8044",
@@ -3692,7 +3913,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.234405+00:00"
+      "extracted_at": "2026-03-25T22:18:28.708094+00:00"
     },
     {
       "id": "87eb6b00b88588b2",
@@ -3724,7 +3945,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.234450+00:00"
+      "extracted_at": "2026-03-25T22:18:28.708166+00:00"
     },
     {
       "id": "3a8e5ca41efceb9f",
@@ -3753,7 +3974,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.234490+00:00"
+      "extracted_at": "2026-03-25T22:18:28.708226+00:00"
     },
     {
       "id": "30e4057516bd4ca4",
@@ -3782,7 +4003,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.234528+00:00"
+      "extracted_at": "2026-03-25T22:18:28.708282+00:00"
     },
     {
       "id": "70dc3c803de94d90",
@@ -3811,7 +4032,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.234571+00:00"
+      "extracted_at": "2026-03-25T22:18:28.708391+00:00"
     },
     {
       "id": "8216ede3378834a7",
@@ -3843,7 +4064,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.234633+00:00"
+      "extracted_at": "2026-03-25T22:18:28.708511+00:00"
     },
     {
       "id": "6fb90c0c127e4d83",
@@ -3875,7 +4096,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.234667+00:00"
+      "extracted_at": "2026-03-25T22:18:28.708563+00:00"
     },
     {
       "id": "63f5fda4b71d153e",
@@ -3909,78 +4130,14 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.234751+00:00"
+      "extracted_at": "2026-03-25T22:18:28.708628+00:00"
     },
     {
-      "id": "dd132994f5730894",
+      "id": "5050a232507789a6",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/GOOGL/news?source=feed_symbol_GOOGL",
+      "source_url": "https://seekingalpha.com/article/4885893-the-ai-chip-split-and-why-amazon-is-on-the-right-side?source=feed_symbol_AMZN",
       "source_author": "",
-      "title": "Canal+ to use Google's AI to produce videos, recommend content",
-      "body": "",
-      "ticker_or_market": "GOOGL",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "$GOOGL",
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [
-          "GOOGL"
-        ],
-        "author": "",
-        "published": "Wed, 11 Mar 2026 04:52:27 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.234808+00:00"
-    },
-    {
-      "id": "a15055bb1eb8272e",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/GOOGL/news?source=feed_symbol_GOOGL",
-      "source_author": "",
-      "title": "Google unveils new multimodal Gemini Embedding 2 model",
-      "body": "",
-      "ticker_or_market": "GOOGL",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "$GOOGL",
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [
-          "GOOGL"
-        ],
-        "author": "",
-        "published": "Tue, 10 Mar 2026 12:31:59 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.234847+00:00"
-    },
-    {
-      "id": "4dde4354b7d8ea1c",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/GOOGL/news?source=feed_symbol_GOOGL",
-      "source_author": "",
-      "title": "YouTube is now the world's largest media company - MoffettNathanson",
+      "title": "The AI Chip Split - And Why Amazon Is On The Right Side",
       "body": "",
       "ticker_or_market": "",
       "direction": "neutral",
@@ -3997,23 +4154,23 @@
       "raw_data": {
         "all_tickers": [],
         "author": "",
-        "published": "Tue, 10 Mar 2026 06:41:56 -0400",
+        "published": "Wed, 25 Mar 2026 16:26:04 -0400",
         "source": "rss",
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.234887+00:00"
+      "extracted_at": "2026-03-25T22:18:28.708681+00:00"
     },
     {
-      "id": "411119c9352d0248",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/GOOGL/news?source=feed_symbol_GOOGL",
+      "id": "47bb19c994b69bd8",
+      "type": "earnings",
+      "source_url": "https://seekingalpha.com/symbol/AMZN/news?source=feed_symbol_AMZN",
       "source_author": "",
-      "title": "Alphabet offers CEO pay deal worth up to $692M with stock price, Waymo incentives",
+      "title": "Amazon sees bullish views at Citi on AWS revenue forecast driven by AI tailwinds",
       "body": "",
       "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
+      "direction": "bullish",
+      "confidence": 0.56,
       "urgency": "days",
       "engagement": {
         "comments": 0,
@@ -4021,170 +4178,18 @@
         "shares": 0
       },
       "tags": [
+        "earnings",
         "seekingalpha"
       ],
       "raw_data": {
         "all_tickers": [],
         "author": "",
-        "published": "Mon, 09 Mar 2026 04:24:27 -0400",
+        "published": "Wed, 25 Mar 2026 09:01:09 -0400",
         "source": "rss",
-        "earnings_related": false,
+        "earnings_related": true,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.234933+00:00"
-    },
-    {
-      "id": "d351fd55f483973b",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/GOOGL/news?source=feed_symbol_GOOGL",
-      "source_author": "",
-      "title": "AI space race: BNP predicts Google, Amazon, Meta among first to test orbital data centers",
-      "body": "",
-      "ticker_or_market": "GOOGL",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "$GOOGL",
-        "$META",
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [
-          "GOOGL",
-          "META"
-        ],
-        "author": "",
-        "published": "Sat, 07 Mar 2026 08:00:35 -0500",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.234978+00:00"
-    },
-    {
-      "id": "7fa7bcabb91b058e",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/GOOGL/news?source=feed_symbol_GOOGL",
-      "source_author": "",
-      "title": "Microsoft, Google, Amazon say Anthropic products still available despite Pentagon blacklist",
-      "body": "",
-      "ticker_or_market": "GOOGL",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "$GOOGL",
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [
-          "GOOGL"
-        ],
-        "author": "",
-        "published": "Fri, 06 Mar 2026 14:58:03 -0500",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.235020+00:00"
-    },
-    {
-      "id": "b8c82ff20d346e59",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/GOOGL/news?source=feed_symbol_GOOGL",
-      "source_author": "",
-      "title": "Gemini, Claude continue to gain share at expense of ChatGPT, BNP survey finds",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Fri, 06 Mar 2026 14:11:57 -0500",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.235059+00:00"
-    },
-    {
-      "id": "cfb724d1e6e8b325",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4879478-alphabet-apple-ai-deal-is-the-biggest-blind-spot?source=feed_symbol_GOOGL",
-      "source_author": "",
-      "title": "Alphabet: Apple AI Deal Is The Biggest Blind Spot",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Fri, 06 Mar 2026 10:16:59 -0500",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.235101+00:00"
-    },
-    {
-      "id": "93e894dfb45c98bf",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/GOOGL/news?source=feed_symbol_GOOGL",
-      "source_author": "",
-      "title": "Dividend Roundup: Broadcom, American Express, Alphabet, Coca-Cola, and more",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Fri, 06 Mar 2026 08:31:05 -0500",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.235139+00:00"
+      "extracted_at": "2026-03-25T22:18:28.708736+00:00"
     },
     {
       "id": "3029d02131bde499",
@@ -4213,7 +4218,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.235175+00:00"
+      "extracted_at": "2026-03-25T22:18:28.708788+00:00"
     },
     {
       "id": "d481db147b2976f0",
@@ -4242,7 +4247,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.235213+00:00"
+      "extracted_at": "2026-03-25T22:18:28.708845+00:00"
     },
     {
       "id": "a89174e6393cd103",
@@ -4271,7 +4276,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.235251+00:00"
+      "extracted_at": "2026-03-25T22:18:28.708900+00:00"
     },
     {
       "id": "4774e3ee3949fe93",
@@ -4300,7 +4305,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.235290+00:00"
+      "extracted_at": "2026-03-25T22:18:28.708954+00:00"
     },
     {
       "id": "1aeb2a5ae6b59cac",
@@ -4329,7 +4334,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.235327+00:00"
+      "extracted_at": "2026-03-25T22:18:28.709009+00:00"
     },
     {
       "id": "1d8b56bab5764c75",
@@ -4358,7 +4363,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.235367+00:00"
+      "extracted_at": "2026-03-25T22:18:28.709064+00:00"
     },
     {
       "id": "451211e0be84cd05",
@@ -4387,7 +4392,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.235410+00:00"
+      "extracted_at": "2026-03-25T22:18:28.709124+00:00"
     },
     {
       "id": "9b4e71ccd8ae7150",
@@ -4416,7 +4421,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.235450+00:00"
+      "extracted_at": "2026-03-25T22:18:28.709181+00:00"
     },
     {
       "id": "30361d98de3356c1",
@@ -4445,7 +4450,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.244779+00:00"
+      "extracted_at": "2026-03-25T22:18:28.733028+00:00"
     },
     {
       "id": "a665fee281e41b35",
@@ -4474,7 +4479,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.244864+00:00"
+      "extracted_at": "2026-03-25T22:18:28.733233+00:00"
     },
     {
       "id": "97213bfe87d71601",
@@ -4503,7 +4508,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.244906+00:00"
+      "extracted_at": "2026-03-25T22:18:28.733360+00:00"
     },
     {
       "id": "0e7f10a93bef2cc7",
@@ -4532,7 +4537,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.245034+00:00"
+      "extracted_at": "2026-03-25T22:18:28.733446+00:00"
     },
     {
       "id": "b882a4584554ead4",
@@ -4561,7 +4566,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.245113+00:00"
+      "extracted_at": "2026-03-25T22:18:28.733658+00:00"
     },
     {
       "id": "53f02f89c8c112e3",
@@ -4590,7 +4595,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.245161+00:00"
+      "extracted_at": "2026-03-25T22:18:28.733824+00:00"
     },
     {
       "id": "79c8e785cabc2d81",
@@ -4619,7 +4624,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.245206+00:00"
+      "extracted_at": "2026-03-25T22:18:28.733892+00:00"
     },
     {
       "id": "122c40047c21b007",
@@ -4648,7 +4653,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.245242+00:00"
+      "extracted_at": "2026-03-25T22:18:28.733941+00:00"
     },
     {
       "id": "a32899c1379a6597",
@@ -4677,7 +4682,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.245336+00:00"
+      "extracted_at": "2026-03-25T22:18:28.734004+00:00"
     },
     {
       "id": "1985e5bb1909027a",
@@ -4706,7 +4711,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.246650+00:00"
+      "extracted_at": "2026-03-25T22:18:28.734401+00:00"
     },
     {
       "id": "e2b233ad285208aa",
@@ -4735,7 +4740,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.246844+00:00"
+      "extracted_at": "2026-03-25T22:18:28.734475+00:00"
     },
     {
       "id": "9784d7d37289f55d",
@@ -4764,7 +4769,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.246900+00:00"
+      "extracted_at": "2026-03-25T22:18:28.734536+00:00"
     },
     {
       "id": "75219e83eb844463",
@@ -4793,45 +4798,16 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.247128+00:00"
+      "extracted_at": "2026-03-25T22:18:28.734601+00:00"
     },
     {
-      "id": "849cb18408ffada3",
+      "id": "63bea329566af111",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4882477-amazon-is-paying-today-for-margins-tomorrow?source=feed_symbol_AMZN",
+      "source_url": "https://seekingalpha.com/symbol/META/news?source=feed_symbol_META",
       "source_author": "",
-      "title": "Amazon Is Paying Today For Margins Tomorrow",
+      "title": "Meta to cut 'a few hundred' jobs across the board, including at Reality Labs",
       "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "hours",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Sat, 14 Mar 2026 09:46:40 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.247652+00:00"
-    },
-    {
-      "id": "28076a9fe282339b",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/AMZN/news?source=feed_symbol_AMZN",
-      "source_author": "",
-      "title": "Amazon to charge for 'Prime Video Ultra' separately in the U.S.",
-      "body": "",
-      "ticker_or_market": "",
+      "ticker_or_market": "META",
       "direction": "neutral",
       "confidence": 0.1,
       "urgency": "days",
@@ -4841,17 +4817,84 @@
         "shares": 0
       },
       "tags": [
+        "$META",
         "seekingalpha"
       ],
       "raw_data": {
-        "all_tickers": [],
+        "all_tickers": [
+          "META"
+        ],
         "author": "",
-        "published": "Fri, 13 Mar 2026 11:45:29 -0400",
+        "published": "Wed, 25 Mar 2026 10:04:43 -0400",
         "source": "rss",
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.247824+00:00"
+      "extracted_at": "2026-03-25T22:18:28.734665+00:00"
+    },
+    {
+      "id": "84957c250d21ce4d",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/symbol/META/news?source=feed_symbol_META",
+      "source_author": "",
+      "title": "Meta launches small business initiative to boost entrepreneurship, AI adoption",
+      "body": "",
+      "ticker_or_market": "META",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "$META",
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [
+          "META"
+        ],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 09:16:46 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.734726+00:00"
+    },
+    {
+      "id": "8ce347f8f091385e",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/symbol/META/news?source=feed_symbol_META",
+      "source_author": "",
+      "title": "Meta promises hefty payout to top brass if market cap hits $9T by 2031",
+      "body": "",
+      "ticker_or_market": "META",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "$META",
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [
+          "META"
+        ],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 08:40:13 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.734785+00:00"
     },
     {
       "id": "ffe8ac4223dc127a",
@@ -4883,7 +4926,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.247880+00:00"
+      "extracted_at": "2026-03-25T22:18:28.734850+00:00"
     },
     {
       "id": "cc290c8d5b037738",
@@ -4915,7 +4958,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.248580+00:00"
+      "extracted_at": "2026-03-25T22:18:28.734916+00:00"
     },
     {
       "id": "6ee60c7e13af24f3",
@@ -4947,7 +4990,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.248795+00:00"
+      "extracted_at": "2026-03-25T22:18:28.734976+00:00"
     },
     {
       "id": "1cb7f6e3132cd501",
@@ -4979,7 +5022,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.249025+00:00"
+      "extracted_at": "2026-03-25T22:18:28.735035+00:00"
     },
     {
       "id": "8e2a72d8d3a1d214",
@@ -5011,7 +5054,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.249145+00:00"
+      "extracted_at": "2026-03-25T22:18:28.735093+00:00"
     },
     {
       "id": "948088011efcf42b",
@@ -5043,7 +5086,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.249291+00:00"
+      "extracted_at": "2026-03-25T22:18:28.735150+00:00"
     },
     {
       "id": "737706fd408157a9",
@@ -5075,7 +5118,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.249385+00:00"
+      "extracted_at": "2026-03-25T22:18:28.735207+00:00"
     },
     {
       "id": "0ca0bf80a74e8e1c",
@@ -5107,7 +5150,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.249434+00:00"
+      "extracted_at": "2026-03-25T22:18:28.735264+00:00"
     },
     {
       "id": "da7e71652ca3dde7",
@@ -5139,7 +5182,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.249591+00:00"
+      "extracted_at": "2026-03-25T22:18:28.735319+00:00"
     },
     {
       "id": "d323cdc7e258b8b4",
@@ -5171,7 +5214,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.249680+00:00"
+      "extracted_at": "2026-03-25T22:18:28.735372+00:00"
     },
     {
       "id": "5b09c38d97ba4453",
@@ -5203,7 +5246,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.249734+00:00"
+      "extracted_at": "2026-03-25T22:18:28.735436+00:00"
     },
     {
       "id": "55519d3dfe88e2ea",
@@ -5235,7 +5278,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.249783+00:00"
+      "extracted_at": "2026-03-25T22:18:28.735496+00:00"
     },
     {
       "id": "94d3e27053a195d8",
@@ -5267,7 +5310,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.249826+00:00"
+      "extracted_at": "2026-03-25T22:18:28.735555+00:00"
     },
     {
       "id": "e5e93b42de1b9a22",
@@ -5299,7 +5342,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.249869+00:00"
+      "extracted_at": "2026-03-25T22:18:28.735614+00:00"
     },
     {
       "id": "7f61313b553ff066",
@@ -5331,7 +5374,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.250095+00:00"
+      "extracted_at": "2026-03-25T22:18:28.735750+00:00"
     },
     {
       "id": "a5ec3cf306cd81e0",
@@ -5363,7 +5406,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.250298+00:00"
+      "extracted_at": "2026-03-25T22:18:28.735814+00:00"
     },
     {
       "id": "0421c6cc7859dd47",
@@ -5395,7 +5438,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.250359+00:00"
+      "extracted_at": "2026-03-25T22:18:28.735867+00:00"
     },
     {
       "id": "94853626ac3caeed",
@@ -5427,7 +5470,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.250478+00:00"
+      "extracted_at": "2026-03-25T22:18:28.735914+00:00"
     },
     {
       "id": "3ad9008482f10954",
@@ -5459,7 +5502,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.250528+00:00"
+      "extracted_at": "2026-03-25T22:18:28.735960+00:00"
     },
     {
       "id": "d020a7736ea98c07",
@@ -5491,48 +5534,16 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.250572+00:00"
+      "extracted_at": "2026-03-25T22:18:28.736102+00:00"
     },
     {
-      "id": "aa9bfd1c7c5a9aab",
-      "type": "news",
-      "source_url": "https://seekingalpha.com/symbol/META/news?source=feed_symbol_META",
-      "source_author": "",
-      "title": "Meta strikes news content deal with WSJ owner, leading European media firms",
-      "body": "",
-      "ticker_or_market": "META",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "$META",
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [
-          "META"
-        ],
-        "author": "",
-        "published": "Fri, 13 Mar 2026 10:07:22 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.251017+00:00"
-    },
-    {
-      "id": "bd38d1614191e6f6",
+      "id": "679fb2118d976304",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/META/news?source=feed_symbol_META",
+      "source_url": "https://seekingalpha.com/article/4885928-why-i-remain-constructive-on-us-markets?source=feed_symbol_SPY",
       "source_author": "",
-      "title": "Dividend Roundup: Microsoft, Meta Platforms, Merck & Co., Target, and more",
+      "title": "Why I Remain Constructive On U.S. Markets",
       "body": "",
-      "ticker_or_market": "META",
+      "ticker_or_market": "",
       "direction": "neutral",
       "confidence": 0.1,
       "urgency": "days",
@@ -5542,29 +5553,26 @@
         "shares": 0
       },
       "tags": [
-        "$META",
         "seekingalpha"
       ],
       "raw_data": {
-        "all_tickers": [
-          "META"
-        ],
+        "all_tickers": [],
         "author": "",
-        "published": "Fri, 13 Mar 2026 08:41:12 -0400",
+        "published": "Wed, 25 Mar 2026 18:17:13 -0400",
         "source": "rss",
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.251081+00:00"
+      "extracted_at": "2026-03-25T22:18:28.736176+00:00"
     },
     {
-      "id": "c117cfd183bcc287",
+      "id": "9166c24774f6fc24",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4881878-meta-platforms-the-cheapest-amongst-the-mag-7?source=feed_symbol_META",
+      "source_url": "https://seekingalpha.com/article/4885925-jepi-vs-spy-the-case-for-covered-calls-in-3-charts?source=feed_symbol_SPY",
       "source_author": "",
-      "title": "Meta Platforms: The Cheapest Amongst The Mag 7",
+      "title": "JEPI Vs. SPY: The Case For Covered Calls In 3 Charts",
       "body": "",
-      "ticker_or_market": "META",
+      "ticker_or_market": "SPY",
       "direction": "neutral",
       "confidence": 0.1,
       "urgency": "days",
@@ -5574,29 +5582,29 @@
         "shares": 0
       },
       "tags": [
-        "$META",
+        "$SPY",
         "seekingalpha"
       ],
       "raw_data": {
         "all_tickers": [
-          "META"
+          "SPY"
         ],
         "author": "",
-        "published": "Fri, 13 Mar 2026 07:00:00 -0400",
+        "published": "Wed, 25 Mar 2026 17:59:23 -0400",
         "source": "rss",
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.251121+00:00"
+      "extracted_at": "2026-03-25T22:18:28.736250+00:00"
     },
     {
-      "id": "8a295a94da8232cb",
+      "id": "faa1b028b789f61a",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4882074-metas-chip-resilience?source=feed_symbol_META",
+      "source_url": "https://seekingalpha.com/article/4885895-5-plus-diesel-unleash-inflationary-mindset-fed-better-not-look-through-inflation-already-hot-iran-war?source=feed_symbol_SPY",
       "source_author": "",
-      "title": "Meta's Chip Resilience",
+      "title": "$5+ Diesel Could Unleash Inflationary Mindset The Fed Better Not Look Through; Inflation Was Already Hot Before Iran War",
       "body": "",
-      "ticker_or_market": "META",
+      "ticker_or_market": "",
       "direction": "neutral",
       "confidence": 0.1,
       "urgency": "days",
@@ -5606,61 +5614,26 @@
         "shares": 0
       },
       "tags": [
-        "$META",
         "seekingalpha"
       ],
       "raw_data": {
-        "all_tickers": [
-          "META"
-        ],
+        "all_tickers": [],
         "author": "",
-        "published": "Fri, 13 Mar 2026 03:25:00 -0400",
+        "published": "Wed, 25 Mar 2026 16:30:00 -0400",
         "source": "rss",
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.251156+00:00"
+      "extracted_at": "2026-03-25T22:18:28.736337+00:00"
     },
     {
-      "id": "7c32f61ea750498a",
-      "type": "news",
-      "source_url": "https://seekingalpha.com/symbol/META/news?source=feed_symbol_META",
-      "source_author": "",
-      "title": "Meta delays rollout of new AI model \u2018Avocado\u2019 amid performance concerns, NYT reports",
-      "body": "",
-      "ticker_or_market": "META",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "$META",
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [
-          "META"
-        ],
-        "author": "",
-        "published": "Fri, 13 Mar 2026 00:53:48 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.251226+00:00"
-    },
-    {
-      "id": "cc937a85f5c5a64a",
+      "id": "7eb2c67d550ef9c7",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/META/news?source=feed_symbol_META",
+      "source_url": "https://seekingalpha.com/symbol/SPY/news?source=feed_symbol_SPY",
       "source_author": "",
-      "title": "Meta Platforms stalls work on Persian Gulf cable project amid Iran war: Bloomberg",
+      "title": "SA Analyst: Wall Street gains on hopes of breakthrough in U.S.-Iran talks",
       "body": "",
-      "ticker_or_market": "META",
+      "ticker_or_market": "",
       "direction": "neutral",
       "confidence": 0.1,
       "urgency": "days",
@@ -5670,20 +5643,423 @@
         "shares": 0
       },
       "tags": [
-        "$META",
         "seekingalpha"
       ],
       "raw_data": {
-        "all_tickers": [
-          "META"
-        ],
+        "all_tickers": [],
         "author": "",
-        "published": "Fri, 13 Mar 2026 00:14:19 -0400",
+        "published": "Wed, 25 Mar 2026 16:13:02 -0400",
         "source": "rss",
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.251282+00:00"
+      "extracted_at": "2026-03-25T22:18:28.736386+00:00"
+    },
+    {
+      "id": "53f481e5564afb48",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/article/4885898-what-if-risk-on-cycle-topped?source=feed_symbol_SPY",
+      "source_author": "",
+      "title": "What If The Risk-On Cycle Has Topped?",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "bearish",
+      "confidence": 0.56,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 16:00:00 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.736433+00:00"
+    },
+    {
+      "id": "e8063ac3e326a51f",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/article/4885859-the-us-iran-war-position-for-ground-invasion?source=feed_symbol_SPY",
+      "source_author": "",
+      "title": "The U.S.-Iran War: Position For Ground Invasion",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 14:25:37 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.736477+00:00"
+    },
+    {
+      "id": "38abd75d4e2f18d5",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/symbol/SPY/news?source=feed_symbol_SPY",
+      "source_author": "",
+      "title": "U.S. not insulated from energy shock despite exporter status, Clarida says\u2014BBG interview",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 12:08:54 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.736557+00:00"
+    },
+    {
+      "id": "21c4f4004351ec58",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/article/4885790-dont-buy-the-hope-making-peace-with-iran-will-be-far-easier-said-than-done?source=feed_symbol_SPY",
+      "source_author": "",
+      "title": "Don't Buy The Hope: Making Peace With Iran Will Be Far Easier Said Than Done",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "bullish",
+      "confidence": 0.56,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 11:53:08 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.736608+00:00"
+    },
+    {
+      "id": "6f1f3f4dd181f24c",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/article/4885782-how-to-navigate-stagflation-fears-seeking-less-correlated-assets?source=feed_symbol_SPY",
+      "source_author": "",
+      "title": "How To Navigate Stagflation Fears: Seeking Less Correlated Assets",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 11:39:25 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.736797+00:00"
+    },
+    {
+      "id": "1a3f9559068c5e18",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/article/4885787-investing-on-both-sides-of-the-k-shaped-economy?source=feed_symbol_SPY",
+      "source_author": "",
+      "title": "Investing On Both Sides Of The K-Shaped Economy",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 11:30:17 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.736855+00:00"
+    },
+    {
+      "id": "9b3be459129e482c",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/article/4885757-us-budget-deficit-pressures-mount-as-war-spending-surges?source=feed_symbol_SPY",
+      "source_author": "",
+      "title": "U.S. Budget Deficit Pressures Mount As War Spending Surges",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 10:05:00 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.736906+00:00"
+    },
+    {
+      "id": "faea7486bc33bfa0",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/symbol/SPY/news?source=feed_symbol_SPY",
+      "source_author": "",
+      "title": "Retail investors fleeing to sidelines -- can tax refunds turn it around?",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 10:02:35 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.736954+00:00"
+    },
+    {
+      "id": "02b134577ba07ab6",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/article/4885716-there-is-no-de-escalation?source=feed_symbol_SPY",
+      "source_author": "",
+      "title": "There Is No De-Escalation",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 09:29:22 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.736995+00:00"
+    },
+    {
+      "id": "cfbc390a4cf2434a",
+      "type": "prediction",
+      "source_url": "https://seekingalpha.com/symbol/SPY/news?source=feed_symbol_SPY",
+      "source_author": "",
+      "title": "AI boom and an economic bust: Citrini Scenario gains momentum in prediction markets",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 09:05:15 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.737043+00:00"
+    },
+    {
+      "id": "bc7c9d3d94503e60",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/article/4885708-real-time-indicator-on-warning-track?source=feed_symbol_SPY",
+      "source_author": "",
+      "title": "A Real-Time Indicator On The Warning Track",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 09:00:01 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.737087+00:00"
+    },
+    {
+      "id": "40f76626784e8087",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/symbol/SPY/news?source=feed_symbol_SPY",
+      "source_author": "",
+      "title": "AI now dominates equities, bonds, and venture capital flows, Apollo warns",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 08:46:50 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.737135+00:00"
+    },
+    {
+      "id": "40cbaa523eb1d032",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/symbol/SPY/news?source=feed_symbol_SPY",
+      "source_author": "",
+      "title": "Private credit has 'zero' similarities to 2007, BlackRock\u2019s Fink says in BBC interview",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 07:41:48 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.737368+00:00"
+    },
+    {
+      "id": "0d9afb1e9510e1b1",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/article/4885461-the-current-market-rotation-one-of-the-biggest-disruptions-in-generations?source=feed_symbol_SPY",
+      "source_author": "",
+      "title": "The Current Market Rotation - One Of The Biggest Disruptions In Generations",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 07:30:00 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.737590+00:00"
     },
     {
       "id": "c12250d6be0a98a4",
@@ -5712,7 +6088,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.251376+00:00"
+      "extracted_at": "2026-03-25T22:18:28.737640+00:00"
     },
     {
       "id": "78dc09ba720cddd4",
@@ -5741,7 +6117,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.251447+00:00"
+      "extracted_at": "2026-03-25T22:18:28.737699+00:00"
     },
     {
       "id": "ed4d08cc65596db3",
@@ -5770,7 +6146,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.251591+00:00"
+      "extracted_at": "2026-03-25T22:18:28.737750+00:00"
     },
     {
       "id": "ab14943293d9761f",
@@ -5799,7 +6175,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.251634+00:00"
+      "extracted_at": "2026-03-25T22:18:28.737791+00:00"
     },
     {
       "id": "03dd3bcc83e9c625",
@@ -5828,7 +6204,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.251677+00:00"
+      "extracted_at": "2026-03-25T22:18:28.737838+00:00"
     },
     {
       "id": "b92e32dd508b6c4c",
@@ -5857,7 +6233,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.251717+00:00"
+      "extracted_at": "2026-03-25T22:18:28.737883+00:00"
     },
     {
       "id": "b3587a5860d43acd",
@@ -5886,7 +6262,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.251758+00:00"
+      "extracted_at": "2026-03-25T22:18:28.737930+00:00"
     },
     {
       "id": "74957ac5f1c8a5a4",
@@ -5915,7 +6291,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.251817+00:00"
+      "extracted_at": "2026-03-25T22:18:28.737978+00:00"
     },
     {
       "id": "61b8f07716980759",
@@ -5944,7 +6320,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.251864+00:00"
+      "extracted_at": "2026-03-25T22:18:28.738028+00:00"
     },
     {
       "id": "2f8d69886456df6f",
@@ -5973,7 +6349,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.251903+00:00"
+      "extracted_at": "2026-03-25T22:18:28.738255+00:00"
     },
     {
       "id": "4bfece1fe03b1a12",
@@ -6002,7 +6378,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.251941+00:00"
+      "extracted_at": "2026-03-25T22:18:28.738380+00:00"
     },
     {
       "id": "f2401b2b3923fad2",
@@ -6031,16 +6407,16 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.252049+00:00"
+      "extracted_at": "2026-03-25T22:18:28.738500+00:00"
     },
     {
-      "id": "f44e3006fb9f2c3d",
+      "id": "c7a66f00968be69b",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/SPY/news?source=feed_symbol_SPY",
+      "source_url": "https://seekingalpha.com/article/4885789-qqq-stocks-still-dangerously-detached-from-reality?source=feed_symbol_QQQ",
       "source_author": "",
-      "title": "Weekly ETF flows: three of 11 sectors record outflows; financial sector leads inflows",
+      "title": "QQQ: Stocks Still Dangerously Detached From Reality",
       "body": "",
-      "ticker_or_market": "",
+      "ticker_or_market": "QQQ",
       "direction": "neutral",
       "confidence": 0.1,
       "urgency": "days",
@@ -6050,51 +6426,25 @@
         "shares": 0
       },
       "tags": [
+        "$QQQ",
         "seekingalpha"
       ],
       "raw_data": {
-        "all_tickers": [],
+        "all_tickers": [
+          "QQQ"
+        ],
         "author": "",
-        "published": "Tue, 24 Mar 2026 12:42:08 -0400",
+        "published": "Wed, 25 Mar 2026 11:52:29 -0400",
         "source": "rss",
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.252097+00:00"
-    },
-    {
-      "id": "21067733020efb77",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/SPY/news?source=feed_symbol_SPY",
-      "source_author": "",
-      "title": "Oil spike unlikely to end equity cycle as earnings accelerate, Morgan Stanley says",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Tue, 24 Mar 2026 12:18:34 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.252140+00:00"
+      "extracted_at": "2026-03-25T22:18:28.738621+00:00"
     },
     {
       "id": "7220d77d4f263b26",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4885374-us-just-blinked-in-this-war-its-like-last-years-tariff-playbook?source=feed_symbol_SPY",
+      "source_url": "https://seekingalpha.com/article/4885374-us-just-blinked-in-this-war-its-like-last-years-tariff-playbook?source=feed_symbol_QQQ",
       "source_author": "",
       "title": "The US Just Blinked In This War: It's Like Last Year's Tariff Playbook",
       "body": "",
@@ -6118,12 +6468,12 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.252180+00:00"
+      "extracted_at": "2026-03-25T22:18:28.738841+00:00"
     },
     {
       "id": "5834cae2ee207647",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4885346-why-s-and-p-500-investors-are-seeking-alpha-but-just-getting-beta?source=feed_symbol_SPY",
+      "source_url": "https://seekingalpha.com/article/4885346-why-s-and-p-500-investors-are-seeking-alpha-but-just-getting-beta?source=feed_symbol_QQQ",
       "source_author": "",
       "title": "Why S&P 500 Investors Are Seeking Alpha, But Just Getting Beta",
       "body": "",
@@ -6147,12 +6497,12 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.252220+00:00"
+      "extracted_at": "2026-03-25T22:18:28.738940+00:00"
     },
     {
       "id": "9b557981f4043bd6",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4885321-bitcoin-says-the-war-ends-soon?source=feed_symbol_SPY",
+      "source_url": "https://seekingalpha.com/article/4885321-bitcoin-says-the-war-ends-soon?source=feed_symbol_QQQ",
       "source_author": "",
       "title": "Bitcoin Says The War Ends Soon",
       "body": "",
@@ -6176,12 +6526,12 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.252254+00:00"
+      "extracted_at": "2026-03-25T22:18:28.739021+00:00"
     },
     {
       "id": "59be41c2d306bfdf",
       "type": "prediction",
-      "source_url": "https://seekingalpha.com/symbol/SPY/news?source=feed_symbol_SPY",
+      "source_url": "https://seekingalpha.com/symbol/QQQ/news?source=feed_symbol_QQQ",
       "source_author": "",
       "title": "How high will inflation get this year? See what traders are forecasting",
       "body": "",
@@ -6205,12 +6555,12 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.252295+00:00"
+      "extracted_at": "2026-03-25T22:18:28.739082+00:00"
     },
     {
       "id": "7e3a20fb01628f87",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4885329-gold-loses-its-luster-as-stagflation-risk-jumps-on-iran-war?source=feed_symbol_SPY",
+      "source_url": "https://seekingalpha.com/article/4885329-gold-loses-its-luster-as-stagflation-risk-jumps-on-iran-war?source=feed_symbol_QQQ",
       "source_author": "",
       "title": "Gold Loses Its Luster As Stagflation Risk Jumps On Iran War",
       "body": "",
@@ -6234,326 +6584,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.252820+00:00"
-    },
-    {
-      "id": "be558f42f4f12458",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/SPY/news?source=feed_symbol_SPY",
-      "source_author": "",
-      "title": "Wells Fargo sees the U.S. economy weathering an oil shock as inflation risks stay contained",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "bearish",
-      "confidence": 0.56,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Tue, 24 Mar 2026 09:12:51 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.252870+00:00"
-    },
-    {
-      "id": "e297cc27c2002c2b",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/SPY/news?source=feed_symbol_SPY",
-      "source_author": "",
-      "title": "2025 marked start of end of U.S. market exceptionalism, Lazard\u2019s Temple says - CNBC interview",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Tue, 24 Mar 2026 09:02:41 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.253010+00:00"
-    },
-    {
-      "id": "ea6b32d693f7fffa",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/SPY/news?source=feed_symbol_SPY",
-      "source_author": "",
-      "title": "BNP Paribas raises 2026 inflation outlook as it signals a new 3% era",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Tue, 24 Mar 2026 09:00:21 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.253054+00:00"
-    },
-    {
-      "id": "2dd410d6f2b92e8b",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4885257-bonds-need-to-confirm-stock-optimism?source=feed_symbol_SPY",
-      "source_author": "",
-      "title": "Bonds Need To Confirm Stock Optimism",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Tue, 24 Mar 2026 08:54:23 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.253090+00:00"
-    },
-    {
-      "id": "d5528ba3dc165665",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/symbol/SPY/news?source=feed_symbol_SPY",
-      "source_author": "",
-      "title": "Cantor Fitzgerald sees the current market pullback as a possible opportunity",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "bullish",
-      "confidence": 0.56,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Tue, 24 Mar 2026 08:47:20 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.253136+00:00"
-    },
-    {
-      "id": "fea7ba7836224abe",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4885209-business-conditions-monthly-january-2026?source=feed_symbol_SPY",
-      "source_author": "",
-      "title": "Business Conditions Monthly January 2026",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Tue, 24 Mar 2026 06:09:00 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.253173+00:00"
-    },
-    {
-      "id": "65ba36e8c551eacb",
-      "type": "alert",
-      "source_url": "https://seekingalpha.com/article/4885108-consumer-sentiment-is-near-the-breaking-point?source=feed_symbol_SPY",
-      "source_author": "",
-      "title": "Consumer Sentiment Is Near The Breaking Point",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "realtime",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Tue, 24 Mar 2026 05:30:00 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.253205+00:00"
-    },
-    {
-      "id": "7dbd3d205819e444",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4885151-calming-inflationary-fears-is-job-number-one?source=feed_symbol_SPY",
-      "source_author": "",
-      "title": "Calming Inflationary Fears Is Job Number One",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Mon, 23 Mar 2026 20:20:00 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.253297+00:00"
-    },
-    {
-      "id": "3072e821ab5d630e",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4885123-stocks-can-return-to-2022-levels?source=feed_symbol_SPY",
-      "source_author": "",
-      "title": "Stocks Can Return To 2022 Levels",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Mon, 23 Mar 2026 18:51:10 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.253386+00:00"
-    },
-    {
-      "id": "4acfd63b7f138e51",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4884958-us-debt-hits-39-trillion-post-wwii-playbook-revisited?source=feed_symbol_SPY",
-      "source_author": "",
-      "title": "U.S. Debt Hits $39 Trillion: Post-WWII Playbook Revisited",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Mon, 23 Mar 2026 18:00:15 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.253455+00:00"
-    },
-    {
-      "id": "f6c7bb868a71a44e",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4885101-trumps-delayed-ultimatum-to-iran-a-trap-for-dip-buyers?source=feed_symbol_SPY",
-      "source_author": "",
-      "title": "Trump's Delayed Ultimatum To Iran: A Trap For Dip Buyers",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "bullish",
-      "confidence": 0.56,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Mon, 23 Mar 2026 17:31:48 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.253496+00:00"
+      "extracted_at": "2026-03-25T22:18:28.739143+00:00"
     },
     {
       "id": "27795779bbe37059",
@@ -6585,14 +6616,14 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.253537+00:00"
+      "extracted_at": "2026-03-25T22:18:28.739202+00:00"
     },
     {
-      "id": "c032e1b26f2889a6",
+      "id": "be558f42f4f12458",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4885097-4-of-5-prime-trend-factors-bearish-5th-fading-fast?source=feed_symbol_QQQ",
+      "source_url": "https://seekingalpha.com/symbol/QQQ/news?source=feed_symbol_QQQ",
       "source_author": "",
-      "title": "4 Of The 5 PRIME Trend Factors Are Bearish (And The 5th Is Fading Fast)",
+      "title": "Wells Fargo sees the U.S. economy weathering an oil shock as inflation risks stay contained",
       "body": "",
       "ticker_or_market": "",
       "direction": "bearish",
@@ -6609,19 +6640,19 @@
       "raw_data": {
         "all_tickers": [],
         "author": "",
-        "published": "Mon, 23 Mar 2026 16:35:00 -0400",
+        "published": "Tue, 24 Mar 2026 09:12:51 -0400",
         "source": "rss",
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.253579+00:00"
+      "extracted_at": "2026-03-25T22:18:28.739269+00:00"
     },
     {
-      "id": "4868e892d1037a65",
+      "id": "ea6b32d693f7fffa",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4885074-the-dumb-money-is-finally-getting-out?source=feed_symbol_QQQ",
+      "source_url": "https://seekingalpha.com/symbol/QQQ/news?source=feed_symbol_QQQ",
       "source_author": "",
-      "title": "The 'Dumb Money' Is Finally Getting Out",
+      "title": "BNP Paribas raises 2026 inflation outlook as it signals a new 3% era",
       "body": "",
       "ticker_or_market": "",
       "direction": "neutral",
@@ -6638,19 +6669,19 @@
       "raw_data": {
         "all_tickers": [],
         "author": "",
-        "published": "Mon, 23 Mar 2026 15:38:19 -0400",
+        "published": "Tue, 24 Mar 2026 09:00:21 -0400",
         "source": "rss",
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.253613+00:00"
+      "extracted_at": "2026-03-25T22:18:28.739325+00:00"
     },
     {
-      "id": "2fdab07a375a5939",
+      "id": "f44e3006fb9f2c3d",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4885079-trump-speaks-markets-rise-but-i-remain-cautious?source=feed_symbol_QQQ",
+      "source_url": "https://seekingalpha.com/symbol/BTC-USD/news?source=feed_symbol_BTC-USD",
       "source_author": "",
-      "title": "Trump Speaks, Markets Rise, But I Remain Cautious",
+      "title": "Weekly ETF flows: three of 11 sectors record outflows; financial sector leads inflows",
       "body": "",
       "ticker_or_market": "",
       "direction": "neutral",
@@ -6667,157 +6698,12 @@
       "raw_data": {
         "all_tickers": [],
         "author": "",
-        "published": "Mon, 23 Mar 2026 15:10:48 -0400",
+        "published": "Tue, 24 Mar 2026 12:42:08 -0400",
         "source": "rss",
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.253649+00:00"
-    },
-    {
-      "id": "a1f521db03d295bb",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4885026-the-ai-bubble-is-going-to-burst?source=feed_symbol_QQQ",
-      "source_author": "",
-      "title": "The AI Bubble Is Going To Burst",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Mon, 23 Mar 2026 15:00:28 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.253682+00:00"
-    },
-    {
-      "id": "ece76dc910d1a599",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4885042-another-uno-reverse-card-this-market-trusts-trump?source=feed_symbol_QQQ",
-      "source_author": "",
-      "title": "Another Uno-Reverse Card: This Market Trusts Trump",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Mon, 23 Mar 2026 13:26:04 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.253718+00:00"
-    },
-    {
-      "id": "5565020c613f79e6",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4885034-wall-street-lunch-markets-seesaw-after-trumps-iran-pivot?source=feed_symbol_QQQ",
-      "source_author": "",
-      "title": "Wall Street Lunch: Markets Flip After Trump's Iran Pivot",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Mon, 23 Mar 2026 12:49:56 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.253755+00:00"
-    },
-    {
-      "id": "6e5ee24ec7b9fd36",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4885008-oil-plunging-to-50-could-be-the-next-big-catalyst-for-stocks?source=feed_symbol_QQQ",
-      "source_author": "",
-      "title": "Oil Plunging To $50 Could Be The Next Big Catalyst For Stocks",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Mon, 23 Mar 2026 12:05:04 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.253793+00:00"
-    },
-    {
-      "id": "e3c7bd64812cc516",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4885002-it-is-time-to-be-greedy?source=feed_symbol_QQQ",
-      "source_author": "",
-      "title": "It Is Time To Be Greedy",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Mon, 23 Mar 2026 12:00:29 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.253824+00:00"
+      "extracted_at": "2026-03-25T22:18:28.739444+00:00"
     },
     {
       "id": "b52f6a678c9986a1",
@@ -6846,7 +6732,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.253863+00:00"
+      "extracted_at": "2026-03-25T22:18:28.739526+00:00"
     },
     {
       "id": "fa3b4dc33e18dffb",
@@ -6875,7 +6761,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.253944+00:00"
+      "extracted_at": "2026-03-25T22:18:28.739651+00:00"
     },
     {
       "id": "ce8d130700186d0b",
@@ -6904,7 +6790,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.254061+00:00"
+      "extracted_at": "2026-03-25T22:18:28.739788+00:00"
     },
     {
       "id": "4b138a41273a0bde",
@@ -6933,7 +6819,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.254107+00:00"
+      "extracted_at": "2026-03-25T22:18:28.739907+00:00"
     },
     {
       "id": "d71a9aa9cb049268",
@@ -6962,7 +6848,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.254145+00:00"
+      "extracted_at": "2026-03-25T22:18:28.740065+00:00"
     },
     {
       "id": "1e1e08a8ecaa75f8",
@@ -6991,7 +6877,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.254287+00:00"
+      "extracted_at": "2026-03-25T22:18:28.740143+00:00"
     },
     {
       "id": "5b42b62907adf1a2",
@@ -7020,7 +6906,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.254468+00:00"
+      "extracted_at": "2026-03-25T22:18:28.740197+00:00"
     },
     {
       "id": "e4f4f6f1ecb47724",
@@ -7049,7 +6935,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.254606+00:00"
+      "extracted_at": "2026-03-25T22:18:28.740245+00:00"
     },
     {
       "id": "f36d1a59184cace0",
@@ -7078,7 +6964,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.254844+00:00"
+      "extracted_at": "2026-03-25T22:18:28.740293+00:00"
     },
     {
       "id": "1a9001b2ca7dea71",
@@ -7107,7 +6993,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.255557+00:00"
+      "extracted_at": "2026-03-25T22:18:28.740372+00:00"
     },
     {
       "id": "c16096a97b869691",
@@ -7136,7 +7022,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.255644+00:00"
+      "extracted_at": "2026-03-25T22:18:28.740417+00:00"
     },
     {
       "id": "9cd8a5ab20c2c38a",
@@ -7165,7 +7051,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.255707+00:00"
+      "extracted_at": "2026-03-25T22:18:28.740461+00:00"
     },
     {
       "id": "7d10374ea4e95394",
@@ -7194,7 +7080,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.255831+00:00"
+      "extracted_at": "2026-03-25T22:18:28.740508+00:00"
     },
     {
       "id": "492d0da0192f4099",
@@ -7223,7 +7109,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.255896+00:00"
+      "extracted_at": "2026-03-25T22:18:28.740550+00:00"
     },
     {
       "id": "a997c1f41a4b2e17",
@@ -7252,7 +7138,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.255978+00:00"
+      "extracted_at": "2026-03-25T22:18:28.740599+00:00"
     },
     {
       "id": "f39fce06005edc66",
@@ -7281,7 +7167,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.256077+00:00"
+      "extracted_at": "2026-03-25T22:18:28.740647+00:00"
     },
     {
       "id": "3aea279acc56feaf",
@@ -7310,7 +7196,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.256121+00:00"
+      "extracted_at": "2026-03-25T22:18:28.740694+00:00"
     },
     {
       "id": "2f95cc9a3a22e61d",
@@ -7339,7 +7225,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.256160+00:00"
+      "extracted_at": "2026-03-25T22:18:28.740740+00:00"
     },
     {
       "id": "2c32c3e53d0ab722",
@@ -7368,7 +7254,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.256285+00:00"
+      "extracted_at": "2026-03-25T22:18:28.740786+00:00"
     },
     {
       "id": "4688f035880017b4",
@@ -7397,7 +7283,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.256425+00:00"
+      "extracted_at": "2026-03-25T22:18:28.740833+00:00"
     },
     {
       "id": "899e010fc43b8a23",
@@ -7426,7 +7312,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.256497+00:00"
+      "extracted_at": "2026-03-25T22:18:28.740883+00:00"
     },
     {
       "id": "834bf5f774f1539d",
@@ -7455,7 +7341,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.258460+00:00"
+      "extracted_at": "2026-03-25T22:18:28.740924+00:00"
     },
     {
       "id": "c43a9dda94bd881d",
@@ -7484,7 +7370,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.258514+00:00"
+      "extracted_at": "2026-03-25T22:18:28.741239+00:00"
     },
     {
       "id": "3ac01445dae256f3",
@@ -7513,7 +7399,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.258560+00:00"
+      "extracted_at": "2026-03-25T22:18:28.741345+00:00"
     },
     {
       "id": "608c1fa49e352993",
@@ -7542,7 +7428,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.258607+00:00"
+      "extracted_at": "2026-03-25T22:18:28.741419+00:00"
     },
     {
       "id": "7033c6a34dacaa8f",
@@ -7571,7 +7457,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.262054+00:00"
+      "extracted_at": "2026-03-25T22:18:28.741477+00:00"
     },
     {
       "id": "ebc2fc992c6f6177",
@@ -7600,7 +7486,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.262143+00:00"
+      "extracted_at": "2026-03-25T22:18:28.741533+00:00"
     },
     {
       "id": "59b53b2447c3cf04",
@@ -7629,7 +7515,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.262200+00:00"
+      "extracted_at": "2026-03-25T22:18:28.741653+00:00"
     },
     {
       "id": "bc283263b882aa3f",
@@ -7658,7 +7544,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.262251+00:00"
+      "extracted_at": "2026-03-25T22:18:28.741717+00:00"
     },
     {
       "id": "769a401e28da21f2",
@@ -7687,7 +7573,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.262311+00:00"
+      "extracted_at": "2026-03-25T22:18:28.741783+00:00"
     },
     {
       "id": "90a82de8ef5f9f3b",
@@ -7716,7 +7602,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.262358+00:00"
+      "extracted_at": "2026-03-25T22:18:28.741846+00:00"
     },
     {
       "id": "4ce9ca3a5a828a1a",
@@ -7745,7 +7631,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.262403+00:00"
+      "extracted_at": "2026-03-25T22:18:28.741984+00:00"
     },
     {
       "id": "c9d1661f34895c9f",
@@ -7774,7 +7660,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.262449+00:00"
+      "extracted_at": "2026-03-25T22:18:28.742059+00:00"
     },
     {
       "id": "6e0e66c5e7f53ceb",
@@ -7803,7 +7689,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.262497+00:00"
+      "extracted_at": "2026-03-25T22:18:28.742122+00:00"
     },
     {
       "id": "44f3442053581ace",
@@ -7832,7 +7718,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.262543+00:00"
+      "extracted_at": "2026-03-25T22:18:28.742181+00:00"
     },
     {
       "id": "aad15a042e1eba3e",
@@ -7861,7 +7747,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.262591+00:00"
+      "extracted_at": "2026-03-25T22:18:28.742244+00:00"
     },
     {
       "id": "7fa285023444d20f",
@@ -7890,7 +7776,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.262637+00:00"
+      "extracted_at": "2026-03-25T22:18:28.742303+00:00"
     },
     {
       "id": "e468ebc4ddaf325a",
@@ -7919,7 +7805,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.262692+00:00"
+      "extracted_at": "2026-03-25T22:18:28.742361+00:00"
     },
     {
       "id": "b0899e362c331f40",
@@ -7948,7 +7834,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.262739+00:00"
+      "extracted_at": "2026-03-25T22:18:28.742419+00:00"
     },
     {
       "id": "9b1c96938071c53e",
@@ -7977,7 +7863,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.262838+00:00"
+      "extracted_at": "2026-03-25T22:18:28.742479+00:00"
     },
     {
       "id": "86d8215b954e9173",
@@ -8006,7 +7892,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.262892+00:00"
+      "extracted_at": "2026-03-25T22:18:28.742532+00:00"
     },
     {
       "id": "49a2067657604f94",
@@ -8035,7 +7921,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.262931+00:00"
+      "extracted_at": "2026-03-25T22:18:28.742583+00:00"
     },
     {
       "id": "539b320ca8213b24",
@@ -8064,7 +7950,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.262975+00:00"
+      "extracted_at": "2026-03-25T22:18:28.742642+00:00"
     },
     {
       "id": "9b7b3f9e3d3e95c7",
@@ -8093,44 +7979,14 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.263016+00:00"
+      "extracted_at": "2026-03-25T22:18:28.742699+00:00"
     },
     {
-      "id": "db3b971f2b495c85",
-      "type": "earnings",
-      "source_url": "https://seekingalpha.com/news/4568355-dominion-lending-centres-non-gaap-eps-of-013-revenue-of-2655m?utm_source=feed_news_all&utm_medium=referral&feed_item_type=news",
-      "source_author": "",
-      "title": "Dominion Lending Centres Non-GAAP EPS of $0.13, revenue of $26.55M",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "earnings",
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Wed, 25 Mar 2026 06:31:41 -0400",
-        "source": "rss",
-        "earnings_related": true,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.263052+00:00"
-    },
-    {
-      "id": "df5406d9c80ff67e",
+      "id": "c705d708b72908e5",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/news/4567766-meet-versigent-the-auto-supplier-spinning-off-from-aptiv-after-a-long-wait?utm_source=feed_news_all&utm_medium=referral&feed_item_type=news",
+      "source_url": "https://seekingalpha.com/news/4568963-city-holding-authorizes-buyback-of-up-to-1-million-shares?utm_source=feed_news_all&utm_medium=referral&feed_item_type=news",
       "source_author": "",
-      "title": "Meet Versigent: The auto supplier spinning off from Aptiv after a long wait",
+      "title": "City Holding authorizes buyback of up to 1 million shares",
       "body": "",
       "ticker_or_market": "",
       "direction": "bullish",
@@ -8147,19 +8003,19 @@
       "raw_data": {
         "all_tickers": [],
         "author": "",
-        "published": "Wed, 25 Mar 2026 06:30:10 -0400",
+        "published": "Wed, 25 Mar 2026 18:04:03 -0400",
         "source": "rss",
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.279776+00:00"
+      "extracted_at": "2026-03-25T22:18:28.742762+00:00"
     },
     {
-      "id": "391b4f5c79b3e11d",
-      "type": "earnings",
-      "source_url": "https://seekingalpha.com/news/4568354-act-energy-technologies-gaap-eps-of-c008-revenue-of-c1093m?utm_source=feed_news_all&utm_medium=referral&feed_item_type=news",
+      "id": "186b09907b5a5238",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/news/4568440-here-are-the-major-earnings-before-the-open-thursday?utm_source=feed_news_all&utm_medium=referral&feed_item_type=news",
       "source_author": "",
-      "title": "ACT Energy Technologies GAAP EPS of C$0.08, revenue of C$109.3M",
+      "title": "Here are the major earnings before the open Thursday",
       "body": "",
       "ticker_or_market": "",
       "direction": "neutral",
@@ -8171,57 +8027,26 @@
         "shares": 0
       },
       "tags": [
-        "earnings",
         "seekingalpha"
       ],
       "raw_data": {
         "all_tickers": [],
         "author": "",
-        "published": "Wed, 25 Mar 2026 06:29:23 -0400",
+        "published": "Wed, 25 Mar 2026 18:00:15 -0400",
         "source": "rss",
-        "earnings_related": true,
+        "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.279953+00:00"
+      "extracted_at": "2026-03-25T22:18:28.742815+00:00"
     },
     {
-      "id": "bbafadba4dd9200d",
-      "type": "earnings",
-      "source_url": "https://seekingalpha.com/news/4568351-kingsoft-gaap-eps-of-1_45-revenue-of-9_68b?utm_source=feed_news_all&utm_medium=referral&feed_item_type=news",
+      "id": "672a364d491425fa",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/news/4568962-tivic-health-outlines-20b-oncology-market-opportunity-following-strategic-transformation?utm_source=feed_news_all&utm_medium=referral&feed_item_type=news",
       "source_author": "",
-      "title": "Kingsoft GAAP EPS of $1.45, revenue of $9.68B",
+      "title": "Tivic Health outlines $20B oncology market opportunity following strategic transformation",
       "body": "",
       "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "earnings",
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Wed, 25 Mar 2026 06:28:40 -0400",
-        "source": "rss",
-        "earnings_related": true,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.280009+00:00"
-    },
-    {
-      "id": "fa4143169a2374c5",
-      "type": "earnings",
-      "source_url": "https://seekingalpha.com/news/4568353-andean-precious-metals-beats-top-line-estimates-introduces-fy26-outlook?utm_source=feed_news_all&utm_medium=referral&feed_item_type=news",
-      "source_author": "",
-      "title": "Andean Precious Metals beats top-line estimates; introduces FY26 outlook",
-      "body": "",
-      "ticker_or_market": "META",
       "direction": "bullish",
       "confidence": 0.56,
       "urgency": "days",
@@ -8231,28 +8056,53 @@
         "shares": 0
       },
       "tags": [
-        "$META",
-        "earnings",
         "seekingalpha"
       ],
       "raw_data": {
-        "all_tickers": [
-          "META"
-        ],
+        "all_tickers": [],
         "author": "",
-        "published": "Wed, 25 Mar 2026 06:25:19 -0400",
+        "published": "Wed, 25 Mar 2026 17:56:35 -0400",
         "source": "rss",
-        "earnings_related": true,
+        "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.280075+00:00"
+      "extracted_at": "2026-03-25T22:18:28.742880+00:00"
     },
     {
-      "id": "996bcd706af8a0aa",
+      "id": "89707b29978a1906",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/news/4568961-ruger-says-beretta-proposes-partial-tender-offer-for-up-to-20-stake?utm_source=feed_news_all&utm_medium=referral&feed_item_type=news",
+      "source_author": "",
+      "title": "Ruger says Beretta proposes partial tender offer for up to 20% stake",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 17:51:19 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.742937+00:00"
+    },
+    {
+      "id": "b5c8e4c579a6e76d",
       "type": "news",
-      "source_url": "https://seekingalpha.com/news/4568341-openai-hires-indias-jiostar-ceo-to-lead-asia-pacific-operations?utm_source=feed_news_all&utm_medium=referral&feed_item_type=news",
+      "source_url": "https://seekingalpha.com/news/4568960-health-in-tech-announces-7m-private-placement?utm_source=feed_news_all&utm_medium=referral&feed_item_type=news",
       "source_author": "",
-      "title": "OpenAI hires India\u2019s JioStar CEO to lead Asia-Pacific operations: report",
+      "title": "Health In Tech announces $7M private placement",
       "body": "",
       "ticker_or_market": "",
       "direction": "neutral",
@@ -8269,19 +8119,78 @@
       "raw_data": {
         "all_tickers": [],
         "author": "",
-        "published": "Wed, 25 Mar 2026 06:21:07 -0400",
+        "published": "Wed, 25 Mar 2026 17:46:47 -0400",
         "source": "rss",
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.280159+00:00"
+      "extracted_at": "2026-03-25T22:18:28.742988+00:00"
     },
     {
-      "id": "a0ff3e0b432a0551",
+      "id": "fdc7cd46242ba9ce",
       "type": "sentiment",
-      "source_url": "https://seekingalpha.com/news/4568350-viomi-technology-declares-0066-per-ads-special-dividend?utm_source=feed_news_all&utm_medium=referral&feed_item_type=news",
+      "source_url": "https://seekingalpha.com/news/4568953-gold-snaps-losing-streak-alongside-oil-price-drop-on-hopes-for-middle-east-diplomacy?utm_source=feed_news_all&utm_medium=referral&feed_item_type=news",
       "source_author": "",
-      "title": "Viomi Technology declares $0.066 per ADS special dividend",
+      "title": "Gold snaps losing streak alongside oil price drop on hopes for Middle East diplomacy",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "bullish",
+      "confidence": 0.56,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 17:40:06 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.743049+00:00"
+    },
+    {
+      "id": "c0f5108b237472ed",
+      "type": "earnings",
+      "source_url": "https://seekingalpha.com/news/4568717-oxford-industries-q4-2026-earnings-preview?utm_source=feed_news_all&utm_medium=referral&feed_item_type=news",
+      "source_author": "",
+      "title": "Oxford Industries Q4 2026 Earnings Preview",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "earnings",
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 17:35:55 -0400",
+        "source": "rss",
+        "earnings_related": true,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.743095+00:00"
+    },
+    {
+      "id": "d51da3fb38cc17f2",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/article/4885657-mixed-signals-from-u-s-and-iran?source=feed_tag_wall_st_breakfast",
+      "source_author": "",
+      "title": "Mixed Signals From U.S. And Iran",
       "body": "",
       "ticker_or_market": "",
       "direction": "neutral",
@@ -8298,12 +8207,41 @@
       "raw_data": {
         "all_tickers": [],
         "author": "",
-        "published": "Wed, 25 Mar 2026 06:18:51 -0400",
+        "published": "Wed, 25 Mar 2026 07:02:57 -0400",
         "source": "rss",
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.280207+00:00"
+      "extracted_at": "2026-03-25T22:18:28.743141+00:00"
+    },
+    {
+      "id": "d81c4817c69a75d8",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/article/4885694-wall-street-breakfast-podcast-peace-plan-pumps-futures?source=feed_tag_wall_st_breakfast",
+      "source_author": "",
+      "title": "Wall Street Breakfast Podcast: Peace Plan Pumps Futures",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Wed, 25 Mar 2026 07:00:10 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.743194+00:00"
     },
     {
       "id": "64805dd954659dec",
@@ -8332,7 +8270,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.280378+00:00"
+      "extracted_at": "2026-03-25T22:18:28.743250+00:00"
     },
     {
       "id": "15280c70ee5bd257",
@@ -8361,7 +8299,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.283129+00:00"
+      "extracted_at": "2026-03-25T22:18:28.743344+00:00"
     },
     {
       "id": "dc7d9abb90c874ba",
@@ -8390,7 +8328,36 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.283233+00:00"
+      "extracted_at": "2026-03-25T22:18:28.743399+00:00"
+    },
+    {
+      "id": "223d155e06d89df4",
+      "type": "sentiment",
+      "source_url": "https://seekingalpha.com/article/4885034-wall-street-lunch-markets-seesaw-after-trumps-iran-pivot?source=feed_tag_wall_st_breakfast",
+      "source_author": "",
+      "title": "Wall Street Lunch: Markets Flip After Trump's Iran Pivot",
+      "body": "",
+      "ticker_or_market": "",
+      "direction": "neutral",
+      "confidence": 0.1,
+      "urgency": "days",
+      "engagement": {
+        "comments": 0,
+        "upvotes": 0,
+        "shares": 0
+      },
+      "tags": [
+        "seekingalpha"
+      ],
+      "raw_data": {
+        "all_tickers": [],
+        "author": "",
+        "published": "Mon, 23 Mar 2026 12:49:56 -0400",
+        "source": "rss",
+        "earnings_related": false,
+        "contrarian": false
+      },
+      "extracted_at": "2026-03-25T22:18:28.743452+00:00"
     },
     {
       "id": "59fa162c9fbab22c",
@@ -8419,7 +8386,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.283287+00:00"
+      "extracted_at": "2026-03-25T22:18:28.743509+00:00"
     },
     {
       "id": "a4e8c7e75d0a53fe",
@@ -8448,7 +8415,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.283328+00:00"
+      "extracted_at": "2026-03-25T22:18:28.743608+00:00"
     },
     {
       "id": "141d2fcaf9d99ab3",
@@ -8477,7 +8444,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.283381+00:00"
+      "extracted_at": "2026-03-25T22:18:28.743670+00:00"
     },
     {
       "id": "0c44a3281cd80037",
@@ -8506,7 +8473,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.283416+00:00"
+      "extracted_at": "2026-03-25T22:18:28.743715+00:00"
     },
     {
       "id": "6e6860a8474e92a2",
@@ -8535,7 +8502,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.283531+00:00"
+      "extracted_at": "2026-03-25T22:18:28.743761+00:00"
     },
     {
       "id": "cd3f1a4ddb4e286b",
@@ -8564,7 +8531,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.283565+00:00"
+      "extracted_at": "2026-03-25T22:18:28.743898+00:00"
     },
     {
       "id": "a0df6a96402e4f99",
@@ -8593,7 +8560,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.286419+00:00"
+      "extracted_at": "2026-03-25T22:18:28.743953+00:00"
     },
     {
       "id": "dea465e82d3cb58d",
@@ -8622,7 +8589,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.286470+00:00"
+      "extracted_at": "2026-03-25T22:18:28.744003+00:00"
     },
     {
       "id": "24d8694a52f40784",
@@ -8651,7 +8618,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.288474+00:00"
+      "extracted_at": "2026-03-25T22:18:28.744049+00:00"
     },
     {
       "id": "72e7eebb64f66f70",
@@ -8680,7 +8647,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.289154+00:00"
+      "extracted_at": "2026-03-25T22:18:28.744102+00:00"
     },
     {
       "id": "5950861bc42ea531",
@@ -8709,7 +8676,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.289205+00:00"
+      "extracted_at": "2026-03-25T22:18:28.744152+00:00"
     },
     {
       "id": "b36ccdadea64b110",
@@ -8738,7 +8705,7 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.289251+00:00"
+      "extracted_at": "2026-03-25T22:18:28.744205+00:00"
     },
     {
       "id": "64b83b7122c66dea",
@@ -8767,97 +8734,10 @@
         "earnings_related": false,
         "contrarian": false
       },
-      "extracted_at": "2026-03-25T10:36:41.289291+00:00"
-    },
-    {
-      "id": "c0d0a72f84353424",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4883150-wall-street-lunch-nvidia-expands-agentic-ai-push-with-openclaw-creator?source=feed_tag_wall_st_breakfast",
-      "source_author": "",
-      "title": "Wall Street Lunch: Nvidia Expands Agentic AI Push With OpenClaw Creator",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Tue, 17 Mar 2026 11:00:00 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.289333+00:00"
-    },
-    {
-      "id": "2aa15880a506146e",
-      "type": "sentiment",
-      "source_url": "https://seekingalpha.com/article/4883013-the-donroe-doctrine-is-coming-for-cuba?source=feed_tag_wall_st_breakfast",
-      "source_author": "",
-      "title": "The Donroe Doctrine Is Coming For Cuba",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Tue, 17 Mar 2026 07:26:00 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.289374+00:00"
-    },
-    {
-      "id": "d5ba5c2235a2dad7",
-      "type": "news",
-      "source_url": "https://seekingalpha.com/article/4883050-wall-street-breakfast-podcast-beyond-meat-slides-on-report-delay?source=feed_tag_wall_st_breakfast",
-      "source_author": "",
-      "title": "Wall Street Breakfast Podcast: Beyond Meat Slides On Report Delay",
-      "body": "",
-      "ticker_or_market": "",
-      "direction": "neutral",
-      "confidence": 0.1,
-      "urgency": "days",
-      "engagement": {
-        "comments": 0,
-        "upvotes": 0,
-        "shares": 0
-      },
-      "tags": [
-        "seekingalpha"
-      ],
-      "raw_data": {
-        "all_tickers": [],
-        "author": "",
-        "published": "Tue, 17 Mar 2026 06:41:05 -0400",
-        "source": "rss",
-        "earnings_related": false,
-        "contrarian": false
-      },
-      "extracted_at": "2026-03-25T10:36:41.289418+00:00"
+      "extracted_at": "2026-03-25T22:18:28.744257+00:00"
     }
   ],
   "meta": {
-    "total_signals": 300
+    "total_signals": 296
   }
 }
