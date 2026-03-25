@@ -1235,10 +1235,11 @@ async def get_trading_dashboard(user: str = Depends(get_current_user)):
 # ── ArbClaw / RivalClaw Experiment ────────────────────────────────────────────
 
 def _experiment_db(instance):
-    """Open SQLite DB for an experiment instance (arbclaw or rivalclaw)."""
+    """Open SQLite DB for an experiment instance (arbclaw, rivalclaw, or quantumentalclaw)."""
     paths = {
         "arbclaw": Path.home() / "arbclaw" / "arbclaw.db",
         "rivalclaw": Path.home() / "rivalclaw" / "rivalclaw.db",
+        "quantumentalclaw": Path.home() / "quantumentalclaw" / "quantumentalclaw.db",
     }
     db_path = paths.get(instance)
     if not db_path or not db_path.exists():
@@ -1398,19 +1399,157 @@ def _rivalclaw_state(conn):
     }
 
 
+def _quantumentalclaw_state(conn):
+    """Read QuantumentalClaw state — signal fusion engine with learning loop."""
+    starting = 10000.0
+    ctx = conn.execute("SELECT value FROM context WHERE key='starting_balance'").fetchone()
+    if ctx:
+        starting = float(ctx[0])
+
+    # Closed trades PnL
+    closed_pnl = 0.0
+    try:
+        closed_pnl = conn.execute(
+            "SELECT COALESCE(SUM(pnl_usd), 0) FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')"
+        ).fetchone()[0]
+    except Exception:
+        pass
+
+    # Open positions
+    open_trades = conn.execute(
+        "SELECT pt.*, td.event_id, td.venue, td.ticker, td.direction, td.final_score, "
+        "td.confidence, td.amount_usd as decision_amount, td.signal_snapshot, td.reasoning "
+        "FROM paper_trades pt "
+        "JOIN trade_decisions td ON pt.decision_id = td.decision_id "
+        "WHERE pt.status='open' ORDER BY pt.executed_at DESC"
+    ).fetchall()
+
+    unrealized = 0.0
+    open_list = []
+    for t in open_trades:
+        entry = t["fill_price"]
+        current = entry  # No live price tracking yet; will improve
+        pnl = t["fill_shares"] * (current - entry)
+        pnl_pct = (pnl / t["fill_amount_usd"] * 100) if t["fill_amount_usd"] > 0 else 0
+        unrealized += pnl
+
+        # Parse signal snapshot
+        snapshot = {}
+        try:
+            snapshot = json.loads(t["signal_snapshot"]) if t["signal_snapshot"] else {}
+        except Exception:
+            pass
+
+        open_list.append({
+            "event_id": t["event_id"], "venue": t["venue"],
+            "ticker": t["ticker"], "direction": t["direction"],
+            "entry_price": entry, "current_price": current,
+            "amount_usd": t["fill_amount_usd"],
+            "final_score": t["final_score"], "confidence": t["confidence"],
+            "signal_scores": snapshot,
+            "pnl": round(pnl, 2), "pnl_pct": round(pnl_pct, 1),
+            "reasoning": t["reasoning"] or "",
+            "opened_at": t["executed_at"],
+        })
+
+    balance = starting + closed_pnl + unrealized
+
+    # Recent closed trades
+    recent = conn.execute(
+        "SELECT pt.*, td.event_id, td.venue, td.ticker, td.direction, td.final_score, td.signal_snapshot "
+        "FROM paper_trades pt "
+        "JOIN trade_decisions td ON pt.decision_id = td.decision_id "
+        "WHERE pt.status IN ('closed_win','closed_loss','expired') "
+        "ORDER BY pt.exit_at DESC LIMIT 20"
+    ).fetchall()
+    recent_list = []
+    for r in recent:
+        recent_list.append({
+            "event_id": r["event_id"], "venue": r["venue"],
+            "ticker": r["ticker"], "direction": r["direction"],
+            "entry_price": r["fill_price"], "exit_price": r["exit_price"],
+            "pnl": round(r["pnl_usd"] or 0, 2), "status": r["status"],
+            "final_score": r["final_score"],
+            "opened_at": r["executed_at"], "closed_at": r["exit_at"],
+        })
+
+    # Stats
+    all_closed = conn.execute(
+        "SELECT status, pnl_usd FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')"
+    ).fetchall()
+    total_closed = len(all_closed)
+    wins = sum(1 for t in all_closed if t["status"] == "closed_win")
+
+    # Cycle count
+    cycle_count = 0
+    try:
+        cc = conn.execute("SELECT value FROM context WHERE key='cycle_count'").fetchone()
+        if cc:
+            cycle_count = int(cc[0])
+    except Exception:
+        pass
+
+    # Signal weight history (learning evolution)
+    weight_history = []
+    try:
+        rows = conn.execute("SELECT * FROM weight_log ORDER BY logged_at DESC LIMIT 20").fetchall()
+        weight_history = [dict(r) for r in rows]
+    except Exception:
+        pass
+
+    # Module accuracy
+    module_stats = []
+    try:
+        rows = conn.execute(
+            "SELECT module, accuracy, total_signals, avg_score FROM module_accuracy "
+            "ORDER BY computed_at DESC LIMIT 10"
+        ).fetchall()
+        module_stats = [dict(r) for r in rows]
+    except Exception:
+        pass
+
+    # Daily PnL curve
+    pnl_curve = []
+    try:
+        daily = conn.execute("SELECT date, ending_balance, realized_pnl FROM daily_pnl ORDER BY date ASC").fetchall()
+        pnl_curve = [{"date": r["date"], "balance": r["ending_balance"], "pnl": r["realized_pnl"]} for r in daily]
+    except Exception:
+        pass
+
+    return {
+        "instance": "quantumentalclaw",
+        "wallet": {
+            "balance": round(balance, 2), "starting_balance": starting,
+            "total_pnl": round(closed_pnl, 2),
+            "unrealized_pnl": round(unrealized, 2),
+            "total_trades": total_closed, "wins": wins,
+            "win_rate": round(wins / total_closed * 100, 1) if total_closed > 0 else 0,
+            "open_positions": len(open_list),
+            "cycles_completed": cycle_count,
+        },
+        "open_positions": open_list,
+        "recent_trades": recent_list,
+        "pnl_curve": pnl_curve,
+        "weight_history": weight_history,
+        "module_accuracy": module_stats,
+    }
+
+
 @app.get("/api/trading/experiment")
 async def get_experiment_dashboard(user: str = Depends(get_current_user)):
-    """Three-way experiment dashboard: ArbClaw + RivalClaw data."""
-    result = {"arbclaw": None, "rivalclaw": None}
-    for instance in ("arbclaw", "rivalclaw"):
+    """Four-way experiment dashboard: ArbClaw + RivalClaw + QuantumentalClaw."""
+    result = {"arbclaw": None, "rivalclaw": None, "quantumentalclaw": None}
+    for instance in ("arbclaw", "rivalclaw", "quantumentalclaw"):
         conn = _experiment_db(instance)
         if not conn:
             continue
         try:
             if instance == "arbclaw":
                 result[instance] = _arbclaw_state(conn)
-            else:
+            elif instance == "rivalclaw":
                 result[instance] = _rivalclaw_state(conn)
+            else:
+                result[instance] = _quantumentalclaw_state(conn)
         except Exception as e:
             result[instance] = {"error": str(e)}
         finally:
