@@ -110,15 +110,47 @@ else
 fi
 
 # ---------------------------------------------------------------------------
+# Repo Man — research ingestion + synthesis tool
+# ---------------------------------------------------------------------------
+REPOMAN_DIR="$HOME/repo-man"
+if pgrep -f "repo-man/venv/bin/python3 main.py" >/dev/null 2>&1; then
+  echo "→ Repo Man: already running on :8765"
+else
+  if [[ -f "$REPOMAN_DIR/main.py" ]]; then
+    cd "$REPOMAN_DIR" && nohup venv/bin/python3 main.py > /tmp/repoman.log 2>&1 &
+    echo "→ Repo Man: started on :8765 (PID $!)"
+  else
+    echo "→ Repo Man: not found at $REPOMAN_DIR"
+  fi
+fi
+
+# ---------------------------------------------------------------------------
+# Repo Man Signal Watcher — auto-pushes intel to Repo Man on file change
+# ---------------------------------------------------------------------------
+if pgrep -f "signal_watcher.py" >/dev/null 2>&1; then
+  echo "→ Signal Watcher: already running"
+else
+  if [[ -f "$REPOMAN_DIR/scripts/signal_watcher.py" ]]; then
+    cd "$REPOMAN_DIR/scripts" && nohup "$REPOMAN_DIR/venv/bin/python3" signal_watcher.py > /tmp/signal-watcher.log 2>&1 &
+    echo "→ Signal Watcher: started (PID $!)"
+  else
+    echo "→ Signal Watcher: not found"
+  fi
+fi
+
+# ---------------------------------------------------------------------------
 # Summary
 # ---------------------------------------------------------------------------
 echo ""
 echo "=== Stack Status ==="
-echo "  Ollama:       $(pgrep -x ollama >/dev/null && echo 'running' || echo 'NOT running')"
-echo "  Neo4j:        $(command -v neo4j &>/dev/null && echo 'installed' || echo 'not installed')"
-echo "  OpenClaw:     $(command -v openclaw &>/dev/null && echo 'installed' || echo 'not installed')"
-echo "  Queue Runner: $(pgrep -f queue-runner.sh >/dev/null && echo 'running' || echo 'NOT running')"
-echo "  Dashboard:    $(pgrep -f 'dashboard/server.py' >/dev/null && echo 'running on :7080' || echo 'NOT running')"
+echo "  Ollama:          $(pgrep -x ollama >/dev/null && echo 'running' || echo 'NOT running')"
+echo "  Neo4j:           $(command -v neo4j &>/dev/null && echo 'installed' || echo 'not installed')"
+echo "  OpenClaw:        $(command -v openclaw &>/dev/null && echo 'installed' || echo 'not installed')"
+echo "  Queue Runner:    $(pgrep -f queue-runner.sh >/dev/null && echo 'running' || echo 'NOT running')"
+echo "  Dashboard:       $(pgrep -f 'dashboard/server.py' >/dev/null && echo 'running on :7080' || echo 'NOT running')"
+echo "  Repo Man:        $(pgrep -f 'repo-man/venv/bin/python3 main.py' >/dev/null && echo 'running on :8765' || echo 'NOT running')"
+echo "  Signal Watcher:  $(pgrep -f 'signal_watcher.py' >/dev/null && echo 'running' || echo 'NOT running')"
+echo "  CF Tunnel:       $(pgrep -f 'cloudflared tunnel' >/dev/null && echo 'up → asdfghjk.lol' || echo 'NOT running')"
 echo ""
 echo "Stack up. Clawmpson never sleeps."
 
