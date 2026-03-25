@@ -164,14 +164,43 @@ def scan_fair_value(conn, balance, open_ids, spot_dict, events_seen, new_ids) ->
     now = datetime.datetime.utcnow()
     placed = 0
 
-    rows = conn.execute("""
-        SELECT km.ticker, km.title, km.yes_bid, km.yes_ask, km.no_bid, km.no_ask,
-               km.close_time, km.event_ticker, km.strike_type, km.cap_strike, km.floor_strike
-        FROM kalshi_markets km
-        INNER JOIN (SELECT ticker, MAX(fetched_at) as latest FROM kalshi_markets GROUP BY ticker) l
-        ON km.ticker = l.ticker AND km.fetched_at = l.latest
-        WHERE (km.yes_ask > 0 OR km.yes_bid > 0)
-    """).fetchall()
+    # Use RivalClaw's richer market data if available (11K+ snapshots vs our 700)
+    rivalclaw_db = Path.home() / "rivalclaw" / "rivalclaw.db"
+    if rivalclaw_db.exists():
+        try:
+            rc_conn = sqlite3.connect(str(rivalclaw_db))
+            rc_conn.row_factory = sqlite3.Row
+            rows = rc_conn.execute("""
+                SELECT ke.market_id as ticker, md.question as title,
+                       ke.yes_bid, ke.yes_ask, ke.no_bid, ke.no_ask,
+                       ke.close_time, ke.event_ticker, ke.strike_type, ke.cap_strike, ke.floor_strike
+                FROM kalshi_extra ke
+                INNER JOIN (SELECT market_id, MAX(fetched_at) as latest FROM kalshi_extra GROUP BY market_id) l
+                ON ke.market_id = l.market_id AND ke.fetched_at = l.latest
+                LEFT JOIN market_data md ON ke.market_id = md.market_id
+                WHERE (ke.yes_ask > 0 OR ke.yes_bid > 0)
+            """).fetchall()
+            rc_conn.close()
+            print(f"[phantom] Using RivalClaw data: {len(rows)} markets")
+        except Exception as e:
+            print(f"[phantom] RivalClaw DB error: {e}, falling back to clawmson")
+            rows = conn.execute("""
+                SELECT km.ticker, km.title, km.yes_bid, km.yes_ask, km.no_bid, km.no_ask,
+                       km.close_time, km.event_ticker, km.strike_type, km.cap_strike, km.floor_strike
+                FROM kalshi_markets km
+                INNER JOIN (SELECT ticker, MAX(fetched_at) as latest FROM kalshi_markets GROUP BY ticker) l
+                ON km.ticker = l.ticker AND km.fetched_at = l.latest
+                WHERE (km.yes_ask > 0 OR km.yes_bid > 0)
+            """).fetchall()
+    else:
+        rows = conn.execute("""
+            SELECT km.ticker, km.title, km.yes_bid, km.yes_ask, km.no_bid, km.no_ask,
+                   km.close_time, km.event_ticker, km.strike_type, km.cap_strike, km.floor_strike
+            FROM kalshi_markets km
+            INNER JOIN (SELECT ticker, MAX(fetched_at) as latest FROM kalshi_markets GROUP BY ticker) l
+            ON km.ticker = l.ticker AND km.fetched_at = l.latest
+            WHERE (km.yes_ask > 0 OR km.yes_bid > 0)
+        """).fetchall()
 
     for r in rows:
         if placed >= MAX_TRADES_PER_RUN:
@@ -254,15 +283,21 @@ def scan_fair_value(conn, balance, open_ids, spot_dict, events_seen, new_ids) ->
 
         # Edge = |fair - market_price|
         # If fair > market → buy YES (underpriced)
-        # If fair < market → buy NO
-        if fair > ya + 0.01:
+        # If fair < market → buy NO (YES is overpriced)
+        # For NO: use 1-yes_bid as the effective NO price (what you'd pay)
+        yb = _norm(r["yes_bid"])
+        nb = _norm(r["no_bid"])
+        effective_no_price = (1.0 - yb) if yb > 0 else na  # what NO effectively costs
+
+        if fair > ya + 0.01 and ya > 0:
             direction = "YES"
             entry = ya
             edge = fair - ya
-        elif (1.0 - fair) > na + 0.01:
+        elif fair < yb - 0.01 and yb > 0:
+            # YES is overpriced → buy NO
             direction = "NO"
-            entry = na
-            edge = (1.0 - fair) - na
+            entry = effective_no_price
+            edge = yb - fair  # how much YES is overpriced
         else:
             continue
 
@@ -292,7 +327,7 @@ def scan_fair_value(conn, balance, open_ids, spot_dict, events_seen, new_ids) ->
         if kelly <= 0:
             continue
 
-        amount = kelly * balance * KELLY_NEW  # fractional Kelly until proven
+        amount = kelly * balance * KELLY_PROVEN  # full Kelly — strategy is proven by RivalClaw
         amount = min(amount, MAX_POSITION_PCT * balance)
         if amount < 2:
             continue
@@ -415,9 +450,14 @@ def run():
     conn = _get_conn()
     balance = _get_balance(conn)
     open_ids = set(r[0] for r in conn.execute("SELECT market_id FROM paper_trades WHERE status='open'").fetchall())
-    events_seen = set(r[0] for r in conn.execute(
-        "SELECT DISTINCT market_id FROM paper_trades WHERE status='open' AND strategy LIKE 'phantomclaw%'"
-    ).fetchall())
+    # Allow up to 3 brackets per event (like RivalClaw's bracket_cone)
+    from collections import Counter
+    event_counts = Counter()
+    for r in conn.execute("SELECT market_id FROM paper_trades WHERE status='open' AND strategy LIKE 'phantomclaw%'").fetchall():
+        # Extract event ticker from market_id (everything before last dash segment)
+        parts = r[0].rsplit("-", 1)
+        event_counts[parts[0] if len(parts) > 1 else r[0]] += 1
+    events_seen = set(evt for evt, cnt in event_counts.items() if cnt >= 3)
     new_ids: set[int] = set()
 
     # Get spot prices
