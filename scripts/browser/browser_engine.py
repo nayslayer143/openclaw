@@ -49,6 +49,9 @@ class BrowserEngine:
         session_cookies: Optional[list] = None,
     ):
         config = _load_config()
+        # HEADED=1 env var overrides headless for visual debugging
+        if os.environ.get("HEADED", "").strip() in ("1", "true", "yes"):
+            headless = False
         self._headless = headless
         self._stealth = stealth or config.get("stealth_mode", False)
         self._proxy_url = proxy_url or os.environ.get("BROWSER_PROXY_URL") or config.get("proxy_url")
@@ -77,6 +80,8 @@ class BrowserEngine:
     def __enter__(self) -> "BrowserEngine":
         self._pw = sync_playwright().start()
         launch_kwargs: dict = {"headless": self._headless}
+        if not self._headless:
+            launch_kwargs["slow_mo"] = int(os.environ.get("SLOW_MO", 300))
         if self._proxy_url:
             launch_kwargs["proxy"] = {"server": self._proxy_url}
         self._browser = self._pw.chromium.launch(**launch_kwargs)
