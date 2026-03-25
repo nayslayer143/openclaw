@@ -20,7 +20,7 @@ MIN_HISTORY_DAYS = int(os.environ.get("MIROFISH_MIN_HISTORY_DAYS", "7"))
 SLIPPAGE_BPS     = float(os.environ.get("MIROFISH_SLIPPAGE_BPS",     "50"))   # 50 bps = 0.5%
 
 # Sub-agent strategies excluded from Clawmpson's wallet (each has its own $1000)
-_SUBAGENT_STRATEGIES = ("phantomclaw_fv", "calendarclaw", "newsclaw", "sentimentclaw", "dataharvester")
+_SUBAGENT_STRATEGIES = ("phantomclaw_fv", "calendarclaw", "newsclaw", "sentimentclaw", "dataharvester", "lotteryclaw")
 LATENCY_PENALTY  = float(os.environ.get("MIROFISH_LATENCY_PENALTY",  "0.002")) # 0.2% stale price risk
 FILL_RATE_MIN    = float(os.environ.get("MIROFISH_FILL_RATE_MIN",    "0.80"))  # min 80% fill
 EXECUTION_SIM    = os.environ.get("MIROFISH_EXECUTION_SIM", "1") == "1"        # on by default
