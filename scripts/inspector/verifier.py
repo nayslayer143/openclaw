@@ -96,6 +96,14 @@ class TradeVerifier:
         entry_price = trade.get("entry_price", 0) or 0
         opened_at   = trade.get("opened_at", "")
 
+        # Non-Polymarket markets (e.g., Kalshi KX* IDs) cannot be verified
+        # against the Polymarket API — mark UNVERIFIABLE, not IMPOSSIBLE.
+        if not market_id.startswith("0x"):
+            return {
+                "status": VerificationStatus.UNVERIFIABLE,
+                "detail": f"Market {market_id} is not a Polymarket market (no cross-exchange client yet)",
+            }
+
         market = self.poly.get_market(market_id)
         if market is None:
             return {

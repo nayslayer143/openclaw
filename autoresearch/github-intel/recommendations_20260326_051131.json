@@ -20,7 +20,7 @@
       "what_to_take": "Integrate the backtesting.py framework to replace existing strategy validation logic with its standardized backtesting API, particularly for ArbClaw's arb strategy development and RivalClaw's self-tuning engine.",
       "risk": "MIT license (no concerns), but requires refactoring existing strategy code to adopt its API; active maintenance but not directly tied to our stack's SQLite data flow.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "Extract order book feature engineering patterns and ML model architecture for detecting short-term imbalances, to enhance ArbClaw's arb detection at 5-min intervals.",
       "risk": "License unknown (must verify), future-dated last update (2026) suggests possible error, Jupyter format requires significant refactoring to production code.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -100,7 +100,7 @@
       "what_to_take": "Extract the backtesting framework and optimization modules to enhance Clawmpson's graduation engine, and adapt the modular strategy structure for integration with existing modules.",
       "risk": "Suspicious future last updated date (2026-03-22) may indicate maintenance issues; MIT license is acceptable but requires verification of actual activity.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "The event-driven architecture and order management system for Clawmpson's strategy execution engine, but not for backtesting due to prediction market data mismatch.",
       "risk": "Designed for traditional markets (stocks/futures) not prediction markets, causing data structure incompatibility; MIT license is safe but integration would require significant refactoring of core trading logic.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "Core DRL algorithm implementations (neural network architectures, training loops) for potential adaptation to prediction markets, excluding Jupyter notebook structure.",
       "risk": "License unknown (must verify), low maintenance activity (last updated 2026-03-20 - likely typo), high refactoring effort required to convert Jupyter notebooks to production code, and market context mismatch (stocks vs prediction markets).",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "The gym environment structure for building trading environments could be adapted for prediction markets, but crypto-specific data handling would need replacement. Avoid direct RL agent integration due to market mismatch.",
       "risk": "Market mismatch (crypto vs. prediction markets) requires significant adaptation; license not specified in repo; future-dated last update (2026-03-19) suggests potential data error or placeholder.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -280,7 +280,7 @@
       "what_to_take": "Extract RL environment setup and training loop for potential self-tuner enhancement in RivalClaw",
       "risk": "License unclear (MIT likely but unverified), repo inactive (last updated 2026-03-12 typo), high refactoring needed from Jupyter to production code",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -300,7 +300,7 @@
       "what_to_take": "Conceptual inspiration for visual strategy design only; no code reuse possible due to JavaScript vs Python mismatch and crypto-only focus.",
       "risk": "License unknown (GPLv3? Must verify), maintenance red flag (last updated 2026-03-25), and high integration complexity from language mismatch.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -320,7 +320,7 @@
       "what_to_take": "None. Crypto market-making algorithms in C++ are irrelevant to prediction market strategies (Polymarket/Kalshi) and incompatible with Python stack.",
       "risk": "License unknown (requires verification), suspicious future-dated last update (2026-03-25), and fundamental domain mismatch (crypto vs prediction markets) with high refactoring cost.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -340,7 +340,7 @@
       "what_to_take": "Use the curated list to identify specific repositories with actual code (e.g., for time series forecasting or arbitrage detection) and evaluate those for integration, rather than integrating this list directly.",
       "risk": "Links may be outdated or point to projects with incompatible licenses; requires additional research on linked repositories. No direct code to integrate.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -360,7 +360,7 @@
       "what_to_take": "Zipline's backtesting framework is irrelevant for live trading; no components should be integrated into any bot stack.",
       "risk": "Apache 2.0 license is acceptable but Zipline is designed for backtesting, not live trading. Integration would require massive refactoring for real-time use, with no benefit to prediction market trading systems.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -380,7 +380,7 @@
       "what_to_take": "This is an HTML-based resource list, not a code repository. No executable patterns or modules exist for integration.",
       "risk": "Repo is a static HTML list (not code), future-dated last update (2026-03-25) suggests inaccuracy, and no actionable code for integration.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null

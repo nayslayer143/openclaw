@@ -61,6 +61,16 @@ def test_price_impossible_market_not_found():
     assert result["status"] == VerificationStatus.IMPOSSIBLE
 
 
+def test_price_unverifiable_non_polymarket_market():
+    """Non-0x market IDs (e.g., Kalshi KX* IDs) should be UNVERIFIABLE, not IMPOSSIBLE."""
+    poly = MagicMock()
+    tv = TradeVerifier(db=MagicMock(), poly=poly)
+    result = tv._check_price(_make_trade({"market_id": "KXBTC-26MAR2402-T77699.99"}))
+    assert result["status"] == VerificationStatus.UNVERIFIABLE
+    # Polymarket client should NOT be called for non-Polymarket markets
+    poly.get_market.assert_not_called()
+
+
 def test_price_unverifiable_no_history():
     poly = MagicMock()
     poly.get_market.return_value = {"question": "Will X?"}
