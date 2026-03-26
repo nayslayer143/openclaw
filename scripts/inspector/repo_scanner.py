@@ -50,8 +50,9 @@ _COMPILED_PATTERNS = [re.compile(p) for p in SUSPICIOUS_PATTERNS]
 # ---------------------------------------------------------------------------
 
 class RepoScanner:
-    def __init__(self, db: InspectorDB) -> None:
+    def __init__(self, db: InspectorDB, repo_root: str = None) -> None:
         self.db = db
+        self.repo = Path(repo_root).expanduser() if repo_root else REPO_ROOT
 
     # ------------------------------------------------------------------
     # Git helpers
@@ -64,7 +65,7 @@ class RepoScanner:
         """
         try:
             result = subprocess.run(
-                ["git", "-C", str(REPO_ROOT)] + list(args),
+                ["git", "-C", str(self.repo)] + list(args),
                 capture_output=True,
                 text=True,
                 timeout=30,

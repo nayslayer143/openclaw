@@ -56,6 +56,24 @@ class HallucinationDetector:
     # Core grounding checks (pure — no DB writes)
     # ------------------------------------------------------------------
 
+    def _check_price_claim_with_value(
+        self,
+        market_id: str,
+        claimed_price: float,
+        timestamp_iso: str,
+    ):
+        """Returns (GroundingResult, actual_price_or_None)"""
+        actual = self.poly.get_price_at(market_id, timestamp_iso)
+        if actual is None:
+            return GroundingResult.UNVERIFIABLE, None
+
+        delta = abs(actual - claimed_price)
+        if delta <= PRICE_GROUNDED_TOL:
+            return GroundingResult.GROUNDED, actual
+        if delta <= PRICE_PARTIAL_TOL:
+            return GroundingResult.PARTIALLY_GROUNDED, actual
+        return GroundingResult.HALLUCINATED, actual
+
     def check_price_claim(
         self,
         market_id: str,
@@ -72,16 +90,8 @@ class HallucinationDetector:
           HALLUCINATED       if delta > PRICE_PARTIAL_TOL
           UNVERIFIABLE       if no historical price is available
         """
-        actual = self.poly.get_price_at(market_id, timestamp_iso)
-        if actual is None:
-            return GroundingResult.UNVERIFIABLE
-
-        delta = abs(actual - claimed_price)
-        if delta <= PRICE_GROUNDED_TOL:
-            return GroundingResult.GROUNDED
-        if delta <= PRICE_PARTIAL_TOL:
-            return GroundingResult.PARTIALLY_GROUNDED
-        return GroundingResult.HALLUCINATED
+        result, _ = self._check_price_claim_with_value(market_id, claimed_price, timestamp_iso)
+        return result
 
     def check_market_existence(self, market_id: str) -> GroundingResult:
         """
@@ -157,7 +167,7 @@ class HallucinationDetector:
                 if not market_id or claimed_price is None:
                     continue
 
-                result = self.check_price_claim(market_id, float(claimed_price), scan_time)
+                result, actual_value = self._check_price_claim_with_value(market_id, float(claimed_price), scan_time)
                 score = self._score(result)
 
                 self.db.insert("hallucination_checks", {
@@ -166,7 +176,7 @@ class HallucinationDetector:
                     "claim_content":       str(claimed_price),
                     "verification_result": result.value,
                     "grounding_score":     score,
-                    "actual_value":        None,
+                    "actual_value":        actual_value,
                     "checked_at":          datetime.now(timezone.utc).strftime(
                         "%Y-%m-%dT%H:%M:%SZ"
                     ),
@@ -212,7 +222,7 @@ class HallucinationDetector:
                 if not market_id or entry_price is None:
                     continue
 
-                result = self.check_price_claim(market_id, float(entry_price), opened_at)
+                result, actual_value = self._check_price_claim_with_value(market_id, float(entry_price), opened_at)
                 score = self._score(result)
 
                 self.db.insert("hallucination_checks", {
@@ -221,7 +231,7 @@ class HallucinationDetector:
                     "claim_content":       str(entry_price),
                     "verification_result": result.value,
                     "grounding_score":     score,
-                    "actual_value":        None,
+                    "actual_value":        actual_value,
                     "checked_at":          datetime.now(timezone.utc).strftime(
                         "%Y-%m-%dT%H:%M:%SZ"
                     ),

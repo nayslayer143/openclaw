@@ -214,13 +214,24 @@ class StatsAuditor:
         # Check 1: win rate
         red_flags.extend(self.check_win_rate(trades))
 
-        # Check 2: position sizing per trade
+        # Check 2: position sizing — collect all violations, collapse to one flag
+        size_violations = []
         for trade in trades:
             try:
                 flags = self.check_position_size(trade, starting_balance)
-                red_flags.extend(flags)
+                size_violations.extend(flags)
             except Exception:
                 continue
+
+        if size_violations:
+            worst = max(size_violations, key=lambda f: ["low","medium","high","critical"].index(f.severity))
+            count = len(size_violations)
+            red_flags.append(RedFlag(
+                check="position_size",
+                severity=worst.severity,
+                message=f"{count} trade(s) exceeded {KELLY_CAP*100:.0f}% position cap. Worst: {worst.message}",
+                value=worst.value,
+            ))
 
         # Check 3: Sharpe
         red_flags.extend(self.check_sharpe(daily_pnl))
