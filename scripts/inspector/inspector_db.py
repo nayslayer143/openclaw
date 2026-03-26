@@ -4,8 +4,15 @@ Manages five audit tables for independent trading verification.
 """
 
 import sqlite3
+import warnings
 from pathlib import Path
 from typing import List, Dict, Any
+
+
+_TABLES = frozenset({
+    "verified_trades", "resolution_audits", "code_findings",
+    "hallucination_checks", "audit_reports",
+})
 
 
 class InspectorDB:
@@ -16,10 +23,16 @@ class InspectorDB:
         self.db_path = str(Path(raw_path).expanduser())
         Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
 
+    def _validate_table(self, table: str) -> None:
+        if table not in _TABLES:
+            raise ValueError(f"Unknown table: {table!r}")
+
     def _connect(self) -> sqlite3.Connection:
         conn = sqlite3.connect(self.db_path)
         conn.row_factory = sqlite3.Row
-        conn.execute("PRAGMA journal_mode=WAL")
+        result = conn.execute("PRAGMA journal_mode=WAL").fetchone()
+        if result and result[0] != "wal":
+            warnings.warn(f"WAL mode not set; active mode: {result[0]}")
         conn.execute("PRAGMA foreign_keys=ON")
         return conn
 
@@ -43,7 +56,7 @@ class InspectorDB:
                 status           TEXT CHECK(status IN ('VERIFIED','DISCREPANCY','IMPOSSIBLE','UNVERIFIABLE')),
                 discrepancy_amount  REAL,
                 discrepancy_detail  TEXT,
-                checked_at       TEXT
+                checked_at       TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
             )
             """,
             """
@@ -57,7 +70,7 @@ class InspectorDB:
                 recalculated_pnl    REAL,
                 claimed_pnl         REAL,
                 pnl_delta           REAL,
-                checked_at          TEXT
+                checked_at          TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
             )
             """,
             """
@@ -69,7 +82,7 @@ class InspectorDB:
                 severity     TEXT CHECK(severity IN ('critical','high','medium','low')),
                 description  TEXT,
                 snippet      TEXT,
-                found_at     TEXT
+                found_at     TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
             )
             """,
             """
@@ -84,14 +97,14 @@ class InspectorDB:
                                     )),
                 grounding_score     REAL,
                 actual_value        TEXT,
-                checked_at          TEXT
+                checked_at          TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now'))
             )
             """,
             """
             CREATE TABLE IF NOT EXISTS audit_reports (
                 id                      INTEGER PRIMARY KEY AUTOINCREMENT,
                 report_id               TEXT UNIQUE,
-                generated_at            TEXT,
+                generated_at            TEXT DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ', 'now')),
                 summary                 TEXT,
                 total_trades_checked    INTEGER,
                 verified_count          INTEGER,
@@ -103,6 +116,8 @@ class InspectorDB:
                 report_path             TEXT
             )
             """,
+            "CREATE INDEX IF NOT EXISTS idx_verified_trades_trade_id ON verified_trades(trade_id)",
+            "CREATE INDEX IF NOT EXISTS idx_resolution_audits_trade_id ON resolution_audits(trade_id)",
         ]
         with self._connect() as conn:
             for statement in ddl:
@@ -119,6 +134,7 @@ class InspectorDB:
 
     def insert(self, table: str, row: Dict[str, Any]) -> int:
         """Insert a row dict into the named table. Returns the lastrowid."""
+        self._validate_table(table)
         columns = ", ".join(row.keys())
         placeholders = ", ".join(["?"] * len(row))
         sql = f"INSERT INTO {table} ({columns}) VALUES ({placeholders})"
@@ -129,6 +145,7 @@ class InspectorDB:
 
     def fetch_all(self, table: str, where: str = "", params: tuple = ()) -> List[Dict[str, Any]]:
         """SELECT all rows from table with an optional WHERE clause."""
+        self._validate_table(table)
         sql = f"SELECT * FROM {table}"
         if where:
             sql += f" WHERE {where}"
