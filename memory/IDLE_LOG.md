@@ -211,3 +211,11 @@ Synthesis unavailable — Ollama not responding
 ### Self-Improvement Cycle — 2026-03-25 22:00
 - Patterns analyzed: 14 days of logs
 - Result: No recurring failures found — system healthy
+[2026-03-25 23:30] Idea engine ran — wrote /Users/nayslayer/openclaw/outputs/ideas-2026-03-25-23.md, ingested to Ideas Lab
+
+### Nightly Consolidation — 2026-03-25 23:03
+Tasks: 0
+0 complete, 0
+0 blocked, 0
+0 errors
+Consolidation unavailable — Ollama not responding
