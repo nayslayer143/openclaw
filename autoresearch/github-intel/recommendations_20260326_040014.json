@@ -20,7 +20,7 @@
       "what_to_take": "Extract the stats and plot modules for performance metrics (Sharpe, max drawdown, etc.) and visualization functions to integrate with Clawmpson's graduation engine and RivalClaw's strategy comparison, using return series as input.",
       "risk": "MIT license is safe; minor data format adaptation needed (returns series), but no major maintenance or complexity risks; active repo with 6.8k stars.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "General trading bot architecture patterns (data feed handling, strategy execution loops) but not asset-specific Bitcoin code",
       "risk": "JavaScript vs Python mismatch creates high integration complexity; Bitcoin focus irrelevant to prediction markets; future-dated last update suggests potential maintenance issues",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "This repo is a curated list of external resources, not executable code. No patterns or code can be integrated directly.",
       "risk": "Repo is a resource list (not codebase), risking wasted effort if misinterpreted. External resources may have incompatible licenses/maintenance issues.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "Repo is an HTML-based curated list of trading resources, not executable code. No patterns or code can be integrated directly.",
       "risk": "Repo is non-code (HTML list), making integration impossible. Future-dated last update (2026-03-25) indicates potential abandonment or data error. No actionable code for bot integration.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
