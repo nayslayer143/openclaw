@@ -52,6 +52,7 @@ python ~/openclaw/scripts/inspector/run_inspection.py --report
 - Any IMPOSSIBLE trade found
 - Any HALLUCINATED price claim
 - Discrepancy count > 5
+- Any CRITICAL code finding (including statistical anomalies)
 
 ## Approval Thresholds
 - Tier 1 (auto-execute): Reading trade data, calling Polymarket API, generating reports

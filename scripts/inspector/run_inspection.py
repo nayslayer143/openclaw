@@ -120,6 +120,18 @@ def main() -> None:
         print(f"   → trust={results['stats'].get('trust_score', '?')}, "
               f"flags={len(results['stats'].get('red_flags', []))}")
 
+        # Persist stats red flags to code_findings so they appear in the report
+        for flag in results["stats"].get("red_flags", []):
+            db.insert("code_findings", {
+                "file_path": "stats_audit",
+                "line_number": None,
+                "finding_type": f"stats_{flag.get('check', 'unknown')}",
+                "severity": flag.get("severity", "medium"),
+                "description": flag.get("message", ""),
+                "snippet": None,
+                "found_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+            })
+
         print("🧠 Hallucination detection...")
         hd = HallucinationDetector(db=db, poly=poly)
         results["hallucination"]        = hd.run_on_signals(SIGNALS_JSON)
@@ -155,6 +167,10 @@ def main() -> None:
         if h.get("verification_result") == "HALLUCINATED"
     )
 
+    # Check for CRITICAL code findings (includes stats red flags persisted above)
+    critical_findings = sum(1 for f in db.fetch_all("code_findings")
+                            if f.get("severity") == "critical")
+
     summary = (
         f"🔍 Inspector Gadget Report ({datetime.now(timezone.utc).strftime('%Y-%m-%d')})\n"
         f"Trust Score: {trust}/100\n"
@@ -168,9 +184,14 @@ def main() -> None:
     )
     print("\n" + summary)
 
-    alert_needed = (impossible > 0) or (discrepancy > 5) or (hallucinated > 0)
+    alert_needed = (impossible > 0) or (discrepancy > 5) or (hallucinated > 0) or (critical_findings > 0)
     if alert_needed:
-        notify_telegram(f"🚨 INSPECTOR GADGET ALERT\n{summary}")
+        reasons = []
+        if impossible > 0: reasons.append(f"🚨 {impossible} IMPOSSIBLE trade(s)")
+        if discrepancy > 5: reasons.append(f"⚠️ {discrepancy} discrepancies")
+        if hallucinated > 0: reasons.append(f"🧠 {hallucinated} HALLUCINATED claim(s)")
+        if critical_findings > 0: reasons.append(f"🔴 {critical_findings} CRITICAL code finding(s)")
+        notify_telegram(f"🚨 INSPECTOR GADGET ALERT\n{chr(10).join(reasons)}\n\n{summary}")
     else:
         notify_telegram(summary)
 
