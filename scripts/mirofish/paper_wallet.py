@@ -25,6 +25,10 @@ LATENCY_PENALTY  = float(os.environ.get("MIROFISH_LATENCY_PENALTY",  "0.002")) #
 FILL_RATE_MIN    = float(os.environ.get("MIROFISH_FILL_RATE_MIN",    "0.80"))  # min 80% fill
 EXECUTION_SIM    = os.environ.get("MIROFISH_EXECUTION_SIM", "1") == "1"        # on by default
 
+# Fee modeling — deduct real exchange fees from P&L
+POLYMARKET_FEE_RATE = float(os.environ.get("MIROFISH_POLYMARKET_FEE", "0.02"))
+KALSHI_TAKER_FEE_RATE = float(os.environ.get("MIROFISH_KALSHI_FEE", "0.07"))
+
 
 def _get_conn() -> sqlite3.Connection:
     db_path = Path(os.environ.get("CLAWMSON_DB_PATH", Path.home() / ".openclaw" / "clawmson.db"))
@@ -125,35 +129,20 @@ def _generate_recommendation(strats) -> str:
 
 
 def reset_wallet(new_balance: float = WALLET_RESET_AMOUNT) -> dict:
-    """
-    Reset the paper wallet: close all open positions, archive old trades,
-    set new starting balance. Returns summary of what was reset.
-    """
+    """Circuit breaker: halt trading instead of resetting. Preserves loss data."""
     now = datetime.datetime.utcnow().isoformat()
-    with _get_conn() as conn:
-        # Close all open positions at entry price (flat)
-        open_count = conn.execute(
-            "SELECT COUNT(*) as n FROM paper_trades WHERE status='open'"
-        ).fetchone()["n"]
-        conn.execute("""
-            UPDATE paper_trades SET status='reset', pnl=0, exit_price=entry_price,
-            closed_at=? WHERE status='open'
-        """, (now,))
-
-        # Update starting balance
-        conn.execute("""
-            INSERT OR REPLACE INTO context (chat_id, key, value)
-            VALUES ('mirofish', 'starting_balance', ?)
-        """, (str(new_balance),))
-
-        # Record the reset event
-        conn.execute("""
-            INSERT INTO context (chat_id, key, value)
-            VALUES ('mirofish', ?, ?)
-        """, (f"wallet_reset_{now}", f"Reset to ${new_balance:.2f}, closed {open_count} positions"))
-
-    print(f"[wallet] Reset to ${new_balance:.2f} — closed {open_count} open positions")
-    return {"new_balance": new_balance, "closed_positions": open_count, "reset_at": now}
+    conn = _get_conn()
+    try:
+        conn.execute(
+            "INSERT OR REPLACE INTO context (chat_id, key, value) VALUES ('mirofish', 'trading_status', 'halted')")
+        conn.execute(
+            "INSERT OR REPLACE INTO context (chat_id, key, value) VALUES ('mirofish', ?, ?)",
+            (f"halt_event_{now}", f"Circuit breaker triggered at balance floor"))
+        conn.commit()
+    finally:
+        conn.close()
+    print(f"[mirofish] TRADING HALTED by circuit breaker at {now}")
+    return {"status": "halted", "halted_at": now}
 
 
 def _get_starting_balance() -> float:
@@ -260,9 +249,10 @@ def _simulate_execution(
     amount_usd: float,
     shares: float,
     direction: str,
+    venue: str = "polymarket",
 ) -> tuple[float, float, float, dict]:
     """
-    Apply execution simulation: slippage, latency penalty, partial fills.
+    Apply execution simulation: slippage, latency penalty, partial fills, fees.
     Returns (adjusted_price, adjusted_amount, adjusted_shares, sim_metadata).
     """
     import random
@@ -287,6 +277,11 @@ def _simulate_execution(
     # 3. Partial fill: random fill between FILL_RATE_MIN and 1.0
     fill_rate = random.uniform(FILL_RATE_MIN, 1.0)
     adjusted_amount = ideal_amount * fill_rate
+
+    # 4. Fee deduction
+    fee_rate = KALSHI_TAKER_FEE_RATE if venue == "kalshi" else POLYMARKET_FEE_RATE
+    entry_fee = adjusted_amount * fee_rate * min(adjusted_price, 1.0 - adjusted_price)
+    adjusted_amount -= entry_fee
     adjusted_shares = adjusted_amount / adjusted_price if adjusted_price > 0 else 0
 
     sim_metadata = {
@@ -297,6 +292,7 @@ def _simulate_execution(
         "fill_rate": fill_rate,
         "ideal_amount": ideal_amount,
         "adjusted_amount": adjusted_amount,
+        "entry_fee": entry_fee,
         "price_impact_pct": ((adjusted_price - ideal_price) / ideal_price * 100)
                             if ideal_price > 0 else 0,
     }
@@ -316,6 +312,18 @@ def execute_trade(decision: Any) -> dict | None:
     - Latency penalty (default 0.2%)
     - Partial fills (80-100% fill rate)
     """
+    # Check if trading is halted
+    conn_check = _get_conn()
+    try:
+        status_row = conn_check.execute(
+            "SELECT value FROM context WHERE chat_id='mirofish' AND key='trading_status'"
+        ).fetchone()
+        if status_row and status_row["value"] == "halted":
+            print("[mirofish/wallet] REJECTED: trading is halted by circuit breaker")
+            return None
+    finally:
+        conn_check.close()
+
     state = get_state()
     cap = state["balance"] * MAX_POSITION_PCT
 
@@ -326,11 +334,14 @@ def execute_trade(decision: Any) -> dict | None:
     amount_usd = decision.amount_usd
     shares = decision.shares
     sim_metadata = None
+    venue = getattr(decision, "venue", None) or ("kalshi" if decision.market_id.startswith("KX") else "polymarket")
+    entry_fee = 0.0
 
     if EXECUTION_SIM:
         entry_price, amount_usd, shares, sim_metadata = _simulate_execution(
-            entry_price, amount_usd, shares, decision.direction,
+            entry_price, amount_usd, shares, decision.direction, venue=venue,
         )
+        entry_fee = sim_metadata.get("entry_fee", 0.0)
         # Re-check cap after simulation adjustments
         if amount_usd > cap:
             return None
@@ -340,7 +351,7 @@ def execute_trade(decision: Any) -> dict | None:
     if sim_metadata:
         reasoning += (
             f" [sim: price {sim_metadata['ideal_price']:.3f}→{sim_metadata['adjusted_price']:.3f}, "
-            f"fill {sim_metadata['fill_rate']:.0%}]"
+            f"fill {sim_metadata['fill_rate']:.0%}, fee ${entry_fee:.2f}]"
         )
 
     ts = datetime.datetime.utcnow().isoformat()
@@ -348,8 +359,8 @@ def execute_trade(decision: Any) -> dict | None:
         cur = conn.execute("""
             INSERT INTO paper_trades
             (market_id, question, direction, shares, entry_price, amount_usd,
-             status, confidence, reasoning, strategy, opened_at)
-            VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?)
+             status, confidence, reasoning, strategy, opened_at, entry_fee)
+            VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?)
         """, (
             decision.market_id, decision.question, decision.direction,
             shares, entry_price, amount_usd,
@@ -357,6 +368,7 @@ def execute_trade(decision: Any) -> dict | None:
             reasoning,
             getattr(decision, "strategy", "manual"),
             ts,
+            entry_fee,
         ))
         trade_id = cur.lastrowid
 
@@ -393,14 +405,20 @@ def check_stops(current_prices: dict[str, dict]) -> list[dict]:
 
     for t in open_trades:
         p = current_prices.get(t["market_id"], {})
-        if t["direction"] == "YES":
-            current_price = p.get("yes_price", t["entry_price"])
-        else:
-            current_price = p.get("no_price", t["entry_price"])
+        current_price = p.get("yes_price" if t["direction"] == "YES" else "no_price")
+        if current_price is None:
+            continue  # Skip — no fresh price available, don't settle on stale data
 
         unrealized_pnl = t["shares"] * (current_price - t["entry_price"])
+
+        # Compute exit fee for net PnL
+        venue = "kalshi" if t["market_id"].startswith("KX") else "polymarket"
+        fee_rate = KALSHI_TAKER_FEE_RATE if venue == "kalshi" else POLYMARKET_FEE_RATE
+        exit_fee = t["shares"] * current_price * fee_rate * min(current_price, 1.0 - current_price)
+        net_pnl = unrealized_pnl - (t["entry_fee"] or 0) - exit_fee
+
         # Round to 10 decimal places to avoid floating-point drift at boundary conditions
-        pnl_pct = round(unrealized_pnl / t["amount_usd"], 10) if t["amount_usd"] > 0 else 0.0
+        pnl_pct = round(net_pnl / t["amount_usd"], 10) if t["amount_usd"] > 0 else 0.0
 
         # Check expiry
         expired = False
@@ -418,18 +436,18 @@ def check_stops(current_prices: dict[str, dict]) -> list[dict]:
         )
 
         if should_close:
-            status = "expired" if expired else ("closed_win" if unrealized_pnl >= 0 else "closed_loss")
+            status = "expired" if expired else ("closed_win" if net_pnl >= 0 else "closed_loss")
             ts = now.isoformat()
-            closed_updates.append((current_price, unrealized_pnl, status, ts, t["id"]))
+            closed_updates.append((current_price, net_pnl, status, ts, exit_fee, t["id"]))
             closed.append({
                 "id": t["id"], "market_id": t["market_id"],
-                "status": status, "exit_price": current_price, "pnl": unrealized_pnl,
+                "status": status, "exit_price": current_price, "pnl": net_pnl,
             })
 
     if closed_updates:
         with _get_conn() as conn:
             conn.executemany("""
-                UPDATE paper_trades SET exit_price=?, pnl=?, status=?, closed_at=? WHERE id=?
+                UPDATE paper_trades SET exit_price=?, pnl=?, status=?, closed_at=?, exit_fee=? WHERE id=?
             """, closed_updates)
 
     return closed

@@ -12,7 +12,7 @@ from pathlib import Path
 
 GAMMA_API = "https://gamma-api.polymarket.com/markets"
 MIN_VOLUME = float(os.environ.get("MIROFISH_MIN_MARKET_VOLUME", "10000"))
-CACHE_MAX_AGE_HOURS = 6
+CACHE_MAX_AGE_HOURS = 1
 
 
 def _parse_json_field(val):

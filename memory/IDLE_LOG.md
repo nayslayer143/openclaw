@@ -227,3 +227,32 @@ Tasks: 0
 0 | Blocked: 0
 0
 Synthesis unavailable — Ollama not responding
+
+### Memory Librarian — 2026-03-26 06:00
+Tasks: 0
+0 | Errors: 0
+0 | Blocked: 0
+0
+Synthesis unavailable — Ollama not responding
+
+### Market Intel Skip — 2026-03-26 06:30
+- No scout reports found for today
+- Skipped market intel run
+
+### Intel Scan — 2026-03-26 07:03
+- Reports scanned: 0
+- No new scout reports found
+[2026-03-26 23:30] Idea engine ran — wrote /Users/nayslayer/openclaw/outputs/ideas-2026-03-26-08.md, ingested to Ideas Lab
+
+### Morning Brief — 2026-03-26 08:03
+- Completed overnight: 0
+- Pending queue: 3
+[2026-03-26 23:30] Idea engine ran — wrote /Users/nayslayer/openclaw/outputs/ideas-2026-03-26-08.md, ingested to Ideas Lab
+[2026-03-26] Upstream check failed — gh API error
+
+### Memory Librarian — 2026-03-26 12:00
+Tasks: 0
+0 | Errors: 0
+0 | Blocked: 0
+0
+Synthesis unavailable — Ollama not responding
