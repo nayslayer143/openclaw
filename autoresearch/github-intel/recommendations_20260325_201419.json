@@ -20,7 +20,7 @@
       "what_to_take": "Extract the Strategy class and Backtest engine patterns for strategy execution and performance metrics calculation, adapting them to Clawmpson's graduation engine and ArbClaw's validation module without full framework integration.",
       "risk": "MIT license (permissive), active maintenance, minimal risk for pattern extraction; no major complexity concerns when taking only core patterns.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "Extract order book feature engineering techniques (e.g., imbalance metrics, depth features) and ML model architecture for short-term price prediction, adapting to our data sources and strategy pipelines.",
       "risk": "License unknown (must verify), SGX-specific data pipeline requires adaptation, Jupyter Notebook format needs refactoring for production use, and ML approach may not align with Clawmpson's existing strategy weights.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -100,7 +100,7 @@
       "what_to_take": "Extract the backtesting framework and machine learning integration patterns for strategy development, avoiding direct market-specific code (stocks/Bitcoin) and focusing on strategy base classes and ML pipeline structure.",
       "risk": "Suspicious future last-update date (2026-03-25) suggests possible data error; market mismatch (stocks/Bitcoin vs prediction markets) requires significant adaptation; MIT license is acceptable but high refactoring risk.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "Extract the backtesting module and strategy base class for performance evaluation, adapting it to work with our SQLite data storage and feed integrations.",
       "risk": "Unknown license (must verify permissive license), suspicious future last updated date (2026), and potential need for significant adaptation to fit existing SQLite/data flow patterns.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "Adapt Qlib's model training/evaluation framework (especially supervised learning/RL) and RD-Agent for automated strategy tuning to prediction market data pipelines, skipping stock-specific data modules.",
       "risk": "Data format mismatch (stock vs prediction market) requires major data pipeline rework; Qlib's equity focus may not align with prediction market dynamics; active maintenance uncertain due to future-dated last update (2026-03-25).",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -440,7 +440,7 @@
       "what_to_take": "Extract modular strategy component patterns (signal indicators, stop-loss logic) for Python adaptation, ignoring A-share market specifics.",
       "risk": "Market mismatch (A-shares vs prediction markets), C++ dependency requiring wrapper code, and potential maintenance burden for unused components.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -460,7 +460,7 @@
       "what_to_take": "Study event-driven architecture patterns and data-oriented state management for inspiration in improving Clawmpson's feed processing and strategy coordination, avoiding direct Rust integration.",
       "risk": "Rust/Python language mismatch creates high integration complexity; suspicious 2026 last update date may indicate repo inaccuracy; MIT license is acceptable but porting would require significant refactoring.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -500,7 +500,7 @@
       "what_to_take": "Backtesting framework and hyperparameter optimization modules, adapted to prediction market data pipelines and strategy interfaces.",
       "risk": "License unknown (potential MIT but unverified), suspicious future date (2026-03-25) suggesting possible repo inaccuracy, and high domain mismatch (crypto vs prediction markets) requiring major refactoring.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -520,7 +520,7 @@
       "what_to_take": "Market making algorithms (C++) not directly applicable to prediction markets; exchange integration code for crypto exchanges (Binance, Bitfinex) could be adapted for feed expansion but requires significant translation.",
       "risk": "C++ codebase requires significant translation to Python; potential license issues (license not specified in repo); market making strategy not directly applicable to prediction markets.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -540,7 +540,7 @@
       "what_to_take": "Extract specific statistical arbitrage indicator implementations (e.g., cointegration, mean-reversion) for porting to Python, avoiding full engine integration",
       "risk": "C# vs Python language mismatch requires significant porting effort; MIT license is acceptable but maintenance burden of ported code outweighs benefits; Lean's event-driven architecture incompatible with existing Python stack",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -620,7 +620,7 @@
       "what_to_take": "No relevant patterns; repo focuses on crypto futures exchanges (Binance/Bybit) while our stack targets prediction markets (Polymarket/Kalshi) with different market mechanics.",
       "risk": "License unknown (GitHub repo), high maintenance risk due to mismatched exchange APIs and market structure requiring major refactoring.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -760,7 +760,7 @@
       "what_to_take": "No executable code to integrate; the repo is a curated list of resources (not a codebase). Use the list to identify specific repos for potential integration instead.",
       "risk": "Repo contains no code (only a list), making direct integration impossible. Future 'last updated' date (2026) is likely a typo, but the list's primary value is research, not code reuse. No license concerns but no actionable code for integration.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -820,7 +820,7 @@
       "what_to_take": "Nothing. This is a curated HTML list of resources, not a code repository. No executable code or patterns can be integrated.",
       "risk": "Repo is a static HTML list (not code), making integration impossible. Future-dated last update (2026) suggests potential data error. No license or maintenance details for actual code integration.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
