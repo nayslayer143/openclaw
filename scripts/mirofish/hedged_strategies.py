@@ -80,19 +80,24 @@ def _get_open_ids(conn) -> set:
 def _place(conn, ticker, question, direction, entry, amount, edge, strategy) -> int | None:
     if amount < 1 or entry < MIN_ENTRY or entry > MAX_ENTRY:
         return None
+
+    # Fee deduction before share calculation
+    fee_rate = 0.07  # Kalshi
+    entry_fee = amount * fee_rate * min(entry, 1.0 - entry)
+    amount -= entry_fee
     shares = amount / entry
     ts = datetime.datetime.utcnow().isoformat()
     try:
         cur = conn.execute("""
             INSERT INTO paper_trades
             (market_id, question, direction, shares, entry_price, amount_usd,
-             status, confidence, reasoning, strategy, opened_at)
-            VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?)
+             status, confidence, reasoning, strategy, opened_at, entry_fee)
+            VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?)
         """, (
             ticker, (question or "")[:200], direction, shares, entry, amount,
             min(edge / 0.05, 1.0),
             f"{strategy}: edge={edge:.3f} entry={entry:.3f}",
-            strategy, ts,
+            strategy, ts, entry_fee,
         ))
         conn.commit()
         return cur.lastrowid

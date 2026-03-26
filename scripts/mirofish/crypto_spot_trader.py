@@ -179,6 +179,11 @@ def _place_crypto_trade(conn, asset: str, direction: str, price: float,
     if amount <= 0 or price <= 0:
         return False
 
+    # Fee deduction before share calculation
+    fee_rate = 0.07  # Kalshi crypto
+    entry_fee = amount * fee_rate * min(price, 1.0 - price) if price < 1.0 else 0.0
+    amount -= entry_fee
+
     shares = amount / price
     ts = datetime.datetime.utcnow().isoformat()
 
@@ -188,13 +193,13 @@ def _place_crypto_trade(conn, asset: str, direction: str, price: float,
     conn.execute("""
         INSERT INTO paper_trades
         (market_id, question, direction, shares, entry_price, amount_usd,
-         status, confidence, reasoning, strategy, opened_at)
-        VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?)
+         status, confidence, reasoning, strategy, opened_at, entry_fee)
+        VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?)
     """, (
         f"SPOT:{asset}",
         f"{asset} spot trade @ ${price:,.2f}",
         paper_direction, shares, price, amount,
-        min(edge / 0.05, 1.0), reasoning, strategy, ts,
+        min(edge / 0.05, 1.0), reasoning, strategy, ts, entry_fee,
     ))
     conn.commit()
     print(f"[crypto_spot] {direction} {shares:.6f} {asset} @ ${price:,.2f} (${amount:.0f}) [{strategy}]")

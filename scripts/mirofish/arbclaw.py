@@ -220,6 +220,10 @@ def run():
         if amount < 2:
             continue
 
+        # Fee deduction before share calculation
+        fee_rate = 0.07  # Kalshi
+        entry_fee = amount * fee_rate * min(opp["entry"], 1.0 - opp["entry"])
+        amount -= entry_fee
         shares = amount / opp["entry"]
         ts = now.isoformat()
 
@@ -227,14 +231,14 @@ def run():
             cur = conn.execute("""
                 INSERT INTO paper_trades
                 (market_id, question, direction, shares, entry_price, amount_usd,
-                 status, confidence, reasoning, strategy, opened_at)
-                VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?)
+                 status, confidence, reasoning, strategy, opened_at, entry_fee)
+                VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?)
             """, (
                 opp["ticker"], (opp["title"] or "")[:200], opp["direction"],
                 shares, opp["entry"], amount,
                 min(opp["gap"] / 0.05, 1.0),
                 f"arbclaw: gap={opp['gap']:.3f} entry={opp['entry']:.3f} vol={opp['volume']:.0f}",
-                "arbclaw_single_venue", ts,
+                "arbclaw_single_venue", ts, entry_fee,
             ))
             conn.commit()
             new_ids.add(cur.lastrowid)

@@ -127,11 +127,17 @@ def score_polymarket(m):
     return None
 
 
-def place_trade(conn, market_id, question, direction, entry, confidence, thesis, balance):
+def place_trade(conn, market_id, question, direction, entry, confidence, thesis, balance, venue="polymarket"):
     scaled_bet = BET_SIZE_USD * (1 + confidence - 0.5)  # scale $4 base by confidence
     amount = min(scaled_bet, balance * 0.05)
     if amount < 1:
         return False
+
+    # Fee deduction before share calculation
+    fee_rate = 0.07 if venue == "kalshi" else 0.02
+    entry_fee = amount * fee_rate * min(entry, 1.0 - entry)
+    amount -= entry_fee
+
     shares = amount / entry if entry > 0 else 0
     if shares <= 0:
         return False
@@ -140,11 +146,11 @@ def place_trade(conn, market_id, question, direction, entry, confidence, thesis,
     conn.execute("""
         INSERT INTO paper_trades
         (market_id, question, direction, shares, entry_price, amount_usd,
-         status, confidence, reasoning, strategy, opened_at)
-        VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?)
+         status, confidence, reasoning, strategy, opened_at, entry_fee)
+        VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?)
     """, (
         market_id, question[:200], direction, shares, entry, amount,
-        confidence, f"dataharvester: {thesis}", "dataharvester", ts,
+        confidence, f"dataharvester: {thesis}", "dataharvester", ts, entry_fee,
     ))
     return True
 
@@ -175,7 +181,7 @@ def run():
         result = score_kalshi(m)
         if result:
             direction, entry, conf, thesis = result
-            if place_trade(conn, ticker, m.get("title", "")[:200], direction, entry, conf, thesis, balance):
+            if place_trade(conn, ticker, m.get("title", "")[:200], direction, entry, conf, thesis, balance, venue="kalshi"):
                 placed += 1
                 open_ids.add(ticker)
                 print(f"  [K] {direction} {entry:.3f} c={conf:.2f} | {m.get('title','')[:50]} | {thesis}")
@@ -193,7 +199,7 @@ def run():
         result = score_polymarket(m)
         if result:
             direction, entry, conf, thesis = result
-            if place_trade(conn, mid, m.get("question", "")[:200], direction, entry, conf, thesis, balance):
+            if place_trade(conn, mid, m.get("question", "")[:200], direction, entry, conf, thesis, balance, venue="polymarket"):
                 placed += 1
                 open_ids.add(mid)
                 print(f"  [P] {direction} {entry:.3f} c={conf:.2f} | {m.get('question','')[:50]} | {thesis}")

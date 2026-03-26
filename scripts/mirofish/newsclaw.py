@@ -321,6 +321,10 @@ def run():
         if amount < 2:
             continue
 
+        # Fee deduction before share calculation
+        fee_rate = 0.07  # Kalshi
+        entry_fee = amount * fee_rate * min(entry, 1.0 - entry)
+        amount -= entry_fee
         shares = amount / entry
         reasoning = match.get("reasoning", "news catalyst")
 
@@ -328,13 +332,13 @@ def run():
             conn.execute("""
                 INSERT INTO paper_trades
                 (market_id, question, direction, shares, entry_price, amount_usd,
-                 status, confidence, reasoning, strategy, opened_at)
-                VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?)
+                 status, confidence, reasoning, strategy, opened_at, entry_fee)
+                VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?)
             """, (
                 market_id, (mkt["title"] or "")[:200], direction, shares, entry, amount,
                 confidence,
                 f"newsclaw: {reasoning[:150]}",
-                "newsclaw", datetime.datetime.utcnow().isoformat(),
+                "newsclaw", datetime.datetime.utcnow().isoformat(), entry_fee,
             ))
             conn.commit()
             placed += 1
