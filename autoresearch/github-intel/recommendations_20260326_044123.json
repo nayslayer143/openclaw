@@ -100,7 +100,7 @@
       "what_to_take": "Extract the core environment class (state/action/reward definitions) from Jupyter notebooks and refactor into a production module for RivalClaw's self-tuning strategy development, focusing on state representation and reward function design.",
       "risk": "Future-dated last update (2026) suggests potential maintenance issues; Jupyter format requires significant refactoring; license not specified (must verify MIT/Apache-2.0).",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -120,7 +120,7 @@
       "what_to_take": "Extract exchange connection patterns and order lifecycle management design (not code) for Python implementation in RivalClaw's multi-exchange handling.",
       "risk": "Java-to-Python porting complexity, Apache 2.0 license is acceptable but design patterns may not map cleanly to Python stack; risk of over-engineering if adopted naively.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "Genetic programming model selection approach could be studied for potential adaptation, but stock prediction focus makes direct integration impractical for prediction markets.",
       "risk": "Domain mismatch (stocks vs. prediction markets), notebook format requiring major refactoring, suspicious future last updated date (2026-03-20), and no clear license in repo.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "None. The repo is for stock trading (not prediction markets) in Jupyter Notebooks, which requires full refactoring to match our asset class and production system architecture.",
       "risk": "Asset class mismatch (stocks vs. prediction markets), Jupyter Notebook format unsuitable for production integration, and suspicious future-dated last update (2026).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
