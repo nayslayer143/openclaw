@@ -20,7 +20,7 @@
       "what_to_take": "Adopt the core backtesting engine (Backtest class and Strategy base class) for strategy validation and parameter tuning, replacing custom backtesting logic in Clawmpson's graduation engine and enabling RivalClaw's self-tuning with standardized performance metrics.",
       "risk": "MIT license (safe), but requires adapting existing strategy code to backtesting.py's interface; minimal maintenance risk due to active community and 8k+ stars.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "Study its strategy execution framework and event-driven architecture for potential refactoring of Clawmpson's strategy engine, but avoid full integration due to prediction market mismatch.",
       "risk": "MIT license acceptable but high complexity adapting to prediction markets; framework designed for traditional securities (stocks/futures) not prediction markets, requiring significant data feed/order execution rework.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "Extract configuration management and backtesting framework patterns (e.g., strategy parameter handling, dry-run mode), avoiding crypto exchange dependencies.",
       "risk": "Crypto-specific dependencies (CCXT, Binance/Kraken APIs) require significant removal; license (MIT) is acceptable but repo's 2026 last update suggests potential abandonment; prediction market data sources (Polymarket/Kalshi) differ from crypto exchanges.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "No actionable patterns; visual strategy designer and crypto-specific backtesting are irrelevant to prediction markets and Python stack.",
       "risk": "Domain mismatch (crypto vs prediction markets), JavaScript vs Python language barrier, and high integration complexity with no direct utility.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "None. Crypto market making patterns in C++ are irrelevant to prediction market strategies and would require heavy adaptation for Python stack.",
       "risk": "License unknown (potential legal risk), C++/Python integration complexity, and domain mismatch (crypto vs prediction markets).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
