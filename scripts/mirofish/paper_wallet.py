@@ -129,35 +129,20 @@ def _generate_recommendation(strats) -> str:
 
 
 def reset_wallet(new_balance: float = WALLET_RESET_AMOUNT) -> dict:
-    """
-    Reset the paper wallet: close all open positions, archive old trades,
-    set new starting balance. Returns summary of what was reset.
-    """
+    """Circuit breaker: halt trading instead of resetting. Preserves loss data."""
     now = datetime.datetime.utcnow().isoformat()
-    with _get_conn() as conn:
-        # Close all open positions at entry price (flat)
-        open_count = conn.execute(
-            "SELECT COUNT(*) as n FROM paper_trades WHERE status='open'"
-        ).fetchone()["n"]
-        conn.execute("""
-            UPDATE paper_trades SET status='reset', pnl=0, exit_price=entry_price,
-            closed_at=? WHERE status='open'
-        """, (now,))
-
-        # Update starting balance
-        conn.execute("""
-            INSERT OR REPLACE INTO context (chat_id, key, value)
-            VALUES ('mirofish', 'starting_balance', ?)
-        """, (str(new_balance),))
-
-        # Record the reset event
-        conn.execute("""
-            INSERT INTO context (chat_id, key, value)
-            VALUES ('mirofish', ?, ?)
-        """, (f"wallet_reset_{now}", f"Reset to ${new_balance:.2f}, closed {open_count} positions"))
-
-    print(f"[wallet] Reset to ${new_balance:.2f} — closed {open_count} open positions")
-    return {"new_balance": new_balance, "closed_positions": open_count, "reset_at": now}
+    conn = _get_conn()
+    try:
+        conn.execute(
+            "INSERT OR REPLACE INTO context (chat_id, key, value) VALUES ('mirofish', 'trading_status', 'halted')")
+        conn.execute(
+            "INSERT OR REPLACE INTO context (chat_id, key, value) VALUES ('mirofish', ?, ?)",
+            (f"halt_event_{now}", f"Circuit breaker triggered at balance floor"))
+        conn.commit()
+    finally:
+        conn.close()
+    print(f"[mirofish] TRADING HALTED by circuit breaker at {now}")
+    return {"status": "halted", "halted_at": now}
 
 
 def _get_starting_balance() -> float:
@@ -327,6 +312,18 @@ def execute_trade(decision: Any) -> dict | None:
     - Latency penalty (default 0.2%)
     - Partial fills (80-100% fill rate)
     """
+    # Check if trading is halted
+    conn_check = _get_conn()
+    try:
+        status_row = conn_check.execute(
+            "SELECT value FROM context WHERE chat_id='mirofish' AND key='trading_status'"
+        ).fetchone()
+        if status_row and status_row["value"] == "halted":
+            print("[mirofish/wallet] REJECTED: trading is halted by circuit breaker")
+            return None
+    finally:
+        conn_check.close()
+
     state = get_state()
     cap = state["balance"] * MAX_POSITION_PCT
 
