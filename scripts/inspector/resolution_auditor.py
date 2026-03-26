@@ -115,6 +115,10 @@ class ResolutionAuditor:
             if not closed or actual_resolution is None:
                 match = -1
                 actual_resolution = "UNRESOLVED"
+            elif actual_resolution not in ("YES", "NO"):
+                # Unknown resolution (cancelled, N/A, etc.) — unverifiable, not a mismatch
+                match = -1
+                # actual_resolution already holds the raw value; preserve it
             else:
                 match = 1 if _resolution_matches(direction, status, actual_resolution) else 0
 
@@ -145,12 +149,15 @@ class ResolutionAuditor:
         Read closed paper_trades from clawmson_db_path, audit each for resolution
         accuracy, write results to resolution_audits, and return a summary dict.
         """
-        conn = sqlite3.connect(str(Path(clawmson_db_path).expanduser()))
-        conn.row_factory = sqlite3.Row
-        trades = conn.execute(
-            "SELECT * FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')"
-        ).fetchall()
-        conn.close()
+        db_path = str(Path(clawmson_db_path).expanduser())
+        try:
+            conn = sqlite3.connect(db_path)
+            conn.row_factory = sqlite3.Row
+            trades = conn.execute(
+                "SELECT * FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')"
+            ).fetchall()
+        finally:
+            conn.close()
 
         total_closed = len(trades)
         matched = 0
