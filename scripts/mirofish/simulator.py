@@ -189,6 +189,24 @@ def migrate():
     """Create mirofish tables. Idempotent."""
     with _get_conn() as conn:
         conn.executescript(MIGRATION_SQL)
+
+    # Idempotent column additions for tracking/settlement infrastructure
+    conn = _get_conn()
+    _add_cols = [
+        ("paper_trades", "binary_outcome", "TEXT"),
+        ("paper_trades", "resolved_price", "REAL"),
+        ("paper_trades", "resolution_source", "TEXT"),
+        ("paper_trades", "entry_fee", "REAL DEFAULT 0"),
+        ("paper_trades", "exit_fee", "REAL DEFAULT 0"),
+    ]
+    for table, col, col_type in _add_cols:
+        try:
+            conn.execute(f"ALTER TABLE {table} ADD COLUMN {col} {col_type}")
+        except sqlite3.OperationalError:
+            pass  # column already exists
+    conn.commit()
+    conn.close()
+
     db_path = Path(os.environ.get("CLAWMSON_DB_PATH", Path.home() / ".openclaw" / "clawmson.db"))
     print(f"[mirofish] Migration complete. DB: {db_path}")
 
