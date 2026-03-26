@@ -200,7 +200,7 @@
       "what_to_take": "Extract order book feature engineering patterns (e.g., spread, depth, imbalance metrics) for potential adaptation to Clawmpson's price-lag/momentum strategies, but avoid direct code reuse due to SGX market context mismatch.",
       "risk": "License not specified (legal risk), last updated date 2026-03-25 (future date, indicating repo metadata error), and high adaptation complexity for prediction market data structure.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "Strategy component design patterns and backtesting framework concepts for Python strategy development, avoiding C++ dependencies.",
       "risk": "C++ core complicates integration; future-dated last update (2026-03-25) suggests potential metadata error; stock-focused framework requires adaptation for prediction markets.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
