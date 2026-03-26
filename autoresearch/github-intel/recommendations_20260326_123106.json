@@ -20,7 +20,7 @@
       "what_to_take": "Extract technical analysis modules (e.g., indicators, signal generation) and data ingestion pipelines for consistent market data handling across strategies.",
       "risk": "Suspicious 2026 last update date (likely metadata error); verify actual commit history. Apache 2.0 license is acceptable but requires adaptation to existing data models.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -40,7 +40,7 @@
       "what_to_take": "Extract Binance WebSocket stream management and data handling logic (excluding TUI/console components) for Clawmpson's Binance feed integration.",
       "risk": "License not specified (verify in repo), future-dated last update (2026-03-23) suggests possible data error, Binance-only focus limits cross-exchange utility for RivalClaw.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -60,7 +60,7 @@
       "what_to_take": "Use vectorbt's backtesting engine for strategy validation in ArbClaw (replacing custom backtesting) and enhance RivalClaw's self-tuning with its efficient backtesting capabilities, while potentially augmenting Clawmpson's graduation engine.",
       "risk": "MIT license is compatible, but integration requires adapting existing data pipelines to vectorbt's DataFrame-based structure and may necessitate refactoring legacy backtesting code. Project appears active but future-dated last update (2026) is suspicious.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "Conceptual arbitrage detection logic and backtesting framework for inspiration, but not direct code due to JavaScript/Python mismatch and Bitcoin-specific focus.",
       "risk": "MIT license is acceptable, but project appears inactive (last updated 2026-03-25 - likely a placeholder for outdated status), and significant effort required to port Bitcoin-focused strategies to prediction markets with different data structures.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "None; the JavaScript codebase is incompatible with our Python stack. Study architecture patterns only for conceptual inspiration, not code reuse.",
       "risk": "Critical language mismatch (JavaScript vs Python) creates massive integration barriers. Repo's 'written in Python' description is misleading and inaccurate. High maintenance risk if forced to port.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "None. The charting library is irrelevant to core trading logic and UI is outside current stack scope.",
       "risk": "Not maintained (major risk), JavaScript vs Python mismatch, future-dated last update (2026) suggests data error, potential license gaps.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
