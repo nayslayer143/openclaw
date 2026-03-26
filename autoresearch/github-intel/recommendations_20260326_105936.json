@@ -20,7 +20,7 @@
       "what_to_take": "Extract the backtesting engine and optimization framework for Clawmpson's graduation engine and RivalClaw's self-tuner, avoiding full platform integration.",
       "risk": "MIT license is safe, but integration requires adapting to existing SQLite/Python structure; potential for dependency conflicts with Clawmpson's 10+ modules.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -40,7 +40,7 @@
       "what_to_take": "Extract the backtesting engine and strategy evaluation module for Clawmpson's graduation engine to validate strategies against historical data with performance metrics.",
       "risk": "License not specified in repo (must verify MIT/Apache), suspicious 2026 last update date (likely typo), and integration requires adapting to Clawmpson's strategy interface.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -60,7 +60,7 @@
       "what_to_take": "Strategy template and event-driven architecture for multi-strategy development, excluding crypto exchange adapters",
       "risk": "Crypto-specific exchange adapters require full replacement for prediction markets; MIT license is safe but integration demands significant adaptation to prediction market APIs",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "Refactor RL environment and agent training loop from Jupyter notebooks into modular Python for potential enhancement of Clawmpson's LLM strategy or RivalClaw's self-tuner",
       "risk": "Jupyter format requires major refactoring (complexity 8), license unknown, last update date (2026) suggests possible metadata error or abandonment, and RL trading patterns may not align with current strategy architectures",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -100,7 +100,7 @@
       "what_to_take": "Study exchange connection patterns and order management architecture for potential Python adaptation in Clawmpson's exchange layer, avoiding direct code reuse due to Java/Python mismatch.",
       "risk": "License unknown (likely permissive but unverified), suspicious 2026 last update date suggesting possible typo or abandonment, and significant reimplementation effort required due to language mismatch.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -120,7 +120,7 @@
       "what_to_take": "Extract WebSocket connection/reconnection patterns and message parsing logic for Python adaptation; avoid API-specific endpoints and Java dependencies.",
       "risk": "Java language mismatch requires full rewrite (high complexity), license unknown (check repo), suspicious 2026 last updated date (likely typo/maintenance risk), and patterns may be tied to alltick API rather than generic data handling.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "None; repo is Jupyter-based research code for stock market RL, not production-ready or prediction-market aligned.",
       "risk": "License unknown (legal risk), 2026 last update (likely typo indicating abandonment), stock market focus mismatch with prediction markets, Jupyter format incompatible with production stack.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "Conceptual framework for deep learning/Genetic Programming prediction models, not code (market mismatch: stocks vs prediction markets)",
       "risk": "Market mismatch (stocks vs prediction markets), notebook format requiring major refactoring, suspicious 2026 last update date indicating abandonment",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "Study the composable architecture patterns for real-time data pipelines and execution, but avoid direct code integration due to Elixir/Python mismatch.",
       "risk": "Language mismatch (Elixir vs Python) makes code integration impossible without massive refactoring. Future last-update date (2026) suggests data error. Low practical value for Python stack despite promising concepts.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "None. Domain mismatch (crypto token market-making vs prediction markets) and JavaScript vs Python stack prevent meaningful integration.",
       "risk": "License unknown (legal risk), suspicious future update date (2026), and massive language/paradigm mismatch requiring full rewrite.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "Repo is HTML documentation only (no actual code), not applicable to prediction markets",
       "risk": "Language mismatch (HTML vs expected Python), future last update date (2026), irrelevant to prediction markets (stock price vs event-based markets), no usable code for integration",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "Nothing; this is a curated resource list, not a codebase for integration.",
       "risk": "Repo is a README-based resource index (no executable code), making integration impossible. Potential false positive due to misleading 'code' expectations.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
