@@ -60,7 +60,7 @@
       "what_to_take": "Extract the core RL environment class (gym environment) and reward function implementation for strategy testing, then refactor into Clawmpson's LLM strategy module as a new strategy type.",
       "risk": "License unknown (must verify MIT or similar), last updated 2026-03-12 (likely typo indicating abandonment), Jupyter format requires major refactoring for production use, and RL training overhead may not align with Clawmpson's real-time trading requirements.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -120,7 +120,7 @@
       "what_to_take": "No actionable code for prediction markets; repo is stock-focused and uses Jupyter notebooks (not production-ready)",
       "risk": "Domain mismatch (stocks vs prediction markets), notebook format requiring major refactoring, and future-dated last update suggesting potential inactivity",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "No relevant code for prediction markets; repo focuses on stock price prediction (not event-based prediction markets like Polymarket/Kalshi) and uses non-production Jupyter Notebooks.",
       "risk": "Domain mismatch (stocks vs. prediction markets), non-production Jupyter format requiring major refactoring, suspicious last update date (2026), and potential license ambiguity.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
