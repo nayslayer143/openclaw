@@ -1,9 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> Auto-generated 2026-03-26T06:00:00-07:00. Do not edit manually.
+> Auto-generated 2026-03-26T06:07:00-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-03-26T06:00:00-07:00
+Generated: 2026-03-26T06:07:00-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -1151,3 +1151,149 @@ openpyxl
 openai-whisper
 
 ```
+
+### ~/quantumentalclaw/requirements.txt
+```
+aiohttp>=3.9
+httpx>=0.27
+yfinance>=0.2.36
+feedparser>=6.0
+praw>=7.7
+python-dotenv>=1.0
+cryptography>=42.0
+pytest>=8.0
+pytest-asyncio>=0.23
+
+```
+
+## Git Status
+
+### openclaw
+```
+Branch: feat/inspector-gadget
+Last commit: 0d8974c auto: 2026-03-26 06:00 state snapshot
+Uncommitted files: 10
+Remote: https://github.com/nayslayer143/openclaw.git
+```
+
+### rivalclaw
+```
+Branch: main
+Last commit: 0bfd994 fix: add binary resolution for Kalshi and Polymarket trades
+Uncommitted files: 16
+Remote: https://github.com/nayslayer143/rivalclaw.git
+```
+
+### arbclaw
+```
+Branch: main
+Last commit: a2613e9 daily report 2026-03-26 — day 3 | bal=$ pnl=$ trades=0
+Uncommitted files: 3
+Remote: https://github.com/nayslayer143/arbclaw.git
+```
+
+### quantumentalclaw
+```
+Branch: main
+Last commit: 989b528 hourly: 2026-03-26 13:00 | $10,696 | 9W/15closed | $+696 | calm
+Uncommitted files: 0
+Remote: https://github.com/nayslayer143/quantumentalclaw.git
+```
+
+### doctor-claw
+```
+Branch: main
+Last commit: 0cdc5ed chore: suppress Supabase never-type build error in next.config.mjs
+Uncommitted files: 2
+Remote: https://github.com/nayslayer143/doctor-claw.git
+```
+
+### punch-my-baby
+```
+Branch: main
+Last commit: 954066f feat: file attachments, URL crawling, voice recording, mobile-first
+Uncommitted files: 0
+Remote: https://github.com/nayslayer143/punch-my-baby.git
+```
+
+### shiny-new
+```
+Branch: main
+Last commit: ac64d70 feat: SHINY.NEW v3 — LaChapelle flash, phosphor trail, full-bleed §7, oracle reveal, manifesto inversion, OMEGA easter egg
+Uncommitted files: 3
+Remote: https://github.com/nayslayer143/shiny-new.git
+```
+
+## Environment Files (names only, NO values)
+```
+~/openclaw/dashboard/.env
+~/openclaw/dashboard/.env.example
+~/openclaw/doctor-claw/.env.local
+~/openclaw/doctor-claw/.env.example
+~/openclaw/.env
+~/openclaw/punch-my-baby/.env.local
+~/openclaw/punch-my-baby/.env.example
+~/rivalclaw/.env.prev
+~/rivalclaw/.env
+~/quantumentalclaw/.env
+~/quantumentalclaw/.env.example
+~/openclaw/doctor-claw/.env.local
+~/openclaw/doctor-claw/.env.example
+~/openclaw/punch-my-baby/.env.local
+~/openclaw/punch-my-baby/.env.example
+```
+
+## Trading State (if available)
+
+### Clawmpson Trading Dashboard
+```json
+{
+  "portfolio": {
+    "open_positions": 1,
+    "total_invested": 0,
+    "total_current_value": 0,
+    "total_pnl": 0,
+    "total_pnl_pct": 0,
+    "positions": [
+      {
+        "id": "pos-20260323170243-9921",
+        "question": "Will the All India Anna Dravida Munnetra Kazhagam (ADMK) win the most seats in the 2026 Tamil Nadu Assembly Elections?",
+        "direction": "buy_yes",
+        "entry_price": 0.2155,
+        "estimated_true_prob": 0.4,
+        "edge": 0.1845,
+        "size_usd": 10,
+        "confidence": "medium",
+        "reasoning": "ADMK is a strong party but faces challenges, making it more likely than priced.",
+        "opened_at": "2026-03-23T17:02:43.403185",
+        "status": "open",
+        "pnl": 0,
+        "current_price": null,
+        "note": "Market not found \u2014 may have resolved"
+      }
+    ],
+    "as_of": "2026-03-23T17:02:44.495492"
+  },
+  "recent_signals": [
+    {
+      "question": "Will the All India Anna Dravida Munnetra Kazhagam (ADMK) win the most seats in the 2026 Tamil Nadu Assembly Elections?",
+      "current_yes_price": 0.2155,
+      "estimated_true_prob": 0.4,
+      "edge": 0.1845,
+      "direction": "buy_yes",
+      "confidence": "medium",
+      "reasoning": "ADMK is a strong party but faces challenges, making it more likely than priced.",
+      "suggested_size_usd": 10,
+      "scan_time": "2026-03-23T17:02:43.387870",
+      "status": "traded",
+      "id": "sig-20260323170243-9921"
+    }
+  ],
+  "history": [],
+  "updated_at": "2026-03-23T17:02:44.496312"
+}
+```
+
+---
+End of context. Generated 2026-03-26T06:07:00-07:00.
+For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw

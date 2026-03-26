@@ -20,7 +20,7 @@
       "what_to_take": "Extract the unified async-iterable interface pattern for real-time tick data across exchanges (Binance/BitMEX/Deribit) and historical data API design, then implement in Python for Clawmpson's feed layer to replace current feed code.",
       "risk": "License not specified (must verify MIT/Apache-2.0); TypeScript-to-Python port requires 2-3 weeks effort; last updated date (2026-03-25) appears erroneous (likely typo) raising maintenance concerns.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "Extract risk management and AI analysis modules for RivalClaw's self-tuning engine; focus on modular data processing patterns compatible with prediction market feeds.",
       "risk": "License not specified in repo (must verify MIT/Apache), potential data pipeline mismatch with prediction markets, moderate refactoring needed for integration.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -100,7 +100,7 @@
       "what_to_take": "Extract optuna-based hyperparameter optimization module and backtesting framework (without TradingView/Pine dependencies) for Clawmpson's graduation engine and RivalClaw's self-tuning.",
       "risk": "License MIT (assumed) but verify; last update date 2026 is likely a typo; requires removing TradingView-specific data pipeline dependencies.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -120,7 +120,7 @@
       "what_to_take": "Extract the event-driven core and feed handling pipeline to replace Clawmpson's current feed management with a more robust event loop and data processing structure.",
       "risk": "Suspicious future last updated date (2026) suggests possible data error or inactive maintenance; verify license and current activity before integration.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "Extract WebSocket connection patterns and tick data parsing logic for real-time feeds, then reimplement in Python for our data layer",
       "risk": "License unknown (potential GPL risk), last update date 2026-03-24 is future-dated (likely error indicating abandonment), Java implementation requires full rewrite for Python stack",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "Multi-exchange API integration patterns (Binance/Bitget/Bybit/Kucoin) for configuration management, but exclude CEX-specific strategy logic as it's incompatible with prediction markets.",
       "risk": "Unspecified license (legal risk), future-dated last update (2026, likely error), and domain mismatch (CEX trading vs prediction markets) reducing practical value.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "Modular DRL framework design patterns for strategy extension, not code (due to Jupyter format).",
       "risk": "Future-dated last update (2026-03-20) indicates possible repo tampering; Jupyter format requires major conversion for production use; license unknown (MIT likely but unverified).",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -300,7 +300,7 @@
       "what_to_take": "No actionable patterns for prediction markets; grid strategy is crypto-exchange specific and incompatible with Polymarket/Kalshi event-based trading.",
       "risk": "Market mismatch (crypto grid vs prediction markets), Binance API dependency, and high adaptation cost with no strategic fit.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -320,7 +320,7 @@
       "what_to_take": "Do not integrate this repo directly. It's a curated list of external projects, not reusable code. Instead, use it to identify specific repos (e.g., those with actual ML models) for deeper evaluation.",
       "risk": "License inconsistencies across linked projects, no maintenance for the list itself, and high effort to extract usable code from referenced repos. May lead to wasted time chasing dead ends.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -340,7 +340,7 @@
       "what_to_take": "No relevant patterns; Bitcoin trading logic and exchange APIs (Bitfinex/Bitstamp) are incompatible with prediction markets (Polymarket/Kalshi) and our Python stack.",
       "risk": "License not specified (potential legal risk), Java vs Python language mismatch requiring heavy refactoring, and domain mismatch (Bitcoin trading vs prediction markets).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -360,7 +360,7 @@
       "what_to_take": "Composable architecture patterns for real-time data processing, but not the Elixir code due to language mismatch with Python stack.",
       "risk": "Elixir vs Python language barrier requires full rewrite; future-dated last update (2026) suggests potential repo abandonment or error; license not specified in description.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
