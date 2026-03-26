@@ -54,9 +54,9 @@ class TradeVerifier:
 
     def _check_math(self, trade: dict) -> dict:
         """Verify shares * entry_price ≈ amount_usd."""
-        shares      = trade["shares"]
-        entry_price = trade["entry_price"]
-        amount_usd  = trade["amount_usd"]
+        shares      = trade.get("shares", 0) or 0
+        entry_price = trade.get("entry_price", 0) or 0
+        amount_usd  = trade.get("amount_usd", 0) or 0
 
         if shares <= 0:
             return {
@@ -92,9 +92,9 @@ class TradeVerifier:
 
     def _check_price(self, trade: dict) -> dict:
         """Verify entry price against Polymarket historical data."""
-        market_id   = trade["market_id"]
-        entry_price = trade["entry_price"]
-        opened_at   = trade["opened_at"]
+        market_id   = trade.get("market_id", "")
+        entry_price = trade.get("entry_price", 0) or 0
+        opened_at   = trade.get("opened_at", "")
 
         market = self.poly.get_market(market_id)
         if market is None:
@@ -157,15 +157,16 @@ class TradeVerifier:
         # Gather optional fields
         verified_entry: Optional[float] = price_result.get("verified_price")
         exit_price     = trade.get("exit_price")
+        shares         = trade.get("shares")
         claimed_pnl    = trade.get("pnl")
 
-        # verified_pnl = (exit_price - entry_price) * shares when both are present
+        # Only compute verified_pnl when we have the actual verified entry price.
+        # If price was DISCREPANCY or UNVERIFIABLE, leave verified_pnl as None
+        # so discrepancy_amount reflects the unknown gap, not a false zero.
         verified_pnl: Optional[float] = None
-        if exit_price is not None and verified_entry is not None:
-            verified_pnl = (exit_price - trade["entry_price"]) * trade["shares"]
-        elif exit_price is not None:
-            # No verified entry price — use claimed entry as best estimate
-            verified_pnl = (exit_price - trade["entry_price"]) * trade["shares"]
+        if exit_price is not None and shares is not None:
+            if verified_entry is not None:
+                verified_pnl = (exit_price - verified_entry) * shares
 
         discrepancy_amount: Optional[float] = None
         if claimed_pnl is not None and verified_pnl is not None:
@@ -179,7 +180,7 @@ class TradeVerifier:
 
         return {
             "trade_id":           str(trade["id"]),
-            "bot_source":         trade.get("strategy"),
+            "bot_source":         trade.get("strategy") or "unknown",
             "market_id":          trade.get("market_id"),
             "direction":          trade.get("direction"),
             "claimed_entry":      trade.get("entry_price"),
@@ -200,20 +201,21 @@ class TradeVerifier:
         Read all paper_trades from clawmson_db_path, verify each, write
         results to verified_trades, and return a summary dict.
         """
-        conn = sqlite3.connect(clawmson_db_path)
+        from pathlib import Path
+        conn = sqlite3.connect(str(Path(clawmson_db_path).expanduser()))
         conn.row_factory = sqlite3.Row
-        try:
-            rows = conn.execute("SELECT * FROM paper_trades").fetchall()
-        finally:
-            conn.close()
+        trades = conn.execute("SELECT * FROM paper_trades").fetchall()
+        conn.close()
 
-        trades = [dict(row) for row in rows]
-        counts: Dict[str, int] = {}
-
+        counts = {s.value: 0 for s in VerificationStatus}
+        errors = 0
         for trade in trades:
-            result = self.verify_trade(trade)
-            self.db.insert("verified_trades", result)
-            status = result["status"]
-            counts[status] = counts.get(status, 0) + 1
+            try:
+                result = self.verify_trade(dict(trade))
+                self.db.insert("verified_trades", result)
+                counts[result["status"]] += 1
+            except Exception:
+                errors += 1
+                continue
 
-        return {"total": len(trades), "counts": counts}
+        return {"total": len(trades), "counts": counts, "errors": errors}

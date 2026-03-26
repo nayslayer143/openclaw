@@ -107,3 +107,35 @@ def test_verify_trade_computes_verified_pnl():
     trade = _make_trade({"exit_price": 0.80, "pnl": 30.0})
     result = tv.verify_trade(trade)
     assert abs(result["verified_pnl"] - 30.0) < 0.01  # (0.80 - 0.50) * 100 = 30
+
+
+def test_run_processes_all_trades(tmp_path):
+    """run() should process all rows and return correct counts, not crash on bad trades."""
+    import sqlite3
+    # Create a minimal clawmson.db with 2 trades
+    db_path = tmp_path / "clawmson.db"
+    conn = sqlite3.connect(str(db_path))
+    conn.execute("""CREATE TABLE paper_trades (
+        id INTEGER PRIMARY KEY, market_id TEXT, question TEXT, direction TEXT,
+        shares REAL, entry_price REAL, exit_price REAL, amount_usd REAL,
+        pnl REAL, status TEXT, confidence REAL, reasoning TEXT,
+        strategy TEXT, opened_at TEXT, closed_at TEXT
+    )""")
+    conn.execute("INSERT INTO paper_trades VALUES (1,'0xABC','Q?','YES',100,0.5,NULL,50,NULL,'open',0.7,'','momentum','2026-03-24T10:00:00',NULL)")
+    conn.execute("INSERT INTO paper_trades VALUES (2,'0xDEF','Q2?','NO',50,0.3,NULL,15,NULL,'open',0.6,'','arb','2026-03-24T11:00:00',NULL)")
+    conn.commit()
+    conn.close()
+
+    poly = MagicMock()
+    poly.get_market.return_value = {"question": "Q?"}
+    poly.get_price_at.return_value = 0.50  # matches entry_price exactly
+
+    inspector_db = MagicMock()
+    inspector_db.insert.return_value = 1
+
+    tv = TradeVerifier(db=inspector_db, poly=poly)
+    result = tv.run(str(db_path))
+
+    assert result["total"] == 2
+    assert inspector_db.insert.call_count == 2
+    assert result["errors"] == 0
