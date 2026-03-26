@@ -87,6 +87,8 @@ class PolymarketClient:
             if resp.status_code != 200:
                 return None
             data = resp.json()
+            if not isinstance(data, dict):
+                return None
             return data.get("history")
         except Exception:
             return None
@@ -127,6 +129,10 @@ class PolymarketClient:
         if not _validate_price(price):
             return None
         return float(price)
+
+    def close(self):
+        """Close the underlying HTTP connection pool."""
+        self._client.close()
 
     def get_resolution(self, condition_id: str) -> Optional[Dict]:
         """
