@@ -291,6 +291,105 @@ def _resolve_kalshi_trades():
     conn.close()
 
 
+def _resolve_polymarket_trades():
+    """Check Polymarket gamma API for resolution on open Polymarket trades."""
+    conn = _get_conn()
+    now = datetime.datetime.utcnow()
+
+    open_trades = conn.execute("""
+        SELECT id, market_id, direction, entry_price, shares, amount_usd, entry_fee
+        FROM paper_trades
+        WHERE status = 'open' AND market_id NOT LIKE 'KX%'
+    """).fetchall()
+
+    if not open_trades:
+        conn.close()
+        return
+
+    # Group by market_id to avoid duplicate API calls
+    market_ids = list(set(t["market_id"] for t in open_trades))
+    resolutions = {}  # market_id -> {"resolved": bool, "outcome": str}
+
+    for mid in market_ids:
+        try:
+            resp = requests.get(
+                f"https://gamma-api.polymarket.com/markets/{mid}",
+                timeout=10,
+            )
+            if resp.status_code != 200:
+                continue
+            data = resp.json()
+            # Handle both single-market and wrapped responses
+            if isinstance(data, list):
+                data = data[0] if data else {}
+            is_resolved = data.get("resolved", False) or data.get("closed", False)
+            if is_resolved:
+                # Determine winning outcome from outcomePrices after resolution
+                outcome_prices = data.get("outcomePrices", [])
+                outcomes = data.get("outcomes", [])
+                winning_outcome = None
+                if outcome_prices and outcomes:
+                    for label, price_str in zip(outcomes, outcome_prices):
+                        try:
+                            price = float(price_str)
+                        except (ValueError, TypeError):
+                            continue
+                        if price >= 0.95:  # resolved to ~1.0
+                            winning_outcome = label.upper()
+                            break
+                # Fallback: check result field
+                if not winning_outcome:
+                    result_str = data.get("result", "")
+                    if result_str:
+                        winning_outcome = result_str.upper()
+                resolutions[mid] = {"resolved": True, "winning_outcome": winning_outcome}
+        except Exception as e:
+            print(f"[mirofish] Polymarket resolution check error for {mid[:20]}: {e}")
+            continue
+
+    closed_count = 0
+    for t in open_trades:
+        res = resolutions.get(t["market_id"])
+        if not res or not res["resolved"]:
+            continue
+
+        winning = res.get("winning_outcome")
+        if not winning:
+            continue
+
+        we_bet = t["direction"].upper()
+        we_won = (we_bet == winning)
+
+        if we_won:
+            exit_price = 1.0
+            binary_outcome = "correct"
+        else:
+            exit_price = 0.0
+            binary_outcome = "incorrect"
+
+        raw_pnl = t["shares"] * (exit_price - t["entry_price"])
+        entry_fee = t["entry_fee"] or 0
+        pnl = raw_pnl - entry_fee
+        status = "closed_win" if we_won else "closed_loss"
+
+        conn.execute("""
+            UPDATE paper_trades
+            SET exit_price=?, pnl=?, status=?, closed_at=?,
+                binary_outcome=?, resolved_price=?, resolution_source=?
+            WHERE id=?
+        """, (exit_price, pnl, status, now.isoformat(),
+              binary_outcome, exit_price, "polymarket_api", t["id"]))
+
+        sign = "+" if pnl >= 0 else ""
+        print(f"[mirofish] Polymarket resolved: {t['market_id'][:30]} → {status} {sign}${pnl:.2f}")
+        closed_count += 1
+
+    if closed_count:
+        conn.commit()
+        _notify_dashboard()
+    conn.close()
+
+
 def _notify_dashboard():
     """Ping the dashboard to trigger SSE refresh."""
     try:
@@ -540,6 +639,12 @@ def run_loop():
         _resolve_kalshi_trades()
     except Exception as exc:
         print(f"[mirofish] Kalshi resolution check failed: {exc}")
+
+    # 6a. Check Polymarket resolutions for resolved/closed markets
+    try:
+        _resolve_polymarket_trades()
+    except Exception as exc:
+        print(f"[mirofish] Polymarket resolution check failed: {exc}")
 
     # 6b. Check stops (always runs, even if API is down)
     try:
