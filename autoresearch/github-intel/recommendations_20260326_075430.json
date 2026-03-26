@@ -60,7 +60,7 @@
       "what_to_take": "Extract data pipeline and feature engineering modules for prediction market data preprocessing, avoiding full model training framework.",
       "risk": "Domain mismatch (stock-focused vs prediction markets), requires significant adaptation of data handling, and potential over-engineering for our lightweight strategies.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "Study event-driven architecture patterns and market data handling for Clawmpson/RivalClaw redesign; avoid direct code reuse due to Rust/Python mismatch.",
       "risk": "Rust/Python language barrier requires full reimplementation of patterns; Nautilus's complexity may over-engineer existing systems; MIT license safe but not relevant for design study.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "Strategy interface pattern and backtesting framework for multi-strategy management, excluding crypto-specific exchange integrations and data pipelines.",
       "risk": "MIT license is safe but requires significant adaptation to prediction market data structures; active maintenance is good but Freqtrade's crypto focus creates misalignment with our prediction market feeds (Polymarket/Kalshi).",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "Port core indicator implementations (e.g., RSI, Bollinger Bands, moving averages) from Lean's C# codebase to Python for Clawmpson's strategy modules and RivalClaw's quant engine.",
       "risk": "High C# to Python conversion complexity; MIT license is acceptable but porting requires significant effort and maintenance; Lean's framework is not designed for prediction markets (Polymarket/Kalshi) so direct data integration would fail.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "Study the event-driven architecture and websocket data pipeline patterns for feed handling, but avoid exchange-specific API integrations as they target crypto exchanges not prediction markets.",
       "risk": "License not confirmed (must verify MIT/other), future-dated last update (2026-03-25) suggests metadata error, and domain mismatch requires significant adaptation for prediction market feeds.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -280,7 +280,7 @@
       "what_to_take": "None - domain mismatch (stock prediction vs prediction markets) and non-production Jupyter notebook structure",
       "risk": "License uncertainty (no license specified), inactive maintenance (2026 update date is invalid), and domain mismatch requiring significant adaptation for prediction markets",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -300,7 +300,7 @@
       "what_to_take": "None - repo has spammy README, impossible future last update date (2026), and no clear value for our stack's specific strategies or feeds",
       "risk": "Suspicious repo (future date, spammy description), potential license issues (no license specified), and low code quality likely to cause integration headaches",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -320,7 +320,7 @@
       "what_to_take": "Core deep learning model architectures (e.g., LSTM, Transformer) for time-series prediction, but requires significant adaptation to prediction market data due to domain mismatch (stock vs. event-based prediction markets).",
       "risk": "Domain mismatch (stock market prediction library vs. prediction markets) requires extensive data pipeline/model retraining. Last update date (2026-03-25) appears to be a typo, raising maintenance concerns. License not specified in description.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -340,7 +340,7 @@
       "what_to_take": "Not a code repository; use as reference to identify specific libraries (e.g., for technical analysis or arbitrage) but do not attempt to integrate the HTML list itself.",
       "risk": "Repo is a static HTML list (not code), making integration impossible. Last update date (2026) is invalid, indicating poor maintenance. No actionable code for integration.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
