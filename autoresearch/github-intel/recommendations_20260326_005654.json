@@ -160,7 +160,7 @@
       "what_to_take": "Extract LSTM/seq2seq model architectures for time series forecasting, but avoid direct code integration due to stock-market focus and notebook format.",
       "risk": "Stock-market models require domain adaptation for prediction markets; notebooks need full refactoring; high risk of misalignment with our market data structure.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "Data fetching patterns for crypto/stock exchanges (e.g., CoinGecko) but discard terminal UI components; focus only on API interaction logic for potential Python adaptation.",
       "risk": "License unclear (no LICENSE file visible), Go-to-Python integration complexity, terminal-focused code not aligned with backend trading systems, and future-dated last update (2026) suggests possible data error.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "No reusable patterns; exchange API code is Bitcoin-specific and in Java, while our stack uses Python for prediction markets (not crypto trading).",
       "risk": "Java language mismatch (requires heavy refactoring), domain mismatch (Bitcoin trading vs prediction markets), redundant with existing exchange integrations in RivalClaw/Clawmpson, and future-dated last update (2026) suggests potential repo inaccuracy.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "Use the list to identify specific libraries for research, but do not integrate the list itself as code.",
       "risk": "Repo is a static HTML list (not code), so no actual integration possible. Last updated date (2026) is invalid, indicating potential maintenance issues.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
