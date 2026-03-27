@@ -29,6 +29,16 @@ def _load_env():
                 os.environ.setdefault(k.strip(), v.strip())
 
 
+try:
+    from scripts.mirofish.protocol_adapter import submit_trade, USE_PROTOCOL
+except ImportError:
+    try:
+        from protocol_adapter import submit_trade, USE_PROTOCOL
+    except ImportError:
+        submit_trade = None
+        USE_PROTOCOL = False
+
+
 # ---------------------------------------------------------------------------
 # Config
 # ---------------------------------------------------------------------------
@@ -189,17 +199,44 @@ def _place_crypto_trade(conn, asset: str, direction: str, price: float,
 
     # For crypto spot: direction is BUY/SELL, map to YES/NO for paper_trades compatibility
     paper_direction = "YES" if direction == "BUY" else "NO"
+    _confidence = min(edge / 0.05, 1.0)
+    _market_id = f"SPOT:{asset}"
+    _question = f"{asset} spot trade @ ${price:,.2f}"
+    # Note: venue is "crypto_spot" — crypto_spot_trader uses USD prices, not probabilities.
+    # Protocol receives the raw USD price as entry_price.
+    _venue = "crypto_spot"
 
+    # Protocol path
+    if USE_PROTOCOL and submit_trade is not None:
+        _trade_id = submit_trade(
+            market_id=_market_id,
+            question=_question,
+            direction=paper_direction,
+            shares=shares,
+            entry_price=price,
+            amount_usd=amount,
+            confidence=_confidence,
+            reasoning=reasoning,
+            strategy=strategy,
+            venue=_venue,
+            db_conn=conn,
+        )
+        if _trade_id is not None:
+            print(f"[crypto_spot] {direction} {shares:.6f} {asset} @ ${price:,.2f} (${amount:.0f}) [{strategy}]")
+            return True
+        # Protocol rejected or failed — fall through to legacy
+
+    # Legacy INSERT fallback
     conn.execute("""
         INSERT INTO paper_trades
         (market_id, question, direction, shares, entry_price, amount_usd,
          status, confidence, reasoning, strategy, opened_at, entry_fee)
         VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?)
     """, (
-        f"SPOT:{asset}",
-        f"{asset} spot trade @ ${price:,.2f}",
+        _market_id,
+        _question,
         paper_direction, shares, price, amount,
-        min(edge / 0.05, 1.0), reasoning, strategy, ts, entry_fee,
+        _confidence, reasoning, strategy, ts, entry_fee,
     ))
     conn.commit()
     print(f"[crypto_spot] {direction} {shares:.6f} {asset} @ ${price:,.2f} (${amount:.0f}) [{strategy}]")

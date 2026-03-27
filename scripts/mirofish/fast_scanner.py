@@ -19,6 +19,15 @@ import datetime
 import sqlite3
 from pathlib import Path
 
+try:
+    from scripts.mirofish.protocol_adapter import submit_trade, USE_PROTOCOL
+except ImportError:
+    try:
+        from protocol_adapter import submit_trade, USE_PROTOCOL
+    except ImportError:
+        submit_trade = None
+        USE_PROTOCOL = False
+
 
 def _load_env():
     env_file = Path.home() / "openclaw" / ".env"
@@ -477,6 +486,34 @@ def _resolve_expired(conn, skip_ids: set | None = None) -> int:
 def _place_trade(conn, market_id, question, direction, entry_price, amount, shares, edge, strategy) -> int | None:
     """Insert a paper trade directly (bypasses wallet for speed). Returns trade ID."""
     ts = datetime.datetime.utcnow().isoformat()
+    _confidence = min(edge / 0.10, 1.0)
+    _reasoning = f"{strategy}: edge={edge:.3f} entry={entry_price:.3f}"
+    _venue = "kalshi" if market_id.startswith("KX") else "polymarket"
+
+    # Protocol path
+    if USE_PROTOCOL and submit_trade is not None:
+        try:
+            _trade_id = submit_trade(
+                market_id=market_id,
+                question=question[:200],
+                direction=direction,
+                shares=shares,
+                entry_price=entry_price,
+                amount_usd=amount,
+                confidence=_confidence,
+                reasoning=_reasoning,
+                strategy=strategy,
+                venue=_venue,
+                db_conn=conn,
+            )
+            if _trade_id is not None:
+                print(f"[fast_scan] {direction} ${amount:.0f} on '{question[:50]}' [{strategy}] edge={edge:.3f}")
+                return _trade_id
+        except Exception as e:
+            print(f"[fast_scan] Protocol error: {e}")
+        # Protocol rejected or failed — fall through to legacy
+
+    # Legacy INSERT fallback (intentionally omits entry_fee — fast_scanner speed path)
     try:
         cur = conn.execute("""
             INSERT INTO paper_trades
@@ -485,8 +522,8 @@ def _place_trade(conn, market_id, question, direction, entry_price, amount, shar
             VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?)
         """, (
             market_id, question[:200], direction, shares, entry_price, amount,
-            min(edge / 0.10, 1.0),
-            f"{strategy}: edge={edge:.3f} entry={entry_price:.3f}",
+            _confidence,
+            _reasoning,
             strategy, ts,
         ))
         conn.commit()

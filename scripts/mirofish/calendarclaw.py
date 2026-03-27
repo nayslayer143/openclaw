@@ -32,6 +32,15 @@ def _load_env():
 # Config
 from scripts.mirofish.bot_config import get_param as _p, confidence_position_pct
 
+try:
+    from scripts.mirofish.protocol_adapter import submit_trade, USE_PROTOCOL
+except ImportError:
+    try:
+        from protocol_adapter import submit_trade, USE_PROTOCOL
+    except ImportError:
+        submit_trade = None
+        USE_PROTOCOL = False
+
 MAX_TRADES_PER_RUN = _p("calendarclaw", "MAX_TRADES_PER_RUN", 30)
 POSITION_PCT       = _p("calendarclaw", "POSITION_PCT", 0.03)
 MIN_ENTRY          = _p("calendarclaw", "MIN_ENTRY", 0.03)
@@ -294,23 +303,50 @@ def scan_calendar_setups(conn, balance, open_ids) -> int:
 
         # Place trade
         ts = now.isoformat()
+        _reasoning = f"calendarclaw: {thesis}"
+        _venue = "kalshi"
         try:
-            conn.execute("""
-                INSERT INTO paper_trades
-                (market_id, question, direction, shares, entry_price, amount_usd,
-                 status, confidence, reasoning, strategy, opened_at, entry_fee)
-                VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?)
-            """, (
-                ticker, title[:200], direction, shares, entry, amount,
-                score,
-                f"calendarclaw: {thesis}",
-                "calendarclaw", ts, entry_fee,
-            ))
-            conn.commit()
-            placed += 1
-            open_ids.add(ticker)
-            events_seen.add(evt)
-            print(f"[calendar] {direction} ${amount:.0f} '{title[:40]}' score={score:.2f} [{family}] {hours_to_close:.1f}h")
+            # Protocol path
+            _trade_id = None
+            if USE_PROTOCOL and submit_trade is not None:
+                _trade_id = submit_trade(
+                    market_id=ticker,
+                    question=title[:200],
+                    direction=direction,
+                    shares=shares,
+                    entry_price=entry,
+                    amount_usd=amount,
+                    confidence=score,
+                    reasoning=_reasoning,
+                    strategy="calendarclaw",
+                    venue=_venue,
+                    db_conn=conn,
+                )
+
+            if _trade_id is not None:
+                # Protocol handled it (including shadow write to paper_trades)
+                placed += 1
+                open_ids.add(ticker)
+                events_seen.add(evt)
+                print(f"[calendar] {direction} ${amount:.0f} '{title[:40]}' score={score:.2f} [{family}] {hours_to_close:.1f}h")
+            else:
+                # Legacy INSERT fallback
+                conn.execute("""
+                    INSERT INTO paper_trades
+                    (market_id, question, direction, shares, entry_price, amount_usd,
+                     status, confidence, reasoning, strategy, opened_at, entry_fee)
+                    VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?)
+                """, (
+                    ticker, title[:200], direction, shares, entry, amount,
+                    score,
+                    _reasoning,
+                    "calendarclaw", ts, entry_fee,
+                ))
+                conn.commit()
+                placed += 1
+                open_ids.add(ticker)
+                events_seen.add(evt)
+                print(f"[calendar] {direction} ${amount:.0f} '{title[:40]}' score={score:.2f} [{family}] {hours_to_close:.1f}h")
         except Exception as e:
             print(f"[calendar] Error: {e}")
 

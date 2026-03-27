@@ -30,6 +30,16 @@ def _load_env():
                 os.environ.setdefault(k.strip(), v.strip())
 
 
+try:
+    from scripts.mirofish.protocol_adapter import submit_trade, USE_PROTOCOL
+except ImportError:
+    try:
+        from protocol_adapter import submit_trade, USE_PROTOCOL
+    except ImportError:
+        submit_trade = None
+        USE_PROTOCOL = False
+
+
 # Config
 POSITION_PCT = float(os.environ.get("MATH_STRAT_POSITION_PCT", "0.03"))
 MAX_TRADES_PER_RUN = int(os.environ.get("MATH_STRAT_MAX_TRADES", "5"))
@@ -84,6 +94,45 @@ def _place(conn, ticker, question, direction, entry, amount, edge, strategy, new
     amount -= entry_fee
     shares = amount / entry
     ts = datetime.datetime.utcnow().isoformat()
+    _reasoning = f"{strategy}: edge={edge:.3f} entry={entry:.3f}"
+    _confidence = min(edge / 0.05, 1.0)
+    _venue = "kalshi"
+
+    # Protocol path
+    if USE_PROTOCOL and submit_trade is not None:
+        try:
+            _trade_id = submit_trade(
+                market_id=ticker,
+                question=(question or "")[:200],
+                direction=direction,
+                shares=shares,
+                entry_price=entry,
+                amount_usd=amount,
+                confidence=_confidence,
+                reasoning=_reasoning,
+                strategy=strategy,
+                venue=_venue,
+                db_conn=conn,
+            )
+            if _trade_id is not None:
+                new_ids.add(_trade_id)
+                timer = ""
+                km = conn.execute("SELECT close_time FROM kalshi_markets WHERE ticker=? ORDER BY fetched_at DESC LIMIT 1",
+                                  (ticker,)).fetchone()
+                if km and km["close_time"]:
+                    try:
+                        ct = datetime.datetime.fromisoformat(km["close_time"].replace("Z", "+00:00"))
+                        mins = (ct.replace(tzinfo=None) - datetime.datetime.utcnow()).total_seconds() / 60
+                        timer = f" [{mins:.0f}min]"
+                    except Exception:
+                        pass
+                print(f"[math] {direction} ${amount:.0f} '{question[:40]}' [{strategy}] edge={edge:.3f}{timer}")
+                return True
+        except Exception as e:
+            print(f"[math] Protocol error: {e}")
+        # Protocol rejected or failed — fall through to legacy
+
+    # Legacy INSERT fallback
     try:
         cur = conn.execute("""
             INSERT INTO paper_trades
@@ -92,8 +141,8 @@ def _place(conn, ticker, question, direction, entry, amount, edge, strategy, new
             VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?)
         """, (
             ticker, (question or "")[:200], direction, shares, entry, amount,
-            min(edge / 0.05, 1.0),
-            f"{strategy}: edge={edge:.3f} entry={entry:.3f}",
+            _confidence,
+            _reasoning,
             strategy, ts, entry_fee,
         ))
         conn.commit()

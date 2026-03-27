@@ -26,6 +26,15 @@ def _load_env():
 # Config
 from scripts.mirofish.bot_config import get_param as _p, confidence_position_pct
 
+try:
+    from scripts.mirofish.protocol_adapter import submit_trade, USE_PROTOCOL
+except ImportError:
+    try:
+        from protocol_adapter import submit_trade, USE_PROTOCOL
+    except ImportError:
+        submit_trade = None
+        USE_PROTOCOL = False
+
 MAX_TRADES_PER_RUN    = _p("sentimentclaw", "MAX_TRADES_PER_RUN", 25)
 POSITION_PCT          = _p("sentimentclaw", "POSITION_PCT", 0.03)
 MIN_ENTRY             = _p("sentimentclaw", "MIN_ENTRY", 0.03)
@@ -213,21 +222,47 @@ def scan_volume_attention_gaps(conn, balance, open_ids) -> int:
         amount -= entry_fee
         shares = amount / entry
 
+        _venue = "kalshi"
         try:
-            conn.execute("""
-                INSERT INTO paper_trades
-                (market_id, question, direction, shares, entry_price, amount_usd,
-                 status, confidence, reasoning, strategy, opened_at, entry_fee)
-                VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?)
-            """, (
-                ticker, (r["title"] or "")[:200], direction, shares, entry, amount,
-                score, thesis, "sentimentclaw", now.isoformat(), entry_fee,
-            ))
-            conn.commit()
-            placed += 1
-            open_ids.add(ticker)
-            events_seen.add(evt)
-            print(f"[sentiment] {direction} ${amount:.0f} '{r['title'][:40]}' | {thesis[:60]}")
+            # Protocol path
+            _trade_id = None
+            if USE_PROTOCOL and submit_trade is not None:
+                _trade_id = submit_trade(
+                    market_id=ticker,
+                    question=(r["title"] or "")[:200],
+                    direction=direction,
+                    shares=shares,
+                    entry_price=entry,
+                    amount_usd=amount,
+                    confidence=score,
+                    reasoning=thesis,
+                    strategy="sentimentclaw",
+                    venue=_venue,
+                    db_conn=conn,
+                )
+
+            if _trade_id is not None:
+                # Protocol handled it (including shadow write to paper_trades)
+                placed += 1
+                open_ids.add(ticker)
+                events_seen.add(evt)
+                print(f"[sentiment] {direction} ${amount:.0f} '{r['title'][:40]}' | {thesis[:60]}")
+            else:
+                # Legacy INSERT fallback
+                conn.execute("""
+                    INSERT INTO paper_trades
+                    (market_id, question, direction, shares, entry_price, amount_usd,
+                     status, confidence, reasoning, strategy, opened_at, entry_fee)
+                    VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?)
+                """, (
+                    ticker, (r["title"] or "")[:200], direction, shares, entry, amount,
+                    score, thesis, "sentimentclaw", now.isoformat(), entry_fee,
+                ))
+                conn.commit()
+                placed += 1
+                open_ids.add(ticker)
+                events_seen.add(evt)
+                print(f"[sentiment] {direction} ${amount:.0f} '{r['title'][:40]}' | {thesis[:60]}")
         except Exception as e:
             print(f"[sentiment] Error: {e}")
 

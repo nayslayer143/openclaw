@@ -56,6 +56,15 @@ def _load_env():
 # ---------------------------------------------------------------------------
 from scripts.mirofish.bot_config import get_param as _p
 
+try:
+    from scripts.mirofish.protocol_adapter import submit_trade, USE_PROTOCOL
+except ImportError:
+    try:
+        from protocol_adapter import submit_trade, USE_PROTOCOL
+    except ImportError:
+        submit_trade = None
+        USE_PROTOCOL = False
+
 MAX_POSITION_PCT = _p("phantomclaw_fv", "MAX_POSITION_PCT", 0.05)
 MIN_FV_EDGE = _p("phantomclaw_fv", "MIN_FV_EDGE", 0.01)
 KELLY_PROVEN = 1.0
@@ -348,24 +357,52 @@ def scan_fair_value(conn, balance, open_ids, spot_dict, events_seen, new_ids) ->
 
         # Place trade
         ts = now.isoformat()
+        _reasoning = f"phantomclaw_fv: fair={fair:.3f} mkt={entry:.3f} edge={edge:.3f} bucket={bucket} vol={vol:.2f}"
+        _venue = "kalshi"
         try:
-            cur = conn.execute("""
-                INSERT INTO paper_trades
-                (market_id, question, direction, shares, entry_price, amount_usd,
-                 status, confidence, reasoning, strategy, opened_at, entry_fee)
-                VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?)
-            """, (
-                ticker, (r["title"] or "")[:200], direction, shares, entry_adj, amount,
-                confidence,
-                f"phantomclaw_fv: fair={fair:.3f} mkt={entry:.3f} edge={edge:.3f} bucket={bucket} vol={vol:.2f}",
-                "phantomclaw_fv", ts, entry_fee,
-            ))
-            conn.commit()
-            new_ids.add(cur.lastrowid)
-            placed += 1
-            open_ids.add(ticker)
-            events_seen.add(evt)
-            print(f"[phantom] {direction} ${amount:.0f} '{r['title'][:40]}' fair={fair:.3f} mkt={entry:.3f} edge={edge:.3f} [{bucket}]")
+            # Protocol path
+            _trade_id = None
+            if USE_PROTOCOL and submit_trade is not None:
+                _trade_id = submit_trade(
+                    market_id=ticker,
+                    question=(r["title"] or "")[:200],
+                    direction=direction,
+                    shares=shares,
+                    entry_price=entry_adj,
+                    amount_usd=amount,
+                    confidence=confidence,
+                    reasoning=_reasoning,
+                    strategy="phantomclaw_fv",
+                    venue=_venue,
+                    db_conn=conn,
+                )
+
+            if _trade_id is not None:
+                # Protocol handled it (including shadow write to paper_trades)
+                new_ids.add(_trade_id)
+                placed += 1
+                open_ids.add(ticker)
+                events_seen.add(evt)
+                print(f"[phantom] {direction} ${amount:.0f} '{r['title'][:40]}' fair={fair:.3f} mkt={entry:.3f} edge={edge:.3f} [{bucket}]")
+            else:
+                # Legacy INSERT fallback
+                cur = conn.execute("""
+                    INSERT INTO paper_trades
+                    (market_id, question, direction, shares, entry_price, amount_usd,
+                     status, confidence, reasoning, strategy, opened_at, entry_fee)
+                    VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?)
+                """, (
+                    ticker, (r["title"] or "")[:200], direction, shares, entry_adj, amount,
+                    confidence,
+                    _reasoning,
+                    "phantomclaw_fv", ts, entry_fee,
+                ))
+                conn.commit()
+                new_ids.add(cur.lastrowid)
+                placed += 1
+                open_ids.add(ticker)
+                events_seen.add(evt)
+                print(f"[phantom] {direction} ${amount:.0f} '{r['title'][:40]}' fair={fair:.3f} mkt={entry:.3f} edge={edge:.3f} [{bucket}]")
         except Exception as e:
             print(f"[phantom] Error: {e}")
 

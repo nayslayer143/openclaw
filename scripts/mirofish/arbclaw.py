@@ -20,6 +20,15 @@ import sqlite3
 import datetime
 from pathlib import Path
 
+try:
+    from scripts.mirofish.protocol_adapter import submit_trade, USE_PROTOCOL
+except ImportError:
+    try:
+        from protocol_adapter import submit_trade, USE_PROTOCOL
+    except ImportError:
+        submit_trade = None
+        USE_PROTOCOL = False
+
 
 def _load_env():
     env_file = Path.home() / "openclaw" / ".env"
@@ -228,21 +237,48 @@ def run():
         ts = now.isoformat()
 
         try:
-            cur = conn.execute("""
-                INSERT INTO paper_trades
-                (market_id, question, direction, shares, entry_price, amount_usd,
-                 status, confidence, reasoning, strategy, opened_at, entry_fee)
-                VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?)
-            """, (
-                opp["ticker"], (opp["title"] or "")[:200], opp["direction"],
-                shares, opp["entry"], amount,
-                min(opp["gap"] / 0.05, 1.0),
-                f"arbclaw: gap={opp['gap']:.3f} entry={opp['entry']:.3f} vol={opp['volume']:.0f}",
-                "arbclaw_single_venue", ts, entry_fee,
-            ))
-            conn.commit()
-            new_ids.add(cur.lastrowid)
-            placed += 1
+            _reasoning = f"arbclaw: gap={opp['gap']:.3f} entry={opp['entry']:.3f} vol={opp['volume']:.0f}"
+            _confidence = min(opp["gap"] / 0.05, 1.0)
+            _venue = "kalshi"
+
+            # Protocol path
+            _trade_id = None
+            if USE_PROTOCOL and submit_trade is not None:
+                _trade_id = submit_trade(
+                    market_id=opp["ticker"],
+                    question=(opp["title"] or "")[:200],
+                    direction=opp["direction"],
+                    shares=shares,
+                    entry_price=opp["entry"],
+                    amount_usd=amount,
+                    confidence=_confidence,
+                    reasoning=_reasoning,
+                    strategy="arbclaw_single_venue",
+                    venue=_venue,
+                    db_conn=conn,
+                )
+
+            if _trade_id is not None:
+                # Protocol handled it (including shadow write to paper_trades)
+                new_ids.add(_trade_id)
+                placed += 1
+            else:
+                # Legacy INSERT fallback
+                cur = conn.execute("""
+                    INSERT INTO paper_trades
+                    (market_id, question, direction, shares, entry_price, amount_usd,
+                     status, confidence, reasoning, strategy, opened_at, entry_fee)
+                    VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?)
+                """, (
+                    opp["ticker"], (opp["title"] or "")[:200], opp["direction"],
+                    shares, opp["entry"], amount,
+                    _confidence,
+                    _reasoning,
+                    "arbclaw_single_venue", ts, entry_fee,
+                ))
+                conn.commit()
+                new_ids.add(cur.lastrowid)
+                placed += 1
 
             hrs = opp["hours_left"]
             timer = f"{hrs:.0f}h" if hrs < 999 else "?"

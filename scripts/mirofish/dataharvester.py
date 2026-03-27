@@ -12,6 +12,15 @@ DB_PATH = Path(os.environ.get("CLAWMSON_DB_PATH", Path.home() / ".openclaw" / "c
 
 from scripts.mirofish.bot_config import get_param as _p, confidence_position_pct
 
+try:
+    from scripts.mirofish.protocol_adapter import submit_trade, USE_PROTOCOL
+except ImportError:
+    try:
+        from protocol_adapter import submit_trade, USE_PROTOCOL
+    except ImportError:
+        submit_trade = None
+        USE_PROTOCOL = False
+
 MAX_TRADES_PER_RUN = _p("dataharvester", "MAX_TRADES_PER_RUN", 50)
 BET_SIZE_USD       = _p("dataharvester", "BET_SIZE_USD", 4.0)
 EDGE_THRESHOLD     = _p("dataharvester", "EDGE_THRESHOLD", 0.08)
@@ -142,6 +151,28 @@ def place_trade(conn, market_id, question, direction, entry, confidence, thesis,
     if shares <= 0:
         return False
 
+    _reasoning = f"dataharvester: {thesis}"
+
+    # Protocol path
+    if USE_PROTOCOL and submit_trade is not None:
+        _trade_id = submit_trade(
+            market_id=market_id,
+            question=question[:200],
+            direction=direction,
+            shares=shares,
+            entry_price=entry,
+            amount_usd=amount,
+            confidence=confidence,
+            reasoning=_reasoning,
+            strategy="dataharvester",
+            venue=venue,
+            db_conn=conn,
+        )
+        if _trade_id is not None:
+            return True
+        # Protocol rejected or failed — fall through to legacy
+
+    # Legacy INSERT fallback
     ts = datetime.now(timezone.utc).isoformat()
     conn.execute("""
         INSERT INTO paper_trades
@@ -150,7 +181,7 @@ def place_trade(conn, market_id, question, direction, entry, confidence, thesis,
         VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?)
     """, (
         market_id, question[:200], direction, shares, entry, amount,
-        confidence, f"dataharvester: {thesis}", "dataharvester", ts, entry_fee,
+        confidence, _reasoning, "dataharvester", ts, entry_fee,
     ))
     return True
 

@@ -31,6 +31,16 @@ def _load_env():
                 os.environ.setdefault(k.strip(), v.strip())
 
 
+try:
+    from scripts.mirofish.protocol_adapter import submit_trade, USE_PROTOCOL
+except ImportError:
+    try:
+        from protocol_adapter import submit_trade, USE_PROTOCOL
+    except ImportError:
+        submit_trade = None
+        USE_PROTOCOL = False
+
+
 # Config
 POSITION_PCT = float(os.environ.get("HEDGE_POSITION_PCT", "0.04"))
 HEDGE_RATIO = float(os.environ.get("HEDGE_RATIO", "0.25"))  # spend 25% of position on hedge
@@ -87,6 +97,33 @@ def _place(conn, ticker, question, direction, entry, amount, edge, strategy) -> 
     amount -= entry_fee
     shares = amount / entry
     ts = datetime.datetime.utcnow().isoformat()
+    _reasoning = f"{strategy}: edge={edge:.3f} entry={entry:.3f}"
+    _confidence = min(edge / 0.05, 1.0)
+    _venue = "kalshi"
+
+    # Protocol path
+    if USE_PROTOCOL and submit_trade is not None:
+        try:
+            _trade_id = submit_trade(
+                market_id=ticker,
+                question=(question or "")[:200],
+                direction=direction,
+                shares=shares,
+                entry_price=entry,
+                amount_usd=amount,
+                confidence=_confidence,
+                reasoning=_reasoning,
+                strategy=strategy,
+                venue=_venue,
+                db_conn=conn,
+            )
+            if _trade_id is not None:
+                return _trade_id
+        except Exception as e:
+            print(f"[hedge] Protocol error: {e}")
+        # Protocol rejected or failed — fall through to legacy
+
+    # Legacy INSERT fallback
     try:
         cur = conn.execute("""
             INSERT INTO paper_trades
@@ -95,8 +132,8 @@ def _place(conn, ticker, question, direction, entry, amount, edge, strategy) -> 
             VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?)
         """, (
             ticker, (question or "")[:200], direction, shares, entry, amount,
-            min(edge / 0.05, 1.0),
-            f"{strategy}: edge={edge:.3f} entry={entry:.3f}",
+            _confidence,
+            _reasoning,
             strategy, ts, entry_fee,
         ))
         conn.commit()

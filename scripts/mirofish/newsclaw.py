@@ -29,6 +29,15 @@ def _load_env():
 # Config
 from scripts.mirofish.bot_config import get_param as _p, confidence_position_pct
 
+try:
+    from scripts.mirofish.protocol_adapter import submit_trade, USE_PROTOCOL
+except ImportError:
+    try:
+        from protocol_adapter import submit_trade, USE_PROTOCOL
+    except ImportError:
+        submit_trade = None
+        USE_PROTOCOL = False
+
 MAX_TRADES_PER_RUN = _p("newsclaw", "MAX_TRADES_PER_RUN", 20)
 POSITION_PCT       = _p("newsclaw", "POSITION_PCT", 0.03)
 MIN_ENTRY          = _p("newsclaw", "MIN_ENTRY", 0.03)
@@ -328,22 +337,48 @@ def run():
         shares = amount / entry
         reasoning = match.get("reasoning", "news catalyst")
 
+        _reasoning_full = f"newsclaw: {reasoning[:150]}"
+        _venue = "kalshi" if market_id.startswith("KX") else "polymarket"
         try:
-            conn.execute("""
-                INSERT INTO paper_trades
-                (market_id, question, direction, shares, entry_price, amount_usd,
-                 status, confidence, reasoning, strategy, opened_at, entry_fee)
-                VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?)
-            """, (
-                market_id, (mkt["title"] or "")[:200], direction, shares, entry, amount,
-                confidence,
-                f"newsclaw: {reasoning[:150]}",
-                "newsclaw", datetime.datetime.utcnow().isoformat(), entry_fee,
-            ))
-            conn.commit()
-            placed += 1
-            open_ids.add(market_id)
-            print(f"[news] {direction} ${amount:.0f} '{mkt['title'][:40]}' conf={confidence:.2f}")
+            # Protocol path
+            _trade_id = None
+            if USE_PROTOCOL and submit_trade is not None:
+                _trade_id = submit_trade(
+                    market_id=market_id,
+                    question=(mkt["title"] or "")[:200],
+                    direction=direction,
+                    shares=shares,
+                    entry_price=entry,
+                    amount_usd=amount,
+                    confidence=confidence,
+                    reasoning=_reasoning_full,
+                    strategy="newsclaw",
+                    venue=_venue,
+                    db_conn=conn,
+                )
+
+            if _trade_id is not None:
+                # Protocol handled it (including shadow write to paper_trades)
+                placed += 1
+                open_ids.add(market_id)
+                print(f"[news] {direction} ${amount:.0f} '{mkt['title'][:40]}' conf={confidence:.2f}")
+            else:
+                # Legacy INSERT fallback
+                conn.execute("""
+                    INSERT INTO paper_trades
+                    (market_id, question, direction, shares, entry_price, amount_usd,
+                     status, confidence, reasoning, strategy, opened_at, entry_fee)
+                    VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?)
+                """, (
+                    market_id, (mkt["title"] or "")[:200], direction, shares, entry, amount,
+                    confidence,
+                    _reasoning_full,
+                    "newsclaw", datetime.datetime.utcnow().isoformat(), entry_fee,
+                ))
+                conn.commit()
+                placed += 1
+                open_ids.add(market_id)
+                print(f"[news] {direction} ${amount:.0f} '{mkt['title'][:40]}' conf={confidence:.2f}")
         except Exception as e:
             print(f"[news] Error: {e}")
 

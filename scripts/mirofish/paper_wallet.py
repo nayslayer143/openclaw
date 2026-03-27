@@ -11,6 +11,17 @@ from pathlib import Path
 from statistics import mean, stdev
 from typing import Any
 
+try:
+    from scripts.mirofish.protocol_adapter import submit_trade, USE_PROTOCOL, init_engine
+    init_engine()
+except ImportError:
+    try:
+        from protocol_adapter import submit_trade, USE_PROTOCOL, init_engine
+        init_engine()
+    except ImportError:
+        submit_trade = None
+        USE_PROTOCOL = False
+
 STOP_LOSS_PCT    = float(os.environ.get("MIROFISH_STOP_LOSS_PCT",    "0.20"))
 TAKE_PROFIT_PCT  = float(os.environ.get("MIROFISH_TAKE_PROFIT_PCT",  "0.50"))
 MAX_POSITION_PCT = float(os.environ.get("MIROFISH_MAX_POSITION_PCT", "0.10"))
@@ -355,6 +366,43 @@ def execute_trade(decision: Any) -> dict | None:
         )
 
     ts = datetime.datetime.utcnow().isoformat()
+    _strategy = getattr(decision, "strategy", "manual")
+    _confidence = getattr(decision, "confidence", 1.0)
+    _venue = venue
+
+    # Protocol path
+    if USE_PROTOCOL and submit_trade is not None:
+        try:
+            with _get_conn() as conn:
+                _trade_id = submit_trade(
+                    market_id=decision.market_id,
+                    question=decision.question,
+                    direction=decision.direction,
+                    shares=shares,
+                    entry_price=entry_price,
+                    amount_usd=amount_usd,
+                    confidence=_confidence,
+                    reasoning=reasoning,
+                    strategy=_strategy,
+                    venue=_venue,
+                    db_conn=conn,
+                )
+            if _trade_id is not None:
+                result = {
+                    "id": _trade_id, "status": "open", "amount_usd": amount_usd,
+                    "market_id": decision.market_id, "direction": decision.direction,
+                }
+                if sim_metadata:
+                    result["execution_sim"] = sim_metadata
+                return result
+        except Exception as e:
+            import logging
+            logging.getLogger("clawmpson.protocol").warning(
+                f"Protocol path failed in execute_trade, falling back to legacy: {e}"
+            )
+        # Protocol rejected or failed — fall through to legacy INSERT
+
+    # Legacy INSERT fallback
     with _get_conn() as conn:
         cur = conn.execute("""
             INSERT INTO paper_trades
@@ -364,9 +412,9 @@ def execute_trade(decision: Any) -> dict | None:
         """, (
             decision.market_id, decision.question, decision.direction,
             shares, entry_price, amount_usd,
-            getattr(decision, "confidence", 1.0),
+            _confidence,
             reasoning,
-            getattr(decision, "strategy", "manual"),
+            _strategy,
             ts,
             entry_fee,
         ))
