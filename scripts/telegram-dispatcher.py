@@ -921,6 +921,25 @@ def handle_message(msg: dict):
         print(f"[dispatcher] Ignored from non-allowed user {user_id}")
         return
 
+    # ── CodeMonkeyClaw relay ─────────────────────────────────────────────────
+    # Messages starting with 🐒 are written to a JSONL inbox file for
+    # CodeMonkeyClaw's Claude Code session to poll. The message continues
+    # through normal dispatch too (so Clawmson can ack it).
+    _CODEMONKEY_INBOX = Path("/tmp/codemonkey-inbox.jsonl")
+    if text and text.startswith("\U0001f412"):  # 🐒
+        relay_payload = json.dumps({
+            "ts": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+            "chat_id": chat_id,
+            "user_id": user_id,
+            "msg_id": msg_id,
+            "text": text,
+        })
+        with open(_CODEMONKEY_INBOX, "a") as f:
+            f.write(relay_payload + "\n")
+        print(f"[dispatcher] CodeMonkeyClaw relay: {text[:80]}")
+        send(chat_id, f"🐒 Relayed to CodeMonkeyClaw.")
+        return  # don't process further — this is for CodeMonkeyClaw only
+
     # ── 0. Twitter/X scout pre-route (runs before all other routing) ─────────
     if text and _TWITTER_RE.search(text):
         db.save_message(chat_id, "user", text, message_id=msg_id)
