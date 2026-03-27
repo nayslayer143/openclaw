@@ -1,9 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> Auto-generated 2026-03-26T23:07:00-07:00. Do not edit manually.
+> Auto-generated 2026-03-27T00:07:00-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-03-26T23:07:00-07:00
+Generated: 2026-03-27T00:07:00-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -156,6 +156,7 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/rivalclaw/CLAUDE.md
 ~/rivalclaw/P0-001-diagnostic.md
 ~/rivalclaw/README.md
+~/rivalclaw/__pycache__
 ~/rivalclaw/auto_changelog.py
 ~/rivalclaw/daily
 ~/rivalclaw/daily-update.log
@@ -179,6 +180,11 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/rivalclaw/notify.py
 ~/rivalclaw/paper_wallet.py
 ~/rivalclaw/polymarket_feed.py
+~/rivalclaw/protocol_adapter.py
+~/rivalclaw/protocol_commands.db
+~/rivalclaw/protocol_cycles.db
+~/rivalclaw/protocol_events.db
+~/rivalclaw/protocol_rollout.db
 ~/rivalclaw/risk_engine.py
 ~/rivalclaw/rivalclaw.db
 ~/rivalclaw/rivalclaw.db-shm
@@ -224,6 +230,7 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/arbclaw/daily/2026-03-24.md
 ~/arbclaw/daily/2026-03-25.md
 ~/arbclaw/daily/2026-03-26.md
+~/arbclaw/daily/2026-03-27.md
 ~/arbclaw/feed.py
 ~/arbclaw/learned_thresholds.json
 ~/arbclaw/learner.py
@@ -250,6 +257,7 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/quantumentalclaw/daily/2026-03-24.txt
 ~/quantumentalclaw/daily/2026-03-25.md
 ~/quantumentalclaw/daily/2026-03-26.md
+~/quantumentalclaw/daily/2026-03-27.md
 ~/quantumentalclaw/docs
 ~/quantumentalclaw/engine
 ~/quantumentalclaw/engine/__init__.py
@@ -259,9 +267,11 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/quantumentalclaw/engine/trade_filter.py
 ~/quantumentalclaw/execution
 ~/quantumentalclaw/execution/__init__.py
+~/quantumentalclaw/execution/__pycache__
 ~/quantumentalclaw/execution/equity_wallet.py
 ~/quantumentalclaw/execution/live_prices.py
 ~/quantumentalclaw/execution/paper_wallet.py
+~/quantumentalclaw/execution/protocol_adapter.py
 ~/quantumentalclaw/execution/router.py
 ~/quantumentalclaw/feeds
 ~/quantumentalclaw/feeds/__init__.py
@@ -284,6 +294,10 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/quantumentalclaw/learning/tuner.py
 ~/quantumentalclaw/logs
 ~/quantumentalclaw/notify.py
+~/quantumentalclaw/protocol_commands.db
+~/quantumentalclaw/protocol_cycles.db
+~/quantumentalclaw/protocol_events.db
+~/quantumentalclaw/protocol_rollout.db
 ~/quantumentalclaw/quantumentalclaw.db
 ~/quantumentalclaw/quantumentalclaw.db-shm
 ~/quantumentalclaw/quantumentalclaw.db-wal
@@ -317,6 +331,7 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/quantumentalclaw/tests/test_types.py
 ~/quantumentalclaw/utils
 ~/quantumentalclaw/utils/__init__.py
+~/quantumentalclaw/utils/__pycache__
 ~/quantumentalclaw/utils/config.py
 ~/quantumentalclaw/utils/db.py
 ~/quantumentalclaw/utils/helpers.py
@@ -1173,23 +1188,23 @@ pytest-asyncio>=0.23
 ### openclaw
 ```
 Branch: main
-Last commit: 96e8042 auto: 2026-03-26 23:00 state snapshot
-Uncommitted files: 11
+Last commit: 942973a auto: 2026-03-27 00:00 state snapshot
+Uncommitted files: 9
 Remote: https://github.com/nayslayer143/openclaw.git
 ```
 
 ### rivalclaw
 ```
 Branch: main
-Last commit: e8a7bb6 docs: add P0-001 diagnostic — cycle time explosion root cause analysis
-Uncommitted files: 16
+Last commit: fde3a28 feat: add protocol adapter for RivalClaw integration
+Uncommitted files: 20
 Remote: https://github.com/nayslayer143/rivalclaw.git
 ```
 
 ### arbclaw
 ```
 Branch: main
-Last commit: a2613e9 daily report 2026-03-26 — day 3 | bal=$ pnl=$ trades=0
+Last commit: 9d65c6f daily report 2026-03-27 — day 4 | bal=$ pnl=$ trades=0
 Uncommitted files: 3
 Remote: https://github.com/nayslayer143/arbclaw.git
 ```
@@ -1197,7 +1212,7 @@ Remote: https://github.com/nayslayer143/arbclaw.git
 ### quantumentalclaw
 ```
 Branch: main
-Last commit: 74acf38 hourly: 2026-03-27 06:00 | $17,592 | 17W/46closed | $+603 | calm
+Last commit: d2c2217 feat: add protocol adapter and wire ProtocolEngine into QuantClaw execution (Phase 2)
 Uncommitted files: 0
 Remote: https://github.com/nayslayer143/quantumentalclaw.git
 ```
@@ -1297,5 +1312,5 @@ Remote: https://github.com/nayslayer143/shiny-new.git
 ```
 
 ---
-End of context. Generated 2026-03-26T23:07:00-07:00.
+End of context. Generated 2026-03-27T00:07:00-07:00.
 For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw
