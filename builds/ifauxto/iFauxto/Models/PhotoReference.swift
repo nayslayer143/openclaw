@@ -3,7 +3,7 @@ import Foundation
 
 @Model
 final class PhotoReference {
-    @Attribute(.unique) var id: String  // PHAsset.localIdentifier — never duplicated
+    @Attribute(.unique) var id: String
     var folderId: String
     var orderIndex: Int
 
