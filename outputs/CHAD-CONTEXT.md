@@ -1,9 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> Auto-generated 2026-03-27T00:07:00-07:00. Do not edit manually.
+> Auto-generated 2026-03-27T01:07:00-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-03-27T00:07:00-07:00
+Generated: 2026-03-27T01:07:00-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -46,6 +46,8 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/openclaw/autoresearch/signals
 ~/openclaw/benchmark
 ~/openclaw/build-results
+~/openclaw/builds
+~/openclaw/builds/ifauxto
 ~/openclaw/chatgpt-mcp
 ~/openclaw/cinema-lab
 ~/openclaw/cinema-lab/builds
@@ -1188,16 +1190,16 @@ pytest-asyncio>=0.23
 ### openclaw
 ```
 Branch: main
-Last commit: 942973a auto: 2026-03-27 00:00 state snapshot
-Uncommitted files: 9
+Last commit: 29ab869 auto: hourly sync 2026-03-27 07:47 UTC
+Uncommitted files: 8
 Remote: https://github.com/nayslayer143/openclaw.git
 ```
 
 ### rivalclaw
 ```
 Branch: main
-Last commit: fde3a28 feat: add protocol adapter for RivalClaw integration
-Uncommitted files: 20
+Last commit: f2953a8 auto: hourly sync 2026-03-27 07:47 UTC
+Uncommitted files: 1
 Remote: https://github.com/nayslayer143/rivalclaw.git
 ```
 
@@ -1212,7 +1214,7 @@ Remote: https://github.com/nayslayer143/arbclaw.git
 ### quantumentalclaw
 ```
 Branch: main
-Last commit: d2c2217 feat: add protocol adapter and wire ProtocolEngine into QuantClaw execution (Phase 2)
+Last commit: 6b1e0c9 hourly: 2026-03-27 08:00 | $17,594 | 0W/0closed | $+0 | quiet
 Uncommitted files: 0
 Remote: https://github.com/nayslayer143/quantumentalclaw.git
 ```
@@ -1312,5 +1314,5 @@ Remote: https://github.com/nayslayer143/shiny-new.git
 ```
 
 ---
-End of context. Generated 2026-03-27T00:07:00-07:00.
+End of context. Generated 2026-03-27T01:07:00-07:00.
 For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw
