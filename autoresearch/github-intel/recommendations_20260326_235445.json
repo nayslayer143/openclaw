@@ -20,7 +20,7 @@
       "what_to_take": "Integrate the core backtesting engine (Backtest class and Strategy base class) to standardize strategy validation across all systems, particularly for Clawmpson's graduation engine and RivalClaw's strategy comparison.",
       "risk": "MIT license is safe; minor data pipeline adaptation needed; no major maintenance concerns (active repo with 8k+ stars).",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "The environment and agent abstraction for building RL-based strategies, but only if adding an RL component to LLM strategy in Clawmpson is prioritized later.",
       "risk": "MIT license is acceptable but last update date (2026-03-26) is future-dated and likely a typo indicating potential abandonment; high complexity for integration with existing rule-based systems; no direct fit for arb detection or rival strategy comparison.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "Systematic feature selection methodology and alpha factor library for building prediction market-specific factors, excluding stock-specific models.",
       "risk": "No license specified (legal risk), asset class mismatch (stocks vs prediction markets), high refactoring needed from Jupyter to production Python, and models trained on stock data won't transfer directly.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "Only the modular strategy framework pattern (not actual trading logic), requiring full Python rewrite and prediction market adaptation.",
       "risk": "JavaScript/Python language mismatch, Bitcoin-specific domain (not prediction markets), and high refactoring effort with low ROI. MIT license is acceptable but irrelevant domain.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "Nothing; repo contains educational Jupyter notebooks with generic ML examples not tailored to our multi-strategy architecture or production requirements.",
       "risk": "Potential license restrictions (book companion code may require attribution/commercial use fees), no production-ready code, and high refactoring effort needed to adapt notebooks to our stack.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "No usable code due to JavaScript vs Python mismatch; strategy concepts would require full reimplementation in Python with no clear advantage over existing stack.",
       "risk": "Critical language mismatch (JavaScript vs Python) requiring massive rework; prediction market mechanics differ from crypto focus; high complexity with minimal ROI.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -280,7 +280,7 @@
       "what_to_take": "Do not integrate; use as research reference only to identify specific libraries/strategies from external sources.",
       "risk": "Repo is a curated list (not code), so no direct integration possible. External resources may be outdated, require license checks, and demand manual integration effort.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -300,7 +300,7 @@
       "what_to_take": "No useful patterns; Java implementation for Bitcoin spot trading on exchanges (Bitfinex/Bitstamp) irrelevant to prediction markets (Polymarket/Kalshi) and Python stack.",
       "risk": "Future-dated last update (2026-03-17) suggests potential error/inactivity; Java code would require full porting to Python; license unknown (MIT/Apache likely but not confirmed).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
