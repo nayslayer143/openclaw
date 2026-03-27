@@ -3,11 +3,12 @@ import Foundation
 
 @Model
 final class Folder {
-    @Attribute(.unique) var id: String
-    var name: String
+    // CloudKit requires all non-optional properties to have default values
+    @Attribute(.unique) var id: String = UUID().uuidString
+    var name: String = ""
     var parentId: String?
-    var createdAt: Date
-    var order: Int
+    var createdAt: Date = Date()
+    var order: Int = 0
 
     @Relationship(deleteRule: .cascade, inverse: \PhotoReference.folder)
     var photoReferences: [PhotoReference] = []

@@ -3,9 +3,10 @@ import Foundation
 
 @Model
 final class PhotoReference {
-    @Attribute(.unique) var id: String
-    var folderId: String
-    var orderIndex: Int
+    // CloudKit requires all non-optional properties to have default values
+    @Attribute(.unique) var id: String = ""
+    var folderId: String = ""
+    var orderIndex: Int = 0
 
     var folder: Folder?
 

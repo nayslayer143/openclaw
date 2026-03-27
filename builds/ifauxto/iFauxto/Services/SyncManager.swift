@@ -1,5 +1,6 @@
 import Foundation
 import SwiftData
+import CoreData
 import Combine
 
 /// Coordinates CloudKit sync state and notifies the UI of sync events.
