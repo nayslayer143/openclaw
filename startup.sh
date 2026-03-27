@@ -139,6 +139,14 @@ else
 fi
 
 # ---------------------------------------------------------------------------
+# Claw Terminal Sessions
+# ---------------------------------------------------------------------------
+echo ""
+echo "Starting claw terminal sessions..."
+bash "$OPENCLAW_ROOT/scripts/claw-bootstrap.sh"
+echo "→ Claw terminals: $(tmux list-sessions -F '#S' 2>/dev/null | grep '^claw-' | tr '\n' ' ')"
+
+# ---------------------------------------------------------------------------
 # Summary
 # ---------------------------------------------------------------------------
 echo ""

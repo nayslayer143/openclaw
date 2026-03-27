@@ -38,3 +38,21 @@ else
   echo $! > "$DISP_PID"
   echo "[$(date)] Dispatcher restarted (PID $!)" >> "$HOME/openclaw/logs/watchdog.log"
 fi
+
+# ── Session Manager ─────────────────────────────────────────────────
+OPENCLAW_ROOT="${OPENCLAW_ROOT:-$HOME/openclaw}"
+SM_PID="$HOME/.openclaw/claw-session-manager.pid"
+if [ -f "$SM_PID" ]; then
+  if ! kill -0 "$(cat "$SM_PID")" 2>/dev/null; then
+    echo "[watchdog] session manager stale, restarting"
+    rm -f "$SM_PID"
+    nohup python3 "$OPENCLAW_ROOT/scripts/claw-session-manager.py" \
+      >> "$OPENCLAW_ROOT/logs/session-manager.log" 2>&1 &
+    echo $! > "$SM_PID"
+  fi
+else
+  echo "[watchdog] session manager not running, starting"
+  nohup python3 "$OPENCLAW_ROOT/scripts/claw-session-manager.py" \
+    >> "$OPENCLAW_ROOT/logs/session-manager.log" 2>&1 &
+  echo $! > "$HOME/.openclaw/claw-session-manager.pid"
+fi
