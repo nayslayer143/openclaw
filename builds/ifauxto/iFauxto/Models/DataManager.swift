@@ -8,18 +8,19 @@ final class DataManager: ObservableObject {
 
     // MARK: Init
 
+    // CloudKit sync disabled pending entitlements setup.
+    // Model is CloudKit-compatible: all relationships optional ([PhotoReference]?).
+    let isCloudKitEnabled: Bool = false
+
     init(inMemory: Bool = false) throws {
         let schema = Schema([Folder.self, PhotoReference.self])
-        let config: ModelConfiguration
-        if inMemory {
-            config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-        } else {
-            config = ModelConfiguration(
-                schema: schema,
-                isStoredInMemoryOnly: false,
-                cloudKitDatabase: .private("iCloud.com.ifauxto.app")
-            )
-        }
+        // cloudKitDatabase: .none prevents SwiftData from auto-enabling CloudKit via entitlements,
+        // which would fail model validation (non-optional to-many relationship).
+        let config = ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: inMemory,
+            cloudKitDatabase: .none
+        )
         modelContainer = try ModelContainer(for: schema, configurations: [config])
         modelContext = modelContainer.mainContext
     }
@@ -78,11 +79,11 @@ final class DataManager: ObservableObject {
 
     @discardableResult
     func addPhoto(assetIdentifier: String, to folder: Folder) -> PhotoReference {
-        let order = folder.photoReferences.count
+        let order = (folder.photoReferences ?? []).count
         let ref = PhotoReference(assetIdentifier: assetIdentifier, folderId: folder.id, orderIndex: order)
         ref.folder = folder
         modelContext.insert(ref)
-        folder.photoReferences.append(ref)
+        folder.photoReferences = (folder.photoReferences ?? []) + [ref]
         try? modelContext.save()
         return ref
     }
@@ -90,13 +91,13 @@ final class DataManager: ObservableObject {
     func addPhotos(assetIdentifiers: [String], to folder: Folder) {
         for identifier in assetIdentifiers {
             // Skip duplicates in this folder
-            guard !folder.photoReferences.contains(where: { $0.id == identifier }) else { continue }
+            guard !(folder.photoReferences ?? []).contains(where: { $0.id == identifier }) else { continue }
             _ = addPhoto(assetIdentifier: identifier, to: folder)
         }
     }
 
     func fetchPhotos(in folder: Folder) -> [PhotoReference] {
-        return folder.photoReferences.sorted { $0.orderIndex < $1.orderIndex }
+        return (folder.photoReferences ?? []).sorted { $0.orderIndex < $1.orderIndex }
     }
 
     func updatePhotoOrder(_ photos: [PhotoReference]) {
@@ -107,7 +108,7 @@ final class DataManager: ObservableObject {
     }
 
     func removePhoto(_ photo: PhotoReference, from folder: Folder) {
-        folder.photoReferences.removeAll { $0.id == photo.id }
+        folder.photoReferences?.removeAll { $0.id == photo.id }
         modelContext.delete(photo)
         try? modelContext.save()
     }
@@ -123,12 +124,12 @@ final class DataManager: ObservableObject {
     func movePhotos(_ photos: [PhotoReference], to destination: Folder) {
         for photo in photos {
             // Remove from source folder's relationship array
-            photo.folder?.photoReferences.removeAll { $0.id == photo.id }
+            photo.folder?.photoReferences?.removeAll { $0.id == photo.id }
             // Assign to destination
             photo.folderId = destination.id
             photo.folder = destination
-            photo.orderIndex = destination.photoReferences.count
-            destination.photoReferences.append(photo)
+            photo.orderIndex = (destination.photoReferences ?? []).count
+            destination.photoReferences = (destination.photoReferences ?? []) + [photo]
         }
         try? modelContext.save()
     }

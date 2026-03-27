@@ -11,7 +11,7 @@ final class Folder {
     var order: Int = 0
 
     @Relationship(deleteRule: .cascade, inverse: \PhotoReference.folder)
-    var photoReferences: [PhotoReference] = []
+    var photoReferences: [PhotoReference]? = []
 
     init(name: String, parentId: String? = nil, order: Int = 0) {
         self.id = UUID().uuidString

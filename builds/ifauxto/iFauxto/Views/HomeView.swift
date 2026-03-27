@@ -89,7 +89,7 @@ struct FolderRowView: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(folder.name)
                     .font(.body.weight(.medium))
-                Text("\(folder.photoReferences.count) photos")
+                Text("\((folder.photoReferences ?? []).count) photos")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
