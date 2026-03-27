@@ -26,6 +26,7 @@ final class DataManager: ObservableObject {
 
     // MARK: Folder CRUD
 
+    @discardableResult
     func createFolder(name: String, parentId: String? = nil) -> Folder {
         let siblings = fetchFolders(parentId: parentId)
         let order = siblings.count
@@ -52,6 +53,11 @@ final class DataManager: ObservableObject {
     }
 
     func deleteFolder(_ folder: Folder) {
+        // Recursively delete subfolders first
+        let children = fetchFolders(parentId: folder.id)
+        for child in children {
+            deleteFolder(child)
+        }
         modelContext.delete(folder)
         try? modelContext.save()
     }
@@ -70,6 +76,7 @@ final class DataManager: ObservableObject {
 
     // MARK: Photo CRUD
 
+    @discardableResult
     func addPhoto(assetIdentifier: String, to folder: Folder) -> PhotoReference {
         let order = folder.photoReferences.count
         let ref = PhotoReference(assetIdentifier: assetIdentifier, folderId: folder.id, orderIndex: order)
@@ -115,6 +122,9 @@ final class DataManager: ObservableObject {
 
     func movePhotos(_ photos: [PhotoReference], to destination: Folder) {
         for photo in photos {
+            // Remove from source folder's relationship array
+            photo.folder?.photoReferences.removeAll { $0.id == photo.id }
+            // Assign to destination
             photo.folderId = destination.id
             photo.folder = destination
             photo.orderIndex = destination.photoReferences.count

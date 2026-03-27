@@ -29,21 +29,16 @@ final class PhotoKitService: ObservableObject {
         guard let asset = fetchAsset(withIdentifier: identifier) else { return nil }
         return await withCheckedContinuation { continuation in
             let options = PHImageRequestOptions()
-            options.deliveryMode = .opportunistic
+            options.deliveryMode = .highQualityFormat
             options.resizeMode = .fast
             options.isNetworkAccessAllowed = true
             options.isSynchronous = false
-            var didResume = false
             PHImageManager.default().requestImage(
                 for: asset,
                 targetSize: targetSize,
                 contentMode: .aspectFill,
                 options: options
-            ) { image, info in
-                // opportunistic mode can call back twice; only resume once
-                guard !didResume else { return }
-                if let isDegraded = info?[PHImageResultIsDegradedKey] as? Bool, isDegraded { return }
-                didResume = true
+            ) { image, _ in
                 continuation.resume(returning: image)
             }
         }

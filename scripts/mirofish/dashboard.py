@@ -241,7 +241,8 @@ def generate_report(period: str = "daily") -> Path:
     if recent_trades:
         lines.append("\n## Recent Trades\n")
         for t in recent_trades:
-            pnl_str = f"+${t['pnl']:.2f}" if (t['pnl'] or 0) >= 0 else f"-${abs(t['pnl'] or 0):.2f}"
+            _pnl = t['pnl'] if t['pnl'] is not None else 0.0
+            pnl_str = f"+${_pnl:.2f}" if _pnl >= 0 else f"-${abs(_pnl):.2f}"
             lines.append(f"- [{t['status']}] {t['direction']} ${t['amount_usd']:.0f} "
                          f"on {t['question'][:50]}  {pnl_str}  [{t['strategy']}]\n")
 

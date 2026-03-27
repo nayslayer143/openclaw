@@ -24,6 +24,7 @@ struct PhotoViewer: View {
         .tabViewStyle(.page(indexDisplayMode: .never))
         .background(Color.black)
         .ignoresSafeArea()
+        .toolbar(.hidden, for: .navigationBar)
         .overlay(alignment: .topLeading) {
             Button {
                 dismiss()

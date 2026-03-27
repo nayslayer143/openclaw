@@ -1,4 +1,5 @@
 """Protocol adapter for Clawmpson. Single gateway for all sub-agent trade execution."""
+from __future__ import annotations
 import os
 import sys
 import hashlib
