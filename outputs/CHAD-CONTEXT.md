@@ -1,9 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> Auto-generated 2026-03-27T15:07:00-07:00. Do not edit manually.
+> Auto-generated 2026-03-27T16:07:00-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-03-27T15:07:00-07:00
+Generated: 2026-03-27T16:07:00-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -564,61 +564,51 @@ Combine 5 independent signal types to find trades where the upside massively out
 ```
 # ArbClaw
 
-Lean arbitrage validation experiment — 14-day paper trading test to determine whether Clawmpson's full trading stack introduces execution lag on prediction market arb opportunities.
+The simplest possible Polymarket arb bot. 441 lines of Python. No AI, no agents, no dashboard. Just math.
 
-## Hypothesis
+I built this as a speed baseline for an experiment: my main system ([OpenClaw](https://gitlab.com/jordan291/openclaw)) has a lot of moving parts, and I wanted to know if all that architecture was actually slowing down arb execution. ArbClaw is the control group — what happens when you strip everything away and just run the arb logic?
 
-Clawmpson runs 5 strategies, 5 feeds, LLM analysis, and a graduation engine on a 30-minute cron cycle. For cross-outcome arb where mispricing windows close in minutes, that machinery may cost alpha through execution lag. ArbClaw tests this by running a single strategy on a 5-minute cycle with zero overhead.
+## How it works
 
-## Architecture
+Every 5 minutes:
+1. Fetch all active Polymarket markets
+2. Check if YES + NO prices sum to less than 1.0 (after 2% taker fees per leg)
+3. Size with Kelly criterion
+4. Paper trade the underpriced side
 
-| File | Purpose | Lines |
-|------|---------|-------|
-| `feed.py` | Polymarket gamma API fetch + SQLite cache | 112 |
+That's it. Four files, one strategy, zero overhead.
+
+| File | What it does | Lines |
+|------|-------------|-------|
+| `feed.py` | Polymarket API fetch + SQLite cache | 112 |
 | `arb_strategy.py` | Cross-outcome arb detection + Kelly sizing | 77 |
-| `wallet.py` | Paper wallet with signal-to-trade latency tracking | 192 |
-| `run.py` | Entry point chaining feed -> strategy -> wallet | 60 |
+| `wallet.py` | Paper wallet with latency tracking | 192 |
+| `run.py` | Entry point | 60 |
 
-**Total: 441 lines.** No LLM. No OSINT. No momentum. No agents. No dashboard.
+## The experiment
 
-## Strategy
+Three systems running the same arb logic on the same machine:
 
-Pure cross-outcome arb only: detect when YES + NO prices for the same Polymarket market sum to less than 1.0 after accounting for 2% taker fees per leg. Kelly criterion sizes positions. Buy the underpriced side.
+| System | Complexity | Cycle |
+|--------|-----------|-------|
+| **ArbClaw** (this) | 4 files, 441 lines | 5 min |
+| **RivalClaw** | Full architecture, arb only | 5 min |
+| **Clawmpson** | Full system, 5 strategies | 30 min |
 
-## Paper Wallet Rules
+Key metric: `signal_to_trade_latency_ms` — how long from spotting an opportunity to placing the trade?
 
-- Starting capital: $1,000
-- Max position: 10% of balance
-- Stop-loss: -20%
-- Take-profit: +50%
-- Key metric: `signal_to_trade_latency_ms`
+## Outcome logic
 
-## Cron
-
-Runs every 5 minutes (vs Clawmpson's 30-minute cycle).
-
-## Comparison (after 14 days)
-
-| Metric | ArbClaw Target | Clawmpson Baseline |
-|--------|---------------|-------------------|
-| Signal-to-trade latency | <30s | ~30min cycle |
-| Win rate | Track | Track |
-| Edge capture rate | Track | Track |
-| Total PnL | Track | Track |
-
-## Outcome
-
-- If ArbClaw captures more edge -> build fast-path mode into Clawmpson
-- If Clawmpson wins anyway -> architecture validated, delete ArbClaw
-- Either way, we learn something
-
-## Daily Reports
-
-Auto-generated daily performance reports are posted to `daily/` by cron at 11:50 PM.
+- If ArbClaw captures more edge → build a fast-path mode into Clawmpson
+- If Clawmpson wins anyway → architecture validated, ArbClaw gets retired
+- Either way, I learn something
 
 ## Status
 
-**Experiment start:
+Paper trading experiment running March 24 – April 7, 2026. Daily reports auto-generated in `daily/`.
+
+Part of the [OpenClaw](https://gitlab.com/jordan291/openclaw) ecosystem.
+
 ```
 
 ### ~/openclaw/.pytest_cache/README.md
@@ -632,6 +622,43 @@ which provides the `--lf` and `--ff` options, as well as the `cache` fixture.
 
 See [the docs](https://docs.pytest.org/en/stable/how-to/cache.html) for more information.
 
+```
+
+### ~/openclaw/README.md
+```
+# OpenClaw
+
+My personal AI operating system. Started as a trading bot, turned into something way bigger.
+
+OpenClaw is the central nervous system that runs my fleet of AI agents — trading, research, content, automation, all of it. Think of it like a business OS where Claude-powered agents handle the heavy lifting and I steer from the top.
+
+## What's in here
+
+- **Agent orchestration** — multiple specialized agents (ArbClaw, PhantomClaw, etc.) that each own a domain
+- **Trading stack** — paper trading across Polymarket and equities with multiple strategies running in parallel
+- **Research engine** — automated multi-domain research (market intel, content ideas, academic papers, competitive analysis)
+- **Lobster workflows** — deterministic YAML-based pipelines for anything that needs to run on a schedule or with approval gates
+- **Build system** — agents can pick up tasks, write code, run tests, and submit results for review
+- **Memory layer** — the system learns from past runs and surfaces patterns over time
+
+## The ecosystem
+
+OpenClaw doesn't run alone. It's the hub for a few other projects:
+
+| Project | What it does |
+|---------|-------------|
+| [Mission Control](https://gitlab.com/jordan291/openclaw-mission-control) | Next.js dashboard — monitor agents, chat with them, track costs |
+| [QuantumentalClaw](https://gitlab.com/jordan291/quantumentalclaw) | Signal fusion engine for asymmetric trading |
+| [RivalClaw](https://gitlab.com/jordan291/rivalclaw) | Architecture comparison experiment for arb execution |
+| [ArbClaw](https://gitlab.com/jordan291/arbclaw) | Minimal arb bot — the speed baseline |
+
+## Status
+
+Active development. This is my daily driver — constantly evolving as I figure out what works and what doesn't. Paper trading only for now.
+
+## Setup
+
+This isn't really designed for others to run (yet). It's deeply tied to my local environment, API keys, and workflow. But if you're curious about any of the architecture, the `CONTEXT.md` files are
 ```
 
 ### ~/openclaw/chatgpt-mcp/README.md
@@ -954,32 +981,34 @@ See [the docs](https://docs.pytest.org/en/stable/how-to/cache.html) for more inf
 ```
 # QuantumentalClaw
 
-Signal fusion engine for asymmetric trading across equities and prediction markets.
+Signal fusion engine for finding asymmetric trades across equities and prediction markets.
 
-Part of the [OpenClaw](https://github.com/nayslayer) ecosystem.
+The name is a mashup of "quantitative" and "fundamental" — the idea is to combine hard data signals with softer contextual ones and let them reinforce each other. When multiple independent signals point the same direction, that's when things get interesting.
 
-## Quick Start
+## What it does
 
-```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env  # Fill in API keys
-python run.py --migrate
-python run.py --run
-```
-
-## Architecture
-
-Async single-process. 5 signal modules fused into trade decisions with continuous learning.
+7 data feeds flow into 5 signal modules, get fused together, filtered, sized, risk-checked, and executed. The system learns from every trade to recalibrate signal weights over time.
 
 ```
 Feeds (7) → Signals (5) → Fusion → Filter → Size → Risk → Execute → Learn
 ```
 
+Everything runs async in a single process. No microservices, no message queues — just clean Python.
+
+## Quick start
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env  # add your API keys
+python run.py --migrate
+python run.py --run
+```
+
 ## Status
 
-V1 build in progress. Paper trading only.
+V1 build, paper trading only. Part of the [OpenClaw](https://gitlab.com/jordan291/openclaw) ecosystem.
 
 ```
 
@@ -987,50 +1016,48 @@ V1 build in progress. Paper trading only.
 ```
 # RivalClaw
 
-Architecture-faithful arb-only sibling of Mirofish. Part of a three-way comparison experiment testing whether Clawmpson's trading architecture introduces execution lag on arbitrage opportunities.
+Testing a hunch: does my main trading system's architecture actually slow down arbitrage execution?
 
-## The Experiment
+[OpenClaw](https://gitlab.com/jordan291/openclaw) (Clawmpson) runs 5 strategies, LLM analysis, a graduation engine, and a bunch of other stuff on a 30-minute cycle. That's great for complex trades, but for cross-outcome arb where mispricing windows close in minutes — all that machinery might be costing me alpha.
 
-Three systems run the same cross-outcome arb logic against the same Polymarket API on the same machine:
+RivalClaw is the middle child in a three-way experiment:
 
-| System | Architecture | Cron | Purpose |
-|--------|-------------|------|---------|
-| **ArbClaw** | 4 files, no overhead | */5 | Speed baseline — what does zero architecture cost? |
-| **RivalClaw** | Mirofish skeleton, arb-only | */5 | Architecture test — does the framework itself add lag? |
-| **Clawmpson** | Full Mirofish, 5 strategies | */30 | Production baseline — does strategy contention matter? |
+| System | What it is | Cycle | Question it answers |
+|--------|-----------|-------|-------------------|
+| **ArbClaw** | 4 files, zero overhead | 5 min | What's the speed ceiling? |
+| **RivalClaw** | Same architecture as Clawmpson, arb only | 5 min | Does the framework itself add lag? |
+| **Clawmpson** | Full system, 5 strategies | 30 min | Does strategy contention matter? |
 
-## Architecture
+## How it works
 
-RivalClaw preserves Mirofish's control flow shape while stripping non-arb organs:
+RivalClaw keeps Clawmpson's exact control flow but strips everything that isn't arb:
 
 ```
-simulator.run_loop()
-  -> polymarket_feed.fetch_markets()     # configurable cache/categories
-  -> trading_brain.analyze()             # arb-only + integrity guards
-  -> paper_wallet.execute_trade()        # frozen Mirofish execution sim
-  -> paper_wallet.check_stops()          # same SL/TP + expiry logic
-  -> graduation.maybe_snapshot()         # same 4 graduation gates
+fetch markets → analyze (arb only) → paper trade → check stops → maybe graduate
 ```
 
-| File | Lines | Preserves from Mirofish |
-|------|-------|------------------------|
-| simulator.py | ~160 | run_loop orchestration, migration, cycle metrics |
-| trading_brain.py | ~130 | TradeDecision, arb detection, Kelly, integrity guards |
-| paper_wallet.py | ~280 | Execution sim, stops, mark-to-market, balance derivation |
-| polymarket_feed.py | ~160 | Gamma API, SQLite cache, price parsing |
-| graduation.py | ~120 | 4 graduation gates, daily snapshot |
-| run.py | ~30 | CLI entry point |
+Same architecture shape. Same execution simulation (slippage, latency penalty, partial fills). Same graduation gates. Just fewer strategies competing for attention.
 
-## Arb Logic Parity
+## The arb math
 
-Arb math is identical to ArbClaw — same fee computation, same Kelly formula, same thresholds:
+Identical to ArbClaw — same fee computation, same Kelly formula, same thresholds:
 - Fee: 2% of min(price, 1-price) per leg
 - Min edge: 0.5% after fees
 - Kelly cap: 10% of balance
 
-## What RivalClaw Adds Over ArbClaw
+## What RivalClaw adds over ArbClaw
 
-These are the "arch
+This is the "architectural weight" being measured:
+- Execution simulation (50bps slippage, 0.2% latency penalty, 80-100% fill rate)
+- Full daily PnL accounting with ROI, Sharpe, max drawdown
+- Graduation gates (7-day window, same thresholds as Clawmpson)
+- Mark-to-market balance derivation
+- Integrity guards (stale timestamps, impossible prices, sum sanity checks)
+- Per-cycle timing instrumentation
+
+## Key metric
+
+`signal_to_trade_latency_ms` — how fast does each system go from seeing an opportunity to placing a trade? Tha
 ```
 
 ## Tech Stack Fingerprint
@@ -1213,33 +1240,33 @@ pytest-asyncio>=0.23
 ### openclaw
 ```
 Branch: main
-Last commit: 16ce9c3 auto: 2026-03-27 15:00 state snapshot
+Last commit: 9f4d9d7 auto: 2026-03-27 16:00 state snapshot
 Uncommitted files: 9
-Remote: https://github.com/nayslayer143/openclaw.git
+Remote: 
 ```
 
 ### rivalclaw
 ```
 Branch: main
-Last commit: c782c83 auto: hourly sync 2026-03-27 21:47 UTC
-Uncommitted files: 3
-Remote: https://github.com/nayslayer143/rivalclaw.git
+Last commit: e134844 auto: hourly sync 2026-03-27 22:47 UTC
+Uncommitted files: 5
+Remote: 
 ```
 
 ### arbclaw
 ```
 Branch: main
-Last commit: 9d65c6f daily report 2026-03-27 — day 4 | bal=$ pnl=$ trades=0
+Last commit: 84c5a9a Update README for GitLab migration
 Uncommitted files: 3
-Remote: https://github.com/nayslayer143/arbclaw.git
+Remote: https://oauth2:glpat-gpKuP2MCJ523PLVy2Rez7mM6MQpvOjEKdTpsMmJnZg8.01.170uc249y@gitlab.com/jordan291/arbclaw.git
 ```
 
 ### quantumentalclaw
 ```
 Branch: main
-Last commit: ebe1cbe hourly: 2026-03-27 22:00 | $10,000 | 0W/0closed | $+0 | quiet
+Last commit: ec281f1 hourly: 2026-03-27 23:00 | $10,000 | 0W/0closed | $+0 | quiet
 Uncommitted files: 0
-Remote: https://github.com/nayslayer143/quantumentalclaw.git
+Remote: https://oauth2:glpat-gpKuP2MCJ523PLVy2Rez7mM6MQpvOjEKdTpsMmJnZg8.01.170uc249y@gitlab.com/jordan291/quantumentalclaw.git
 ```
 
 ### doctor-claw
@@ -1337,5 +1364,5 @@ Remote: https://github.com/nayslayer143/shiny-new.git
 ```
 
 ---
-End of context. Generated 2026-03-27T15:07:00-07:00.
+End of context. Generated 2026-03-27T16:07:00-07:00.
 For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw

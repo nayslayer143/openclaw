@@ -66,3 +66,5 @@
 {"event":"health","timestamp":1774648800,"ollama":"ok","disk_pct":5,"queue_depth":3,"error_count":0}
 {"event":"auto_deploy","timestamp":1774650600,"from":"a38aa0d","to":"82a3132"}
 {"event":"health","timestamp":1774650600,"ollama":"ok","disk_pct":5,"queue_depth":3,"error_count":0}
+{"event":"auto_deploy","timestamp":1774652400,"from":"5f398ef","to":"origin/"}
+{"event":"health","timestamp":1774652400,"ollama":"ok","disk_pct":5,"queue_depth":3,"error_count":0}
