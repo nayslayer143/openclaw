@@ -20,7 +20,7 @@
       "what_to_take": "Integrate the alpaca_trade_api package for all Alpaca trading API interactions, replacing custom HTTP client implementations with this well-maintained library.",
       "risk": "Low risk: MIT license, actively maintained by Alpaca with strong community adoption (1861 stars). No significant maintenance concerns for standard API usage.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "Extract the optuna-based hyperparameter optimization module and core backtesting engine (without GUI), adapting it to work with our strategy interfaces and data feeds.",
       "risk": "License not specified in description (must verify MIT/Apache-2.0), potential data format mismatches with our feeds, and possible redundancy with RivalClaw's existing self-tuner requiring careful integration.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -100,7 +100,7 @@
       "what_to_take": "Extract the backtesting module and strategy template for Clawmpson's development workflow, avoiding full platform integration.",
       "risk": "Future-dated last update (2026-03-22) indicates potential metadata error or abandonment; MIT license is acceptable but requires verification of actual maintenance activity.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "Study the composable architecture patterns for real-time data pipelines and trade execution layer design to inform future Python-based improvements, avoiding direct Elixir code integration due to language mismatch.",
       "risk": "Elixir vs Python language barrier requires significant adaptation effort; future-dated last update (2026-03-17) raises maintenance credibility concerns; license not specified in description (must verify MIT/Apache).",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "No actionable patterns due to crypto exchange focus (vs prediction markets) and TypeScript language mismatch; CCXT already handles exchange integration in Python stack.",
       "risk": "Domain mismatch (crypto exchanges vs prediction markets), language mismatch (TypeScript vs Python), and future-dated last update (2026-03-26) suggesting metadata error. License not verified but high risk of being incompatible with Python-based stack.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "Signal tracking and trade execution pipeline pattern, excluding Binance-specific logic for potential adaptation to prediction market feeds",
       "risk": "Market mismatch (Binance futures vs prediction markets), TypeScript-to-Python translation complexity, and unverified license (must check GitHub repo for license file)",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -280,7 +280,7 @@
       "what_to_take": "None. The repo focuses on stock prediction using DL/Genetic Programming, while our stack targets prediction markets (Polymarket/Kalshi) with different data structures and strategy requirements.",
       "risk": "Asset class mismatch (stocks vs prediction markets), non-production Jupyter format requiring major refactoring, and unverified license (repo lacks license specification).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -300,7 +300,7 @@
       "what_to_take": "Modular DRL framework structure for agent/environment separation, but requires complete domain adaptation from stock trading to prediction markets.",
       "risk": "Domain mismatch (stocks vs prediction markets), Jupyter notebook format unsuitable for production, potential license ambiguity, and high refactoring effort.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -320,7 +320,7 @@
       "what_to_take": "This repo is a curated list of resources, not executable code. No patterns or code can be integrated directly from the list.",
       "risk": "Repo is a static HTML list (not code), so no integration possible. Risk of wasting time chasing non-existent code. List may contain outdated/irrelevant resources. License/maintenance concerns irrelevant as it's not code.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
