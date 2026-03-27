@@ -1,9 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> Auto-generated 2026-03-26T18:07:00-07:00. Do not edit manually.
+> Auto-generated 2026-03-26T19:07:01-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-03-26T18:07:00-07:00
+Generated: 2026-03-26T19:07:01-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -154,6 +154,7 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/rivalclaw/.gitignore
 ~/rivalclaw/CHANGELOG.md
 ~/rivalclaw/CLAUDE.md
+~/rivalclaw/P0-001-diagnostic.md
 ~/rivalclaw/README.md
 ~/rivalclaw/auto_changelog.py
 ~/rivalclaw/daily
@@ -286,6 +287,7 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/quantumentalclaw/quantumentalclaw.db
 ~/quantumentalclaw/quantumentalclaw.db-shm
 ~/quantumentalclaw/quantumentalclaw.db-wal
+~/quantumentalclaw/quantumentalclaw.db.pre-cleanup-20260326-1813
 ~/quantumentalclaw/quantumentalclaw.lock
 ~/quantumentalclaw/requirements.txt
 ~/quantumentalclaw/run.py
@@ -1171,15 +1173,15 @@ pytest-asyncio>=0.23
 ### openclaw
 ```
 Branch: main
-Last commit: 411bfde auto: 2026-03-26 18:00 state snapshot
-Uncommitted files: 9
+Last commit: 847f1cb auto: hourly sync 2026-03-27 01:47 UTC
+Uncommitted files: 11
 Remote: https://github.com/nayslayer143/openclaw.git
 ```
 
 ### rivalclaw
 ```
 Branch: main
-Last commit: 0bfd994 fix: add binary resolution for Kalshi and Polymarket trades
+Last commit: e8a7bb6 docs: add P0-001 diagnostic — cycle time explosion root cause analysis
 Uncommitted files: 16
 Remote: https://github.com/nayslayer143/rivalclaw.git
 ```
@@ -1195,7 +1197,7 @@ Remote: https://github.com/nayslayer143/arbclaw.git
 ### quantumentalclaw
 ```
 Branch: main
-Last commit: 8c9d331 hourly: 2026-03-27 01:00 | $866,880 | 10W/29closed | $+541 | calm
+Last commit: 03ea993 hourly: 2026-03-27 02:00 | $16,614 | 18W/42closed | $+750 | calm
 Uncommitted files: 0
 Remote: https://github.com/nayslayer143/quantumentalclaw.git
 ```
@@ -1295,5 +1297,5 @@ Remote: https://github.com/nayslayer143/shiny-new.git
 ```
 
 ---
-End of context. Generated 2026-03-26T18:07:00-07:00.
+End of context. Generated 2026-03-26T19:07:01-07:00.
 For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw
