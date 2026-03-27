@@ -40,7 +40,7 @@ def _get_conn() -> sqlite3.Connection:
 
 
 CIRCUIT_BREAKER_PCT = float(os.environ.get("MIROFISH_CIRCUIT_BREAKER_PCT", "0.05"))  # pause at 5% of starting
-WALLET_RESET_AMOUNT = float(os.environ.get("MIROFISH_WALLET_RESET", "1000.0"))
+WALLET_RESET_AMOUNT = float(os.environ.get("MIROFISH_WALLET_RESET", "10000.0"))
 
 
 def check_circuit_breaker() -> dict | None:

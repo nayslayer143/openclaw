@@ -264,3 +264,10 @@ Tasks: 0
 0 | Blocked: 0
 0
 Synthesis unavailable — Ollama not responding
+
+### Evening Summary — 2026-03-26 18:03
+- Tasks completed: 0
+- Tasks pending: 3
+- Log activity: 78 lines
+- Errors: 0
+- Nightly consolidation: scheduled for 23:03
