@@ -7,6 +7,25 @@ options:
   createIntermediateGroups: true
   generateEmptyDirectories: true
 
+schemes:
+  iFauxto:
+    build:
+      targets:
+        iFauxto: all
+        iFauxtoTests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - iFauxtoTests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+
 settings:
   SWIFT_VERSION: "5.9"
   IPHONEOS_DEPLOYMENT_TARGET: "17.0"
@@ -67,3 +86,4 @@ targets:
     settings:
       PRODUCT_BUNDLE_IDENTIFIER: com.ifauxto.tests
       DEVELOPMENT_TEAM: ""
+      GENERATE_INFOPLIST_FILE: YES
