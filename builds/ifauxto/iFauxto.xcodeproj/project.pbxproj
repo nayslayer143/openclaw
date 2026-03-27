@@ -24,10 +24,12 @@
 		A7678EC57B62624613697C1B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FFBED5883116DC1BECF899 /* ContentView.swift */; };
 		B2ACB1273BBFF9DADBD58CA0 /* PhotoReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AE52712A6A5FB1976B6E3D7 /* PhotoReference.swift */; };
 		B2AE7E0C0B34B5BF8F57B1B4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 103DCEC79A2F9FFA35D66E1C /* Assets.xcassets */; };
+		B8E98E521415AA20F4CFA7A0 /* ImportProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA875DA9DD3412F08C515026 /* ImportProgressView.swift */; };
 		C8913675E02E0F3C8E6F321B /* DragDropManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 251CD3FA94D23C242095B0C4 /* DragDropManager.swift */; };
 		E049B910842EA8EA97201869 /* iFauxtoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD328EE97D38C9FECD54FC6 /* iFauxtoApp.swift */; };
 		EC4A1F9036F66F4750194FBE /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08D9C03D9F30F008BB5DAB70 /* SyncManager.swift */; };
 		F40D48F3F141304CB5D68660 /* PhotoKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE83CD674D2197CFE37A7099 /* PhotoKitService.swift */; };
+		F6739A570740C0745CE8B880 /* LibraryImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71023995B7DB672B2865A799 /* LibraryImportService.swift */; };
 		F8BDC931956D6ED6ABED3483 /* iFauxtoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E37E26D083740E160EDE6DB /* iFauxtoTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -57,11 +59,13 @@
 		69C58BC719D64219558E6C51 /* FolderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderTests.swift; sourceTree = "<group>"; };
 		6E37E26D083740E160EDE6DB /* iFauxtoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iFauxtoTests.swift; sourceTree = "<group>"; };
 		6ECDE847A4204338D50CAD3D /* iFauxto.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = iFauxto.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		71023995B7DB672B2865A799 /* LibraryImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryImportService.swift; sourceTree = "<group>"; };
 		72BFD302313DA02BDFEF8540 /* FolderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderView.swift; sourceTree = "<group>"; };
 		966484D5F5ED98072014BADD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		BA7CA76C1A82EEE03FE49904 /* PhotoViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoViewer.swift; sourceTree = "<group>"; };
 		BE72F53C6904D4686288D4BE /* Folder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Folder.swift; sourceTree = "<group>"; };
 		BE83CD674D2197CFE37A7099 /* PhotoKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoKitService.swift; sourceTree = "<group>"; };
+		CA875DA9DD3412F08C515026 /* ImportProgressView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportProgressView.swift; sourceTree = "<group>"; };
 		D0DD47588EE7EC7E12D262DF /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		D29C4B5DA289D398AA0765C9 /* EditModeToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditModeToolbar.swift; sourceTree = "<group>"; };
 		D4FFBED5883116DC1BECF899 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -114,6 +118,7 @@
 			isa = PBXGroup;
 			children = (
 				01ED550A03711B56F8827E42 /* CloudKitService.swift */,
+				71023995B7DB672B2865A799 /* LibraryImportService.swift */,
 				BE83CD674D2197CFE37A7099 /* PhotoKitService.swift */,
 				08D9C03D9F30F008BB5DAB70 /* SyncManager.swift */,
 			);
@@ -150,6 +155,7 @@
 				428977AEEFA854F10C33353D /* FolderCreationSheet.swift */,
 				72BFD302313DA02BDFEF8540 /* FolderView.swift */,
 				D0DD47588EE7EC7E12D262DF /* HomeView.swift */,
+				CA875DA9DD3412F08C515026 /* ImportProgressView.swift */,
 				502473E19CF7167CA16D954E /* PhotoPickerView.swift */,
 				E5939D45474DB18D9722F985 /* PhotoThumbnailView.swift */,
 				BA7CA76C1A82EEE03FE49904 /* PhotoViewer.swift */,
@@ -289,6 +295,8 @@
 				6437DB4787E0137B2B5A8D6A /* FolderCreationSheet.swift in Sources */,
 				476EDB4A5106172AE4D6E8FE /* FolderView.swift in Sources */,
 				847F2E2624BB5B12FBCD494A /* HomeView.swift in Sources */,
+				B8E98E521415AA20F4CFA7A0 /* ImportProgressView.swift in Sources */,
+				F6739A570740C0745CE8B880 /* LibraryImportService.swift in Sources */,
 				F40D48F3F141304CB5D68660 /* PhotoKitService.swift in Sources */,
 				69139E9C44A69D4C1B3B1DB4 /* PhotoPickerView.swift in Sources */,
 				B2ACB1273BBFF9DADBD58CA0 /* PhotoReference.swift in Sources */,

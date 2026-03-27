@@ -2,8 +2,11 @@ import SwiftUI
 
 struct HomeView: View {
     @EnvironmentObject var dataManager: DataManager
+    @EnvironmentObject var importService: LibraryImportService
+
     @State private var folders: [Folder] = []
     @State private var showingCreateFolder = false
+    @State private var showingImport = false
     @State private var editMode: EditMode = .inactive
 
     var body: some View {
@@ -21,10 +24,23 @@ struct HomeView: View {
                     EditButton()
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        showingCreateFolder = true
+                    Menu {
+                        Button {
+                            showingCreateFolder = true
+                        } label: {
+                            Label("New Folder", systemImage: "folder.badge.plus")
+                        }
+                        Divider()
+                        Button {
+                            showingImport = true
+                        } label: {
+                            Label(
+                                importService.hasImportedLibrary ? "Re-import Library" : "Import Library",
+                                systemImage: "square.and.arrow.down.on.square"
+                            )
+                        }
                     } label: {
-                        Image(systemName: "folder.badge.plus")
+                        Image(systemName: "ellipsis.circle")
                     }
                 }
             }
@@ -32,9 +48,25 @@ struct HomeView: View {
             .sheet(isPresented: $showingCreateFolder, onDismiss: loadFolders) {
                 FolderCreationSheet(parentId: nil)
             }
-            .onAppear(perform: loadFolders)
+            .sheet(isPresented: $showingImport, onDismiss: loadFolders) {
+                ImportProgressView(importService: importService) {
+                    showingImport = false
+                    loadFolders()
+                }
+            }
+            .onAppear {
+                loadFolders()
+                // Auto-prompt on first launch if library not yet imported
+                if !importService.hasImportedLibrary && !showingImport {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                        showingImport = true
+                    }
+                }
+            }
         }
     }
+
+    // MARK: Folder list
 
     private var folderList: some View {
         List {
@@ -57,26 +89,52 @@ struct HomeView: View {
         .listStyle(.plain)
     }
 
+    // MARK: Empty state
+
     private var emptyState: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "folder")
-                .font(.system(size: 56))
+        VStack(spacing: 20) {
+            Image(systemName: "photo.on.rectangle.angled")
+                .font(.system(size: 64, weight: .light))
                 .foregroundStyle(.secondary)
             Text("No Folders Yet")
                 .font(.title2.weight(.semibold))
-            Text("Tap + to create your first folder.")
+            Text("Import your Photos library structure or create a folder manually.")
+                .font(.subheadline)
                 .foregroundStyle(.secondary)
-            Button("Create Folder") {
-                showingCreateFolder = true
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 32)
+            VStack(spacing: 12) {
+                Button {
+                    showingImport = true
+                } label: {
+                    Label("Import from Photos", systemImage: "square.and.arrow.down.on.square")
+                        .frame(maxWidth: 280)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+
+                Button {
+                    showingCreateFolder = true
+                } label: {
+                    Label("Create Folder", systemImage: "folder.badge.plus")
+                        .frame(maxWidth: 280)
+                }
+                .buttonStyle(.bordered)
+                .controlSize(.large)
             }
-            .buttonStyle(.borderedProminent)
+            .padding(.top, 8)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
+
+    // MARK: Helpers
 
     private func loadFolders() {
         folders = dataManager.fetchFolders(parentId: nil)
     }
 }
+
+// MARK: - FolderRowView
 
 struct FolderRowView: View {
     let folder: Folder
