@@ -20,7 +20,7 @@
       "what_to_take": "Integrate the Alpaca client's order execution and account management modules to replace custom API wrappers in Clawmpson and ArbClaw, leveraging its robust error handling and WebSocket support for real-time data.",
       "risk": "MIT license is safe; active maintenance (1862 stars) reduces long-term risk; minimal complexity as it's a standard library replacement with no major dependencies.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -40,7 +40,7 @@
       "what_to_take": "Extract the optuna-based hyperparameter optimization framework for backtesting, excluding TradingView/Pine dependencies.",
       "risk": "License not specified in description; suspicious 2026 last update date; optimization code requires adaptation to fit existing systems' data structures and SQLite DBs.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -60,7 +60,7 @@
       "what_to_take": "CoinGecko data fetching logic for potential reuse in RivalClaw, but requires Go-to-Python porting and offers minimal advantage over existing feed implementations.",
       "risk": "Language mismatch (Go vs Python) necessitates significant porting effort; TUI interface irrelevant to backend systems; data fetching code likely redundant with existing RivalClaw/Clawmpson feeds.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "None; visual strategy designer and crypto-specific backtesting are irrelevant to prediction markets and Python stack",
       "risk": "High risk: JavaScript vs Python mismatch, crypto domain mismatch, and high porting complexity would require massive refactoring",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -100,7 +100,7 @@
       "what_to_take": "No direct code integration possible due to TypeScript vs Python mismatch; consider studying multi-exchange architecture patterns for inspiration only.",
       "risk": "License unknown (potential GPL risk), high complexity from language mismatch, and domain mismatch (crypto trading vs prediction markets).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -120,7 +120,7 @@
       "what_to_take": "Signal tracking pattern for external AI agents (without Binance-specific execution logic), to be adapted to Python and prediction markets.",
       "risk": "License unknown (requires verification), future-dated last update (2026-03-25) suggests data error, TypeScript-to-Python porting complexity, and market mismatch (Binance futures vs. prediction markets).",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "Core grid strategy algorithm (order placement logic) for potential adaptation to prediction markets, but not directly applicable without significant API and market structure changes.",
       "risk": "License not specified (legal risk), suspicious future last update date (2026), and high adaptation complexity due to Binance-specific implementation and mismatch with prediction market mechanics.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "Core RL environment code for prototyping, but requires full refactoring into production Python module to integrate with RivalClaw's self-tuner.",
       "risk": "License unknown (repo lacks explicit license), Jupyter format unsuitable for production, high refactoring effort required, and no market-specific adaptation for Polymarket/Kalshi.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "Data preprocessing patterns for time-series data, but not model architectures due to domain mismatch (stocks vs prediction markets).",
       "risk": "Domain mismatch (stock prediction vs prediction markets), Jupyter notebook format requiring significant refactoring, and no license specified in repo. Models would require retraining on prediction market data to be useful.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "Conceptual modular DRL framework design patterns (not code) for potential strategy engine inspiration, ignoring notebook format and stock-market context",
       "risk": "License not specified (high risk), low maintenance activity (last updated 2026-03-26), mismatched stock-market focus vs prediction markets, notebook format unsuitable for production integration",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "Not applicable for backend trading systems. The library is a frontend charting tool requiring Vue.js integration, which conflicts with the Python-based bot stack architecture.",
       "risk": "Unmaintained (critical risk), JavaScript frontend library incompatible with Python backend stack, requires major frontend overhaul for minimal value.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "The design patterns for unified exchange API are redundant as existing ccxt (Python) library already provides superior native integration for crypto exchanges, eliminating need for REST layer.",
       "risk": "License likely MIT but unnecessary; existing ccxt library in Python avoids language mismatch and provides direct access without additional service dependency.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "Nothing of value; repo is a simple Java Bitcoin bot with no prediction market relevance or Python integration patterns.",
       "risk": "License unknown, suspicious future last update (2026), language mismatch (Java vs Python), and no alignment with prediction markets or our strategy frameworks.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
