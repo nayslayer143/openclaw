@@ -1,0 +1,6 @@
+{"event":"health","timestamp":1773984601,"ollama":"fail","disk_pct":6,"queue_depth":0,"error_count":0}
+{"event":"health","timestamp":1773984645,"ollama":"ok","disk_pct":6,"queue_depth":0,"error_count":0}
+{"event":"health","timestamp":1773986400,"ollama":"fail","disk_pct":7,"queue_depth":0,"error_count":0}
+{"event":"health","timestamp":1773986446,"ollama":"ok","disk_pct":7,"queue_depth":0,"error_count":0}
+{"event":"health","timestamp":1773988200,"ollama":"fail","disk_pct":7,"queue_depth":0,"error_count":0}
+{"event":"health","timestamp":1773988523,"ollama":"ok","disk_pct":7,"queue_depth":0,"error_count":0}

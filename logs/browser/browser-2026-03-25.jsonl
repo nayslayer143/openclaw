@@ -1,0 +1,553 @@
+{"ts": "2026-03-25T15:31:39.308032", "url": "https://x.com", "action": "captcha_tier2_skip", "reason": "no_api_key"}
+{"ts": "2026-03-25T15:31:40.973552", "url": "about:blank", "action": "captcha_tier3_start"}
+{"ts": "2026-03-25T15:31:42.978466", "url": "about:blank", "action": "captcha_tier3_timeout"}
+{"ts": "2026-03-25T15:31:45.526061", "url": "about:blank", "action": "type", "selector": "#q", "length": 11}
+{"ts": "2026-03-25T15:31:45.558137", "url": "about:blank", "action": "clear", "selector": "#q"}
+{"ts": "2026-03-25T15:31:47.274730", "url": "about:blank", "action": "fill", "selector": "#name", "length": 6}
+{"ts": "2026-03-25T15:31:47.363611", "url": "about:blank", "action": "fill", "selector": "#email", "length": 13}
+{"ts": "2026-03-25T15:31:47.364509", "url": "about:blank", "action": "fill_form", "field_count": 2}
+{"ts": "2026-03-25T15:31:57.674559", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:31:58.186160", "url": "https://example.com/", "action": "scroll", "x": 0, "y": 300}
+{"ts": "2026-03-25T15:32:00.121378", "url": "about:blank", "action": "select", "selector": "#s", "value": "b"}
+{"ts": "2026-03-25T15:32:13.769802", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:32:13.826990", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:32:18.175069", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:32:18.605450", "url": "https://example.org", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:32:22.623325", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:32:22.697276", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:32:26.545604", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:32:26.669596", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T15:32:26.699783", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:32:35.347927", "url": "about:blank", "action": "fill", "selector": "#first", "length": 6}
+{"ts": "2026-03-25T15:32:35.433626", "url": "about:blank", "action": "fill", "selector": "#last", "length": 4}
+{"ts": "2026-03-25T15:32:35.506643", "url": "about:blank", "action": "fill", "selector": "#age", "length": 2}
+{"ts": "2026-03-25T15:32:35.507136", "url": "about:blank", "action": "fill_form", "field_count": 3}
+{"ts": "2026-03-25T15:32:43.886932", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:32:54.454242", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:32:54.676786", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:32:58.299516", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:32:58.402272", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T15:33:02.741907", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:33:02.842711", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": "/private/var/folders/8b/vkfpw3n90mq6pt99t2vbcf8h0000gn/T/pytest-of-nayslayer/pytest-168/test_eyes_screenshot_saves_fil0/shot.png"}
+{"ts": "2026-03-25T15:33:06.901070", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:33:06.974419", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:33:10.764387", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:33:10.885855", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T15:33:14.105648", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:33:14.172315", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:33:19.857821", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:33:19.982867", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T15:33:25.686289", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:33:25.701562", "url": "https://example.com/", "action": "evaluate", "js_snippet": "document.title"}
+{"ts": "2026-03-25T15:34:02.669137", "url": "about:blank", "action": "captcha_tier1_applied"}
+{"ts": "2026-03-25T15:34:04.484750", "url": "https://x.com", "action": "captcha_tier2_skip", "reason": "no_api_key"}
+{"ts": "2026-03-25T15:34:06.601299", "url": "about:blank", "action": "captcha_tier3_start"}
+{"ts": "2026-03-25T15:34:08.608649", "url": "about:blank", "action": "captcha_tier3_timeout"}
+{"ts": "2026-03-25T15:34:11.528487", "url": "about:blank", "action": "type", "selector": "#q", "length": 11}
+{"ts": "2026-03-25T15:34:11.567925", "url": "about:blank", "action": "clear", "selector": "#q"}
+{"ts": "2026-03-25T15:34:14.497612", "url": "about:blank", "action": "fill", "selector": "#name", "length": 6}
+{"ts": "2026-03-25T15:34:14.676995", "url": "about:blank", "action": "fill", "selector": "#email", "length": 13}
+{"ts": "2026-03-25T15:34:14.680760", "url": "about:blank", "action": "fill_form", "field_count": 2}
+{"ts": "2026-03-25T15:34:18.298844", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:34:18.573941", "url": "https://example.com/", "action": "scroll", "x": 0, "y": 300}
+{"ts": "2026-03-25T15:34:23.078240", "url": "about:blank", "action": "select", "selector": "#s", "value": "b"}
+{"ts": "2026-03-25T15:34:30.281305", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:34:30.341926", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:34:41.205739", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:34:41.593135", "url": "https://example.org", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:34:46.371963", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:34:46.429676", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:34:49.859490", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:34:50.032087", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T15:34:50.150312", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:34:52.761878", "url": "about:blank", "action": "fill", "selector": "#first", "length": 6}
+{"ts": "2026-03-25T15:34:52.928978", "url": "about:blank", "action": "fill", "selector": "#last", "length": 4}
+{"ts": "2026-03-25T15:34:53.025130", "url": "about:blank", "action": "fill", "selector": "#age", "length": 2}
+{"ts": "2026-03-25T15:34:53.025614", "url": "about:blank", "action": "fill_form", "field_count": 3}
+{"ts": "2026-03-25T15:35:13.306709", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:35:13.476098", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:35:15.981761", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:35:16.063880", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T15:35:18.820406", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:35:18.904216", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": "/private/var/folders/8b/vkfpw3n90mq6pt99t2vbcf8h0000gn/T/pytest-of-nayslayer/pytest-169/test_eyes_screenshot_saves_fil0/shot.png"}
+{"ts": "2026-03-25T15:35:21.356085", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:35:21.446463", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:35:26.611863", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:35:26.747044", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T15:35:29.522322", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:35:29.609733", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:35:32.832140", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:35:32.928201", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T15:35:35.605187", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:35:35.653347", "url": "https://example.com/", "action": "evaluate", "js_snippet": "document.title"}
+{"ts": "2026-03-25T15:36:08.033890", "url": "about:blank", "action": "captcha_tier1_applied"}
+{"ts": "2026-03-25T15:36:11.035084", "url": "https://x.com", "action": "captcha_tier2_skip", "reason": "no_api_key"}
+{"ts": "2026-03-25T15:36:14.924630", "url": "about:blank", "action": "captcha_tier3_start"}
+{"ts": "2026-03-25T15:36:16.935444", "url": "about:blank", "action": "captcha_tier3_timeout"}
+{"ts": "2026-03-25T15:36:24.572793", "url": "about:blank", "action": "type", "selector": "#q", "length": 11}
+{"ts": "2026-03-25T15:36:24.687805", "url": "about:blank", "action": "clear", "selector": "#q"}
+{"ts": "2026-03-25T15:36:30.201472", "url": "about:blank", "action": "fill", "selector": "#name", "length": 6}
+{"ts": "2026-03-25T15:36:30.373995", "url": "about:blank", "action": "fill", "selector": "#email", "length": 13}
+{"ts": "2026-03-25T15:36:30.374729", "url": "about:blank", "action": "fill_form", "field_count": 2}
+{"ts": "2026-03-25T15:36:35.725383", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:36:36.240090", "url": "https://example.com/", "action": "scroll", "x": 0, "y": 300}
+{"ts": "2026-03-25T15:36:42.638072", "url": "about:blank", "action": "select", "selector": "#s", "value": "b"}
+{"ts": "2026-03-25T15:36:52.379266", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:36:52.541485", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:36:56.614280", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:36:56.940833", "url": "https://example.org", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:37:00.280973", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:37:00.361621", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:37:04.558903", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:37:04.718180", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T15:37:04.784966", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:37:07.951625", "url": "about:blank", "action": "fill", "selector": "#first", "length": 6}
+{"ts": "2026-03-25T15:37:08.057551", "url": "about:blank", "action": "fill", "selector": "#last", "length": 4}
+{"ts": "2026-03-25T15:37:08.172507", "url": "about:blank", "action": "fill", "selector": "#age", "length": 2}
+{"ts": "2026-03-25T15:37:08.175982", "url": "about:blank", "action": "fill_form", "field_count": 3}
+{"ts": "2026-03-25T15:37:13.424365", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:37:20.813720", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:37:21.062244", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:37:25.351318", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:37:25.473227", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T15:37:28.121405", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:37:28.209398", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": "/private/var/folders/8b/vkfpw3n90mq6pt99t2vbcf8h0000gn/T/pytest-of-nayslayer/pytest-170/test_eyes_screenshot_saves_fil0/shot.png"}
+{"ts": "2026-03-25T15:37:31.072653", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:37:31.134172", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:37:34.088128", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:37:34.214215", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T15:37:38.357297", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:37:38.413205", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:37:41.587997", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:37:41.682665", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T15:37:44.147427", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:37:44.161276", "url": "https://example.com/", "action": "evaluate", "js_snippet": "document.title"}
+{"ts": "2026-03-25T15:37:59.431508", "url": "https://httpbin.org/html", "action": "navigate", "title": ""}
+{"ts": "2026-03-25T15:37:59.543114", "url": "https://httpbin.org/html", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:38:02.573574", "url": "https://httpbin.org/html", "action": "navigate", "title": ""}
+{"ts": "2026-03-25T15:38:02.742714", "url": "https://httpbin.org/html", "action": "screenshot", "full_page": true, "saved": "/tmp/openclaw-test-screenshot.png"}
+{"ts": "2026-03-25T15:38:07.862973", "url": "https://httpbin.org/html", "action": "navigate", "title": ""}
+{"ts": "2026-03-25T15:38:07.884202", "url": "https://httpbin.org/html", "action": "evaluate", "js_snippet": "document.title"}
+{"ts": "2026-03-25T15:47:11.101342", "url": "about:blank", "action": "captcha_tier1_applied"}
+{"ts": "2026-03-25T15:47:18.822298", "url": "https://x.com", "action": "captcha_tier2_skip", "reason": "no_api_key"}
+{"ts": "2026-03-25T15:47:29.862351", "url": "about:blank", "action": "captcha_tier3_start"}
+{"ts": "2026-03-25T15:47:31.867734", "url": "about:blank", "action": "captcha_tier3_timeout"}
+{"ts": "2026-03-25T15:47:44.831592", "url": "about:blank", "action": "type", "selector": "#q", "length": 11}
+{"ts": "2026-03-25T15:47:45.240052", "url": "about:blank", "action": "clear", "selector": "#q"}
+{"ts": "2026-03-25T15:47:59.404089", "url": "about:blank", "action": "fill", "selector": "#name", "length": 6}
+{"ts": "2026-03-25T15:47:59.908760", "url": "about:blank", "action": "fill", "selector": "#email", "length": 13}
+{"ts": "2026-03-25T15:47:59.913278", "url": "about:blank", "action": "fill_form", "field_count": 2}
+{"ts": "2026-03-25T15:48:15.391867", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:48:23.507003", "url": "https://example.com/", "action": "scroll", "x": 0, "y": 300}
+{"ts": "2026-03-25T15:48:32.304241", "url": "about:blank", "action": "select", "selector": "#s", "value": "b"}
+{"ts": "2026-03-25T15:48:58.709752", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:48:58.824876", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:49:11.900527", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:49:13.533722", "url": "https://example.org", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:49:28.209974", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:49:28.399903", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:49:42.577808", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:49:51.208227", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T15:49:51.353759", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:50:00.529353", "url": "about:blank", "action": "fill", "selector": "#first", "length": 6}
+{"ts": "2026-03-25T15:50:00.981462", "url": "about:blank", "action": "fill", "selector": "#last", "length": 4}
+{"ts": "2026-03-25T15:50:01.488506", "url": "about:blank", "action": "fill", "selector": "#age", "length": 2}
+{"ts": "2026-03-25T15:50:01.493685", "url": "about:blank", "action": "fill_form", "field_count": 3}
+{"ts": "2026-03-25T15:50:34.769395", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:50:57.180158", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:50:57.867014", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:51:10.214543", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:51:20.142555", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T15:51:26.836665", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:51:30.038708", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": "/private/var/folders/8b/vkfpw3n90mq6pt99t2vbcf8h0000gn/T/pytest-of-nayslayer/pytest-171/test_eyes_screenshot_saves_fil0/shot.png"}
+{"ts": "2026-03-25T15:51:33.921623", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:51:33.988516", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:51:43.843350", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:51:50.531138", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T15:51:56.735537", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:51:56.818344", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:52:03.279034", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:52:04.994410", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T15:52:09.582473", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T15:52:09.621801", "url": "https://example.com/", "action": "evaluate", "js_snippet": "document.title"}
+{"ts": "2026-03-25T15:53:37.740740", "url": "https://news.ycombinator.com", "action": "navigate", "title": "Hacker News"}
+{"ts": "2026-03-25T15:53:40.372368", "url": "https://news.ycombinator.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:54:00.003547", "url": "https://news.ycombinator.com", "action": "navigate", "title": "Hacker News"}
+{"ts": "2026-03-25T15:54:05.640744", "url": "https://news.ycombinator.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T15:54:07.526873", "url": "https://news.ycombinator.com/", "action": "scroll", "x": 0, "y": 800}
+{"ts": "2026-03-25T15:54:09.533770", "url": "https://news.ycombinator.com/", "action": "scroll", "x": 0, "y": -800}
+{"ts": "2026-03-25T15:54:12.346958", "url": "https://news.ycombinator.com/", "action": "screenshot", "full_page": true, "saved": "/Users/nayslayer/openclaw/scripts/browser/demo_output/shot-20260325-155410.png"}
+{"ts": "2026-03-25T16:14:11.769169", "url": "about:blank", "action": "tab_create", "name": "search"}
+{"ts": "2026-03-25T16:14:15.728310", "url": "about:blank", "action": "tab_create", "name": "news"}
+{"ts": "2026-03-25T16:14:22.949834", "url": "about:blank", "action": "tab_create", "name": "tab-a"}
+{"ts": "2026-03-25T16:14:23.046386", "url": "about:blank", "action": "tab_create", "name": "tab-b"}
+{"ts": "2026-03-25T16:14:23.063746", "url": "about:blank", "action": "tab_switch", "name": "tab-b"}
+{"ts": "2026-03-25T16:14:23.070255", "url": "about:blank", "action": "tab_switch", "name": "tab-a"}
+{"ts": "2026-03-25T16:14:25.135982", "url": "about:blank", "action": "tab_create", "name": "temp"}
+{"ts": "2026-03-25T16:14:25.137055", "url": "about:blank", "action": "tab_close", "name": "temp"}
+{"ts": "2026-03-25T16:14:27.389398", "url": "about:blank", "action": "tab_create", "name": "keep"}
+{"ts": "2026-03-25T16:14:27.511123", "url": "about:blank", "action": "tab_create", "name": "remove"}
+{"ts": "2026-03-25T16:14:27.523770", "url": "about:blank", "action": "tab_switch", "name": "remove"}
+{"ts": "2026-03-25T16:14:27.524509", "url": "about:blank", "action": "tab_close", "name": "remove"}
+{"ts": "2026-03-25T16:14:30.955767", "url": "about:blank", "action": "tab_create", "name": "alpha"}
+{"ts": "2026-03-25T16:14:31.105630", "url": "about:blank", "action": "tab_create", "name": "beta"}
+{"ts": "2026-03-25T16:14:31.246249", "url": "about:blank", "action": "tab_create", "name": "gamma"}
+{"ts": "2026-03-25T16:14:34.218031", "url": "about:blank", "action": "tab_create", "name": "one"}
+{"ts": "2026-03-25T16:14:34.335647", "url": "about:blank", "action": "tab_create", "name": "two"}
+{"ts": "2026-03-25T16:14:36.848665", "url": "about:blank", "action": "tab_create", "name": "site-a"}
+{"ts": "2026-03-25T16:14:36.964349", "url": "about:blank", "action": "tab_create", "name": "site-b"}
+{"ts": "2026-03-25T16:14:40.825441", "url": "about:blank", "action": "tab_create", "name": "x"}
+{"ts": "2026-03-25T16:14:40.957873", "url": "about:blank", "action": "tab_create", "name": "y"}
+{"ts": "2026-03-25T16:14:41.072762", "url": "about:blank", "action": "tab_create", "name": "z"}
+{"ts": "2026-03-25T16:14:41.073662", "url": "about:blank", "action": "tab_close", "name": "x"}
+{"ts": "2026-03-25T16:14:41.086998", "url": "about:blank", "action": "tab_close", "name": "y"}
+{"ts": "2026-03-25T16:14:41.096464", "url": "about:blank", "action": "tab_close", "name": "z"}
+{"ts": "2026-03-25T16:15:48.435092", "url": "about:blank", "action": "tab_create", "name": "a"}
+{"ts": "2026-03-25T16:15:48.610113", "url": "about:blank", "action": "tab_create", "name": "b"}
+{"ts": "2026-03-25T16:15:51.532911", "url": "about:blank", "action": "tab_create", "name": "form-tab"}
+{"ts": "2026-03-25T16:15:54.302853", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:15:57.973486", "url": "about:blank", "action": "tab_create", "name": "news"}
+{"ts": "2026-03-25T16:15:58.109622", "url": "about:blank", "action": "tab_create", "name": "docs"}
+{"ts": "2026-03-25T16:16:46.486181", "url": "about:blank", "action": "tab_create", "name": "a"}
+{"ts": "2026-03-25T16:16:46.638039", "url": "about:blank", "action": "tab_create", "name": "b"}
+{"ts": "2026-03-25T16:16:47.446397", "url": "about:blank", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:16:48.721967", "url": "about:blank", "action": "tab_create", "name": "form-tab"}
+{"ts": "2026-03-25T16:16:48.970793", "url": "about:blank", "action": "fill", "selector": "#name", "length": 6}
+{"ts": "2026-03-25T16:16:50.704062", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:16:51.861619", "url": "about:blank", "action": "tab_create", "name": "news"}
+{"ts": "2026-03-25T16:16:51.941012", "url": "about:blank", "action": "tab_create", "name": "docs"}
+{"ts": "2026-03-25T16:16:52.405158", "url": "about:blank", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:17:05.501434", "url": "about:blank", "action": "captcha_tier1_applied"}
+{"ts": "2026-03-25T16:17:07.242820", "url": "https://x.com", "action": "captcha_tier2_skip", "reason": "no_api_key"}
+{"ts": "2026-03-25T16:17:09.112681", "url": "about:blank", "action": "captcha_tier3_start"}
+{"ts": "2026-03-25T16:17:11.124687", "url": "about:blank", "action": "captcha_tier3_timeout"}
+{"ts": "2026-03-25T16:17:13.541367", "url": "about:blank", "action": "type", "selector": "#q", "length": 11}
+{"ts": "2026-03-25T16:17:13.570205", "url": "about:blank", "action": "clear", "selector": "#q"}
+{"ts": "2026-03-25T16:17:15.850537", "url": "about:blank", "action": "fill", "selector": "#name", "length": 6}
+{"ts": "2026-03-25T16:17:15.988328", "url": "about:blank", "action": "fill", "selector": "#email", "length": 13}
+{"ts": "2026-03-25T16:17:15.989429", "url": "about:blank", "action": "fill_form", "field_count": 2}
+{"ts": "2026-03-25T16:17:19.230311", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:17:19.707318", "url": "https://example.com/", "action": "scroll", "x": 0, "y": 300}
+{"ts": "2026-03-25T16:17:21.000962", "url": "about:blank", "action": "select", "selector": "#s", "value": "b"}
+{"ts": "2026-03-25T16:17:23.862872", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:17:23.906592", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:17:25.923617", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:17:26.198989", "url": "https://example.org", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:17:28.191912", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:17:28.245847", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:17:30.565948", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:17:30.671735", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T16:17:30.705345", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:17:32.927073", "url": "about:blank", "action": "fill", "selector": "#first", "length": 6}
+{"ts": "2026-03-25T16:17:33.096885", "url": "about:blank", "action": "fill", "selector": "#last", "length": 4}
+{"ts": "2026-03-25T16:17:33.237773", "url": "about:blank", "action": "fill", "selector": "#age", "length": 2}
+{"ts": "2026-03-25T16:17:33.238116", "url": "about:blank", "action": "fill_form", "field_count": 3}
+{"ts": "2026-03-25T16:17:36.066786", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:17:42.391410", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:17:42.599158", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:17:45.938918", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:17:46.047353", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T16:17:49.224812", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:17:49.328793", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": "/private/var/folders/8b/vkfpw3n90mq6pt99t2vbcf8h0000gn/T/pytest-of-nayslayer/pytest-173/test_eyes_screenshot_saves_fil0/shot.png"}
+{"ts": "2026-03-25T16:17:52.756177", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:17:52.813825", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:17:55.821676", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:17:56.055440", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T16:17:58.567175", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:17:58.627081", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:18:01.763041", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:18:01.877845", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T16:18:05.246932", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:18:05.263043", "url": "https://example.com/", "action": "evaluate", "js_snippet": "document.title"}
+{"ts": "2026-03-25T16:18:24.917200", "url": "about:blank", "action": "tab_create", "name": "a"}
+{"ts": "2026-03-25T16:18:25.092300", "url": "about:blank", "action": "tab_create", "name": "b"}
+{"ts": "2026-03-25T16:18:25.720450", "url": "about:blank", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:18:27.903723", "url": "about:blank", "action": "tab_create", "name": "form-tab"}
+{"ts": "2026-03-25T16:18:28.126271", "url": "about:blank", "action": "fill", "selector": "#name", "length": 6}
+{"ts": "2026-03-25T16:18:31.714972", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:18:34.620483", "url": "about:blank", "action": "tab_create", "name": "news"}
+{"ts": "2026-03-25T16:18:34.754458", "url": "about:blank", "action": "tab_create", "name": "docs"}
+{"ts": "2026-03-25T16:18:35.619950", "url": "about:blank", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:18:38.211304", "url": "about:blank", "action": "tab_create", "name": "search"}
+{"ts": "2026-03-25T16:18:41.454368", "url": "about:blank", "action": "tab_create", "name": "news"}
+{"ts": "2026-03-25T16:18:47.545723", "url": "about:blank", "action": "tab_create", "name": "tab-a"}
+{"ts": "2026-03-25T16:18:47.660338", "url": "about:blank", "action": "tab_create", "name": "tab-b"}
+{"ts": "2026-03-25T16:18:47.667004", "url": "about:blank", "action": "tab_switch", "name": "tab-b"}
+{"ts": "2026-03-25T16:18:47.673345", "url": "about:blank", "action": "tab_switch", "name": "tab-a"}
+{"ts": "2026-03-25T16:18:50.204841", "url": "about:blank", "action": "tab_create", "name": "temp"}
+{"ts": "2026-03-25T16:18:50.205673", "url": "about:blank", "action": "tab_close", "name": "temp"}
+{"ts": "2026-03-25T16:18:52.334357", "url": "about:blank", "action": "tab_create", "name": "keep"}
+{"ts": "2026-03-25T16:18:52.457115", "url": "about:blank", "action": "tab_create", "name": "remove"}
+{"ts": "2026-03-25T16:18:52.464846", "url": "about:blank", "action": "tab_switch", "name": "remove"}
+{"ts": "2026-03-25T16:18:52.467271", "url": "about:blank", "action": "tab_close", "name": "remove"}
+{"ts": "2026-03-25T16:18:55.420478", "url": "about:blank", "action": "tab_create", "name": "alpha"}
+{"ts": "2026-03-25T16:18:55.653314", "url": "about:blank", "action": "tab_create", "name": "beta"}
+{"ts": "2026-03-25T16:18:55.864838", "url": "about:blank", "action": "tab_create", "name": "gamma"}
+{"ts": "2026-03-25T16:18:59.050372", "url": "about:blank", "action": "tab_create", "name": "one"}
+{"ts": "2026-03-25T16:18:59.265458", "url": "about:blank", "action": "tab_create", "name": "two"}
+{"ts": "2026-03-25T16:19:01.793724", "url": "about:blank", "action": "tab_create", "name": "site-a"}
+{"ts": "2026-03-25T16:19:01.922275", "url": "about:blank", "action": "tab_create", "name": "site-b"}
+{"ts": "2026-03-25T16:19:06.495999", "url": "about:blank", "action": "tab_create", "name": "x"}
+{"ts": "2026-03-25T16:19:06.646719", "url": "about:blank", "action": "tab_create", "name": "y"}
+{"ts": "2026-03-25T16:19:06.813676", "url": "about:blank", "action": "tab_create", "name": "z"}
+{"ts": "2026-03-25T16:19:06.814498", "url": "about:blank", "action": "tab_close", "name": "x"}
+{"ts": "2026-03-25T16:19:06.834048", "url": "about:blank", "action": "tab_close", "name": "y"}
+{"ts": "2026-03-25T16:19:06.844863", "url": "about:blank", "action": "tab_close", "name": "z"}
+{"ts": "2026-03-25T16:20:13.367666", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:20:13.383817", "url": "https://example.com/", "action": "evaluate", "js_snippet": "localStorage.setItem('auth_token', 'test-jwt-123')"}
+{"ts": "2026-03-25T16:20:13.393628", "url": "https://example.com/", "action": "evaluate", "js_snippet": "localStorage.setItem('user_id', '42')"}
+{"ts": "2026-03-25T16:20:13.413839", "url": "https://example.com/", "action": "evaluate", "js_snippet": "\n            (() => {\n                const data = {};\n                for (let "}
+{"ts": "2026-03-25T16:20:17.126728", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:20:17.142062", "url": "https://example.com/", "action": "evaluate", "js_snippet": "localStorage.setItem('theme', 'dark')"}
+{"ts": "2026-03-25T16:20:17.148243", "url": "https://example.com/", "action": "evaluate", "js_snippet": "localStorage.setItem('lang', 'en')"}
+{"ts": "2026-03-25T16:20:17.158900", "url": "https://example.com/", "action": "evaluate", "js_snippet": "localStorage.getItem('theme')"}
+{"ts": "2026-03-25T16:21:32.143827", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:21:32.247980", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:21:33.640354", "url": "https://example.org", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:21:33.689843", "url": "https://example.org/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:21:36.990692", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:21:37.052134", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:21:49.310831", "url": "about:blank", "action": "captcha_tier1_applied"}
+{"ts": "2026-03-25T16:21:50.670795", "url": "https://x.com", "action": "captcha_tier2_skip", "reason": "no_api_key"}
+{"ts": "2026-03-25T16:21:52.001007", "url": "about:blank", "action": "captcha_tier3_start"}
+{"ts": "2026-03-25T16:21:54.010756", "url": "about:blank", "action": "captcha_tier3_timeout"}
+{"ts": "2026-03-25T16:21:56.432188", "url": "about:blank", "action": "type", "selector": "#q", "length": 11}
+{"ts": "2026-03-25T16:21:56.473023", "url": "about:blank", "action": "clear", "selector": "#q"}
+{"ts": "2026-03-25T16:21:59.027450", "url": "about:blank", "action": "fill", "selector": "#name", "length": 6}
+{"ts": "2026-03-25T16:21:59.195729", "url": "about:blank", "action": "fill", "selector": "#email", "length": 13}
+{"ts": "2026-03-25T16:21:59.197562", "url": "about:blank", "action": "fill_form", "field_count": 2}
+{"ts": "2026-03-25T16:22:02.606351", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:22:02.962907", "url": "https://example.com/", "action": "scroll", "x": 0, "y": 300}
+{"ts": "2026-03-25T16:22:05.139726", "url": "about:blank", "action": "select", "selector": "#s", "value": "b"}
+{"ts": "2026-03-25T16:22:07.954748", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:22:08.009891", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:22:10.893834", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:22:11.214189", "url": "https://example.org", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:22:15.293910", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:22:15.362196", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:22:17.028213", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:22:17.057955", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:22:19.945197", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:22:20.026531", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T16:22:22.023323", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:22:22.029114", "url": "https://example.com/", "action": "evaluate", "js_snippet": "document.title"}
+{"ts": "2026-03-25T16:22:24.957962", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:22:24.983616", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:22:27.383338", "url": "https://example.org", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:22:27.422533", "url": "https://example.org/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:22:29.962948", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:22:30.045328", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:22:32.336606", "url": "about:blank", "action": "tab_create", "name": "a"}
+{"ts": "2026-03-25T16:22:32.468158", "url": "about:blank", "action": "tab_create", "name": "b"}
+{"ts": "2026-03-25T16:22:33.145095", "url": "about:blank", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:22:34.585331", "url": "about:blank", "action": "tab_create", "name": "form-tab"}
+{"ts": "2026-03-25T16:22:34.751076", "url": "about:blank", "action": "fill", "selector": "#name", "length": 6}
+{"ts": "2026-03-25T16:22:36.331328", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:22:37.524653", "url": "about:blank", "action": "tab_create", "name": "news"}
+{"ts": "2026-03-25T16:22:37.625062", "url": "about:blank", "action": "tab_create", "name": "docs"}
+{"ts": "2026-03-25T16:22:38.253503", "url": "about:blank", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:22:40.832664", "url": "about:blank", "action": "tab_create", "name": "search"}
+{"ts": "2026-03-25T16:22:43.276360", "url": "about:blank", "action": "tab_create", "name": "news"}
+{"ts": "2026-03-25T16:22:48.068974", "url": "about:blank", "action": "tab_create", "name": "tab-a"}
+{"ts": "2026-03-25T16:22:48.225552", "url": "about:blank", "action": "tab_create", "name": "tab-b"}
+{"ts": "2026-03-25T16:22:48.235068", "url": "about:blank", "action": "tab_switch", "name": "tab-b"}
+{"ts": "2026-03-25T16:22:48.249103", "url": "about:blank", "action": "tab_switch", "name": "tab-a"}
+{"ts": "2026-03-25T16:22:50.519341", "url": "about:blank", "action": "tab_create", "name": "temp"}
+{"ts": "2026-03-25T16:22:50.519941", "url": "about:blank", "action": "tab_close", "name": "temp"}
+{"ts": "2026-03-25T16:22:52.759077", "url": "about:blank", "action": "tab_create", "name": "keep"}
+{"ts": "2026-03-25T16:22:52.900850", "url": "about:blank", "action": "tab_create", "name": "remove"}
+{"ts": "2026-03-25T16:22:52.911614", "url": "about:blank", "action": "tab_switch", "name": "remove"}
+{"ts": "2026-03-25T16:22:52.911994", "url": "about:blank", "action": "tab_close", "name": "remove"}
+{"ts": "2026-03-25T16:22:54.914768", "url": "about:blank", "action": "tab_create", "name": "alpha"}
+{"ts": "2026-03-25T16:22:55.066919", "url": "about:blank", "action": "tab_create", "name": "beta"}
+{"ts": "2026-03-25T16:22:55.202813", "url": "about:blank", "action": "tab_create", "name": "gamma"}
+{"ts": "2026-03-25T16:22:57.491289", "url": "about:blank", "action": "tab_create", "name": "one"}
+{"ts": "2026-03-25T16:22:57.614870", "url": "about:blank", "action": "tab_create", "name": "two"}
+{"ts": "2026-03-25T16:22:59.382791", "url": "about:blank", "action": "tab_create", "name": "site-a"}
+{"ts": "2026-03-25T16:22:59.491708", "url": "about:blank", "action": "tab_create", "name": "site-b"}
+{"ts": "2026-03-25T16:23:03.131610", "url": "about:blank", "action": "tab_create", "name": "x"}
+{"ts": "2026-03-25T16:23:03.256730", "url": "about:blank", "action": "tab_create", "name": "y"}
+{"ts": "2026-03-25T16:23:03.368390", "url": "about:blank", "action": "tab_create", "name": "z"}
+{"ts": "2026-03-25T16:23:03.370964", "url": "about:blank", "action": "tab_close", "name": "x"}
+{"ts": "2026-03-25T16:23:03.404564", "url": "about:blank", "action": "tab_close", "name": "y"}
+{"ts": "2026-03-25T16:23:03.427495", "url": "about:blank", "action": "tab_close", "name": "z"}
+{"ts": "2026-03-25T16:26:20.385259", "url": "about:blank", "action": "captcha_tier1_applied"}
+{"ts": "2026-03-25T16:26:22.745036", "url": "https://x.com", "action": "captcha_tier2_skip", "reason": "no_api_key"}
+{"ts": "2026-03-25T16:26:25.500320", "url": "about:blank", "action": "captcha_tier3_start"}
+{"ts": "2026-03-25T16:26:27.519419", "url": "about:blank", "action": "captcha_tier3_timeout"}
+{"ts": "2026-03-25T16:26:29.349092", "url": "about:blank", "action": "type", "selector": "#q", "length": 11}
+{"ts": "2026-03-25T16:26:29.374915", "url": "about:blank", "action": "clear", "selector": "#q"}
+{"ts": "2026-03-25T16:26:31.200373", "url": "about:blank", "action": "fill", "selector": "#name", "length": 6}
+{"ts": "2026-03-25T16:26:31.378909", "url": "about:blank", "action": "fill", "selector": "#email", "length": 13}
+{"ts": "2026-03-25T16:26:31.379375", "url": "about:blank", "action": "fill_form", "field_count": 2}
+{"ts": "2026-03-25T16:26:34.511746", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:26:35.018326", "url": "https://example.com/", "action": "scroll", "x": 0, "y": 300}
+{"ts": "2026-03-25T16:26:37.569703", "url": "about:blank", "action": "select", "selector": "#s", "value": "b"}
+{"ts": "2026-03-25T16:26:42.110497", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:26:42.179761", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:26:45.104762", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:26:45.439628", "url": "https://example.org", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:26:48.541154", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:26:48.595661", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:26:50.974190", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:26:51.066252", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T16:26:51.090171", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:26:52.956969", "url": "about:blank", "action": "fill", "selector": "#first", "length": 6}
+{"ts": "2026-03-25T16:26:53.043703", "url": "about:blank", "action": "fill", "selector": "#last", "length": 4}
+{"ts": "2026-03-25T16:26:53.185864", "url": "about:blank", "action": "fill", "selector": "#age", "length": 2}
+{"ts": "2026-03-25T16:26:53.186552", "url": "about:blank", "action": "fill_form", "field_count": 3}
+{"ts": "2026-03-25T16:26:59.820338", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:27:05.483138", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:27:05.644052", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:27:07.691148", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:27:07.777075", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T16:27:10.385748", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:27:10.480403", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": "/private/var/folders/8b/vkfpw3n90mq6pt99t2vbcf8h0000gn/T/pytest-of-nayslayer/pytest-177/test_eyes_screenshot_saves_fil0/shot.png"}
+{"ts": "2026-03-25T16:27:13.197085", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:27:13.271474", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:27:17.026012", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:27:17.146939", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T16:27:20.446120", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:27:20.516204", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:27:22.684003", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:27:22.801325", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T16:27:25.341942", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:27:25.352101", "url": "https://example.com/", "action": "evaluate", "js_snippet": "document.title"}
+{"ts": "2026-03-25T16:27:27.116701", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:27:27.127622", "url": "https://example.com/", "action": "evaluate", "js_snippet": "localStorage.setItem('auth_token', 'test-jwt-123')"}
+{"ts": "2026-03-25T16:27:27.134239", "url": "https://example.com/", "action": "evaluate", "js_snippet": "localStorage.setItem('user_id', '42')"}
+{"ts": "2026-03-25T16:27:27.146850", "url": "https://example.com/", "action": "evaluate", "js_snippet": "\n            (() => {\n                const data = {};\n                for (let "}
+{"ts": "2026-03-25T16:27:29.555246", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:27:29.572249", "url": "https://example.com/", "action": "evaluate", "js_snippet": "localStorage.setItem('theme', 'dark')"}
+{"ts": "2026-03-25T16:27:29.617927", "url": "https://example.com/", "action": "evaluate", "js_snippet": "localStorage.setItem('lang', 'en')"}
+{"ts": "2026-03-25T16:27:29.628390", "url": "https://example.com/", "action": "evaluate", "js_snippet": "localStorage.getItem('theme')"}
+{"ts": "2026-03-25T16:27:42.405927", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:27:42.461935", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:27:43.683506", "url": "https://example.org", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:27:43.735617", "url": "https://example.org/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:27:46.274464", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:27:46.332939", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:27:48.644798", "url": "about:blank", "action": "tab_create", "name": "a"}
+{"ts": "2026-03-25T16:27:48.843672", "url": "about:blank", "action": "tab_create", "name": "b"}
+{"ts": "2026-03-25T16:27:49.411191", "url": "about:blank", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:27:51.603704", "url": "about:blank", "action": "tab_create", "name": "form-tab"}
+{"ts": "2026-03-25T16:27:51.795721", "url": "about:blank", "action": "fill", "selector": "#name", "length": 6}
+{"ts": "2026-03-25T16:27:54.109821", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:27:57.046587", "url": "about:blank", "action": "tab_create", "name": "news"}
+{"ts": "2026-03-25T16:27:57.210684", "url": "about:blank", "action": "tab_create", "name": "docs"}
+{"ts": "2026-03-25T16:27:57.873873", "url": "about:blank", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:27:59.400303", "url": "about:blank", "action": "tab_create", "name": "search"}
+{"ts": "2026-03-25T16:28:00.513378", "url": "about:blank", "action": "tab_create", "name": "news"}
+{"ts": "2026-03-25T16:28:03.910249", "url": "about:blank", "action": "tab_create", "name": "tab-a"}
+{"ts": "2026-03-25T16:28:04.053156", "url": "about:blank", "action": "tab_create", "name": "tab-b"}
+{"ts": "2026-03-25T16:28:04.056930", "url": "about:blank", "action": "tab_switch", "name": "tab-b"}
+{"ts": "2026-03-25T16:28:04.062314", "url": "about:blank", "action": "tab_switch", "name": "tab-a"}
+{"ts": "2026-03-25T16:28:06.351435", "url": "about:blank", "action": "tab_create", "name": "temp"}
+{"ts": "2026-03-25T16:28:06.353499", "url": "about:blank", "action": "tab_close", "name": "temp"}
+{"ts": "2026-03-25T16:28:09.355045", "url": "about:blank", "action": "tab_create", "name": "keep"}
+{"ts": "2026-03-25T16:28:09.477710", "url": "about:blank", "action": "tab_create", "name": "remove"}
+{"ts": "2026-03-25T16:28:09.482027", "url": "about:blank", "action": "tab_switch", "name": "remove"}
+{"ts": "2026-03-25T16:28:09.483051", "url": "about:blank", "action": "tab_close", "name": "remove"}
+{"ts": "2026-03-25T16:28:12.470448", "url": "about:blank", "action": "tab_create", "name": "alpha"}
+{"ts": "2026-03-25T16:28:12.908722", "url": "about:blank", "action": "tab_create", "name": "beta"}
+{"ts": "2026-03-25T16:28:13.233765", "url": "about:blank", "action": "tab_create", "name": "gamma"}
+{"ts": "2026-03-25T16:28:16.676264", "url": "about:blank", "action": "tab_create", "name": "one"}
+{"ts": "2026-03-25T16:28:16.812796", "url": "about:blank", "action": "tab_create", "name": "two"}
+{"ts": "2026-03-25T16:28:20.032961", "url": "about:blank", "action": "tab_create", "name": "site-a"}
+{"ts": "2026-03-25T16:28:20.183743", "url": "about:blank", "action": "tab_create", "name": "site-b"}
+{"ts": "2026-03-25T16:28:23.546723", "url": "about:blank", "action": "tab_create", "name": "x"}
+{"ts": "2026-03-25T16:28:23.681048", "url": "about:blank", "action": "tab_create", "name": "y"}
+{"ts": "2026-03-25T16:28:23.827969", "url": "about:blank", "action": "tab_create", "name": "z"}
+{"ts": "2026-03-25T16:28:23.828565", "url": "about:blank", "action": "tab_close", "name": "x"}
+{"ts": "2026-03-25T16:28:23.848183", "url": "about:blank", "action": "tab_close", "name": "y"}
+{"ts": "2026-03-25T16:28:23.871476", "url": "about:blank", "action": "tab_close", "name": "z"}
+{"ts": "2026-03-25T16:29:28.489373", "url": "about:blank", "action": "captcha_tier1_applied"}
+{"ts": "2026-03-25T16:29:29.678833", "url": "https://x.com", "action": "captcha_tier2_skip", "reason": "no_api_key"}
+{"ts": "2026-03-25T16:29:30.823707", "url": "about:blank", "action": "captcha_tier3_start"}
+{"ts": "2026-03-25T16:29:32.833535", "url": "about:blank", "action": "captcha_tier3_timeout"}
+{"ts": "2026-03-25T16:29:35.381515", "url": "about:blank", "action": "type", "selector": "#q", "length": 11}
+{"ts": "2026-03-25T16:29:35.408522", "url": "about:blank", "action": "clear", "selector": "#q"}
+{"ts": "2026-03-25T16:29:37.369524", "url": "about:blank", "action": "fill", "selector": "#name", "length": 6}
+{"ts": "2026-03-25T16:29:37.499335", "url": "about:blank", "action": "fill", "selector": "#email", "length": 13}
+{"ts": "2026-03-25T16:29:37.499689", "url": "about:blank", "action": "fill_form", "field_count": 2}
+{"ts": "2026-03-25T16:29:40.635681", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:29:40.873895", "url": "https://example.com/", "action": "scroll", "x": 0, "y": 300}
+{"ts": "2026-03-25T16:29:43.230619", "url": "about:blank", "action": "select", "selector": "#s", "value": "b"}
+{"ts": "2026-03-25T16:29:48.502541", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:29:48.562683", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:29:51.201667", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:29:51.550227", "url": "https://example.org", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:29:54.677847", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:29:54.758311", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:29:58.206960", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:29:58.316815", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T16:29:58.347280", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:30:00.614855", "url": "about:blank", "action": "fill", "selector": "#first", "length": 6}
+{"ts": "2026-03-25T16:30:00.736255", "url": "about:blank", "action": "fill", "selector": "#last", "length": 4}
+{"ts": "2026-03-25T16:30:00.816136", "url": "about:blank", "action": "fill", "selector": "#age", "length": 2}
+{"ts": "2026-03-25T16:30:00.817552", "url": "about:blank", "action": "fill_form", "field_count": 3}
+{"ts": "2026-03-25T16:30:07.570913", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:30:13.333781", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:30:13.492191", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:30:17.478243", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:30:17.585103", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T16:30:21.528427", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:30:21.654844", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": "/private/var/folders/8b/vkfpw3n90mq6pt99t2vbcf8h0000gn/T/pytest-of-nayslayer/pytest-178/test_eyes_screenshot_saves_fil0/shot.png"}
+{"ts": "2026-03-25T16:30:25.321876", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:30:25.376768", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:30:29.294713", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:30:29.418508", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T16:30:32.796174", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:30:32.878992", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:30:36.339504", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:30:36.468409", "url": "https://example.com/", "action": "screenshot", "full_page": true, "saved": null}
+{"ts": "2026-03-25T16:30:40.285107", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:30:40.292619", "url": "https://example.com/", "action": "evaluate", "js_snippet": "document.title"}
+{"ts": "2026-03-25T16:30:42.467648", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:30:42.476682", "url": "https://example.com/", "action": "evaluate", "js_snippet": "localStorage.setItem('auth_token', 'test-jwt-123')"}
+{"ts": "2026-03-25T16:30:42.480909", "url": "https://example.com/", "action": "evaluate", "js_snippet": "localStorage.setItem('user_id', '42')"}
+{"ts": "2026-03-25T16:30:42.495820", "url": "https://example.com/", "action": "evaluate", "js_snippet": "\n            (() => {\n                const data = {};\n                for (let "}
+{"ts": "2026-03-25T16:30:45.579646", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:30:45.746238", "url": "https://example.com/", "action": "evaluate", "js_snippet": "localStorage.setItem('theme', 'dark')"}
+{"ts": "2026-03-25T16:30:45.762780", "url": "https://example.com/", "action": "evaluate", "js_snippet": "localStorage.setItem('lang', 'en')"}
+{"ts": "2026-03-25T16:30:45.787616", "url": "https://example.com/", "action": "evaluate", "js_snippet": "localStorage.getItem('theme')"}
+{"ts": "2026-03-25T16:31:11.380115", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:31:11.442027", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:31:13.886553", "url": "https://example.org", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:31:13.936825", "url": "https://example.org/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:31:20.092989", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:31:20.139387", "url": "https://example.com/", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:31:22.029554", "url": "about:blank", "action": "tab_create", "name": "a"}
+{"ts": "2026-03-25T16:31:22.169873", "url": "about:blank", "action": "tab_create", "name": "b"}
+{"ts": "2026-03-25T16:31:22.924316", "url": "about:blank", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:31:25.480485", "url": "about:blank", "action": "tab_create", "name": "form-tab"}
+{"ts": "2026-03-25T16:31:25.742276", "url": "about:blank", "action": "fill", "selector": "#name", "length": 6}
+{"ts": "2026-03-25T16:31:29.071520", "url": "https://example.com", "action": "navigate", "title": "Example Domain"}
+{"ts": "2026-03-25T16:31:30.914877", "url": "about:blank", "action": "tab_create", "name": "news"}
+{"ts": "2026-03-25T16:31:31.022850", "url": "about:blank", "action": "tab_create", "name": "docs"}
+{"ts": "2026-03-25T16:31:31.703304", "url": "about:blank", "action": "dom_text", "selector": "body"}
+{"ts": "2026-03-25T16:31:34.093598", "url": "about:blank", "action": "tab_create", "name": "search"}
+{"ts": "2026-03-25T16:31:36.891315", "url": "about:blank", "action": "tab_create", "name": "news"}
+{"ts": "2026-03-25T16:31:42.377670", "url": "about:blank", "action": "tab_create", "name": "tab-a"}
+{"ts": "2026-03-25T16:31:42.551818", "url": "about:blank", "action": "tab_create", "name": "tab-b"}
+{"ts": "2026-03-25T16:31:42.565928", "url": "about:blank", "action": "tab_switch", "name": "tab-b"}
+{"ts": "2026-03-25T16:31:42.569865", "url": "about:blank", "action": "tab_switch", "name": "tab-a"}
+{"ts": "2026-03-25T16:31:45.900139", "url": "about:blank", "action": "tab_create", "name": "temp"}
+{"ts": "2026-03-25T16:31:45.900927", "url": "about:blank", "action": "tab_close", "name": "temp"}
+{"ts": "2026-03-25T16:31:47.456216", "url": "about:blank", "action": "tab_create", "name": "keep"}
+{"ts": "2026-03-25T16:31:47.559599", "url": "about:blank", "action": "tab_create", "name": "remove"}
+{"ts": "2026-03-25T16:31:47.567493", "url": "about:blank", "action": "tab_switch", "name": "remove"}
+{"ts": "2026-03-25T16:31:47.568524", "url": "about:blank", "action": "tab_close", "name": "remove"}
+{"ts": "2026-03-25T16:31:49.311724", "url": "about:blank", "action": "tab_create", "name": "alpha"}
+{"ts": "2026-03-25T16:31:49.397897", "url": "about:blank", "action": "tab_create", "name": "beta"}
+{"ts": "2026-03-25T16:31:49.483578", "url": "about:blank", "action": "tab_create", "name": "gamma"}
+{"ts": "2026-03-25T16:31:51.057636", "url": "about:blank", "action": "tab_create", "name": "one"}
+{"ts": "2026-03-25T16:31:51.151093", "url": "about:blank", "action": "tab_create", "name": "two"}
+{"ts": "2026-03-25T16:31:53.107663", "url": "about:blank", "action": "tab_create", "name": "site-a"}
+{"ts": "2026-03-25T16:31:53.197288", "url": "about:blank", "action": "tab_create", "name": "site-b"}
+{"ts": "2026-03-25T16:32:01.370501", "url": "about:blank", "action": "tab_create", "name": "x"}
+{"ts": "2026-03-25T16:32:01.453334", "url": "about:blank", "action": "tab_create", "name": "y"}
+{"ts": "2026-03-25T16:32:01.535058", "url": "about:blank", "action": "tab_create", "name": "z"}
+{"ts": "2026-03-25T16:32:01.535688", "url": "about:blank", "action": "tab_close", "name": "x"}
+{"ts": "2026-03-25T16:32:01.544792", "url": "about:blank", "action": "tab_close", "name": "y"}
+{"ts": "2026-03-25T16:32:01.551488", "url": "about:blank", "action": "tab_close", "name": "z"}

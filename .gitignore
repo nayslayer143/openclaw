@@ -37,3 +37,4 @@ doctor-claw/
 punch-my-baby/
 shiny-new/
 openclaw-build/
+logs/*.jsonl
