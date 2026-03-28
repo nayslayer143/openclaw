@@ -160,7 +160,7 @@
       "what_to_take": "Do not integrate code; study its event-driven architecture patterns for potential Python-inspired design concepts but avoid C# code porting due to language mismatch.",
       "risk": "Critical language mismatch (C# vs Python) creates massive integration complexity. MIT license is acceptable but porting would require rewriting core components, making it impractical for our stack. Repo's scope exceeds our lean needs.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "Use as reference for discovering external libraries/strategies; no executable code to integrate.",
       "risk": "License risks from external resources (each listed item has separate license), no codebase to integrate, and list lacks implementation details for direct use in trading systems.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "Nothing of value; Gekko is a Bitcoin-focused JavaScript bot with no prediction market integration patterns.",
       "risk": "MIT license acceptable but high risk due to language mismatch (JS vs Python), domain mismatch (Bitcoin vs prediction markets), and suspicious future-dated last update (2026-03-27).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
