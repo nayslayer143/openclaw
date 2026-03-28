@@ -20,7 +20,7 @@
       "what_to_take": "Adopt the core backtesting engine and strategy interface to validate all strategies against historical data, adapting data ingestion to work with existing SQLite feeds and graduation engine.",
       "risk": "MIT license is safe; minimal maintenance risk due to active repo; moderate integration effort to align with existing data pipelines.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -40,7 +40,7 @@
       "what_to_take": "Backtesting engine and modular strategy components for strategy development and testing.",
       "risk": "Future last update date (2026) is suspicious; license not specified in description; requires adapting C++ core to Python stack.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "Extract the backtesting module's event-driven architecture for Clawmpson's graduation engine, but avoid full framework integration due to prediction market mismatch.",
       "risk": "Designed for traditional stock/futures markets (not prediction markets), requiring heavy adaptation; last update date (2026) is suspicious despite high stars/forks.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "Feature engineering patterns for order book data (bid/ask depth, order flow imbalance) and ML model selection methodology from the notebooks, adaptable to Clawmpson's momentum strategy.",
       "risk": "No explicit license (potential legal risk), Jupyter Notebook format requires heavy refactoring, SGX market data structure differs from prediction markets (Polymarket/Kalshi), and ML approach may be overkill for ArbClaw's lean design.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "Extract the candlestick pattern recognition module (specifically 'Shooting Star' and 'Pattern Recognition' implementations) for potential integration into Clawmpson's momentum strategy, avoiding redundant indicators already present.",
       "risk": "License not specified in repo (must verify MIT/CC0), and strategies require adaptation to prediction market data structure and SQLite schema; high risk of over-engineering for minor gains.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "Model architectures (LSTM, seq2seq) for research only; no direct integration due to stock vs prediction market domain mismatch",
       "risk": "Domain mismatch (stock prediction vs prediction markets), Jupyter Notebook format requiring major refactoring, potential license ambiguity, and low relevance to all three bots",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -280,7 +280,7 @@
       "what_to_take": "No actionable patterns; dynamic order book concepts are domain-mismatched (crypto tokens vs prediction markets) and JavaScript code would require full rewrite for Python stack.",
       "risk": "License unknown (critical risk), future-dated last update (2026) suggests possible data error or abandonment, and JavaScript/Python language mismatch creates high integration complexity.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
