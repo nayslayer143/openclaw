@@ -100,7 +100,7 @@
       "what_to_take": "Extract order book feature engineering patterns (e.g., spread, depth, imbalance calculations) and ML model training pipelines for potential adaptation to Clawmpson's price-lag/momentum strategies, avoiding SGX-specific data handling.",
       "risk": "Jupyter notebook format requires heavy refactoring for production use; SGX market structure differs from prediction markets (Polymarket/Kalshi); last update date (2026) suggests possible data error or stale repo; no explicit license check.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -120,7 +120,7 @@
       "what_to_take": "Study order book simulation patterns (Level-2/3, queue positions) for backtesting strategy accuracy, but avoid direct Rust code integration due to language mismatch.",
       "risk": "Rust-to-Python integration complexity, crypto HFT focus mismatch with prediction markets, unknown license (must verify), and suspicious future-dated last update (2026-03-26) indicating potential repo inaccuracy.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "No relevant patterns for prediction markets; C++ market making code not applicable to our Python-based strategies or exchange targets (Polymarket/Kalshi vs crypto exchanges).",
       "risk": "License unknown (must verify), last updated 2023 (inactive), high complexity from C++/Python mismatch, and irrelevant strategy focus (market making vs arbitrage/prediction markets).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
