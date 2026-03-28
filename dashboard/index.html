@@ -1693,9 +1693,9 @@ body {
 .claw-ctx-menu button:hover { background:#2a2a4a; color:#fff; }
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/xterm.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@xterm/addon-web-links@0.11.0/lib/addon-web-links.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@xterm/addon-web-links@0.11.0/lib/addon-web-links.min.js"></script>
 </head>
 <body>
 
@@ -2551,7 +2551,14 @@ function renderMilestones(done, target) {
 }
 
 // ── Page navigation ────────────────────────────────────────────────────────
-function showPage(page) {
+// Map URL paths to internal page names and back
+const _pageToUrl = { dashboard: 'ops' }
+const _urlToPage = { ops: 'dashboard' }
+
+function showPage(page, pushState) {
+  // Resolve URL-style names to internal page names
+  if (_urlToPage[page]) page = _urlToPage[page]
+
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'))
   if (page === 'ideas') {
@@ -2594,10 +2601,31 @@ function showPage(page) {
     pollResearchBadge()
     chatgptRefreshReports()
   } else {
+    page = 'dashboard'
     document.getElementById('pageDashboard').classList.add('active')
     document.getElementById('tabDashboard').classList.add('active')
   }
+
+  // Update URL (unless called from popstate or initial load)
+  if (pushState !== false) {
+    const urlPath = _pageToUrl[page] || page
+    history.pushState({page: page}, '', '/' + urlPath)
+  }
 }
+
+// Route on initial page load
+;(function() {
+  const validPages = ['dashboard','ops','jordan','ideas','projects','agents','trading','terminal','intel','research']
+  const path = location.pathname.replace(/^\//, '') || 'ops'
+  const page = validPages.includes(path) ? path : 'ops'
+  showPage(page, false)
+})()
+
+// Handle browser back/forward
+window.addEventListener('popstate', (e) => {
+  const page = e.state?.page || location.pathname.replace(/^\//, '') || 'ops'
+  showPage(page, false)
+})
 
 // ══════════════════════════════════════════════════════════════════
 // PROJECTS
@@ -4425,7 +4453,7 @@ function esc(s) { const d=document.createElement('div'); d.textContent=s; return
 function renderNotes(idea) {
   if (!idea.notes || !idea.notes.length) return ''
   return idea.notes.map(n => {
-    const imgs = (n.images||[]).map(f => `<img class="note-img" src="/api/ideas/media/${f}" onclick="window.open('/api/ideas/media/${f}','_blank')">`).join('')
+    const imgs = (n.images||[]).map(f => `<img class="note-img" src="/api/ideas/media/${f}" loading="lazy" onclick="window.open('/api/ideas/media/${f}','_blank')">`).join('')
     const audio = n.audio ? `<div class="note-audio"><audio controls src="/api/ideas/media/${n.audio}"></audio></div>` : ''
     const ts = n.created_at ? new Date(n.created_at).toLocaleString() : ''
     return `<div class="note-entry">
@@ -5811,35 +5839,48 @@ function clawInitTerminal(sessionName, container) {
     origWrite(data)
   }
 
-  // Connect SSE stream for PTY output
-  const sse = new EventSource(`/api/terminal/pty/stream/${sessionName}`)
+  // Connect SSE stream for PTY output (with auto-reconnect)
   let connected = false
 
-  sse.onopen = () => {
-    connected = true
-    // Send initial resize
-    fetch(`/api/terminal/pty/resize/${sessionName}`, {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ cols: term.cols, rows: term.rows })
-    }).catch(() => {})
-  }
+  function connectSSE() {
+    const sse = new EventSource(`/api/terminal/pty/stream/${sessionName}`)
 
-  sse.onmessage = (e) => {
-    try {
-      const msg = JSON.parse(e.data)
-      if (msg.type === 'output' && msg.data) {
-        // Decode base64
-        const bytes = Uint8Array.from(atob(msg.data), c => c.charCodeAt(0))
-        term.write(bytes)
-      }
-    } catch(err) {}
-  }
-
-  sse.onerror = () => {
-    if (connected) {
-      term.write('\r\n\x1b[31m[disconnected]\x1b[0m\r\n')
-      connected = false
+    sse.onopen = () => {
+      connected = true
+      // Send initial resize
+      fetch(`/api/terminal/pty/resize/${sessionName}`, {
+        method: 'POST', headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ cols: term.cols, rows: term.rows })
+      }).catch(() => {})
     }
+
+    sse.onmessage = (e) => {
+      try {
+        const msg = JSON.parse(e.data)
+        if (msg.type === 'output' && msg.data) {
+          // Decode base64
+          const bytes = Uint8Array.from(atob(msg.data), c => c.charCodeAt(0))
+          term.write(bytes)
+        }
+      } catch(err) {}
+    }
+
+    sse.onerror = () => {
+      sse.close()
+      if (connected) {
+        term.write('\r\n\x1b[31m[disconnected — reconnecting...]\x1b[0m\r\n')
+      }
+      connected = false
+      // Auto-reconnect after 2s if the terminal still exists
+      setTimeout(() => {
+        if (clawState.terminals[sessionName]) {
+          connectSSE()
+        }
+      }, 2000)
+    }
+
+    // Update the stored SSE reference so clawKillScratch can close it
+    clawState.terminals[sessionName].sse = sse
   }
 
   // Copy on select: auto-copy selected text to clipboard
@@ -5924,7 +5965,8 @@ function clawInitTerminal(sessionName, container) {
   })
   resizeObserver.observe(container)
 
-  clawState.terminals[sessionName] = { term, fitAddon, sse, resizeObserver }
+  clawState.terminals[sessionName] = { term, fitAddon, sse: null, resizeObserver }
+  connectSSE()
 }
 
 // Render sparkline for a session

@@ -13,6 +13,7 @@ from fastapi import FastAPI, Request, Response, HTTPException, Depends, UploadFi
 from fastapi.responses import HTMLResponse, StreamingResponse, RedirectResponse, JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.gzip import GZipMiddleware
 import httpx
 from jose import jwt, JWTError
 
@@ -64,6 +65,7 @@ TERMINAL_PID   = LOGS_DIR / "terminal-relay.pid"
 
 # ── App ───────────────────────────────────────────────────────────────────────
 app = FastAPI(title="OpenClaw Dashboard")
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
                    allow_methods=["*"], allow_headers=["*"])
 
