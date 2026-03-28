@@ -1,9 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> Auto-generated 2026-03-28T06:00:00-07:00. Do not edit manually.
+> Auto-generated 2026-03-28T06:07:00-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-03-28T06:00:00-07:00
+Generated: 2026-03-28T06:07:00-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -894,3 +894,479 @@ A local Ollama instance runs on the VPS, providing zero-API-cost inference. Curr
 
 ```
 openclaw-buil
+```
+
+### ~/openclaw/punch-my-baby/README.md
+```
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Getting Started
+
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+```
+
+### ~/openclaw/shiny-new/README.md
+```
+# SHINY.NEW — The Living Reinvention Engine
+
+An Awwwards-tier cinematic web experience for the shiny.new domain. Single-file HTML, zero build step, fully self-contained.
+
+## What It Is
+
+A `.new`-compliant creation tool that makes people forget they're looking at a browser. Users type a fragment of an idea — a feeling, a word, a half-thought — and SHINY generates a luminous artifact of thought in return.
+
+**Google `.new` compliance:** Users must actively CREATE something. This experience requires typed input before any content is generated. ✓
+
+## Features
+
+- **WebGL iridescent orb** — IcosahedronGeometry with custom GLSL vertex + fragment shaders. Multi-octave organic morphing, view-dependent soap-bubble iridescence, Fresnel rim glow, cursor reactivity
+- **Particle field** — 600 AdditiveBlending particles orbiting the orb with lazy drift physics
+- **CSS bloom** — `drop-shadow` filter stack simulating post-processing glow without EffectComposer
+- **Glyph scramble preloader** — exotic Unicode glyphs snap into "SHINY", then cinematic slide-up reveal
+- **Kinetic hero typography** — characters materialize with GSAP `back.out` easing + 3D rotateX
+- **GSAP ScrollTrigger** — scroll-linked orb drift, hue shift, section reveals
+- **Lenis smooth scroll** — physics-based smooth scroll wired to GSAP ticker
+- **Custom cursor** — 18-particle iridescent trail with spring-follow decay, magnetic snap on interactive elements
+- **Cycling placeholders** — 7 evocative suggestions that rotate every 3.8s
+- **Keyword-matched responses** — 14 thematic "Shiny Things" matched by input keywords, each a vivid poetic artifact
+- **Streaming text** — character-by-character reveal with natural punctuation pauses and blinking cursor
+- **Glassmorphism artifact card** — `backdrop-filter: blur(40px)`, iridescent border shimmer, rotating light sweep, 3D tilt on hover
+- **Mobile responsive** — reduced particle count, WebGL still runs, all interactions touch-friendly
+
+## Te
+```
+
+### ~/quantumentalclaw/.pytest_cache/README.md
+```
+# pytest cache directory #
+
+This directory contains data from the pytest's cache plugin,
+which provides the `--lf` and `--ff` options, as well as the `cache` fixture.
+
+**Do not** commit this to version control.
+
+See [the docs](https://docs.pytest.org/en/stable/how-to/cache.html) for more information.
+
+```
+
+### ~/quantumentalclaw/README.md
+```
+# QuantumentalClaw
+
+Signal fusion engine for finding asymmetric trades across equities and prediction markets.
+
+The name is a mashup of "quantitative" and "fundamental" — the idea is to combine hard data signals with softer contextual ones and let them reinforce each other. When multiple independent signals point the same direction, that's when things get interesting.
+
+## What it does
+
+7 data feeds flow into 5 signal modules, get fused together, filtered, sized, risk-checked, and executed. The system learns from every trade to recalibrate signal weights over time.
+
+```
+Feeds (7) → Signals (5) → Fusion → Filter → Size → Risk → Execute → Learn
+```
+
+Everything runs async in a single process. No microservices, no message queues — just clean Python.
+
+## Quick start
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env  # add your API keys
+python run.py --migrate
+python run.py --run
+```
+
+## Status
+
+V1 build, paper trading only. Part of the [OpenClaw](https://gitlab.com/jordan291/openclaw) ecosystem.
+
+```
+
+### ~/rivalclaw/README.md
+```
+# RivalClaw
+
+Testing a hunch: does my main trading system's architecture actually slow down arbitrage execution?
+
+[OpenClaw](https://gitlab.com/jordan291/openclaw) (Clawmpson) runs 5 strategies, LLM analysis, a graduation engine, and a bunch of other stuff on a 30-minute cycle. That's great for complex trades, but for cross-outcome arb where mispricing windows close in minutes — all that machinery might be costing me alpha.
+
+RivalClaw is the middle child in a three-way experiment:
+
+| System | What it is | Cycle | Question it answers |
+|--------|-----------|-------|-------------------|
+| **ArbClaw** | 4 files, zero overhead | 5 min | What's the speed ceiling? |
+| **RivalClaw** | Same architecture as Clawmpson, arb only | 5 min | Does the framework itself add lag? |
+| **Clawmpson** | Full system, 5 strategies | 30 min | Does strategy contention matter? |
+
+## How it works
+
+RivalClaw keeps Clawmpson's exact control flow but strips everything that isn't arb:
+
+```
+fetch markets → analyze (arb only) → paper trade → check stops → maybe graduate
+```
+
+Same architecture shape. Same execution simulation (slippage, latency penalty, partial fills). Same graduation gates. Just fewer strategies competing for attention.
+
+## The arb math
+
+Identical to ArbClaw — same fee computation, same Kelly formula, same thresholds:
+- Fee: 2% of min(price, 1-price) per leg
+- Min edge: 0.5% after fees
+- Kelly cap: 10% of balance
+
+## What RivalClaw adds over ArbClaw
+
+This is the "architectural weight" being measured:
+- Execution simulation (50bps slippage, 0.2% latency penalty, 80-100% fill rate)
+- Full daily PnL accounting with ROI, Sharpe, max drawdown
+- Graduation gates (7-day window, same thresholds as Clawmpson)
+- Mark-to-market balance derivation
+- Integrity guards (stale timestamps, impossible prices, sum sanity checks)
+- Per-cycle timing instrumentation
+
+## Key metric
+
+`signal_to_trade_latency_ms` — how fast does each system go from seeing an opportunity to placing a trade? Tha
+```
+
+## Tech Stack Fingerprint
+
+### ~/openclaw/chatgpt-mcp/package.json
+```
+{
+  "name": "openclaw-chatgpt-mcp",
+  "version": "1.0.0",
+  "description": "MCP server bridging Claude Code → ChatGPT for deep research and terminal insights",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "openai": "^4.80.0"
+  }
+}
+
+```
+
+### ~/openclaw/doctor-claw/.next/package.json
+```
+{"type": "commonjs"}
+```
+
+### ~/openclaw/doctor-claw/package.json
+```
+{
+  "name": "doctor-claw",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "workers": "node workers/index.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
+    "@base-ui/react": "^1.3.0",
+    "@hookform/resolvers": "^5.2.2",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-label": "^2.1.8",
+    "@radix-ui/react-separator": "^1.1.8",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-tabs": "^1.1.13",
+    "@supabase/supabase-js": "^2.99.3",
+    "bullmq": "^5.71.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "dotenv": "^17.3.1",
+    "ioredis": "^5.10.1",
+    "lucide-react": "^0.577.0",
+    "next": "14.2.35",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-hook-form": "^7.71.2",
+    "shadcn": "^4.1.0",
+    "tailwind-merge": "^3.5.0",
+    "tw-animate-css": "^1.4.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@types/supertest": "^7.2.0",
+    "jest": "^30.3.0",
+    "postcss": "^8",
+    "supertest": "^7.2.2",
+    "tailwindcss": "^3.4.1",
+    "ts-jest": "^29.4.6",
+    "typescript": "^5"
+  }
+}
+
+```
+
+### ~/openclaw/punch-my-baby/.next/package.json
+```
+{"type": "commonjs"}
+```
+
+### ~/openclaw/punch-my-baby/package.json
+```
+{
+  "name": "punch-my-baby",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
+    "@base-ui/react": "^1.3.0",
+    "@hookform/resolvers": "^5.2.2",
+    "@supabase/supabase-js": "^2.99.3",
+    "adm-zip": "^0.5.16",
+    "cheerio": "^1.2.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.577.0",
+    "mammoth": "^1.12.0",
+    "next": "16.2.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-hook-form": "^7.71.2",
+    "shadcn": "^4.1.0",
+    "stripe": "^20.4.1",
+    "tailwind-merge": "^3.5.0",
+    "tw-animate-css": "^1.4.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/adm-zip": "^0.5.8",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
+
+```
+
+### ~/openclaw/requirements.txt
+```
+# Clawmson / OpenClaw dispatcher dependencies
+
+# Core (already in use)
+requests
+
+# HTML parsing for nitter tweet extraction
+beautifulsoup4
+
+# Link ingestion — extracts clean readable text from web pages
+trafilatura
+
+# PDF extraction
+pdfplumber
+
+# Excel/spreadsheet parsing
+openpyxl
+
+# Audio transcription (voice notes, audio files)
+# Only needed if Ollama does not have a whisper model loaded.
+# Install with: pip install openai-whisper
+# Requires ffmpeg: brew install ffmpeg
+openai-whisper
+
+```
+
+### ~/quantumentalclaw/requirements.txt
+```
+aiohttp>=3.9
+httpx>=0.27
+yfinance>=0.2.36
+feedparser>=6.0
+praw>=7.7
+python-dotenv>=1.0
+cryptography>=42.0
+pytest>=8.0
+pytest-asyncio>=0.23
+
+```
+
+## Git Status
+
+### openclaw
+```
+Branch: main
+Last commit: 84c273b auto: 2026-03-28 06:00 state snapshot
+Uncommitted files: 9
+Remote: 
+```
+
+### rivalclaw
+```
+Branch: main
+Last commit: a6d6e0e auto: hourly sync 2026-03-28 12:47 UTC
+Uncommitted files: 4
+Remote: 
+```
+
+### arbclaw
+```
+Branch: main
+Last commit: 4313b0c daily report 2026-03-28 — day 5 | bal=$ pnl=$ trades=0
+Uncommitted files: 3
+Remote: https://oauth2:glpat-gpKuP2MCJ523PLVy2Rez7mM6MQpvOjEKdTpsMmJnZg8.01.170uc249y@gitlab.com/jordan291/arbclaw.git
+```
+
+### quantumentalclaw
+```
+Branch: main
+Last commit: 0a98037 hourly: 2026-03-28 13:00 | $10,000 | 0W/0closed | $+0 | quiet
+Uncommitted files: 0
+Remote: https://oauth2:glpat-gpKuP2MCJ523PLVy2Rez7mM6MQpvOjEKdTpsMmJnZg8.01.170uc249y@gitlab.com/jordan291/quantumentalclaw.git
+```
+
+### doctor-claw
+```
+Branch: main
+Last commit: 0cdc5ed chore: suppress Supabase never-type build error in next.config.mjs
+Uncommitted files: 2
+Remote: https://github.com/nayslayer143/doctor-claw.git
+```
+
+### punch-my-baby
+```
+Branch: main
+Last commit: 954066f feat: file attachments, URL crawling, voice recording, mobile-first
+Uncommitted files: 0
+Remote: https://github.com/nayslayer143/punch-my-baby.git
+```
+
+### shiny-new
+```
+Branch: main
+Last commit: ac64d70 feat: SHINY.NEW v3 — LaChapelle flash, phosphor trail, full-bleed §7, oracle reveal, manifesto inversion, OMEGA easter egg
+Uncommitted files: 3
+Remote: https://github.com/nayslayer143/shiny-new.git
+```
+
+## Environment Files (names only, NO values)
+```
+~/openclaw/dashboard/.env
+~/openclaw/dashboard/.env.example
+~/openclaw/doctor-claw/.env.local
+~/openclaw/doctor-claw/.env.example
+~/openclaw/.env
+~/openclaw/punch-my-baby/.env.local
+~/openclaw/punch-my-baby/.env.example
+~/rivalclaw/.env.prev
+~/rivalclaw/.env
+~/quantumentalclaw/.env
+~/quantumentalclaw/.env.example
+~/openclaw/doctor-claw/.env.local
+~/openclaw/doctor-claw/.env.example
+~/openclaw/punch-my-baby/.env.local
+~/openclaw/punch-my-baby/.env.example
+```
+
+## Trading State (if available)
+
+### Clawmpson Trading Dashboard
+```json
+{
+  "portfolio": {
+    "open_positions": 1,
+    "total_invested": 0,
+    "total_current_value": 0,
+    "total_pnl": 0,
+    "total_pnl_pct": 0,
+    "positions": [
+      {
+        "id": "pos-20260323170243-9921",
+        "question": "Will the All India Anna Dravida Munnetra Kazhagam (ADMK) win the most seats in the 2026 Tamil Nadu Assembly Elections?",
+        "direction": "buy_yes",
+        "entry_price": 0.2155,
+        "estimated_true_prob": 0.4,
+        "edge": 0.1845,
+        "size_usd": 10,
+        "confidence": "medium",
+        "reasoning": "ADMK is a strong party but faces challenges, making it more likely than priced.",
+        "opened_at": "2026-03-23T17:02:43.403185",
+        "status": "open",
+        "pnl": 0,
+        "current_price": null,
+        "note": "Market not found \u2014 may have resolved"
+      }
+    ],
+    "as_of": "2026-03-23T17:02:44.495492"
+  },
+  "recent_signals": [
+    {
+      "question": "Will the All India Anna Dravida Munnetra Kazhagam (ADMK) win the most seats in the 2026 Tamil Nadu Assembly Elections?",
+      "current_yes_price": 0.2155,
+      "estimated_true_prob": 0.4,
+      "edge": 0.1845,
+      "direction": "buy_yes",
+      "confidence": "medium",
+      "reasoning": "ADMK is a strong party but faces challenges, making it more likely than priced.",
+      "suggested_size_usd": 10,
+      "scan_time": "2026-03-23T17:02:43.387870",
+      "status": "traded",
+      "id": "sig-20260323170243-9921"
+    }
+  ],
+  "history": [],
+  "updated_at": "2026-03-23T17:02:44.496312"
+}
+```
+
+---
+End of context. Generated 2026-03-28T06:07:00-07:00.
+For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw
