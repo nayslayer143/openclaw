@@ -5802,6 +5802,39 @@ function clawTokenColor(v) {
 }
 
 // Initialize xterm.js for a session
+// ── Document-level image drag-and-drop for terminals ──────────────
+// Simplest approach: handle everything at window level.
+// On drop anywhere on the page, find the nearest terminal and send the image there.
+window.addEventListener('dragover', (e) => {
+  e.preventDefault()
+  e.dataTransfer.dropEffect = 'copy'
+}, false)
+
+window.addEventListener('drop', (e) => {
+  e.preventDefault()
+  e.stopPropagation()
+  const files = e.dataTransfer?.files
+  if (!files || files.length === 0) return
+
+  // Find the terminal closest to the drop point
+  const containers = document.querySelectorAll('[data-term-session-name]')
+  let best = null, bestDist = Infinity
+  containers.forEach(c => {
+    const r = c.getBoundingClientRect()
+    if (r.width === 0 || r.height === 0) return
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2
+    const dist = Math.hypot(e.clientX - cx, e.clientY - cy)
+    if (dist < bestDist) { bestDist = dist; best = c }
+  })
+  if (!best) return
+  const session = best.dataset.termSessionName
+  for (const f of files) {
+    if (f.type.startsWith('image/') || /\.(png|jpg|jpeg|gif|webp|bmp|tiff|heic|screenshot)$/i.test(f.name)) {
+      _uploadImageToTerminal(f, session)
+    }
+  }
+}, false)
+
 function _uploadImageToTerminal(file, sessionName) {
   if (!file) return
   const ext = (file.name?.split('.').pop() || file.type?.split('/')[1] || 'png').toLowerCase()
@@ -5964,68 +5997,8 @@ function clawInitTerminal(sessionName, container) {
     }
   })
 
-  // Image drag-and-drop — use capturing phase (3rd arg = true) so we
-  // intercept before xterm's canvas swallows the events.
-  // Also create an overlay so the drop target covers the whole terminal.
-  const dropOverlay = document.createElement('div')
-  dropOverlay.style.cssText = 'position:absolute;inset:0;z-index:100;display:none;pointer-events:all;border:2px solid #00ff88;border-radius:4px;background:rgba(0,255,136,0.05);'
-  container.style.position = 'relative'
-  container.appendChild(dropOverlay)
-
-  let dragCounter = 0
-  container.addEventListener('dragenter', (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    dragCounter++
-    if (e.dataTransfer?.types?.includes('Files')) {
-      dropOverlay.style.display = 'block'
-    }
-  }, true)
-  container.addEventListener('dragover', (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    e.dataTransfer.dropEffect = 'copy'
-  }, true)
-  container.addEventListener('dragleave', (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    dragCounter--
-    if (dragCounter <= 0) {
-      dragCounter = 0
-      dropOverlay.style.display = 'none'
-    }
-  }, true)
-  container.addEventListener('drop', (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    dragCounter = 0
-    dropOverlay.style.display = 'none'
-    const files = e.dataTransfer?.files
-    if (!files) return
-    for (const file of files) {
-      if (file.type.startsWith('image/')) {
-        _uploadImageToTerminal(file, sessionName)
-      }
-    }
-  }, true)
-  // Also catch drops on the overlay itself
-  dropOverlay.addEventListener('dragover', (e) => {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'copy'
-  })
-  dropOverlay.addEventListener('drop', (e) => {
-    e.preventDefault()
-    e.stopPropagation()
-    dragCounter = 0
-    dropOverlay.style.display = 'none'
-    const files = e.dataTransfer?.files
-    if (!files) return
-    for (const file of files) {
-      if (file.type.startsWith('image/')) {
-        _uploadImageToTerminal(file, sessionName)
-      }
-    }
-  })
+  // Register this terminal for document-level image drop handling
+  container.dataset.termSessionName = sessionName
 
   // Send keystrokes via POST
   let inputBuffer = ''
