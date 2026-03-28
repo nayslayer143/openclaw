@@ -1819,65 +1819,86 @@ async def terminal_packet_preview(user: str = Depends(get_current_user)):
     return {"packet": _build_packet(event)}
 
 
-# ── Claw Terminal Grid (WebSocket PTY + session management) ──────────────────
+# ── Claw Terminal Grid (SSE PTY + session management) ─────────────────────────
 
-@app.websocket("/api/terminal/ws/{session_name}")
-async def terminal_ws(websocket: WebSocket, session_name: str):
-    await websocket.accept()
+# PTY sessions: session_name -> {pid, fd}
+_pty_sessions: dict = {}
+
+def _ensure_pty(session_name: str) -> dict:
+    """Get or create a PTY attached to a tmux session."""
+    if session_name in _pty_sessions:
+        entry = _pty_sessions[session_name]
+        try:
+            os.kill(entry["pid"], 0)
+            return entry
+        except OSError:
+            try: os.close(entry["fd"])
+            except: pass
+            del _pty_sessions[session_name]
 
     pid, fd = pty.fork()
     if pid == 0:
-        # Child: attach to tmux session
         os.execvp("tmux", ["tmux", "attach-session", "-t", session_name])
         os._exit(1)
 
-    # Parent: relay between WebSocket and PTY
     os.set_blocking(fd, False)
+    entry = {"pid": pid, "fd": fd}
+    _pty_sessions[session_name] = entry
+    return entry
 
-    async def read_pty():
-        """Read from PTY and send to WebSocket."""
-        try:
-            while True:
-                await asyncio.sleep(0.01)  # 10ms poll
-                try:
-                    data = os.read(fd, 65536)
-                    if data:
-                        await websocket.send_bytes(data)
-                except (OSError, BlockingIOError):
-                    pass
-        except Exception:
-            pass
 
-    reader_task = asyncio.create_task(read_pty())
+@app.get("/api/terminal/pty/stream/{session_name}")
+async def pty_stream(session_name: str):
+    """SSE stream of PTY output from a tmux session."""
+    r = subprocess.run(["tmux", "has-session", "-t", session_name], capture_output=True)
+    if r.returncode != 0:
+        raise HTTPException(404, f"tmux session '{session_name}' not found")
 
-    try:
+    entry = _ensure_pty(session_name)
+
+    async def generate():
+        import base64
         while True:
-            msg = await websocket.receive()
-            if msg["type"] == "websocket.disconnect":
+            try:
+                data = os.read(entry["fd"], 65536)
+                if data:
+                    encoded = base64.b64encode(data).decode("ascii")
+                    yield f"data: {json.dumps({'type': 'output', 'data': encoded})}\n\n"
+            except (OSError, BlockingIOError):
+                pass
+            except Exception:
                 break
-            if "text" in msg:
-                text = msg["text"]
-                # Handle resize messages
-                if text.startswith("__RESIZE__:"):
-                    parts = text.split(":")
-                    if len(parts) == 3:
-                        cols, rows = int(parts[1]), int(parts[2])
-                        winsize = struct.pack("HHHH", rows, cols, 0, 0)
-                        fcntl.ioctl(fd, termios.TIOCSWINSZ, winsize)
-                        os.kill(pid, signal.SIGWINCH)
-                    continue
-                os.write(fd, text.encode())
-            elif "bytes" in msg:
-                os.write(fd, msg["bytes"])
-    except Exception:
-        pass
-    finally:
-        reader_task.cancel()
-        try:
-            os.kill(pid, signal.SIGTERM)
-            os.close(fd)
-        except Exception:
-            pass
+            await asyncio.sleep(0.02)
+
+    return StreamingResponse(
+        generate(),
+        media_type="text/event-stream",
+        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
+    )
+
+
+@app.post("/api/terminal/pty/input/{session_name}")
+async def pty_input(session_name: str, body: dict = Body(...)):
+    """Send input to a PTY session."""
+    entry = _ensure_pty(session_name)
+    data = body.get("data", "")
+    if data:
+        os.write(entry["fd"], data.encode())
+    return {"ok": True}
+
+
+@app.post("/api/terminal/pty/resize/{session_name}")
+async def pty_resize(session_name: str, body: dict = Body(...)):
+    """Resize a PTY session."""
+    if session_name not in _pty_sessions:
+        raise HTTPException(404, "PTY session not found")
+    entry = _pty_sessions[session_name]
+    cols = body.get("cols", 80)
+    rows = body.get("rows", 24)
+    winsize = struct.pack("HHHH", rows, cols, 0, 0)
+    fcntl.ioctl(entry["fd"], termios.TIOCSWINSZ, winsize)
+    os.kill(entry["pid"], signal.SIGWINCH)
+    return {"ok": True}
 
 
 @app.get("/api/terminal/claw-status")
@@ -2874,8 +2895,8 @@ async def chatgpt_deploy_all(request: Request, user: str = Depends(get_current_u
 
 @app.get("/{path:path}")
 async def spa(path: str, request: Request):
-    # Let API routes through
-    if path.startswith("api/") or path.startswith("auth/"):
+    # Let API and WebSocket routes through
+    if path.startswith("api/") or path.startswith("auth/") or path.startswith("ws"):
         raise HTTPException(404)
     # Check auth — localhost skips OAuth
     token = request.cookies.get("oc_token")

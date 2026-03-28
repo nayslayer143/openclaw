@@ -5796,49 +5796,67 @@ function clawInitTerminal(sessionName, container) {
   term.open(container)
   fitAddon.fit()
 
-  // Connect WebSocket to tmux session
-  const proto = location.protocol === 'https:' ? 'wss:' : 'ws:'
-  const ws = new WebSocket(`${proto}//${location.host}/api/terminal/ws/${sessionName}`)
-  ws.binaryType = 'arraybuffer'
+  // Connect SSE stream for PTY output
+  const sse = new EventSource(`/api/terminal/pty/stream/${sessionName}`)
+  let connected = false
 
-  ws.onopen = () => {
-    // Send initial size
-    ws.send(`__RESIZE__:${term.cols}:${term.rows}`)
+  sse.onopen = () => {
+    connected = true
+    // Send initial resize
+    fetch(`/api/terminal/pty/resize/${sessionName}`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ cols: term.cols, rows: term.rows })
+    }).catch(() => {})
   }
 
-  ws.onmessage = (e) => {
-    if (e.data instanceof ArrayBuffer) {
-      term.write(new Uint8Array(e.data))
-    } else {
-      term.write(e.data)
+  sse.onmessage = (e) => {
+    try {
+      const msg = JSON.parse(e.data)
+      if (msg.type === 'output' && msg.data) {
+        // Decode base64
+        const bytes = Uint8Array.from(atob(msg.data), c => c.charCodeAt(0))
+        term.write(bytes)
+      }
+    } catch(err) {}
+  }
+
+  sse.onerror = () => {
+    if (connected) {
+      term.write('\r\n\x1b[31m[disconnected]\x1b[0m\r\n')
+      connected = false
     }
   }
 
-  ws.onclose = () => {
-    term.write('\r\n\x1b[31m[disconnected]\x1b[0m\r\n')
-  }
-
-  ws.onerror = () => {
-    term.write('\r\n\x1b[31m[connection error]\x1b[0m\r\n')
-  }
-
-  // Send keystrokes to WebSocket
+  // Send keystrokes via POST
+  let inputBuffer = ''
+  let inputTimer = null
   term.onData(data => {
-    if (ws.readyState === WebSocket.OPEN) {
-      ws.send(data)
+    inputBuffer += data
+    if (!inputTimer) {
+      inputTimer = setTimeout(() => {
+        if (inputBuffer) {
+          fetch(`/api/terminal/pty/input/${sessionName}`, {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ data: inputBuffer })
+          }).catch(() => {})
+        }
+        inputBuffer = ''
+        inputTimer = null
+      }, 5)
     }
   })
 
   // Handle resize
   const resizeObserver = new ResizeObserver(() => {
     fitAddon.fit()
-    if (ws.readyState === WebSocket.OPEN) {
-      ws.send(`__RESIZE__:${term.cols}:${term.rows}`)
-    }
+    fetch(`/api/terminal/pty/resize/${sessionName}`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ cols: term.cols, rows: term.rows })
+    }).catch(() => {})
   })
   resizeObserver.observe(container)
 
-  clawState.terminals[sessionName] = { term, fitAddon, ws, resizeObserver }
+  clawState.terminals[sessionName] = { term, fitAddon, sse, resizeObserver }
 }
 
 // Render sparkline for a session
@@ -5872,9 +5890,10 @@ async function clawBroadcastSend() {
   if (!cmd) return
 
   Object.entries(clawState.terminals).forEach(([key, t]) => {
-    if (t.ws && t.ws.readyState === WebSocket.OPEN) {
-      t.ws.send(cmd + '\n')
-    }
+    fetch(`/api/terminal/pty/input/${key}`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ data: cmd + '\n' })
+    }).catch(() => {})
   })
 
   input.value = ''
@@ -5893,7 +5912,7 @@ async function clawCreateScratch() {
 // Kill scratch terminal
 async function clawKillScratch(session) {
   if (clawState.terminals[session]) {
-    clawState.terminals[session].ws?.close()
+    clawState.terminals[session].sse?.close()
     clawState.terminals[session].term?.dispose()
     delete clawState.terminals[session]
   }
