@@ -5798,6 +5798,19 @@ function clawInitTerminal(sessionName, container) {
   term.open(container)
   fitAddon.fit()
 
+  // Intercept and suppress mouse reporting escape sequences from the terminal
+  // This prevents tmux/Claude from capturing mouse events, keeping text selection working
+  const origWrite = term.write.bind(term)
+  term.write = (data) => {
+    if (typeof data === 'string') {
+      // Strip mouse enable sequences: CSI ? 1000-1006 h (enable) — let disable through
+      data = data.replace(/\x1b\[\?100[0-6]h/g, '')
+      // Also strip SGR mouse, urxvt mouse enable
+      data = data.replace(/\x1b\[\?1015h/g, '')
+    }
+    origWrite(data)
+  }
+
   // Connect SSE stream for PTY output
   const sse = new EventSource(`/api/terminal/pty/stream/${sessionName}`)
   let connected = false
