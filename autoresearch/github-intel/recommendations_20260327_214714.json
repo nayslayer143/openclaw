@@ -20,7 +20,7 @@
       "what_to_take": "Extract ZVT's modular data collection framework (for Polymarket/Kalshi/CoinGecko) and technical analysis modules (for price-lag/momentum indicators) to replace Clawmpson's feed handling and indicator calculations.",
       "risk": "Apache 2.0 license is safe, but ZVT's data model may require adaptation for prediction market APIs (not stock/crypto-first) and SQLite schema conflicts; minimal refactoring needed but not drop-in.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -120,7 +120,7 @@
       "what_to_take": "Extract technical analysis indicator implementations (e.g., RSI, MACD, Bollinger Bands) for Clawmpson's momentum/price-lag strategies, adapting to our SQLite feed structure.",
       "risk": "License unknown (potential MIT/GPL conflict), last update date (2026-03-27) suggests possible data error/maintenance issues, and exchange API wrappers (Binance/Coinbase) won't integrate directly with Polymarket/Kalshi data sources.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "Strategy management framework for modular strategy handling (without exchange dependencies), but requires heavy adaptation to remove crypto-specific code and GPL licensing constraints.",
       "risk": "GPLv3 license requires full project open-sourcing if integrated, critical risk for commercial product; codebase is crypto-focused and not aligned with prediction markets (Polymarket/Kalshi).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "None; JavaScript framework incompatible with Python stack and irrelevant to prediction market strategies",
       "risk": "Language mismatch (JavaScript vs Python) creates insurmountable integration barriers; crypto focus diverges from prediction market data/strategies",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "No actionable code; design patterns for strategy plugins could inform architecture but require full rewrite",
       "risk": "JavaScript vs Python mismatch, Bitcoin-only focus irrelevant to prediction markets, suspicious 2026 last update date",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "Not applicable; repo is a curated list of resources, not executable code. Extract specific resource links (e.g., for arbitrage libraries) for manual review and potential integration from linked repositories.",
       "risk": "Repo contains no code to integrate (only a list), risking wasted effort. Future-dated last update (2026-03-27) suggests possible data error. Linked resources require manual license/relevance checks, creating maintenance overhead.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -280,7 +280,7 @@
       "what_to_take": "This repo is a curated list of external resources, not a codebase; no direct integration possible. Use as reference to discover other repos with actual ML implementations.",
       "risk": "Repo is a list of external links (not code), last updated in 2026 (future date, likely error), and contains no executable code for integration. Links may be outdated.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -300,7 +300,7 @@
       "what_to_take": "Only Zipline's data handling patterns (e.g., DataPortal interface) for Clawmpson's data pipeline, but avoid its backtesting core",
       "risk": "Apache 2.0 license is acceptable, but Zipline is exclusively for backtesting (not live trading), making integration complex and irrelevant to stack's live trading focus",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -320,7 +320,7 @@
       "what_to_take": "Not applicable for backend integration; study for potential frontend dashboard inspiration if UI component is later added.",
       "risk": "Abandoned project (not maintained), future-dated last update (2026), JavaScript vs Python mismatch, requires full frontend rewrite for integration.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -340,7 +340,7 @@
       "what_to_take": "This repo is a curated HTML list of trading resources, not a codebase. No executable code or patterns to integrate. Use the list to identify specific libraries for future research, but do not integrate the list itself.",
       "risk": "HTML-based list with no machine-readable code; links may be broken or outdated. Suspicious future-dated last update (2026-03-27) suggests potential data error. No license or maintenance details provided.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
