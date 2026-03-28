@@ -60,7 +60,7 @@
       "what_to_take": "Refactor the DRL agent training pipeline and environment setup from FinRL's modular code structure (not notebooks) for potential self-tuning integration into RivalClaw's strategy engine, ignoring stock-specific components.",
       "risk": "Apache 2.0 license is acceptable, but heavy refactoring needed from Jupyter notebooks to production Python modules; stock market context mismatch with prediction markets may require significant adaptation for RivalClaw.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "Study its real-time data aggregation patterns for multiple asset classes (crypto/stocks/derivatives) and terminal UI design for feed management, but avoid porting Go code due to language mismatch.",
       "risk": "Future-dated last update (2026-03-27) suggests possible data error; Go-to-Python porting would require significant effort; terminal UI focus irrelevant to backend systems.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "Study Lean's strategy management architecture and data feed patterns for conceptual inspiration, but avoid code porting due to C#-Python mismatch.",
       "risk": "C# codebase requires massive porting effort for Python integration (high complexity risk), MIT license is acceptable but design patterns are not directly transferable to our stack's Python/SQLite architecture.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "Consider the event-driven backtesting architecture for inspiration in building a backtesting module, but avoid direct integration due to mismatch with live trading focus and high complexity.",
       "risk": "Apache 2.0 license is acceptable but Zipline is designed for backtesting only (not live trading), creating integration complexity and potential live trading instability; last update date 2026-03-27 appears erroneous.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "None; models are trained on stock price data (not prediction market event outcomes) and presented as Jupyter notebooks (not production-ready code).",
       "risk": "Domain mismatch (stocks vs. prediction markets), notebook format requires major refactoring, suspicious last update date (2026), and unclear license.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "Repo is a static HTML list of resources, not executable code. Do not integrate the list itself; instead, use it as a reference to identify specific libraries (e.g., for arbitrage or technical analysis) for potential separate integration.",
       "risk": "Repo is HTML-based and contains no executable code, making direct integration impossible. Risk of wasting time researching resources from an outdated list (last updated 2026-03-27, likely a typo). Resources may be irrelevant to prediction markets (e.g., stock-focused APIs) or outdated.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "Not applicable for backend integration; charting library requires frontend implementation which isn't part of current stack.",
       "risk": "Not maintained (critical risk), JavaScript frontend library incompatible with Python backend stack, requires major new frontend development.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "Not a code repository; it's a curated HTML list of resources. No executable code or patterns to integrate.",
       "risk": "Repo is a static list (HTML), not code. Last updated 2026 (future date), likely outdated. No license or maintenance details. Cannot integrate any functionality.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
