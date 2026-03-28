@@ -114,3 +114,82 @@ def test_get_balance_reads_starting_plus_closed_pnl():
     )
     conn.commit()
     assert get_balance(conn) == 10250.0
+
+
+from unittest.mock import patch, MagicMock
+
+
+def test_fetch_kalshi_markets_filters_beyond_24h():
+    """Markets closing more than 24h from now are excluded."""
+    from scripts.mirofish.high_freq_trader import fetch_kalshi_markets
+
+    now = datetime.datetime.utcnow()
+    close_soon = (now + datetime.timedelta(hours=1)).isoformat()
+    close_far  = (now + datetime.timedelta(hours=48)).isoformat()
+
+    fake_event = {"event_ticker": "KXBTC-TEST"}
+    fake_market_soon = {
+        "ticker": "KXBTC-NEAR", "event_ticker": "KXBTC-TEST",
+        "title": "BTC above $70k?", "category": "crypto",
+        "yes_bid_dollars": "0.45", "yes_ask_dollars": "0.47",
+        "no_bid_dollars": "0.53", "no_ask_dollars": "0.55",
+        "volume_fp": "1000", "close_time": close_soon,
+        "strike_type": "greater", "cap_strike": 70000.0,
+    }
+    fake_market_far = {
+        "ticker": "KXBTC-FAR", "event_ticker": "KXBTC-TEST",
+        "title": "BTC above $80k?", "category": "crypto",
+        "yes_bid_dollars": "0.20", "yes_ask_dollars": "0.22",
+        "no_bid_dollars": "0.78", "no_ask_dollars": "0.80",
+        "volume_fp": "500", "close_time": close_far,
+        "strike_type": "greater", "cap_strike": 80000.0,
+    }
+
+    def mock_call_kalshi(method, path, params=None):
+        if params and params.get("series_ticker"):
+            return {"events": [fake_event]}
+        if params and params.get("event_ticker"):
+            return {"markets": [fake_market_soon, fake_market_far]}
+        return None
+
+    with patch("scripts.mirofish.high_freq_trader._call_kalshi", side_effect=mock_call_kalshi):
+        markets = fetch_kalshi_markets()
+
+    tickers = [m["market_id"] for m in markets]
+    assert "KXBTC-NEAR" in tickers
+    assert "KXBTC-FAR" not in tickers
+
+
+def test_fetch_kalshi_markets_normalizes_prices():
+    """yes_price and no_price are 0-1 decimals after dividing by 100."""
+    from scripts.mirofish.high_freq_trader import fetch_kalshi_markets
+
+    now = datetime.datetime.utcnow()
+    close_soon = (now + datetime.timedelta(hours=2)).isoformat()
+
+    fake_event = {"event_ticker": "KXBTC-TEST"}
+    fake_market = {
+        "ticker": "KXBTC-NORM", "event_ticker": "KXBTC-TEST",
+        "title": "BTC above $70k?", "category": "crypto",
+        "yes_bid_dollars": "0.40", "yes_ask_dollars": "0.44",
+        "no_bid_dollars": "0.56", "no_ask_dollars": "0.60",
+        "volume_fp": "2000", "close_time": close_soon,
+        "strike_type": "greater", "cap_strike": 70000.0,
+    }
+
+    def mock_call_kalshi(method, path, params=None):
+        if params and params.get("series_ticker"):
+            return {"events": [fake_event]}
+        if params and params.get("event_ticker"):
+            return {"markets": [fake_market]}
+        return None
+
+    with patch("scripts.mirofish.high_freq_trader._call_kalshi", side_effect=mock_call_kalshi):
+        markets = fetch_kalshi_markets()
+
+    assert len(markets) == 1
+    m = markets[0]
+    assert m["venue"] == "kalshi"
+    assert 0.0 < m["yes_price"] < 1.0
+    assert 0.0 < m["no_price"] < 1.0
+    assert m["yes_bid"] < m["yes_ask"]

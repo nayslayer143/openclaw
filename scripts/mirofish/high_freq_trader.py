@@ -123,3 +123,78 @@ def db_startup(conn: sqlite3.Connection) -> None:
     )
     conn.commit()
     print(f"[HFT] DB startup complete — wiped {count} stale open trades, $10,000 balance set")
+
+
+# ── Kalshi market fetcher ─────────────────────────────────────────────────────
+
+try:
+    from scripts.mirofish.kalshi_feed import _call_kalshi, _adapt_market_fields
+except ImportError:
+    from kalshi_feed import _call_kalshi, _adapt_market_fields
+
+
+def fetch_kalshi_markets() -> list[dict]:
+    """
+    Fetch all open Kalshi markets across target series that close within 24h.
+    Returns list of normalized market dicts (venue="kalshi", prices 0-1 decimal).
+    """
+    now = datetime.datetime.utcnow()
+    cutoff = now + datetime.timedelta(hours=MAX_EXPIRY_HOURS)
+    cutoff_iso = cutoff.isoformat()
+
+    seen: set[str] = set()
+    markets: list[dict] = []
+
+    for series in KALSHI_SHORT_SERIES:
+        data = _call_kalshi("GET", "/events", params={
+            "series_ticker": series, "status": "open", "limit": 10,
+        })
+        if not data:
+            continue
+        for event in data.get("events", []):
+            evt_ticker = event.get("event_ticker", "")
+            if not evt_ticker:
+                continue
+            mdata = _call_kalshi("GET", "/markets", params={
+                "event_ticker": evt_ticker, "status": "open", "limit": 100,
+            })
+            if not mdata:
+                continue
+            for m in mdata.get("markets", []):
+                _adapt_market_fields(m)
+                ticker = m.get("ticker", "")
+                if not ticker or ticker in seen:
+                    continue
+                if m.get("mve_collection_ticker") or "KXMVE" in ticker:
+                    continue
+                close_time = m.get("close_time") or m.get("expiration_time", "")
+                if not close_time or close_time > cutoff_iso:
+                    continue
+                # _adapt_market_fields converts yes_bid_dollars -> yes_bid in cents
+                # Divide by 100 to get 0-1 decimal
+                yb = (m.get("yes_bid") or 0) / 100.0
+                ya = (m.get("yes_ask") or 0) / 100.0
+                nb = (m.get("no_bid") or 0) / 100.0
+                na = (m.get("no_ask") or 0) / 100.0
+                yes_price = (yb + ya) / 2 if yb > 0 and ya > 0 else (yb or ya)
+                no_price  = (nb + na) / 2 if nb > 0 and na > 0 else (nb or na)
+                if yes_price <= 0 and no_price <= 0:
+                    continue
+
+                seen.add(ticker)
+                markets.append({
+                    "market_id":    ticker,
+                    "question":     m.get("title", ticker),
+                    "venue":        "kalshi",
+                    "yes_price":    yes_price,
+                    "no_price":     no_price,
+                    "yes_bid":      yb,
+                    "yes_ask":      ya,
+                    "event_ticker": evt_ticker,
+                    "close_time":   close_time,
+                    "category":     (m.get("category") or "").lower(),
+                    "cap_strike":   m.get("cap_strike"),
+                    "strike_type":  m.get("strike_type", ""),
+                })
+
+    return markets
