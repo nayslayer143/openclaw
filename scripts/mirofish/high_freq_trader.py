@@ -140,8 +140,6 @@ def fetch_kalshi_markets() -> list[dict]:
     """
     now = datetime.datetime.utcnow()
     cutoff = now + datetime.timedelta(hours=MAX_EXPIRY_HOURS)
-    cutoff_iso = cutoff.isoformat()
-
     seen: set[str] = set()
     markets: list[dict] = []
 
@@ -167,8 +165,16 @@ def fetch_kalshi_markets() -> list[dict]:
                     continue
                 if m.get("mve_collection_ticker") or "KXMVE" in ticker:
                     continue
+                # Filter to <24hr closing (parse to datetime to handle Z-suffix correctly)
                 close_time = m.get("close_time") or m.get("expiration_time", "")
-                if not close_time or close_time > cutoff_iso:
+                if not close_time:
+                    continue
+                try:
+                    ct_str = close_time.replace("Z", "").replace("+00:00", "")
+                    ct_dt = datetime.datetime.fromisoformat(ct_str)
+                except (ValueError, TypeError):
+                    continue
+                if ct_dt <= now or ct_dt > cutoff:
                     continue
                 # _adapt_market_fields converts yes_bid_dollars -> yes_bid in cents
                 # Divide by 100 to get 0-1 decimal

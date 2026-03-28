@@ -193,3 +193,35 @@ def test_fetch_kalshi_markets_normalizes_prices():
     assert 0.0 < m["yes_price"] < 1.0
     assert 0.0 < m["no_price"] < 1.0
     assert m["yes_bid"] < m["yes_ask"]
+
+
+def test_fetch_kalshi_markets_handles_z_suffix_timestamps():
+    """Markets with Z-suffix close_time are correctly filtered."""
+    from scripts.mirofish.high_freq_trader import fetch_kalshi_markets
+
+    now = datetime.datetime.utcnow()
+    # A market closing in 1 hour, using Z-suffix timestamp (Kalshi API format)
+    close_soon_z = (now + datetime.timedelta(hours=1)).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    fake_event = {"event_ticker": "KXBTC-ZTEST"}
+    fake_market = {
+        "ticker": "KXBTC-ZCLOSE", "event_ticker": "KXBTC-ZTEST",
+        "title": "BTC above $70k?", "category": "crypto",
+        "yes_bid_dollars": "0.45", "yes_ask_dollars": "0.47",
+        "no_bid_dollars": "0.53", "no_ask_dollars": "0.55",
+        "volume_fp": "1000", "close_time": close_soon_z,
+        "strike_type": "greater", "cap_strike": 70000.0,
+    }
+
+    def mock_call_kalshi(method, path, params=None):
+        if params and params.get("series_ticker"):
+            return {"events": [fake_event]}
+        if params and params.get("event_ticker"):
+            return {"markets": [fake_market]}
+        return None
+
+    with patch("scripts.mirofish.high_freq_trader._call_kalshi", side_effect=mock_call_kalshi):
+        markets = fetch_kalshi_markets()
+
+    # Should be included (closes in 1 hour, well within 24h window)
+    assert any(m["market_id"] == "KXBTC-ZCLOSE" for m in markets)
