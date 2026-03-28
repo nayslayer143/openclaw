@@ -1838,6 +1838,9 @@ def _ensure_pty(session_name: str) -> dict:
 
     pid, fd = pty.fork()
     if pid == 0:
+        os.environ["TERM"] = "xterm-256color"
+        os.environ["COLORTERM"] = "truecolor"
+        os.environ["LANG"] = "en_US.UTF-8"
         os.execvp("tmux", ["tmux", "attach-session", "-t", session_name])
         os._exit(1)
 
@@ -1858,32 +1861,36 @@ async def pty_stream(session_name: str):
 
     async def generate():
         import base64
+        from concurrent.futures import ThreadPoolExecutor
         loop = asyncio.get_event_loop()
         fd = entry["fd"]
         heartbeat = 0
-        while True:
-            # Use select to wait for data instead of busy-polling
+        executor = ThreadPoolExecutor(max_workers=1)
+
+        def _read_pty():
+            """Blocking read in thread — waits for data via select."""
             try:
-                readable, _, _ = select.select([fd], [], [], 0.1)
-            except (ValueError, OSError):
+                readable, _, _ = select.select([fd], [], [], 0.5)
+                if readable:
+                    return os.read(fd, 65536)
+            except (ValueError, OSError, BlockingIOError):
+                pass
+            return None
+
+        while True:
+            try:
+                data = await loop.run_in_executor(executor, _read_pty)
+            except Exception:
                 break
-            if readable:
-                try:
-                    data = os.read(fd, 65536)
-                    if data:
-                        encoded = base64.b64encode(data).decode("ascii")
-                        yield f"data: {json.dumps({'type': 'output', 'data': encoded})}\n\n"
-                        heartbeat = 0
-                except (OSError, BlockingIOError):
-                    pass
-                except Exception:
-                    break
+            if data:
+                encoded = base64.b64encode(data).decode("ascii")
+                yield f"data: {json.dumps({'type': 'output', 'data': encoded})}\n\n"
+                heartbeat = 0
             else:
                 heartbeat += 1
-                if heartbeat >= 150:  # ~15 seconds
+                if heartbeat >= 30:  # ~15 seconds
                     yield ": heartbeat\n\n"
                     heartbeat = 0
-            await asyncio.sleep(0)
 
     return StreamingResponse(
         generate(),
