@@ -100,7 +100,7 @@
       "what_to_take": "No direct code integration possible; consider Kerf's columnar storage design for inspiration but not implementation due to C language mismatch with Python stack.",
       "risk": "High risk: C language requires Python binding development (complexity 8), no license specified (legal risk), and SQLite replacement would require massive refactor of existing data layers.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
