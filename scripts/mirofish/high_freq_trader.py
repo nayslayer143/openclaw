@@ -590,3 +590,41 @@ def resolve_expired(conn: sqlite3.Connection) -> int:
     if resolved:
         conn.commit()
     return resolved
+
+
+# ── Strategy weight evolution ─────────────────────────────────────────────────
+
+_ALL_STRATEGIES = ("arb", "spot_lag", "momentum", "mean_reversion")
+
+
+def evolve_weights(conn: sqlite3.Connection, weights: dict) -> dict:
+    """
+    Adjust Kelly multipliers from last 100 resolved trades per strategy.
+    Win rate > 60% → weight × 1.1 (max 1.5)
+    Win rate < 45% → weight × 0.9 (min 0.5)
+    < 10 resolved → unchanged
+    """
+    new_weights = dict(weights)
+    for strategy in _ALL_STRATEGIES:
+        row = conn.execute("""
+            SELECT COUNT(*) as total,
+                   SUM(CASE WHEN status='closed_win' THEN 1 ELSE 0 END) as wins
+            FROM paper_trades
+            WHERE strategy=? AND status IN ('closed_win', 'closed_loss')
+            ORDER BY closed_at DESC
+            LIMIT 100
+        """, (strategy,)).fetchone()
+        total = row["total"] if row else 0
+        wins  = row["wins"]  if row else 0
+        if total < 10:
+            new_weights.setdefault(strategy, 1.0)
+            continue
+        win_rate = wins / total
+        current  = new_weights.get(strategy, 1.0)
+        if win_rate > 0.60:
+            new_weights[strategy] = min(current * 1.1, 1.5)
+        elif win_rate < 0.45:
+            new_weights[strategy] = max(current * 0.9, 0.5)
+        else:
+            new_weights[strategy] = current
+    return new_weights

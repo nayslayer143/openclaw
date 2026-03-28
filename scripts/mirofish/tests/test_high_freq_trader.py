@@ -482,3 +482,47 @@ def test_resolve_expired_skips_no_result():
                return_value={"market": {"result": "", "status": "open"}}):
         resolved = resolve_expired(conn)
     assert resolved == 0
+
+
+def _insert_trades(conn, strategy, wins, losses):
+    for i in range(wins):
+        conn.execute(
+            "INSERT INTO paper_trades (market_id, question, direction, shares, entry_price, "
+            "amount_usd, pnl, status, confidence, reasoning, strategy, opened_at) "
+            "VALUES (?, 'q', 'YES', 10, 0.5, 50, 5.0, 'closed_win', 0.8, '', ?, '2026-03-27T00:00:00')",
+            (f"KX-{strategy}-W{i}", strategy)
+        )
+    for i in range(losses):
+        conn.execute(
+            "INSERT INTO paper_trades (market_id, question, direction, shares, entry_price, "
+            "amount_usd, pnl, status, confidence, reasoning, strategy, opened_at) "
+            "VALUES (?, 'q', 'YES', 10, 0.5, 50, -5.0, 'closed_loss', 0.8, '', ?, '2026-03-27T00:00:00')",
+            (f"KX-{strategy}-L{i}", strategy)
+        )
+    conn.commit()
+
+def test_evolve_weights_increases_winning_strategy():
+    from scripts.mirofish.high_freq_trader import evolve_weights
+    conn = _make_db()
+    _insert_trades(conn, "arb", wins=70, losses=30)
+    weights = {"arb": 1.0}
+    new_weights = evolve_weights(conn, weights)
+    assert new_weights["arb"] > 1.0
+    assert new_weights["arb"] <= 1.5
+
+def test_evolve_weights_decreases_losing_strategy():
+    from scripts.mirofish.high_freq_trader import evolve_weights
+    conn = _make_db()
+    _insert_trades(conn, "spot_lag", wins=20, losses=80)
+    weights = {"spot_lag": 1.0}
+    new_weights = evolve_weights(conn, weights)
+    assert new_weights["spot_lag"] < 1.0
+    assert new_weights["spot_lag"] >= 0.5
+
+def test_evolve_weights_unchanged_when_insufficient_data():
+    from scripts.mirofish.high_freq_trader import evolve_weights
+    conn = _make_db()
+    _insert_trades(conn, "momentum", wins=5, losses=3)
+    weights = {"momentum": 1.0}
+    new_weights = evolve_weights(conn, weights)
+    assert new_weights["momentum"] == pytest.approx(1.0)
