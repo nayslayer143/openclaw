@@ -1858,17 +1858,32 @@ async def pty_stream(session_name: str):
 
     async def generate():
         import base64
+        loop = asyncio.get_event_loop()
+        fd = entry["fd"]
+        heartbeat = 0
         while True:
+            # Use select to wait for data instead of busy-polling
             try:
-                data = os.read(entry["fd"], 65536)
-                if data:
-                    encoded = base64.b64encode(data).decode("ascii")
-                    yield f"data: {json.dumps({'type': 'output', 'data': encoded})}\n\n"
-            except (OSError, BlockingIOError):
-                pass
-            except Exception:
+                readable, _, _ = select.select([fd], [], [], 0.1)
+            except (ValueError, OSError):
                 break
-            await asyncio.sleep(0.02)
+            if readable:
+                try:
+                    data = os.read(fd, 65536)
+                    if data:
+                        encoded = base64.b64encode(data).decode("ascii")
+                        yield f"data: {json.dumps({'type': 'output', 'data': encoded})}\n\n"
+                        heartbeat = 0
+                except (OSError, BlockingIOError):
+                    pass
+                except Exception:
+                    break
+            else:
+                heartbeat += 1
+                if heartbeat >= 150:  # ~15 seconds
+                    yield ": heartbeat\n\n"
+                    heartbeat = 0
+            await asyncio.sleep(0)
 
     return StreamingResponse(
         generate(),
