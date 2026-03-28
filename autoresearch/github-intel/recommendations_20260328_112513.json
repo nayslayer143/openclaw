@@ -160,7 +160,7 @@
       "what_to_take": "This is an HTML-based curated list of trading resources, not a codebase. No executable patterns or code to integrate.",
       "risk": "Repo is a static list (HTML) with no code, making integration impossible. Last updated date (2026-03-27) is future-dated, indicating potential obsolescence. Links to external resources may be broken or outdated.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
