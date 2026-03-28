@@ -20,7 +20,7 @@
       "what_to_take": "Integrate the core backtesting engine (Backtest class) for strategy validation and optimization, adapting historical data loading from SQLite to its OHLCV format.",
       "risk": "MIT license is safe; minor data format adaptation needed but low risk; no major maintenance concerns.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
