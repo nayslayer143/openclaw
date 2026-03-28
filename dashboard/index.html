@@ -5781,8 +5781,9 @@ function clawInitTerminal(sessionName, container) {
     cursorBlink: true,
     fontSize: 13,
     fontFamily: "'JetBrains Mono', 'Fira Code', 'Courier New', monospace",
-    theme: { background: '#0d0d1a', foreground: '#e0e0e0', cursor: '#00ff88', selection: '#2a2a4a' },
+    theme: { background: '#0d0d1a', foreground: '#e0e0e0', cursor: '#00ff88', selectionBackground: 'rgba(0,255,136,0.3)' },
     allowProposedApi: true,
+    rightClickSelectsWord: true,
   })
 
   const fitAddon = new FitAddon.FitAddon()
@@ -5826,6 +5827,59 @@ function clawInitTerminal(sessionName, container) {
       connected = false
     }
   }
+
+  // Copy on select: auto-copy selected text to clipboard
+  term.onSelectionChange(() => {
+    const sel = term.getSelection()
+    if (sel) {
+      navigator.clipboard.writeText(sel).catch(() => {})
+    }
+  })
+
+  // Ctrl+Shift+C = copy, Ctrl+Shift+V = paste
+  term.attachCustomKeyEventHandler((e) => {
+    if (e.type === 'keydown') {
+      // Ctrl+Shift+C — copy
+      if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+        const sel = term.getSelection()
+        if (sel) navigator.clipboard.writeText(sel).catch(() => {})
+        return false
+      }
+      // Ctrl+Shift+V — paste
+      if (e.ctrlKey && e.shiftKey && e.key === 'V') {
+        navigator.clipboard.readText().then(text => {
+          if (text) {
+            fetch(`/api/terminal/pty/input/${sessionName}`, {
+              method: 'POST', headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({ data: text })
+            }).catch(() => {})
+          }
+        }).catch(() => {})
+        return false
+      }
+      // Cmd+C on Mac — copy (if selection exists, otherwise send Ctrl+C)
+      if (e.metaKey && e.key === 'c') {
+        const sel = term.getSelection()
+        if (sel) {
+          navigator.clipboard.writeText(sel).catch(() => {})
+          return false
+        }
+      }
+      // Cmd+V on Mac — paste
+      if (e.metaKey && e.key === 'v') {
+        navigator.clipboard.readText().then(text => {
+          if (text) {
+            fetch(`/api/terminal/pty/input/${sessionName}`, {
+              method: 'POST', headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({ data: text })
+            }).catch(() => {})
+          }
+        }).catch(() => {})
+        return false
+      }
+    }
+    return true
+  })
 
   // Send keystrokes via POST
   let inputBuffer = ''
