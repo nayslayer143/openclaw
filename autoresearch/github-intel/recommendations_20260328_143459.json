@@ -140,7 +140,7 @@
       "what_to_take": "None - JavaScript codebase and crypto focus are incompatible with Python-based prediction market strategies.",
       "risk": "Critical language mismatch (JS vs Python), crypto domain misalignment, and high integration complexity outweigh any potential backtesting concepts.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
