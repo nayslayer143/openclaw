@@ -81,7 +81,9 @@ def get_conn() -> sqlite3.Connection:
     db_path.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(db_path))
     conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA journal_mode=WAL")
+    result = conn.execute("PRAGMA journal_mode=WAL").fetchone()
+    if result and result[0] != "wal":
+        print(f"[HFT] WARNING: WAL mode unavailable (got: {result[0]})")
     return conn
 
 
@@ -104,6 +106,7 @@ def db_startup(conn: sqlite3.Connection) -> None:
     One-time startup: wipe stale open positions, clear context noise,
     set $10k starting balance, add performance index.
     """
+    count = conn.execute("SELECT COUNT(*) FROM paper_trades WHERE status='open'").fetchone()[0]
     conn.execute("DELETE FROM paper_trades WHERE status = 'open'")
     conn.execute("DELETE FROM context WHERE key LIKE 'wallet_reset_%'")
     conn.execute(
@@ -119,4 +122,4 @@ def db_startup(conn: sqlite3.Connection) -> None:
         "ON paper_trades(status, opened_at)"
     )
     conn.commit()
-    print("[HFT] DB startup complete — clean slate, $10,000 balance")
+    print(f"[HFT] DB startup complete — wiped {count} stale open trades, $10,000 balance set")
