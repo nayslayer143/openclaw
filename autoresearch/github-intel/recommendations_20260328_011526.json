@@ -60,7 +60,7 @@
       "what_to_take": "Adapt Qlib's time-series data pipeline and backtesting framework patterns for feature engineering and model evaluation, specifically for Clawmpson's LLM strategy and RivalClaw's self-tuning engine.",
       "risk": "Domain mismatch (stock-focused vs prediction markets), high integration complexity, and potential data structure incompatibility with prediction market data sources.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -120,7 +120,7 @@
       "what_to_take": "Core mean-reversion statistical model for pairs trading, excluding IB API dependencies and adapting to our feed system for potential strategy addition.",
       "risk": "Suspicious future date (2026) in last updated, high-frequency focus misaligned with 5-min ArbClaw cycle, and IB API dependency requiring removal for integration.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "The DRL agent architecture (environment, agent, training loop) for potential adaptation to prediction market strategies, excluding Bitcoin-specific data handling and reward functions.",
       "risk": "License unknown (must verify), asset mismatch (Bitcoin vs prediction markets), high complexity for adaptation, and future-dated last update (2026) suggests possible metadata error.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "Extract the pairs-trading strategy implementation from 'pairs_trading.ipynb' for ArbClaw's arb detection, and adapt the backtesting framework examples for Clawmpson's strategy evaluation modules.",
       "risk": "Educational notebooks lack production optimizations; requires significant refactoring. License not specified in description (check repo), but MIT is likely. High maintenance risk as notebooks aren't designed for integration.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
