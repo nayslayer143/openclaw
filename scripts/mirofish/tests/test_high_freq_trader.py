@@ -225,3 +225,69 @@ def test_fetch_kalshi_markets_handles_z_suffix_timestamps():
 
     # Should be included (closes in 1 hour, well within 24h window)
     assert any(m["market_id"] == "KXBTC-ZCLOSE" for m in markets)
+
+
+def test_fetch_polymarket_markets_filters_beyond_24h():
+    """Polymarket markets closing > 24h from now are excluded."""
+    from scripts.mirofish.high_freq_trader import fetch_polymarket_markets
+
+    now = datetime.datetime.utcnow()
+    close_soon = (now + datetime.timedelta(hours=6)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    close_far  = (now + datetime.timedelta(hours=48)).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    fake_response = [
+        {
+            "conditionId": "0xabc", "question": "Will it rain?",
+            "category": "weather", "volume": "5000",
+            "endDate": close_soon, "active": True, "closed": False,
+            "outcomePrices": ["0.65", "0.35"], "outcomes": ["Yes", "No"],
+        },
+        {
+            "conditionId": "0xdef", "question": "Election winner?",
+            "category": "politics", "volume": "50000",
+            "endDate": close_far, "active": True, "closed": False,
+            "outcomePrices": ["0.55", "0.45"], "outcomes": ["Yes", "No"],
+        },
+    ]
+
+    with patch("scripts.mirofish.high_freq_trader.requests.get") as mock_get:
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = fake_response
+        mock_resp.raise_for_status = MagicMock()
+        mock_get.return_value = mock_resp
+
+        markets = fetch_polymarket_markets()
+
+    ids = [m["market_id"] for m in markets]
+    assert "0xabc" in ids
+    assert "0xdef" not in ids
+
+
+def test_fetch_polymarket_markets_normalizes_fields():
+    """Polymarket markets have correct venue and price fields."""
+    from scripts.mirofish.high_freq_trader import fetch_polymarket_markets
+
+    now = datetime.datetime.utcnow()
+    close_soon = (now + datetime.timedelta(hours=3)).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+    fake_response = [{
+        "conditionId": "0x123", "question": "BTC above $70k today?",
+        "category": "crypto", "volume": "20000",
+        "endDate": close_soon, "active": True, "closed": False,
+        "outcomePrices": ["0.72", "0.28"], "outcomes": ["Yes", "No"],
+    }]
+
+    with patch("scripts.mirofish.high_freq_trader.requests.get") as mock_get:
+        mock_resp = MagicMock()
+        mock_resp.json.return_value = fake_response
+        mock_resp.raise_for_status = MagicMock()
+        mock_get.return_value = mock_resp
+
+        markets = fetch_polymarket_markets()
+
+    assert len(markets) == 1
+    m = markets[0]
+    assert m["venue"] == "polymarket"
+    assert abs(m["yes_price"] - 0.72) < 0.001
+    assert abs(m["no_price"] - 0.28) < 0.001
+    assert m["event_ticker"] == "0x123"[:20]

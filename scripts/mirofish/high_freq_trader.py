@@ -204,3 +204,105 @@ def fetch_kalshi_markets() -> list[dict]:
                 })
 
     return markets
+
+
+# ── Polymarket market fetcher ─────────────────────────────────────────────────
+
+def fetch_polymarket_markets() -> list[dict]:
+    """
+    Fetch Polymarket markets closing within 24h via gamma API.
+    Returns list of normalized market dicts (venue="polymarket", prices 0-1).
+    """
+    now = datetime.datetime.utcnow()
+    cutoff = now + datetime.timedelta(hours=MAX_EXPIRY_HOURS)
+
+    try:
+        resp = requests.get(
+            GAMMA_API,
+            params={"active": "true", "closed": "false", "limit": 200},
+            timeout=20,
+        )
+        resp.raise_for_status()
+        raw = resp.json()
+        raw_list = raw if isinstance(raw, list) else raw.get("data", raw.get("markets", []))
+    except Exception as e:
+        print(f"[HFT] Polymarket fetch error: {e}")
+        return []
+
+    markets: list[dict] = []
+    for m in raw_list:
+        try:
+            volume = float(m.get("volume", 0) or 0)
+        except (ValueError, TypeError):
+            volume = 0.0
+        if volume < MIN_POLY_VOLUME:
+            continue
+
+        end_date_str = m.get("endDate") or m.get("end_date") or ""
+        if not end_date_str:
+            continue
+        try:
+            end_dt_str = end_date_str.replace("Z", "").replace("+00:00", "")
+            end_dt = datetime.datetime.fromisoformat(end_dt_str)
+        except (ValueError, TypeError):
+            continue
+        if end_dt <= now or end_dt > cutoff:
+            continue
+
+        yes_price = no_price = None
+        outcome_prices = m.get("outcomePrices", [])
+        outcomes = m.get("outcomes", [])
+        if isinstance(outcome_prices, str):
+            import json as _json
+            try: outcome_prices = _json.loads(outcome_prices)
+            except Exception: outcome_prices = []
+        if isinstance(outcomes, str):
+            import json as _json
+            try: outcomes = _json.loads(outcomes)
+            except Exception: outcomes = []
+        for label, price_str in zip(outcomes, outcome_prices):
+            try:
+                price = float(price_str)
+            except (ValueError, TypeError):
+                continue
+            if (label or "").lower() == "yes":
+                yes_price = price
+            elif (label or "").lower() == "no":
+                no_price = price
+
+        if yes_price is None or no_price is None:
+            for tok in (m.get("tokens") or []):
+                outcome = (tok.get("outcome") or "").upper()
+                try:
+                    price = float(tok.get("price", 0) or 0)
+                except (ValueError, TypeError):
+                    continue
+                if outcome == "YES":
+                    yes_price = price
+                elif outcome == "NO":
+                    no_price = price
+
+        if yes_price is None or no_price is None:
+            continue
+
+        market_id = m.get("conditionId") or m.get("id") or ""
+        question  = m.get("question", "")
+        if not market_id or not question:
+            continue
+
+        markets.append({
+            "market_id":    market_id,
+            "question":     question,
+            "venue":        "polymarket",
+            "yes_price":    float(yes_price),
+            "no_price":     float(no_price),
+            "yes_bid":      float(yes_price),
+            "yes_ask":      float(yes_price),
+            "event_ticker": market_id[:20],
+            "close_time":   end_date_str,
+            "category":     (m.get("category") or "").lower(),
+            "cap_strike":   None,
+            "strike_type":  "",
+        })
+
+    return markets
