@@ -526,3 +526,27 @@ def test_evolve_weights_unchanged_when_insufficient_data():
     weights = {"momentum": 1.0}
     new_weights = evolve_weights(conn, weights)
     assert new_weights["momentum"] == pytest.approx(1.0)
+
+
+def test_single_cycle_places_and_resolves(monkeypatch):
+    import scripts.mirofish.high_freq_trader as hft
+    conn = _make_db()
+    conn.execute("INSERT OR REPLACE INTO context (chat_id, key, value) VALUES ('mirofish', 'starting_balance', '10000.00')")
+    conn.commit()
+    now = datetime.datetime.utcnow()
+    close_soon = (now + datetime.timedelta(hours=1)).isoformat()
+    fake_kalshi = [{
+        "market_id": "KXBTC-SMOKE", "question": "BTC above $70k?", "venue": "kalshi",
+        "yes_price": 0.45, "no_price": 0.58,
+        "yes_bid": 0.43, "yes_ask": 0.47,
+        "event_ticker": "KXBTC-EVT", "close_time": close_soon,
+        "category": "crypto", "cap_strike": 70000.0, "strike_type": "greater",
+    }]
+    monkeypatch.setattr(hft, "fetch_kalshi_markets", lambda: fake_kalshi)
+    monkeypatch.setattr(hft, "fetch_polymarket_markets", lambda: [])
+    monkeypatch.setattr(hft, "_fetch_result", lambda venue, mid: None)
+    weights = {s: 1.0 for s in hft._ALL_STRATEGIES}
+    placed, resolved = hft._run_cycle(conn, weights, poly_cache=[], cycle_num=1)
+    assert placed >= 1
+    assert resolved == 0
+    assert conn.execute("SELECT COUNT(*) FROM paper_trades WHERE status='open'").fetchone()[0] >= 1

@@ -628,3 +628,159 @@ def evolve_weights(conn: sqlite3.Connection, weights: dict) -> dict:
         else:
             new_weights[strategy] = current
     return new_weights
+
+
+# ── Connectivity checks ───────────────────────────────────────────────────────
+
+def _verify_connectivity() -> bool:
+    ok = True
+    data = _call_kalshi("GET", "/exchange/status")
+    if data:
+        print("[HFT] Kalshi prod API: connected")
+    else:
+        print("[HFT] WARNING: Kalshi API unreachable — Kalshi trades will be skipped")
+        ok = False
+    try:
+        resp = requests.get(GAMMA_API, params={"limit": 1}, timeout=10)
+        resp.raise_for_status()
+        print("[HFT] Polymarket gamma API: connected")
+    except Exception as e:
+        print(f"[HFT] WARNING: Polymarket API unreachable: {e}")
+        ok = False
+    return ok
+
+
+def _notify_dashboard():
+    try:
+        requests.post("http://127.0.0.1:7080/api/trading/notify", timeout=2)
+    except Exception:
+        pass
+
+
+# ── Cycle ─────────────────────────────────────────────────────────────────────
+
+def _run_cycle(conn: sqlite3.Connection, weights: dict, poly_cache: list, cycle_num: int) -> tuple:
+    """One full trading cycle. Returns (trades_placed, trades_resolved)."""
+    balance  = get_balance(conn)
+    open_ids = get_open_ids(conn)
+    spot_prices = load_spot_prices(conn)
+    events_traded: set = set()
+
+    kalshi_markets = fetch_kalshi_markets()
+
+    if cycle_num % POLY_REFRESH_CYCLES == 1 or not poly_cache:
+        fresh = fetch_polymarket_markets()
+        poly_cache.clear()
+        poly_cache.extend(fresh)
+
+    all_markets = kalshi_markets + poly_cache
+    placed = 0
+    kalshi_placed = 0
+
+    for market in all_markets:
+        if market["venue"] == "kalshi" and kalshi_placed >= MAX_KALSHI_PER_CYCLE:
+            continue
+        sig = score_market(market, spot_prices, open_ids, events_traded, weights, balance)
+        if sig is None:
+            continue
+        trade_id = place_trade(conn, sig, balance)
+        if trade_id is not None:
+            placed += 1
+            open_ids.add(sig.market_id)
+            events_traded.add(market["event_ticker"])
+            if market["venue"] == "kalshi":
+                kalshi_placed += 1
+
+    resolved = resolve_expired(conn)
+    return placed, resolved
+
+
+# ── Main daemon ───────────────────────────────────────────────────────────────
+
+_running = True
+
+
+def _handle_signal(signum, frame):
+    global _running
+    print(f"\n[HFT] Signal {signum} — shutting down after this cycle...")
+    _running = False
+
+
+def run():
+    """Main entry point. Daemon loop until SIGINT/SIGTERM."""
+    global _running
+    _running = True
+    _load_env()
+
+    print("=" * 60)
+    print("[HFT] High-Frequency Paper Trader starting up")
+    print(f"[HFT] Cycle: {CYCLE_SLEEP}s | Target: 100+ bets/hour")
+    print("=" * 60)
+
+    signal.signal(signal.SIGINT,  _handle_signal)
+    signal.signal(signal.SIGTERM, _handle_signal)
+
+    conn = get_conn()
+    db_startup(conn)
+    _verify_connectivity()
+
+    weights: dict = {s: 1.0 for s in _ALL_STRATEGIES}
+    poly_cache: list = []
+    session_placed   = 0
+    session_resolved = 0
+    session_start    = datetime.datetime.utcnow()
+    cycle_num        = 0
+
+    print(f"\n[HFT] Clean slate. Balance: $10,000.00. Starting loop...\n")
+
+    while _running:
+        cycle_num += 1
+        cycle_start = time.time()
+        try:
+            placed, resolved = _run_cycle(conn, weights, poly_cache, cycle_num)
+            weights = evolve_weights(conn, weights)
+            session_placed   += placed
+            session_resolved += resolved
+            balance  = get_balance(conn)
+            elapsed_min = (datetime.datetime.utcnow() - session_start).total_seconds() / 60
+            rate = session_placed / elapsed_min if elapsed_min > 0 else 0
+            open_count = conn.execute(
+                "SELECT COUNT(*) FROM paper_trades WHERE status='open'"
+            ).fetchone()[0]
+            pnl = balance - 10000.0
+            print(
+                f"[HFT cycle {cycle_num:4d}] placed={placed:2d} resolved={resolved:2d} "
+                f"open={open_count:3d} balance=${balance:,.2f} "
+                f"({'+'if pnl>=0 else ''}{pnl:,.2f}) rate={rate:.1f}/min"
+            )
+            weight_str = " | ".join(
+                f"{s}:{w:.2f}" for s, w in sorted(weights.items()) if w != 1.0
+            )
+            if weight_str:
+                print(f"[HFT]       weights: {weight_str}")
+            if placed > 0 or resolved > 0:
+                _notify_dashboard()
+        except Exception as e:
+            print(f"[HFT] Cycle {cycle_num} error: {e}")
+            import traceback; traceback.print_exc()
+        elapsed = time.time() - cycle_start
+        sleep_time = max(0, CYCLE_SLEEP - elapsed)
+        if _running and sleep_time > 0:
+            time.sleep(sleep_time)
+
+    elapsed_total = (datetime.datetime.utcnow() - session_start).total_seconds()
+    final_balance = get_balance(conn)
+    final_pnl     = final_balance - 10000.0
+    print("\n" + "=" * 60)
+    print("[HFT] Session complete")
+    print(f"  Runtime:   {elapsed_total/60:.1f} min ({cycle_num} cycles)")
+    print(f"  Placed:    {session_placed} trades ({session_placed/(elapsed_total/3600):.0f}/hr)")
+    print(f"  Resolved:  {session_resolved} trades")
+    print(f"  Final P&L: {'+'if final_pnl>=0 else ''}{final_pnl:,.2f} ({final_pnl/10000*100:.2f}%)")
+    print(f"  Balance:   ${final_balance:,.2f}")
+    print("=" * 60)
+    conn.close()
+
+
+if __name__ == "__main__":
+    run()
