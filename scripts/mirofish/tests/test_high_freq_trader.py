@@ -291,3 +291,94 @@ def test_fetch_polymarket_markets_normalizes_fields():
     assert abs(m["yes_price"] - 0.72) < 0.001
     assert abs(m["no_price"] - 0.28) < 0.001
     assert m["event_ticker"] == "0x123"[:20]
+
+
+def _make_kalshi_market(yes_price=0.45, no_price=0.57, strike=70000.0, strike_type="greater",
+                        ticker="KXBTC-T", event="KXBTC-E"):
+    return {
+        "market_id": ticker, "question": "BTC above $70k?", "venue": "kalshi",
+        "yes_price": yes_price, "no_price": no_price,
+        "yes_bid": yes_price - 0.02, "yes_ask": yes_price + 0.02,
+        "event_ticker": event, "close_time": "2099-01-01T00:00:00",
+        "category": "crypto", "cap_strike": strike, "strike_type": strike_type,
+    }
+
+
+def _make_poly_market(yes_price=0.65, no_price=0.35, mid="0xABC", question="Will it rain?"):
+    return {
+        "market_id": mid, "question": question, "venue": "polymarket",
+        "yes_price": yes_price, "no_price": no_price,
+        "yes_bid": yes_price, "yes_ask": yes_price,
+        "event_ticker": mid[:20], "close_time": "2099-01-01T00:00:00",
+        "category": "weather", "cap_strike": None, "strike_type": "",
+    }
+
+
+def test_score_market_arb_kalshi_detects_gap():
+    """arb strategy fires when yes+no > 1 + MIN_EDGE_KALSHI_ARB on Kalshi."""
+    from scripts.mirofish.high_freq_trader import score_market
+    # yes=0.45, no=0.57 → sum=1.02, gap=0.02 >= MIN_EDGE_KALSHI_ARB=0.02
+    m = _make_kalshi_market(yes_price=0.45, no_price=0.57)
+    sig = score_market(m, spot_prices={}, open_ids=set(), events_traded=set(), weights={})
+    assert sig is not None
+    assert sig.strategy == "arb"
+    assert sig.venue == "kalshi"
+
+
+def test_score_market_arb_polymarket_lower_threshold():
+    """arb strategy fires at lower edge threshold on Polymarket (MIN_EDGE_POLY=0.003)."""
+    from scripts.mirofish.high_freq_trader import score_market
+    # yes=0.48, no=0.53 → gap=0.01, above MIN_EDGE_POLY=0.003
+    m = _make_poly_market(yes_price=0.48, no_price=0.53)
+    sig = score_market(m, spot_prices={}, open_ids=set(), events_traded=set(), weights={})
+    assert sig is not None
+    assert sig.strategy == "arb"
+    assert sig.venue == "polymarket"
+
+
+def test_score_market_skips_already_open():
+    """Returns None if market_id is already in open_ids."""
+    from scripts.mirofish.high_freq_trader import score_market
+    m = _make_kalshi_market(yes_price=0.45, no_price=0.57)
+    sig = score_market(m, spot_prices={}, open_ids={"KXBTC-T"}, events_traded=set(), weights={})
+    assert sig is None
+
+
+def test_score_market_skips_duplicate_event():
+    """Returns None if event_ticker already traded this cycle."""
+    from scripts.mirofish.high_freq_trader import score_market
+    m = _make_kalshi_market(yes_price=0.45, no_price=0.57)
+    sig = score_market(m, spot_prices={}, open_ids=set(), events_traded={"KXBTC-E"}, weights={})
+    assert sig is None
+
+
+def test_score_market_spot_lag_yes_when_spot_above_strike():
+    """spot_lag fires YES when spot clearly above strike (>MIN_EDGE_KALSHI_SPOT away)."""
+    from scripts.mirofish.high_freq_trader import score_market
+    # BTC spot=75000, strike=70000 → dist=0.0714 > 0.025 → YES
+    m = _make_kalshi_market(yes_price=0.45, no_price=0.53, strike=70000.0, strike_type="greater")
+    sig = score_market(
+        m, spot_prices={"BTC": 75000.0},
+        open_ids=set(), events_traded=set(), weights={}
+    )
+    assert sig is not None
+    assert sig.direction == "YES"
+    assert sig.strategy == "spot_lag"
+
+
+def test_score_market_mean_reversion_poly():
+    """mean_reversion fires on Polymarket when YES >= 0.85 (fade it, bet NO)."""
+    from scripts.mirofish.high_freq_trader import score_market
+    m = _make_poly_market(yes_price=0.92, no_price=0.08)
+    sig = score_market(m, spot_prices={}, open_ids=set(), events_traded=set(), weights={})
+    assert sig is not None
+    assert sig.direction == "NO"
+    assert sig.strategy == "mean_reversion"
+
+
+def test_score_market_no_edge_returns_none():
+    """Returns None when no strategy finds sufficient edge."""
+    from scripts.mirofish.high_freq_trader import score_market
+    m = _make_poly_market(yes_price=0.50, no_price=0.50)
+    sig = score_market(m, spot_prices={}, open_ids=set(), events_traded=set(), weights={})
+    assert sig is None

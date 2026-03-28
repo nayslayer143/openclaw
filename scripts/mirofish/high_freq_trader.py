@@ -306,3 +306,178 @@ def fetch_polymarket_markets() -> list[dict]:
         })
 
     return markets
+
+
+# ── Strategy scoring ──────────────────────────────────────────────────────────
+
+_CRYPTO_TICKERS = {
+    "BTC": ["KXBTC", "KXBTCUSD"],
+    "ETH": ["KXETH", "KXETHUSD"],
+    "SOL": ["KXSOL"],
+    "DOGE": ["KXDOGE"],
+    "ADA": ["KXADA"],
+    "BNB": ["KXBNB"],
+    "BCH": ["KXBCH"],
+}
+
+
+def _size_trade(balance: float, venue: str, weight: float) -> float:
+    """Return position size in USD, Kelly-scaled by strategy weight."""
+    base_pct = BASE_POS_POLY if venue == "polymarket" else BASE_POS_KALSHI
+    sized = balance * base_pct * max(0.5, min(1.5, weight))
+    return min(sized, balance * MAX_POS_PCT)
+
+
+def _calc_fee(venue: str, shares: float, entry_price: float, amount_usd: float) -> float:
+    if venue == "kalshi":
+        return KALSHI_FEE_FACTOR * shares * entry_price * (1.0 - entry_price)
+    return POLY_FEE_RATE * amount_usd
+
+
+def _apply_slippage(price: float, direction: str) -> float:
+    """Slip entry price against us by SLIPPAGE_BASE."""
+    if direction == "YES":
+        return min(price * (1.0 + SLIPPAGE_BASE), 0.99)
+    return max(price * (1.0 - SLIPPAGE_BASE), 0.01)
+
+
+def score_market(
+    market: dict,
+    spot_prices: dict,
+    open_ids: set,
+    events_traded: set,
+    weights: dict,
+    balance: float = 10000.0,
+) -> object:
+    """
+    Score a market across 4 strategies. Returns TradeSignal or None.
+    Priority: arb > spot_lag > momentum > mean_reversion.
+    """
+    mid   = market["market_id"]
+    venue = market["venue"]
+    yes_p = market["yes_price"]
+    no_p  = market["no_price"]
+    event = market["event_ticker"]
+
+    if mid in open_ids or event in events_traded:
+        return None
+    if yes_p < MIN_ENTRY_PRICE and no_p < MIN_ENTRY_PRICE:
+        return None
+    if venue == "kalshi":
+        yb, ya = market["yes_bid"], market["yes_ask"]
+        if ya > 0 and yb > 0:
+            spread = (ya - yb) / ((ya + yb) / 2)
+            if spread > MAX_SPREAD_PCT:
+                return None
+
+    # ── Strategy 1: Arbitrage ─────────────────────────────────────────────────
+    min_arb = MIN_EDGE_KALSHI_ARB if venue == "kalshi" else MIN_EDGE_POLY
+    arb_gap = (yes_p + no_p) - 1.0
+    if arb_gap > min_arb:
+        direction = "NO" if no_p < (1.0 - yes_p) else "YES"
+        entry_raw = no_p if direction == "NO" else yes_p
+        entry  = _apply_slippage(entry_raw, direction)
+        fill   = random.uniform(FILL_MIN, 1.0)
+        amount = _size_trade(balance, venue, weights.get("arb", 1.0)) * fill
+        shares = amount / entry if entry > 0 else 0
+        fee    = _calc_fee(venue, shares, entry, amount)
+        return TradeSignal(mid, market["question"], venue, direction,
+                           arb_gap - min_arb, "arb", entry, amount, shares, fee)
+
+    # ── Strategy 2: Spot-lag (Kalshi crypto brackets only) ───────────────────
+    if venue == "kalshi" and market.get("cap_strike") and market.get("strike_type"):
+        for asset, prefixes in _CRYPTO_TICKERS.items():
+            if not any(mid.upper().startswith(p) for p in prefixes):
+                continue
+            spot = spot_prices.get(asset)
+            if not spot or spot <= 0:
+                break
+            strike = float(market["cap_strike"])
+            if strike <= 0:
+                break
+            dist = abs(spot - strike) / spot
+            if dist < MIN_EDGE_KALSHI_SPOT:
+                break
+            stype = (market["strike_type"] or "").lower()
+            if stype in ("greater", "above", "over", "t"):
+                direction = "YES" if spot > strike else "NO"
+            elif stype in ("lesser", "below", "under"):
+                direction = "YES" if spot < strike else "NO"
+            else:
+                break
+            entry_raw = yes_p if direction == "YES" else no_p
+            if entry_raw < MIN_ENTRY_PRICE or entry_raw > 0.95:
+                break
+            entry  = _apply_slippage(entry_raw, direction)
+            fill   = random.uniform(FILL_MIN, 1.0)
+            amount = _size_trade(balance, venue, weights.get("spot_lag", 1.0)) * fill
+            shares = amount / entry if entry > 0 else 0
+            fee    = _calc_fee(venue, shares, entry, amount)
+            return TradeSignal(mid, market["question"], venue, direction,
+                               dist, "spot_lag", entry, amount, shares, fee)
+
+    # ── Strategy 3: Momentum (Polymarket crypto) ─────────────────────────────
+    if venue == "polymarket" and spot_prices:
+        import re as _re
+        for asset, prefixes in _CRYPTO_TICKERS.items():
+            q_lower = market["question"].lower()
+            if asset.lower() not in q_lower and not any(p.lower() in q_lower for p in prefixes):
+                continue
+            spot = spot_prices.get(asset)
+            if not spot:
+                continue
+            thresh_match = _re.search(r"\$?([\d,]+(?:\.\d+)?)", market["question"])
+            if not thresh_match:
+                break
+            try:
+                threshold = float(thresh_match.group(1).replace(",", ""))
+            except ValueError:
+                break
+            if threshold <= 0:
+                break
+            dist = abs(spot - threshold) / spot
+            if dist < MIN_EDGE_POLY:
+                break
+            q = q_lower
+            if "above" in q or "over" in q or "higher" in q:
+                direction = "YES" if spot > threshold else "NO"
+            elif "below" in q or "under" in q or "lower" in q:
+                direction = "YES" if spot < threshold else "NO"
+            else:
+                break
+            entry_raw = yes_p if direction == "YES" else no_p
+            if entry_raw < MIN_ENTRY_PRICE or entry_raw > 0.95:
+                break
+            entry  = _apply_slippage(entry_raw, direction)
+            fill   = random.uniform(FILL_MIN, 1.0)
+            amount = _size_trade(balance, venue, weights.get("momentum", 1.0)) * fill
+            shares = amount / entry if entry > 0 else 0
+            fee    = _calc_fee(venue, shares, entry, amount)
+            return TradeSignal(mid, market["question"], venue, direction,
+                               dist, "momentum", entry, amount, shares, fee)
+
+    # ── Strategy 4: Mean-reversion (Polymarket overpriced contracts) ─────────
+    if venue == "polymarket":
+        threshold = 0.35
+        if yes_p > (1.0 - threshold):
+            edge = yes_p - (1.0 - threshold)
+            if edge >= MIN_EDGE_POLY:
+                entry  = _apply_slippage(no_p, "NO")
+                fill   = random.uniform(FILL_MIN, 1.0)
+                amount = _size_trade(balance, venue, weights.get("mean_reversion", 1.0)) * fill
+                shares = amount / entry if entry > 0 else 0
+                fee    = _calc_fee(venue, shares, entry, amount)
+                return TradeSignal(mid, market["question"], venue, "NO",
+                                   edge, "mean_reversion", entry, amount, shares, fee)
+        elif no_p > (1.0 - threshold):
+            edge = no_p - (1.0 - threshold)
+            if edge >= MIN_EDGE_POLY:
+                entry  = _apply_slippage(yes_p, "YES")
+                fill   = random.uniform(FILL_MIN, 1.0)
+                amount = _size_trade(balance, venue, weights.get("mean_reversion", 1.0)) * fill
+                shares = amount / entry if entry > 0 else 0
+                fee    = _calc_fee(venue, shares, entry, amount)
+                return TradeSignal(mid, market["question"], venue, "YES",
+                                   edge, "mean_reversion", entry, amount, shares, fee)
+
+    return None
