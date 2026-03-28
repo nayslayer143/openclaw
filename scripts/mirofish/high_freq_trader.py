@@ -458,7 +458,7 @@ def score_market(
 
     # ── Strategy 4: Mean-reversion (Polymarket overpriced contracts) ─────────
     if venue == "polymarket":
-        threshold = 0.35
+        threshold = 0.15  # fires when yes_p > 0.85 or no_p > 0.85
         if yes_p > (1.0 - threshold):
             edge = yes_p - (1.0 - threshold)
             if edge >= MIN_EDGE_POLY:
