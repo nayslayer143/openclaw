@@ -5802,6 +5802,20 @@ function clawTokenColor(v) {
 }
 
 // Initialize xterm.js for a session
+function _uploadImageToTerminal(file, sessionName) {
+  if (!file) return
+  const ext = (file.name?.split('.').pop() || file.type?.split('/')[1] || 'png').toLowerCase()
+  const reader = new FileReader()
+  reader.onload = () => {
+    const b64 = reader.result.split(',')[1]
+    fetch(`/api/terminal/pty/paste-image/${sessionName}`, {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ data: b64, ext })
+    }).catch(() => {})
+  }
+  reader.readAsDataURL(file)
+}
+
 function clawInitTerminal(sessionName, container) {
   if (clawState.terminals[sessionName]) return
 
@@ -5937,26 +5951,78 @@ function clawInitTerminal(sessionName, container) {
   })
 
   // Image paste: intercept paste event for image data
-  termDiv.addEventListener('paste', (e) => {
+  container.addEventListener('paste', (e) => {
     const items = e.clipboardData?.items
     if (!items) return
     for (const item of items) {
       if (item.type.startsWith('image/')) {
         e.preventDefault()
         e.stopPropagation()
-        const ext = item.type.split('/')[1] || 'png'
-        const blob = item.getAsFile()
-        if (!blob) return
-        const reader = new FileReader()
-        reader.onload = () => {
-          const b64 = reader.result.split(',')[1]
-          fetch(`/api/terminal/pty/paste-image/${sessionName}`, {
-            method: 'POST', headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ data: b64, ext })
-          }).catch(() => {})
-        }
-        reader.readAsDataURL(blob)
+        _uploadImageToTerminal(item.getAsFile(), sessionName)
         return
+      }
+    }
+  })
+
+  // Image drag-and-drop — use capturing phase (3rd arg = true) so we
+  // intercept before xterm's canvas swallows the events.
+  // Also create an overlay so the drop target covers the whole terminal.
+  const dropOverlay = document.createElement('div')
+  dropOverlay.style.cssText = 'position:absolute;inset:0;z-index:100;display:none;pointer-events:all;border:2px solid #00ff88;border-radius:4px;background:rgba(0,255,136,0.05);'
+  container.style.position = 'relative'
+  container.appendChild(dropOverlay)
+
+  let dragCounter = 0
+  container.addEventListener('dragenter', (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    dragCounter++
+    if (e.dataTransfer?.types?.includes('Files')) {
+      dropOverlay.style.display = 'block'
+    }
+  }, true)
+  container.addEventListener('dragover', (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    e.dataTransfer.dropEffect = 'copy'
+  }, true)
+  container.addEventListener('dragleave', (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    dragCounter--
+    if (dragCounter <= 0) {
+      dragCounter = 0
+      dropOverlay.style.display = 'none'
+    }
+  }, true)
+  container.addEventListener('drop', (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    dragCounter = 0
+    dropOverlay.style.display = 'none'
+    const files = e.dataTransfer?.files
+    if (!files) return
+    for (const file of files) {
+      if (file.type.startsWith('image/')) {
+        _uploadImageToTerminal(file, sessionName)
+      }
+    }
+  }, true)
+  // Also catch drops on the overlay itself
+  dropOverlay.addEventListener('dragover', (e) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'copy'
+  })
+  dropOverlay.addEventListener('drop', (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+    dragCounter = 0
+    dropOverlay.style.display = 'none'
+    const files = e.dataTransfer?.files
+    if (!files) return
+    for (const file of files) {
+      if (file.type.startsWith('image/')) {
+        _uploadImageToTerminal(file, sessionName)
       }
     }
   })
