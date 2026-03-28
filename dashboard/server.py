@@ -1911,6 +1911,22 @@ async def pty_input(session_name: str, body: dict = Body(...)):
     return {"ok": True}
 
 
+@app.post("/api/terminal/pty/paste-image/{session_name}")
+async def pty_paste_image(session_name: str, body: dict = Body(...)):
+    """Save a pasted image to /tmp, write the path into the PTY."""
+    b64 = body.get("data", "")
+    ext = body.get("ext", "png")
+    if not b64:
+        raise HTTPException(400, "No image data")
+    fname = f"paste-{uuid.uuid4().hex[:8]}.{ext}"
+    fpath = f"/tmp/{fname}"
+    with open(fpath, "wb") as f:
+        f.write(base64.b64decode(b64))
+    entry = _ensure_pty(session_name)
+    os.write(entry["fd"], fpath.encode())
+    return {"ok": True, "path": fpath}
+
+
 @app.post("/api/terminal/pty/resize/{session_name}")
 async def pty_resize(session_name: str, body: dict = Body(...)):
     """Resize a PTY session."""

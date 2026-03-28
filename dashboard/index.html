@@ -5936,6 +5936,31 @@ function clawInitTerminal(sessionName, container) {
     return true
   })
 
+  // Image paste: intercept paste event for image data
+  termDiv.addEventListener('paste', (e) => {
+    const items = e.clipboardData?.items
+    if (!items) return
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        e.preventDefault()
+        e.stopPropagation()
+        const ext = item.type.split('/')[1] || 'png'
+        const blob = item.getAsFile()
+        if (!blob) return
+        const reader = new FileReader()
+        reader.onload = () => {
+          const b64 = reader.result.split(',')[1]
+          fetch(`/api/terminal/pty/paste-image/${sessionName}`, {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ data: b64, ext })
+          }).catch(() => {})
+        }
+        reader.readAsDataURL(blob)
+        return
+      }
+    }
+  })
+
   // Send keystrokes via POST
   let inputBuffer = ''
   let inputTimer = null

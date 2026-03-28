@@ -485,8 +485,12 @@ def score_market(
 
 # ── Trade placement ───────────────────────────────────────────────────────────
 
+_HFT_STRATEGIES = frozenset({"arb", "spot_lag", "momentum", "mean_reversion"})
+
 def get_open_ids(conn: sqlite3.Connection) -> set:
-    rows = conn.execute("SELECT market_id FROM paper_trades WHERE status='open'").fetchall()
+    rows = conn.execute(
+        "SELECT market_id FROM paper_trades WHERE status='open' AND strategy IN ('arb','spot_lag','momentum','mean_reversion')"
+    ).fetchall()
     return {r["market_id"] for r in rows}
 
 
@@ -564,8 +568,9 @@ def _fetch_result(venue: str, market_id: str) -> object:
 def resolve_expired(conn: sqlite3.Connection) -> int:
     """Check open trades against venue APIs. Closes resolved ones. Returns count."""
     open_trades = conn.execute(
-        "SELECT id, market_id, direction, entry_price, shares, venue "
-        "FROM paper_trades WHERE status='open' ORDER BY opened_at ASC LIMIT 50"
+        "SELECT rowid, market_id, direction, entry_price, shares, venue "
+        "FROM paper_trades WHERE status='open' AND strategy IN ('arb','spot_lag','momentum','mean_reversion') "
+        "ORDER BY opened_at ASC LIMIT 50"
     ).fetchall()
 
     resolved = 0
@@ -582,8 +587,8 @@ def resolve_expired(conn: sqlite3.Connection) -> int:
         conn.execute("""
             UPDATE paper_trades
             SET exit_price=?, pnl=?, status=?, closed_at=?, resolved_price=?
-            WHERE id=?
-        """, (exit_price, pnl, status, now, exit_price, t["id"]))
+            WHERE rowid=?
+        """, (exit_price, pnl, status, now, exit_price, t["rowid"]))
         sign = "+" if pnl >= 0 else ""
         print(f"[HFT] Resolved {t['market_id'][:35]} → {status} {sign}${pnl:.2f}")
         resolved += 1
