@@ -531,3 +531,62 @@ def place_trade(conn: sqlite3.Connection, sig, balance: float) -> object:
     except Exception as e:
         print(f"[HFT] place_trade error: {e}")
         return None
+
+
+# ── Resolution loop ───────────────────────────────────────────────────────────
+
+def _fetch_result(venue: str, market_id: str) -> object:
+    """Fetch resolution result. Returns 'yes', 'no', or None if still open."""
+    if venue == "kalshi":
+        data = _call_kalshi("GET", f"/markets/{market_id}")
+        if not data:
+            return None
+        m = data.get("market", data)
+        result = (m.get("result") or "").lower().strip()
+        return result if result in ("yes", "no") else None
+    # Polymarket
+    try:
+        resp = requests.get(GAMMA_API, params={"id": market_id, "closed": "true"}, timeout=15)
+        resp.raise_for_status()
+        raw = resp.json()
+        markets = raw if isinstance(raw, list) else raw.get("markets", [raw])
+        for m in markets:
+            if not m.get("closed"):
+                return None
+            winner = (m.get("winningOutcome") or m.get("winning_side") or "").lower()
+            if winner in ("yes", "no"):
+                return winner
+    except Exception:
+        pass
+    return None
+
+
+def resolve_expired(conn: sqlite3.Connection) -> int:
+    """Check open trades against venue APIs. Closes resolved ones. Returns count."""
+    open_trades = conn.execute(
+        "SELECT id, market_id, direction, entry_price, shares, venue "
+        "FROM paper_trades WHERE status='open' ORDER BY opened_at ASC LIMIT 50"
+    ).fetchall()
+
+    resolved = 0
+    for t in open_trades:
+        result = _fetch_result(t["venue"], t["market_id"])
+        if result is None:
+            continue
+        we_bet = t["direction"].lower()
+        we_won = (result == "yes" and we_bet == "yes") or (result == "no" and we_bet == "no")
+        exit_price = 1.0 if we_won else 0.0
+        pnl = t["shares"] * (exit_price - t["entry_price"])
+        status = "closed_win" if we_won else "closed_loss"
+        now = datetime.datetime.utcnow().isoformat()
+        conn.execute("""
+            UPDATE paper_trades
+            SET exit_price=?, pnl=?, status=?, closed_at=?, resolved_price=?
+            WHERE id=?
+        """, (exit_price, pnl, status, now, exit_price, t["id"]))
+        sign = "+" if pnl >= 0 else ""
+        print(f"[HFT] Resolved {t['market_id'][:35]} → {status} {sign}${pnl:.2f}")
+        resolved += 1
+    if resolved:
+        conn.commit()
+    return resolved

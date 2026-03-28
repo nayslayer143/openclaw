@@ -433,3 +433,52 @@ def test_get_open_ids_returns_set():
     ids = get_open_ids(conn)
     assert "KX-OPEN" in ids
     assert "KX-CLOSED" not in ids
+
+
+def test_resolve_expired_kalshi_win():
+    from scripts.mirofish.high_freq_trader import resolve_expired
+    conn = _make_db()
+    conn.execute(
+        "INSERT INTO paper_trades (market_id, question, direction, shares, entry_price, "
+        "amount_usd, status, confidence, reasoning, strategy, opened_at, venue) "
+        "VALUES ('KXBTC-TEST', 'q', 'YES', 100.0, 0.45, 45.0, 'open', 0.8, '', 'arb', '2026-03-27T00:00:00', 'kalshi')"
+    )
+    conn.commit()
+    with patch("scripts.mirofish.high_freq_trader._call_kalshi",
+               return_value={"market": {"result": "yes", "status": "finalized"}}):
+        resolved = resolve_expired(conn)
+    assert resolved == 1
+    row = conn.execute("SELECT status, pnl, exit_price FROM paper_trades WHERE market_id='KXBTC-TEST'").fetchone()
+    assert row["status"] == "closed_win"
+    assert abs(row["exit_price"] - 1.0) < 0.001
+    assert row["pnl"] > 0
+
+def test_resolve_expired_kalshi_loss():
+    from scripts.mirofish.high_freq_trader import resolve_expired
+    conn = _make_db()
+    conn.execute(
+        "INSERT INTO paper_trades (market_id, question, direction, shares, entry_price, "
+        "amount_usd, status, confidence, reasoning, strategy, opened_at, venue) "
+        "VALUES ('KXBTC-LOSS', 'q', 'NO', 50.0, 0.53, 26.5, 'open', 0.6, '', 'arb', '2026-03-27T00:00:00', 'kalshi')"
+    )
+    conn.commit()
+    with patch("scripts.mirofish.high_freq_trader._call_kalshi",
+               return_value={"market": {"result": "yes", "status": "finalized"}}):
+        resolve_expired(conn)
+    row = conn.execute("SELECT status, pnl FROM paper_trades WHERE market_id='KXBTC-LOSS'").fetchone()
+    assert row["status"] == "closed_loss"
+    assert row["pnl"] < 0
+
+def test_resolve_expired_skips_no_result():
+    from scripts.mirofish.high_freq_trader import resolve_expired
+    conn = _make_db()
+    conn.execute(
+        "INSERT INTO paper_trades (market_id, question, direction, shares, entry_price, "
+        "amount_usd, status, confidence, reasoning, strategy, opened_at, venue) "
+        "VALUES ('KXBTC-PEND', 'q', 'YES', 10.0, 0.50, 5.0, 'open', 0.5, '', 'arb', '2026-03-27T00:00:00', 'kalshi')"
+    )
+    conn.commit()
+    with patch("scripts.mirofish.high_freq_trader._call_kalshi",
+               return_value={"market": {"result": "", "status": "open"}}):
+        resolved = resolve_expired(conn)
+    assert resolved == 0
