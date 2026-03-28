@@ -4,11 +4,12 @@ OpenClaw Dashboard — FastAPI backend
 Real-time task monitor with GitHub OAuth
 """
 import os, json, asyncio, secrets, time, hashlib, subprocess, re, uuid, base64, signal, sys
+import pty, fcntl, termios, struct, select
 from pathlib import Path
 from typing import AsyncGenerator, Optional
 from datetime import datetime, timedelta
 
-from fastapi import FastAPI, Request, Response, HTTPException, Depends, UploadFile, File, Form
+from fastapi import FastAPI, Request, Response, HTTPException, Depends, UploadFile, File, Form, WebSocket, Body
 from fastapi.responses import HTMLResponse, StreamingResponse, RedirectResponse, JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -1816,6 +1817,149 @@ async def terminal_packet_preview(user: str = Depends(get_current_user)):
             except Exception: pass
     if not event: return {"packet": None, "note": "No events available"}
     return {"packet": _build_packet(event)}
+
+
+# ── Claw Terminal Grid (WebSocket PTY + session management) ──────────────────
+
+@app.websocket("/api/terminal/ws/{session_name}")
+async def terminal_ws(websocket: WebSocket, session_name: str):
+    await websocket.accept()
+
+    pid, fd = pty.fork()
+    if pid == 0:
+        # Child: attach to tmux session
+        os.execvp("tmux", ["tmux", "attach-session", "-t", session_name])
+        os._exit(1)
+
+    # Parent: relay between WebSocket and PTY
+    os.set_blocking(fd, False)
+
+    async def read_pty():
+        """Read from PTY and send to WebSocket."""
+        try:
+            while True:
+                await asyncio.sleep(0.01)  # 10ms poll
+                try:
+                    data = os.read(fd, 65536)
+                    if data:
+                        await websocket.send_bytes(data)
+                except (OSError, BlockingIOError):
+                    pass
+        except Exception:
+            pass
+
+    reader_task = asyncio.create_task(read_pty())
+
+    try:
+        while True:
+            msg = await websocket.receive()
+            if msg["type"] == "websocket.disconnect":
+                break
+            if "text" in msg:
+                text = msg["text"]
+                # Handle resize messages
+                if text.startswith("__RESIZE__:"):
+                    parts = text.split(":")
+                    if len(parts) == 3:
+                        cols, rows = int(parts[1]), int(parts[2])
+                        winsize = struct.pack("HHHH", rows, cols, 0, 0)
+                        fcntl.ioctl(fd, termios.TIOCSWINSZ, winsize)
+                        os.kill(pid, signal.SIGWINCH)
+                    continue
+                os.write(fd, text.encode())
+            elif "bytes" in msg:
+                os.write(fd, msg["bytes"])
+    except Exception:
+        pass
+    finally:
+        reader_task.cancel()
+        try:
+            os.kill(pid, signal.SIGTERM)
+            os.close(fd)
+        except Exception:
+            pass
+
+
+@app.get("/api/terminal/claw-status")
+async def claw_status():
+    state_file = Path.home() / ".openclaw" / "claw-sessions.json"
+    health_file = Path.home() / ".openclaw" / "claw-health-log.jsonl"
+
+    DISPLAY_NAMES = {
+        "claw-clawmpson": "CLAWMPSON", "clawmpson": "CLAWMPSON",
+        "claw-rival": "RIVALCLAW", "rival": "RIVALCLAW",
+        "claw-quant": "QUANTCLAW", "quant": "QUANTCLAW",
+        "claw-monkey": "CODEMONKEY", "monkey": "CODEMONKEY",
+    }
+
+    sessions = {}
+    if state_file.exists():
+        data = json.loads(state_file.read_text())
+        for key, val in data.items():
+            session_name = val.get("session", key)
+            display = DISPLAY_NAMES.get(session_name, DISPLAY_NAMES.get(key, key.upper()))
+            sessions[session_name] = {
+                **val,
+                "displayName": display,
+                "isScratch": "scratch" in key,
+            }
+
+    events = []
+    if health_file.exists():
+        cutoff = (datetime.utcnow() - timedelta(hours=24)).isoformat()
+        for line in health_file.read_text().strip().split("\n"):
+            if not line:
+                continue
+            try:
+                ev = json.loads(line)
+                ts = ev.get("ts", ev.get("timestamp", ""))
+                if ts >= cutoff:
+                    events.append(ev)
+            except Exception:
+                pass
+
+    return {"ok": True, "sessions": sessions, "healthEvents": events}
+
+
+@app.post("/api/terminal/scratch/create")
+async def create_scratch(body: dict = Body(...)):
+    name = body.get("name", "")
+    if not name.startswith("claw-scratch-"):
+        raise HTTPException(400, "name must start with claw-scratch-")
+    subprocess.run(["tmux", "new-session", "-d", "-s", name, "-x", "200", "-y", "50"])
+    return {"ok": True}
+
+
+@app.post("/api/terminal/scratch/kill")
+async def kill_scratch(body: dict = Body(...)):
+    name = body.get("name", "")
+    if not name.startswith("claw-scratch-"):
+        raise HTTPException(400, "can only kill scratch sessions")
+    subprocess.run(["tmux", "kill-session", "-t", name], capture_output=True)
+    return {"ok": True}
+
+
+@app.post("/api/terminal/restart-claude")
+async def restart_claude(body: dict = Body(...)):
+    session = body.get("session", "")
+    if not session:
+        raise HTTPException(400, "session required")
+    subprocess.run(["tmux", "send-keys", "-t", session, "C-c", ""], capture_output=True)
+    subprocess.run(["tmux", "send-keys", "-t", session, "exit", "Enter"], capture_output=True)
+    await asyncio.sleep(2)
+    subprocess.run(["tmux", "send-keys", "-t", session, "claude", "Enter"], capture_output=True)
+    return {"ok": True}
+
+
+@app.post("/api/terminal/capture")
+async def capture_output(body: dict = Body(...)):
+    session = body.get("session", "")
+    lines = body.get("lines", 50)
+    result = subprocess.run(
+        ["tmux", "capture-pane", "-t", session, "-p", "-S", f"-{lines}"],
+        capture_output=True, text=True
+    )
+    return {"ok": True, "output": result.stdout}
 
 
 # ── GitHub Intel ──────────────────────────────────────────────────────────────

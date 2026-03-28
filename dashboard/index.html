@@ -1601,7 +1601,101 @@ body {
 .agent-footer { display: flex; gap: 16px; margin-top: 4px; }
 .agent-stat { font-size: 0.48rem; letter-spacing: 1px; color: var(--grey2); }
 .agent-stat span { color: var(--fg); font-weight: 700; }
+
+/* ── Claw Terminal Grid ──────────────────────────────────────── */
+.claw-grid-topbar {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:8px 12px; background:#1a1a2e; border-bottom:1px solid #2a2a4a;
+  margin-bottom:8px; border-radius:8px 8px 0 0;
+}
+.claw-grid-topbar h2 { margin:0; font-size:14px; color:#e0e0e0; }
+.claw-grid-topbar-right { display:flex; align-items:center; gap:10px; }
+.claw-token-meter { display:flex; align-items:center; gap:4px; }
+.claw-token-meter span { font-size:10px; color:#888; }
+.claw-token-bar { width:60px; height:6px; background:#333; border-radius:3px; }
+.claw-token-fill { height:100%; border-radius:3px; background:#00ff88; transition:width 0.3s; }
+.claw-new-btn {
+  font-size:12px; color:#00ff88; background:transparent;
+  border:1px solid #00ff88; padding:4px 12px; border-radius:4px; cursor:pointer;
+}
+.claw-new-btn:hover { background:rgba(0,255,136,0.1); }
+
+.claw-broadcast {
+  display:flex; align-items:center; gap:8px; padding:6px 12px;
+  background:#0d0d1a; border:1px solid #2a2a4a; border-radius:6px; margin-bottom:8px;
+}
+.claw-broadcast input {
+  flex:1; background:transparent; border:none; color:#e0e0e0;
+  font-size:13px; outline:none;
+}
+.claw-broadcast .label { font-size:11px; color:#888; white-space:nowrap; }
+.claw-broadcast button {
+  font-size:11px; color:#00ff88; background:none; border:none; cursor:pointer;
+}
+
+.claw-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:8px;
+}
+@media (max-width:768px) {
+  .claw-grid { grid-template-columns:1fr; }
+  .claw-new-btn span.full { display:none; }
+  .claw-new-btn span.short { display:inline; }
+}
+@media (min-width:769px) {
+  .claw-new-btn span.short { display:none; }
+}
+
+.claw-tile {
+  display:flex; flex-direction:column; background:#0d0d1a;
+  border:1px solid #2a2a4a; border-radius:8px; overflow:hidden;
+}
+.claw-tile-header {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:6px 10px; background:#1a1a2e; border-bottom:1px solid #2a2a4a;
+}
+.claw-tile-status { display:flex; align-items:center; gap:6px; }
+.claw-tile-dot {
+  width:8px; height:8px; border-radius:50%; display:inline-block;
+}
+.claw-tile-dot.seated { background:#00ff88; }
+.claw-tile-dot.idle { background:#ffaa00; }
+.claw-tile-dot.down { background:#ff4444; }
+.claw-tile-name { font-size:12px; font-weight:bold; color:#e0e0e0; }
+.claw-tile-actions { display:flex; gap:6px; }
+.claw-tile-actions button {
+  background:none; border:none; color:#555; cursor:pointer; font-size:12px;
+}
+.claw-tile-actions button:hover { color:#e0e0e0; }
+.claw-tile-terminal { height:300px; }
+.claw-tile-tokenbar {
+  padding:4px 10px; background:#0a0a15;
+}
+.claw-tile-tokenbar-inner {
+  width:100%; height:3px; background:#333; border-radius:2px;
+}
+.claw-tile-tokenbar-fill {
+  height:100%; border-radius:2px; transition:width 0.3s;
+}
+.claw-sparkline {
+  display:flex; gap:1px; height:4px; padding:2px 10px;
+}
+.claw-sparkline-seg { flex:1; border-radius:1px; }
+
+/* Context menu */
+.claw-ctx-menu {
+  position:fixed; background:#1a1a2e; border:1px solid #2a2a4a;
+  border-radius:8px; padding:4px 0; z-index:9999; box-shadow:0 4px 12px rgba(0,0,0,0.5);
+}
+.claw-ctx-menu button {
+  display:block; width:100%; text-align:left; padding:6px 16px;
+  font-size:13px; color:#ccc; background:none; border:none; cursor:pointer;
+}
+.claw-ctx-menu button:hover { background:#2a2a4a; color:#fff; }
 </style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/xterm.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@xterm/addon-web-links@0.11.0/lib/addon-web-links.min.js"></script>
 </head>
 <body>
 
@@ -2131,45 +2225,38 @@ body {
   <!-- TERMINAL WATCH PAGE                                           -->
   <!-- ══════════════════════════════════════════════════════════════ -->
   <div class="page" id="pageTerminal">
-    <div class="panel" style="max-width:900px;margin:0 auto;">
-      <div class="tw-status" id="twStatus">
-        <span class="tw-status-dot" id="twDot"></span>
-        <span class="tw-session" id="twSession">OFF</span>
-        <span class="tw-uptime" id="twUptime"></span>
-      </div>
-      <div class="tw-controls">
-        <select class="tw-select" id="twSessionPicker"><option value="">— select session —</option></select>
-        <button class="tw-btn primary" onclick="twStart()">START</button>
-        <button class="tw-btn danger" onclick="twStop()">STOP</button>
-        <button class="tw-btn" onclick="twSnapshot()">SNAPSHOT</button>
-      </div>
-      <div class="panel-hdr">
-        <span class="panel-hdr-title">Event Feed</span>
-        <span class="panel-hdr-count" id="twEventCount">0</span>
-      </div>
-      <div class="tw-events" id="twEvents">
-        <div class="empty"><span class="empty-char">📡</span>no events yet — attach to a tmux session</div>
-      </div>
-      <div class="tw-packet">
-        <div class="tw-packet-btns">
-          <button class="tw-btn" onclick="twPreviewPacket()">PREVIEW PACKET</button>
-          <button class="tw-btn" onclick="twCopyPacket('chatgpt')">COPY FOR CHATGPT</button>
-          <button class="tw-btn" onclick="twCopyPacket('claude')">COPY FOR CLAUDE</button>
-          <button class="tw-btn" onclick="twCopyPacket('both')">COPY FOR BOTH</button>
+    <!-- Top bar -->
+    <div class="claw-grid-topbar">
+      <h2>TERMINALS</h2>
+      <div class="claw-grid-topbar-right">
+        <div class="claw-token-meter">
+          <span>TOKENS</span>
+          <div class="claw-token-bar"><div class="claw-token-fill" id="clawTokenFill"></div></div>
         </div>
-        <input class="tw-packet-input" id="twQuestion" placeholder="Add your question (optional)..." />
-        <div class="tw-packet-preview" id="twPacketPreview"></div>
-      </div>
-      <div class="tw-toggles">
-        <label class="tw-toggle"><input type="checkbox" id="twAutoSnap" /> Auto-snapshot on error</label>
-        <label class="tw-toggle"><input type="checkbox" id="twIncludeDiff" checked /> Include git diff</label>
-        <label class="tw-toggle"><input type="checkbox" id="twIncludeHistory" checked /> Include command history</label>
-        <label class="tw-toggle"><input type="checkbox" id="twErrorsOnly" /> Errors only</label>
-      </div>
-      <div class="tw-explain">
-        <button class="tw-explain-btn" onclick="twExplain()">⚡ EXPLAIN WHAT JUST HAPPENED</button>
+        <button class="claw-new-btn" onclick="clawCreateScratch()">
+          <span class="full">+ New Terminal</span><span class="short">+</span>
+        </button>
       </div>
     </div>
+
+    <!-- Broadcast bar (hidden by default) -->
+    <div class="claw-broadcast" id="clawBroadcast" style="display:none">
+      <button onclick="document.getElementById('clawBroadcast').style.display='none'">&#x2715;</button>
+      <span class="label">ALL &rarr;</span>
+      <input id="clawBroadcastInput" placeholder="Send to all terminals..."
+             onkeydown="if(event.key==='Enter')clawBroadcastSend()" />
+      <button onclick="clawBroadcastSend()">Send</button>
+    </div>
+    <button id="clawBroadcastToggle" class="tw-btn" style="margin-bottom:8px;font-size:11px"
+            onclick="document.getElementById('clawBroadcast').style.display='flex';this.style.display='none'">
+      Broadcast
+    </button>
+
+    <!-- Terminal grid -->
+    <div class="claw-grid" id="clawGrid"></div>
+
+    <!-- Context menu (hidden) -->
+    <div class="claw-ctx-menu" id="clawCtxMenu" style="display:none"></div>
   </div><!-- /pageTerminal -->
 
   <!-- ═══════════════════════ INTEL PAGE ═══════════════════════ -->
@@ -2491,9 +2578,10 @@ function showPage(page) {
   } else if (page === 'terminal') {
     document.getElementById('pageTerminal').classList.add('active')
     document.getElementById('tabTerminal').classList.add('active')
-    twLoadSessions()
-    twLoadEvents()
-    twLoadStatus().then(() => { if (twState.running) twConnectSSE() })
+    clawFetchStatus()
+    if (!clawState._pollInterval) {
+      clawState._pollInterval = setInterval(clawFetchStatus, 5000)
+    }
   } else if (page === 'intel') {
     document.getElementById('pageIntel').classList.add('active')
     document.getElementById('tabIntel').classList.add('active')
@@ -5572,180 +5660,306 @@ function connectTradingSSE() {
 }
 connectTradingSSE()
 
-// ── Terminal Watch ─────────────────────────────────────────────────────────
-const twState = { running: false, session: '', pane: '', startTime: null, events: [], uptimeInterval: null, sse: null }
+// ── Claw Terminal Grid ─────────────────────────────────────────────────────
+const clawState = {
+  sessions: {},
+  healthEvents: [],
+  terminals: {},    // sessionName -> { term, fitAddon, ws }
+  scratchCounter: 1,
+}
 
-async function twLoadSessions() {
+// Fetch session status
+async function clawFetchStatus() {
   try {
-    const r = await fetch('/api/terminal/sessions')
-    const d = await r.json()
-    const sel = document.getElementById('twSessionPicker')
-    sel.innerHTML = '<option value="">— select session —</option>'
-    for (const s of d.sessions || []) {
-      for (const p of s.panes || []) {
-        const val = `${s.name}:${p.index}`
-        const label = `${s.name}:${p.index} (${p.command})`
-        sel.innerHTML += `<option value="${val}">${label}</option>`
-      }
+    const res = await fetch('/api/terminal/claw-status')
+    const data = await res.json()
+    if (data.ok) {
+      clawState.sessions = data.sessions || {}
+      clawState.healthEvents = data.healthEvents || []
+      clawRenderGrid()
     }
-  } catch(e) { console.error('[tw] sessions', e) }
+  } catch(e) { console.error('claw status error', e) }
 }
 
-async function twLoadEvents() {
-  try {
-    const errOnly = document.getElementById('twErrorsOnly')?.checked
-    const r = await fetch(`/api/terminal/events?n=20${errOnly ? '&errors_only=true' : ''}`)
-    const d = await r.json()
-    twState.events = d.events || []
-    twRenderEvents()
-  } catch(e) { console.error('[tw] events', e) }
+// Render the grid
+function clawRenderGrid() {
+  const grid = document.getElementById('clawGrid')
+  const sessions = clawState.sessions
+  const keys = Object.keys(sessions)
+
+  // Add tiles for new sessions
+  keys.forEach(key => {
+    const info = sessions[key]
+    const tileId = 'claw-tile-' + key.replace(/[^a-z0-9]/g, '-')
+
+    if (!document.getElementById(tileId)) {
+      // Create new tile
+      const tile = document.createElement('div')
+      tile.className = 'claw-tile'
+      tile.id = tileId
+      tile.oncontextmenu = (e) => { e.preventDefault(); clawShowCtxMenu(e, key) }
+
+      const status = info.status || 'down'
+      const name = info.displayName || key.toUpperCase()
+      const label = status === 'seated' ? name + ' + Claude' : status === 'down' ? name + ' \u00b7 DOWN' : name
+
+      tile.innerHTML = `
+        <div class="claw-tile-header">
+          <div class="claw-tile-status">
+            <span class="claw-tile-dot ${status}"></span>
+            <span class="claw-tile-name" data-label>${label}</span>
+          </div>
+          <div class="claw-tile-actions">
+            ${info.isScratch ? '<button onclick="clawKillScratch(\'' + key + '\')" title="Close">\u2715</button>' : ''}
+            <button onclick="clawFullscreen('${key}')" title="Fullscreen">\u26F6</button>
+          </div>
+        </div>
+        <div class="claw-tile-terminal" data-terminal="${key}"></div>
+        <div class="claw-tile-tokenbar">
+          <div class="claw-tile-tokenbar-inner">
+            <div class="claw-tile-tokenbar-fill" data-tokenbar style="width:${(info.tokenUsage||info.token_usage||0)*100}%;background:${clawTokenColor(info.tokenUsage||info.token_usage||0)}"></div>
+          </div>
+        </div>
+        <div class="claw-sparkline" data-sparkline="${key}"></div>
+      `
+      grid.appendChild(tile)
+
+      // Initialize xterm in this tile
+      clawInitTerminal(key, tile.querySelector('[data-terminal]'))
+    } else {
+      // Update existing tile status
+      const tile = document.getElementById(tileId)
+      const dot = tile.querySelector('.claw-tile-dot')
+      const label = tile.querySelector('[data-label]')
+      const tokenbar = tile.querySelector('[data-tokenbar]')
+      const status = info.status || 'down'
+      const name = info.displayName || key.toUpperCase()
+
+      dot.className = 'claw-tile-dot ' + status
+      label.textContent = status === 'seated' ? name + ' + Claude' : status === 'down' ? name + ' \u00b7 DOWN' : name
+
+      const usage = info.tokenUsage || info.token_usage || 0
+      tokenbar.style.width = (usage * 100) + '%'
+      tokenbar.style.background = clawTokenColor(usage)
+    }
+
+    // Render sparkline
+    clawRenderSparkline(key)
+  })
+
+  // Remove tiles for sessions that no longer exist
+  const existing = grid.querySelectorAll('.claw-tile')
+  existing.forEach(tile => {
+    const key = tile.querySelector('[data-terminal]')?.dataset.terminal
+    if (key && !sessions[key]) {
+      // Cleanup terminal
+      if (clawState.terminals[key]) {
+        clawState.terminals[key].ws?.close()
+        clawState.terminals[key].term?.dispose()
+        delete clawState.terminals[key]
+      }
+      tile.remove()
+    }
+  })
+
+  // Update aggregate token meter
+  const vals = Object.values(sessions)
+  const avg = vals.length ? vals.reduce((s, v) => s + (v.tokenUsage || v.token_usage || 0), 0) / vals.length : 0
+  const fill = document.getElementById('clawTokenFill')
+  if (fill) { fill.style.width = (avg * 100) + '%'; fill.style.background = clawTokenColor(avg) }
 }
 
-async function twLoadStatus() {
+function clawTokenColor(v) {
+  return v > 0.8 ? '#ff4444' : v > 0.6 ? '#ffaa00' : '#00ff88'
+}
+
+// Initialize xterm.js for a session
+function clawInitTerminal(sessionName, container) {
+  if (clawState.terminals[sessionName]) return
+
+  const term = new Terminal({
+    cursorBlink: true,
+    fontSize: 13,
+    fontFamily: "'JetBrains Mono', 'Fira Code', 'Courier New', monospace",
+    theme: { background: '#0d0d1a', foreground: '#e0e0e0', cursor: '#00ff88', selection: '#2a2a4a' },
+    allowProposedApi: true,
+  })
+
+  const fitAddon = new FitAddon.FitAddon()
+  term.loadAddon(fitAddon)
+
   try {
-    const r = await fetch('/api/terminal/status')
-    const d = await r.json()
-    twState.running = d.running
-    twUpdateStatusUI(d)
+    const webLinksAddon = new WebLinksAddon.WebLinksAddon()
+    term.loadAddon(webLinksAddon)
   } catch(e) {}
-}
 
-async function twStart() {
-  const val = document.getElementById('twSessionPicker').value
-  if (!val) { toast('Select a session first'); return }
-  const [session, pane] = val.split(':')
-  try {
-    const r = await fetch('/api/terminal/start', {
-      method: 'POST', headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ session, pane })
-    })
-    const d = await r.json()
-    if (d.status === 'started' || d.status === 'already_running') {
-      twState.running = true; twState.session = session; twState.pane = pane
-      twState.startTime = Date.now()
-      twStartUptime(); twConnectSSE(); twUpdateStatusUI(d)
-      toast('Relay started')
+  term.open(container)
+  fitAddon.fit()
+
+  // Connect WebSocket to tmux session
+  const proto = location.protocol === 'https:' ? 'wss:' : 'ws:'
+  const ws = new WebSocket(`${proto}//${location.host}/api/terminal/ws/${sessionName}`)
+  ws.binaryType = 'arraybuffer'
+
+  ws.onopen = () => {
+    // Send initial size
+    ws.send(`__RESIZE__:${term.cols}:${term.rows}`)
+  }
+
+  ws.onmessage = (e) => {
+    if (e.data instanceof ArrayBuffer) {
+      term.write(new Uint8Array(e.data))
+    } else {
+      term.write(e.data)
     }
-  } catch(e) { toast('Failed to start relay') }
-}
-
-async function twStop() {
-  try {
-    await fetch('/api/terminal/stop', { method: 'POST' })
-    twState.running = false; twState.session = ''; twState.startTime = null
-    if (twState.uptimeInterval) clearInterval(twState.uptimeInterval)
-    if (twState.sse) { twState.sse.close(); twState.sse = null }
-    twUpdateStatusUI({ running: false })
-    toast('Relay stopped')
-  } catch(e) { toast('Failed to stop relay') }
-}
-
-async function twSnapshot() {
-  try {
-    await fetch('/api/terminal/snapshot', { method: 'POST' })
-    toast('Snapshot taken'); twLoadEvents()
-  } catch(e) { toast('Snapshot failed — is relay running?') }
-}
-
-function twUpdateStatusUI(d) {
-  const dot = document.getElementById('twDot')
-  const label = document.getElementById('twSession')
-  dot.className = 'tw-status-dot' + (d.running ? ' watching' : '')
-  label.textContent = d.running ? `WATCHING ${twState.session}:${twState.pane}` : 'OFF'
-}
-
-function twRenderEvents() {
-  const el = document.getElementById('twEvents')
-  const count = document.getElementById('twEventCount')
-  count.textContent = twState.events.length
-  if (!twState.events.length) {
-    el.innerHTML = '<div class="empty"><span class="empty-char">📡</span>no events yet — attach to a tmux session</div>'
-    return
   }
-  el.innerHTML = twState.events.map(ev => {
-    const ts = new Date(ev.timestamp).toLocaleTimeString()
-    const tail = (ev.output_tail || []).join('\n')
-    return `<div class="tw-event ev-${ev.event_type}" onclick="this.classList.toggle('expanded')">
-      <div class="tw-event-hdr">
-        <span class="tw-event-type ${ev.event_type}">${(ev.event_type||'').toUpperCase()}</span>
-        <span class="tw-event-ts">${ts}</span>
-      </div>
-      ${ev.summary ? `<div class="tw-event-summary">${esc(ev.summary)}</div>` : ''}
-      ${ev.command ? `<div class="tw-event-cmd">$ ${esc(ev.command)}</div>` : ''}
-      ${tail ? `<div class="tw-event-tail">${esc(tail)}</div>` : ''}
-    </div>`
-  }).join('')
-}
 
-function twConnectSSE() {
-  if (twState.sse) twState.sse.close()
-  const tkn = getCookie('oc_token')
-  twState.sse = new EventSource(`/api/terminal/stream?token=${tkn}`)
-  twState.sse.onmessage = (e) => {
-    try {
-      const d = JSON.parse(e.data)
-      if (d.events) {
-        for (const ev of d.events) {
-          twState.events.unshift(ev)
-          if (document.getElementById('twAutoSnap')?.checked &&
-              ['error','build_failure','test_failure'].includes(ev.event_type)) {
-            twSnapshot()
-          }
-        }
-        twState.events = twState.events.slice(0, 50)
-        twRenderEvents()
-      }
-    } catch(_) {}
+  ws.onclose = () => {
+    term.write('\r\n\x1b[31m[disconnected]\x1b[0m\r\n')
   }
-  twState.sse.onerror = () => { twState.sse.close(); setTimeout(twConnectSSE, 5000) }
+
+  ws.onerror = () => {
+    term.write('\r\n\x1b[31m[connection error]\x1b[0m\r\n')
+  }
+
+  // Send keystrokes to WebSocket
+  term.onData(data => {
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(data)
+    }
+  })
+
+  // Handle resize
+  const resizeObserver = new ResizeObserver(() => {
+    fitAddon.fit()
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(`__RESIZE__:${term.cols}:${term.rows}`)
+    }
+  })
+  resizeObserver.observe(container)
+
+  clawState.terminals[sessionName] = { term, fitAddon, ws, resizeObserver }
 }
 
-async function twPreviewPacket() {
-  try {
-    const r = await fetch('/api/terminal/packet/preview')
-    const d = await r.json()
-    const el = document.getElementById('twPacketPreview')
-    el.textContent = d.packet ? JSON.stringify(d.packet, null, 2) : 'No events available'
-    el.style.display = 'block'
-  } catch(e) { toast('Failed to load packet preview') }
+// Render sparkline for a session
+function clawRenderSparkline(sessionName) {
+  const container = document.querySelector(`[data-sparkline="${sessionName}"]`)
+  if (!container || container.children.length > 0) return  // Only render once
+
+  const now = Date.now()
+  const h24 = 24 * 60 * 60 * 1000
+  const start = now - h24
+  const events = clawState.healthEvents.filter(e => e.session === sessionName)
+  events.sort((a, b) => (a.ts || a.timestamp || '').localeCompare(b.ts || b.timestamp || ''))
+
+  for (let i = 0; i < 48; i++) {
+    const segEnd = start + (i + 1) * (h24 / 48)
+    const relevant = events.filter(e => new Date(e.ts || e.timestamp).getTime() <= segEnd)
+    const latest = relevant[relevant.length - 1]
+    const status = latest ? latest.status : 'unknown'
+
+    const seg = document.createElement('div')
+    seg.className = 'claw-sparkline-seg'
+    seg.style.background = status === 'seated' ? '#00ff88' : status === 'idle' ? '#ffaa00' : status === 'down' ? '#ff4444' : '#1a1a2e'
+    container.appendChild(seg)
+  }
 }
 
-async function twCopyPacket(target) {
-  try {
-    const r = await fetch('/api/terminal/packet', {
-      method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({})
-    })
-    const packet = await r.json()
-    const q = document.getElementById('twQuestion').value.trim()
-    if (q) packet.question = q
-    let text = ''
-    if (target === 'chatgpt') text = 'Analyze this terminal output:\n\n' + JSON.stringify(packet, null, 2)
-    else if (target === 'claude') text = 'Here is terminal context from my development session. Analyze the output and suggest next steps:\n\n' + JSON.stringify(packet, null, 2)
-    else text = 'Terminal analysis packet — paste into ChatGPT or Claude:\n\n' + JSON.stringify(packet, null, 2)
-    await navigator.clipboard.writeText(text)
-    toast('Copied to clipboard')
-  } catch(e) { toast('Copy failed — try again') }
+// Broadcast command to all terminals
+async function clawBroadcastSend() {
+  const input = document.getElementById('clawBroadcastInput')
+  const cmd = input.value.trim()
+  if (!cmd) return
+
+  Object.entries(clawState.terminals).forEach(([key, t]) => {
+    if (t.ws && t.ws.readyState === WebSocket.OPEN) {
+      t.ws.send(cmd + '\n')
+    }
+  })
+
+  input.value = ''
 }
 
-async function twExplain() {
-  try {
-    const r = await fetch('/api/terminal/packet', {
-      method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({})
-    })
-    const packet = await r.json()
-    packet.question = 'Explain what just happened in this terminal session. What failed, why, and what should I do next?'
-    await navigator.clipboard.writeText(JSON.stringify(packet, null, 2))
-    toast('Explanation packet copied — paste into ChatGPT or Claude')
-  } catch(e) { toast('No events to explain') }
+// Create scratch terminal
+async function clawCreateScratch() {
+  const name = 'claw-scratch-' + clawState.scratchCounter++
+  await fetch('/api/terminal/scratch/create', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ name })
+  })
+  clawFetchStatus()
 }
 
-function twStartUptime() {
-  if (twState.uptimeInterval) clearInterval(twState.uptimeInterval)
-  twState.uptimeInterval = setInterval(() => {
-    if (!twState.startTime) return
-    const secs = Math.floor((Date.now() - twState.startTime) / 1000)
-    document.getElementById('twUptime').textContent = `${Math.floor(secs/60)}m ${secs%60}s`
-  }, 1000)
+// Kill scratch terminal
+async function clawKillScratch(session) {
+  if (clawState.terminals[session]) {
+    clawState.terminals[session].ws?.close()
+    clawState.terminals[session].term?.dispose()
+    delete clawState.terminals[session]
+  }
+  await fetch('/api/terminal/scratch/kill', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ name: session })
+  })
+  const tile = document.querySelector(`[data-terminal="${session}"]`)?.closest('.claw-tile')
+  if (tile) tile.remove()
+  clawFetchStatus()
+}
+
+// Fullscreen a terminal
+function clawFullscreen(session) {
+  const tile = document.querySelector(`[data-terminal="${session}"]`)?.closest('.claw-tile')
+  if (!tile) return
+
+  if (tile.classList.contains('claw-tile-fullscreen')) {
+    tile.classList.remove('claw-tile-fullscreen')
+    tile.style = ''
+  } else {
+    tile.classList.add('claw-tile-fullscreen')
+    tile.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:9998;border-radius:0;'
+  }
+
+  // Re-fit the terminal
+  const t = clawState.terminals[session]
+  if (t) setTimeout(() => t.fitAddon.fit(), 100)
+}
+
+// Context menu
+function clawShowCtxMenu(e, session) {
+  const menu = document.getElementById('clawCtxMenu')
+  menu.style.display = 'block'
+  menu.style.left = e.clientX + 'px'
+  menu.style.top = e.clientY + 'px'
+  menu.innerHTML = `
+    <button onclick="clawRestartClaude('${session}')">Restart Claude</button>
+    <button onclick="clawKillScratch('${session}')">Kill Session</button>
+    <button onclick="clawCopyOutput('${session}')">Copy Last Output</button>
+  `
+}
+document.addEventListener('click', () => {
+  const m = document.getElementById('clawCtxMenu')
+  if (m) m.style.display = 'none'
+})
+
+async function clawRestartClaude(session) {
+  document.getElementById('clawCtxMenu').style.display = 'none'
+  await fetch('/api/terminal/restart-claude', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ session })
+  })
+  clawFetchStatus()
+}
+
+async function clawCopyOutput(session) {
+  document.getElementById('clawCtxMenu').style.display = 'none'
+  const res = await fetch('/api/terminal/capture', {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({ session, lines: 50 })
+  })
+  const data = await res.json()
+  if (data.output) {
+    navigator.clipboard.writeText(data.output)
+  }
 }
 
 // ══════════════════════════════════════════════════════════════════
