@@ -100,7 +100,7 @@
       "what_to_take": "Extract market making strategy logic (order book analysis, spread calculation) for Python adaptation in Clawmpson's strategy engine, avoiding direct Rust integration.",
       "risk": "License unknown (potential MIT but unverified), future-dated last update (2026-03-27) suggests metadata error or abandonment, and Rust/Python integration complexity requires significant refactoring.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -120,7 +120,7 @@
       "what_to_take": "Study the event-driven architecture patterns and order management design for inspiration, but avoid direct Rust code integration due to language mismatch. Adapt core concepts like deterministic event handling to Python for Clawmpson/RivalClaw refactoring.",
       "risk": "Rust/Python integration requires complex FFI bridge (high maintenance), Apache 2.0 license is acceptable but effort outweighs benefit. Nautilus's full engine scope is overkill for our lean ArbClaw and may conflict with existing SQLite/Python stack.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "Extract time-series prediction models (LSTM/Transformer) and DRL implementations for strategy enhancement, focusing on adaptation to prediction market data rather than stock data.",
       "risk": "Domain shift risk (stock-focused models may not transfer directly to prediction markets), license unknown (must verify), and future-dated last update (2026) suggests potential data error or inactive maintenance.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "Port core indicator algorithms (Bollinger Bands, MACD) to Python for Clawmpson/RivalClaw, avoiding full Go integration",
       "risk": "Go language mismatch requires significant porting effort, license unknown (must verify), suspicious 2026 last updated date",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "Extract the multi-exchange adapter pattern and main trading loop structure for handling multiple exchange APIs, but expect to rewrite exchange-specific logic for prediction markets (Polymarket/Kalshi) and strategy implementations.",
       "risk": "Suspicious future date in last updated (2026), unknown license (requires verification), and high domain mismatch (crypto futures vs prediction markets) requiring significant refactoring. Potential maintenance risk if repo is inactive.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "Extract ML model training/prediction code for signal generation, but refactor into modular component for Clawmpson's LLM strategy; avoid notebook dependencies.",
       "risk": "License uncertainty (no explicit license), notebook format requires heavy refactoring, tutorial lacks production features like real-time feeds or error handling.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -280,7 +280,7 @@
       "what_to_take": "None; domain mismatch between stock market prediction (bulbea) and prediction markets (Polymarket/Kalshi) prevents direct utility.",
       "risk": "Domain mismatch (stock vs event prediction), potential license uncertainty (not specified in repo), and high adaptation complexity for prediction markets data.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -300,7 +300,7 @@
       "what_to_take": "Study event-driven architecture patterns and strategy framework design for inspiration in Python, but avoid direct C# code integration due to language mismatch.",
       "risk": "High complexity from C#-Python interoperability (e.g., Python.NET), maintenance burden, and negligible direct code reuse value despite MIT license.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -320,7 +320,7 @@
       "what_to_take": "This repo is a curated list of resources, not a codebase. No executable patterns or code to integrate.",
       "risk": "Repo is a static list (not code), last updated in 2026 (impossible date indicating poor maintenance), and contains no actionable code for integration. License unknown but irrelevant due to non-code nature.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -340,7 +340,7 @@
       "what_to_take": "Curated list of resources, not executable code. No patterns or code to integrate directly.",
       "risk": "Repo is HTML-based list with no executable code; cannot be integrated into trading systems. Misleading as a code repository despite high star count.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -360,7 +360,7 @@
       "what_to_take": "Nothing to integrate; use as reference to discover other repositories for actual code (not the list itself).",
       "risk": "Repo is a curated list, not executable code; attempting integration would require manual extraction from linked resources, risking license/quality issues and wasted effort.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
