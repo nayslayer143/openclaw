@@ -60,7 +60,7 @@
       "what_to_take": "Extract the feature engineering modules and ML model training pipeline for Clawmpson's LLM strategy to enhance signal generation, avoiding full bot integration.",
       "risk": "Future last update date (2026) suggests possible data error or abandonment; license not specified in repo, creating legal risk.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "Extract backtesting utilities and standardized indicator calculations (e.g., moving averages, RSI) for Clawmpson's graduation engine and RivalClaw's self-tuner, avoiding full library adoption.",
       "risk": "MIT license is safe, but last updated date (2026) is likely a typo requiring verification; IB-specific dependencies may require minor adaptation but generic modules are broker-agnostic.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "Extract LSTM/Transformer model architectures and genetic programming implementations for time series prediction, to be adapted for prediction market data instead of stock data.",
       "risk": "Domain mismatch (stocks vs prediction markets), future-dated last update (2026-03-20) suggests potential repository error, and Jupyter Notebook format requires significant refactoring for production use.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "No relevant patterns; the repo is for Binance futures trading signals (not prediction markets) and uses TypeScript (mismatched with Python stack).",
       "risk": "License ambiguity (not specified in README), high adaptation cost due to TypeScript/Python mismatch, and fundamental market context mismatch (Binance futures vs. prediction markets).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "Design patterns for modular exchange adapters and order management (not code), to inform Python infrastructure improvements.",
       "risk": "Java vs Python language mismatch requires full reimplementation; no direct code reuse possible. Apache 2.0 license is acceptable but integration effort outweighs benefits.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
