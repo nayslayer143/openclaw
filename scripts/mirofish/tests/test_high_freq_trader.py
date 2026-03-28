@@ -382,3 +382,54 @@ def test_score_market_no_edge_returns_none():
     m = _make_poly_market(yes_price=0.50, no_price=0.50)
     sig = score_market(m, spot_prices={}, open_ids=set(), events_traded=set(), weights={})
     assert sig is None
+
+
+def test_place_trade_inserts_to_db():
+    from scripts.mirofish.high_freq_trader import place_trade, TradeSignal
+    import pytest
+    conn = _make_db()
+    conn.execute("INSERT OR REPLACE INTO context (chat_id, key, value) VALUES ('mirofish', 'starting_balance', '10000.00')")
+    conn.commit()
+    sig = TradeSignal(
+        market_id="KXBTC-TEST", question="BTC above $70k?", venue="kalshi",
+        direction="YES", edge=0.05, strategy="arb",
+        entry_price=0.45, amount_usd=300.0, shares=666.0, fee=9.45,
+    )
+    trade_id = place_trade(conn, sig, balance=10000.0)
+    assert trade_id is not None
+    row = conn.execute("SELECT * FROM paper_trades WHERE id=?", (trade_id,)).fetchone()
+    assert row["market_id"] == "KXBTC-TEST"
+    assert row["direction"] == "YES"
+    assert row["status"] == "open"
+    assert row["venue"] == "kalshi"
+    assert abs(row["entry_fee"] - 9.45) < 0.01
+    assert row["strategy"] == "arb"
+    assert abs(row["expected_edge"] - 0.05) < 0.001
+
+def test_place_trade_skips_zero_shares():
+    from scripts.mirofish.high_freq_trader import place_trade, TradeSignal
+    conn = _make_db()
+    sig = TradeSignal(
+        market_id="KXBTC-ZERO", question="test", venue="kalshi",
+        direction="YES", edge=0.05, strategy="arb",
+        entry_price=0.0, amount_usd=100.0, shares=0.0, fee=0.0,
+    )
+    assert place_trade(conn, sig, balance=10000.0) is None
+
+def test_get_open_ids_returns_set():
+    from scripts.mirofish.high_freq_trader import get_open_ids
+    conn = _make_db()
+    conn.execute(
+        "INSERT INTO paper_trades (market_id, question, direction, shares, entry_price, "
+        "amount_usd, status, confidence, reasoning, strategy, opened_at) "
+        "VALUES ('KX-OPEN', 'q', 'YES', 10, 0.5, 100, 'open', 0.6, '', 'arb', '2026-03-27T00:00:00')"
+    )
+    conn.execute(
+        "INSERT INTO paper_trades (market_id, question, direction, shares, entry_price, "
+        "amount_usd, status, confidence, reasoning, strategy, opened_at) "
+        "VALUES ('KX-CLOSED', 'q', 'YES', 10, 0.5, 100, 'closed_win', 0.6, '', 'arb', '2026-03-27T00:00:00')"
+    )
+    conn.commit()
+    ids = get_open_ids(conn)
+    assert "KX-OPEN" in ids
+    assert "KX-CLOSED" not in ids

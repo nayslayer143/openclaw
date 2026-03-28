@@ -481,3 +481,53 @@ def score_market(
                                    edge, "mean_reversion", entry, amount, shares, fee)
 
     return None
+
+
+# ── Trade placement ───────────────────────────────────────────────────────────
+
+def get_open_ids(conn: sqlite3.Connection) -> set:
+    rows = conn.execute("SELECT market_id FROM paper_trades WHERE status='open'").fetchall()
+    return {r["market_id"] for r in rows}
+
+
+def load_spot_prices(conn: sqlite3.Connection) -> dict:
+    spot = {}
+    try:
+        rows = conn.execute("""
+            SELECT ticker, amount_usd FROM spot_prices
+            WHERE ticker LIKE 'SPOT:%'
+            ORDER BY fetched_at DESC
+        """).fetchall()
+        for r in rows:
+            asset = r["ticker"].replace("SPOT:", "")
+            if asset not in spot:
+                spot[asset] = float(r["amount_usd"])
+    except Exception:
+        pass
+    return spot
+
+
+def place_trade(conn: sqlite3.Connection, sig, balance: float) -> object:
+    """Insert a paper trade. Returns row ID or None if invalid."""
+    if sig.shares <= 0:
+        return None
+    ts = datetime.datetime.utcnow().isoformat()
+    try:
+        cur = conn.execute("""
+            INSERT INTO paper_trades
+              (market_id, question, direction, shares, entry_price, amount_usd,
+               status, confidence, reasoning, strategy, opened_at,
+               venue, expected_edge, entry_fee)
+            VALUES (?, ?, ?, ?, ?, ?, 'open', ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            sig.market_id, sig.question[:200], sig.direction, sig.shares,
+            sig.entry_price, sig.amount_usd,
+            min(sig.edge / 0.10, 1.0),
+            f"{sig.strategy}: edge={sig.edge:.3f} entry={sig.entry_price:.3f}",
+            sig.strategy, ts, sig.venue, sig.edge, sig.fee,
+        ))
+        conn.commit()
+        return cur.lastrowid
+    except Exception as e:
+        print(f"[HFT] place_trade error: {e}")
+        return None
