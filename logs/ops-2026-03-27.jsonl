@@ -94,3 +94,6 @@
 {"event":"health","timestamp":1774674001,"ollama":"ok","disk_pct":5,"queue_depth":3,"error_count":0}
 {"event":"auto_deploy","timestamp":1774675801,"from":"188fced","to":"origin/"}
 {"event":"health","timestamp":1774675801,"ollama":"ok","disk_pct":5,"queue_depth":3,"error_count":0}
+{"event":"auto_deploy","timestamp":1774677600,"from":"b45b4ea","to":"origin/"}
+{"event":"health","timestamp":1774677600,"ollama":"ok","disk_pct":5,"queue_depth":3,"error_count":0}
+{"timestamp":1774677606,"check":"ollama","status":"fail","detail":"Idea engine Ollama failure — restart failed, Tier-2 escalated"}
