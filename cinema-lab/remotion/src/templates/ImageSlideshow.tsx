@@ -14,9 +14,10 @@ const SlideFrame: React.FC<{ src: string; caption?: string; totalFrames: number 
 }) => {
   const frame = useCurrentFrame();
   const scale = interpolate(frame, [0, totalFrames], [1, 1.08]);
+  const fadeOutStart = Math.max(10, totalFrames - 10);
   const opacity = interpolate(
     frame,
-    [0, 10, totalFrames - 10, totalFrames],
+    [0, 10, fadeOutStart, totalFrames],
     [0, 1, 1, 0],
     { extrapolateRight: 'clamp', extrapolateLeft: 'clamp' }
   );
@@ -59,11 +60,15 @@ export const ImageSlideshow: React.FC<ImageSlideshowProps> = ({
 
   return (
     <AbsoluteFill style={{ backgroundColor: '#060606' }}>
-      {images.map((img, i) => (
-        <Sequence key={i} from={i * framesPerImage} durationInFrames={framesPerImage}>
-          <SlideFrame src={img} caption={captions?.[i]} totalFrames={framesPerImage} />
-        </Sequence>
-      ))}
+      {images.map((img, i) => {
+        const isLast = i === images.length - 1;
+        const slideDuration = isLast ? duration_frames - i * framesPerImage : framesPerImage;
+        return (
+          <Sequence key={img} from={i * framesPerImage} durationInFrames={slideDuration}>
+            <SlideFrame src={img} caption={captions?.[i]} totalFrames={slideDuration} />
+          </Sequence>
+        );
+      })}
     </AbsoluteFill>
   );
 };

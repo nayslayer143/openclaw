@@ -15,7 +15,8 @@ export const TextReveal: React.FC<TextRevealProps> = ({
   duration_frames,
 }) => {
   const frame = useCurrentFrame();
-  const words = text.split(' ');
+  const words = text.split(' ').filter(Boolean);
+  if (words.length === 0) return <AbsoluteFill style={{ backgroundColor: '#060606' }} />;
   const framesPerWord = Math.max(8, duration_frames / words.length);
 
   return (
@@ -67,7 +68,7 @@ export const TextReveal: React.FC<TextRevealProps> = ({
           );
           return (
             <span
-              key={i}
+              key={`${word}-${i}`}
               style={{
                 color: i % 3 === 0 ? accent_color : '#f0ece4',
                 fontSize: 80,
