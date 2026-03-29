@@ -2715,11 +2715,12 @@ async def cinema_render(request: Request, user: str = Depends(get_current_user))
     )
 
     log_path = LOGS_DIR / f"cinema-{job_id}.log"
-    subprocess.Popen(
-        [sys.executable, str(CINEMA_DIR / "pipeline.py"), job_id, prompt],
-        stdout=open(log_path, "w"),
-        stderr=subprocess.STDOUT,
-    )
+    with open(log_path, "w") as log_fh:
+        subprocess.Popen(
+            [sys.executable, str(CINEMA_DIR / "pipeline.py"), job_id, prompt],
+            stdout=log_fh,
+            stderr=subprocess.STDOUT,
+        )
 
     return {"job_id": job_id, "status": "queued"}
 
@@ -2755,8 +2756,8 @@ async def cinema_list_renders(user: str = Depends(get_current_user)):
 @app.get("/api/cinema/renders/{filename}")
 async def cinema_serve_render(filename: str, user: str = Depends(get_current_user)):
     """Serve an MP4 file with range request support for video playback."""
-    fpath = CINEMA_RENDERS / filename
-    if not fpath.exists():
+    fpath = (CINEMA_RENDERS / filename).resolve()
+    if not str(fpath).startswith(str(CINEMA_RENDERS.resolve())) or not fpath.exists():
         raise HTTPException(404, "Render not found")
     return FileResponse(
         fpath,
