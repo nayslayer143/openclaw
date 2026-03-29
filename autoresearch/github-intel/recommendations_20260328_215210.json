@@ -100,7 +100,7 @@
       "what_to_take": "Extract event-driven architecture patterns and backtesting module for strategy validation, but avoid full framework integration due to market mismatch.",
       "risk": "MIT license is acceptable, but high complexity in adapting to prediction markets (not designed for Polymarket/Kalshi), potential data structure mismatches, and unnecessary bloat for lean systems like ArbClaw.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -120,7 +120,7 @@
       "what_to_take": "Refactor environment setup and agent training patterns from Jupyter notebooks into production-ready Python modules for RivalClaw's self-tuning mechanism",
       "risk": "License unknown (potential GPL conflict), last updated in 2026 (likely typo indicating stale maintenance), and requires significant refactoring from notebook format to production code",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "Extract pairs trading strategy logic and data preprocessing patterns for potential adaptation into ArbClaw's arb detection; note feature engineering techniques for Clawmpson's data pipeline.",
       "risk": "License unknown (requires verification), high refactoring burden due to notebook format, educational code lacks production optimizations for real-time trading.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "The gym-based environment design pattern for building trading environments, but not the RL models (due to crypto vs prediction markets mismatch).",
       "risk": "Domain mismatch (crypto trading vs prediction markets), suspicious future last update date (2026), and high adaptation complexity for our SQLite-based stack.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "Do not extract code; charting concepts are irrelevant to backend trading logic and require frontend integration. Consider alternative Python charting libraries (e.g., Plotly, Matplotlib) instead.",
       "risk": "Not maintained (critical risk), JavaScript vs Python mismatch, no clear license, and requires building frontend layer for minimal backend value.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "API integration patterns for cryptocurrency exchanges (e.g., REST API handling, rate limiting), but only if ported to Python for prediction market exchanges like Polymarket/Kalshi. Not recommended due to domain mismatch.",
       "risk": "Java-to-Python porting effort (high complexity), domain mismatch (Bitcoin trading vs. prediction markets), and questionable maintenance (2026 last update date suggests data error or abandonment).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "None; repo focuses on traditional stock prediction via DL/Genetic Programming, not applicable to prediction market dynamics or our market feeds (Polymarket/Kalshi/CoinGecko).",
       "risk": "Domain mismatch (stocks vs prediction markets), suspicious future last-update date (2026), Jupyter Notebook format unsuitable for production integration, and no license specified.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -280,7 +280,7 @@
       "what_to_take": "Conceptual patterns for visual strategy design and backtesting framework, but not the code due to JavaScript/Python language mismatch and crypto-specific domain (prediction markets differ significantly).",
       "risk": "Language barrier (JS vs Python) requires massive refactoring, domain mismatch (crypto trading vs prediction markets), and high maintenance burden for adapting non-applicable code. License appears permissive but irrelevant due to technical barriers.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -300,7 +300,7 @@
       "what_to_take": "Not applicable; repo is an HTML-based curated list of resources, not executable code for integration.",
       "risk": "Repo is not a code repository (HTML list), making direct integration impossible. Future-dated last update (2026-03-28) indicates potential metadata error. No usable code patterns or libraries provided for integration.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
