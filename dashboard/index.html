@@ -7075,6 +7075,229 @@ async function chatgptDeployAll(reportId) {
   if (btn) { btn.disabled = false; btn.textContent = '\u26a1 DEPLOY ALL' }
 }
 
+// ══════════════════════════════════════════════════════════════════
+// CINEMA STUDIO
+// ══════════════════════════════════════════════════════════════════
+
+const cinemaState = {
+  jobId: null,
+  files: [],        // {name, type, file} objects staged locally
+  pollTimer: null,
+}
+
+function cinemaTypeLabel(name) {
+  const ext = name.split('.').pop().toLowerCase()
+  const audio = ['mp3','wav','m4a','ogg']
+  const video = ['mp4','mov','webm']
+  const image = ['jpg','jpeg','png','gif','webp']
+  if (audio.includes(ext)) return 'AUDIO'
+  if (video.includes(ext)) return 'VIDEO'
+  if (image.includes(ext)) return 'IMG'
+  return 'TEXT'
+}
+
+function cinemaRenderFileChips() {
+  const list = document.getElementById('cinemaFileList')
+  list.innerHTML = ''
+  cinemaState.files.forEach((f, i) => {
+    const chip = document.createElement('div')
+    chip.className = 'cinema-file-chip'
+    chip.innerHTML = `<span class="chip-type">${cinemaTypeLabel(f.name)}</span><span>${f.name}</span><button class="chip-remove" onclick="cinemaRemoveFile(${i})">×</button>`
+    list.appendChild(chip)
+  })
+}
+
+function cinemaRemoveFile(idx) {
+  cinemaState.files.splice(idx, 1)
+  cinemaRenderFileChips()
+}
+
+;(function cinemaDndSetup() {
+  document.addEventListener('DOMContentLoaded', () => {
+    const dz = document.getElementById('cinemaDropzone')
+    const fi = document.getElementById('cinemaFileInput')
+    if (!dz || !fi) return
+
+    dz.addEventListener('click', () => fi.click())
+
+    dz.addEventListener('dragover', e => {
+      e.preventDefault()
+      dz.classList.add('drag-over')
+    })
+    dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'))
+    dz.addEventListener('drop', e => {
+      e.preventDefault()
+      dz.classList.remove('drag-over')
+      cinemaAddFiles(e.dataTransfer.files)
+    })
+
+    fi.addEventListener('change', () => {
+      cinemaAddFiles(fi.files)
+      fi.value = ''
+    })
+  })
+})()
+
+function cinemaAddFiles(fileList) {
+  for (const f of fileList) {
+    if (!cinemaState.files.find(x => x.name === f.name)) {
+      cinemaState.files.push({ name: f.name, file: f })
+    }
+  }
+  cinemaRenderFileChips()
+}
+
+async function cinemaTriggerRender() {
+  const btn = document.getElementById('cinemaMagicBtn')
+  const prompt = document.getElementById('cinemaPrompt').value.trim()
+
+  if (cinemaState.files.length === 0 && !prompt) return
+
+  btn.disabled = true
+
+  // Upload files first
+  let jobId = null
+  if (cinemaState.files.length > 0) {
+    const fd = new FormData()
+    cinemaState.files.forEach(f => fd.append('files', f.file, f.name))
+    try {
+      const r = await fetch('/api/cinema/upload', { method: 'POST', body: fd })
+      const d = await r.json()
+      jobId = d.job_id
+    } catch (e) {
+      btn.disabled = false
+      cinemaShowStatusError('Upload failed: ' + e.message)
+      return
+    }
+  } else {
+    // No files — create a text-only job via render directly
+    jobId = Math.random().toString(36).slice(2, 10)
+  }
+
+  cinemaState.jobId = jobId
+
+  // Trigger render
+  try {
+    await fetch('/api/cinema/render', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ job_id: jobId, prompt }),
+    })
+  } catch (e) {
+    btn.disabled = false
+    cinemaShowStatusError('Render request failed: ' + e.message)
+    return
+  }
+
+  // Show status section, start polling
+  document.getElementById('cinemaStatusSection').style.display = ''
+  cinemaSetStatusStep('queued')
+  cinemaStartPolling(jobId)
+}
+
+function cinemaSetStatusStep(status) {
+  const steps = ['queued', 'composing', 'rendering', 'complete']
+  const idx = steps.indexOf(status)
+  steps.forEach((s, i) => {
+    const el = document.getElementById('cstat-' + s)
+    if (!el) return
+    el.className = 'cinema-status-step'
+    if (i < idx) el.classList.add('done')
+    else if (i === idx) el.classList.add('active')
+  })
+}
+
+function cinemaShowStatusError(msg) {
+  const info = document.getElementById('cinemaStatusInfo')
+  if (info) {
+    info.textContent = msg
+    info.className = 'cinema-status-info error'
+  }
+  document.getElementById('cinemaStatusSection').style.display = ''
+}
+
+function cinemaStartPolling(jobId) {
+  if (cinemaState.pollTimer) clearInterval(cinemaState.pollTimer)
+  cinemaState.pollTimer = setInterval(() => cinemaPollStatus(jobId), 3000)
+}
+
+async function cinemaPollStatus(jobId) {
+  try {
+    const r = await fetch(`/api/cinema/status/${jobId}`)
+    if (!r.ok) return
+    const d = await r.json()
+
+    const status = d.status || 'queued'
+    cinemaSetStatusStep(status)
+
+    const info = document.getElementById('cinemaStatusInfo')
+    if (info) {
+      info.className = 'cinema-status-info'
+      if (d.template) info.textContent = 'template: ' + d.template
+      if (d.error) {
+        info.textContent = d.error
+        info.className = 'cinema-status-info error'
+      }
+    }
+
+    if (status === 'complete' || status === 'failed') {
+      clearInterval(cinemaState.pollTimer)
+      cinemaState.pollTimer = null
+      document.getElementById('cinemaMagicBtn').disabled = false
+      if (status === 'complete') {
+        cinemaLoadGallery()
+        document.getElementById('cinemaGallerySection').style.display = ''
+      }
+    }
+  } catch (_) {}
+}
+
+async function cinemaLoadGallery() {
+  try {
+    const r = await fetch('/api/cinema/renders')
+    if (!r.ok) return
+    const renders = await r.json()
+    const gallery = document.getElementById('cinemaGallery')
+    if (!gallery) return
+
+    if (renders.length > 0) {
+      document.getElementById('cinemaGallerySection').style.display = ''
+    }
+
+    gallery.innerHTML = ''
+    renders.forEach(item => {
+      const card = document.createElement('div')
+      card.className = 'cinema-card'
+      card.onclick = () => cinemaOpenModal(item)
+      const created = item.created_at ? item.created_at.slice(0, 10) : ''
+      card.innerHTML = `
+        <video src="/api/cinema/renders/${item.filename}" preload="metadata" muted playsinline></video>
+        <div class="cinema-card-meta">${item.job_id} · ${created}</div>
+      `
+      gallery.appendChild(card)
+    })
+  } catch (_) {}
+}
+
+function cinemaOpenModal(item) {
+  const modal = document.getElementById('cinemaModal')
+  const video = document.getElementById('cinemaModalVideo')
+  const meta  = document.getElementById('cinemaModalMeta')
+  if (!modal || !video) return
+  video.src = `/api/cinema/renders/${item.filename}`
+  video.load()
+  if (meta) meta.textContent = `${item.job_id} · ${item.template || ''} · ${item.created_at ? item.created_at.slice(0,10) : ''}`
+  modal.classList.add('active')
+  video.play().catch(() => {})
+}
+
+function cinemaCloseModal() {
+  const modal = document.getElementById('cinemaModal')
+  const video = document.getElementById('cinemaModalVideo')
+  if (video) { video.pause(); video.src = '' }
+  if (modal) modal.classList.remove('active')
+}
+
 </script>
 
 <!-- RESEARCH PAGE — toolbar + sub-tabs + content areas -->
