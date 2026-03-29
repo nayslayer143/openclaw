@@ -17,6 +17,7 @@ import sys
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Optional
 
 # Ensure the parent of 'inspector/' is on sys.path so the package is importable.
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -32,24 +33,54 @@ from inspector.stats_auditor import StatsAuditor
 from inspector.verifier import TradeVerifier
 
 # ---------------------------------------------------------------------------
-# Key paths
+# Target configs
 # ---------------------------------------------------------------------------
 
-CLAWMSON_DB  = "~/.openclaw/clawmson.db"
-SIGNALS_JSON = "~/openclaw/trading/signals.json"
-ENV_PATH     = Path("~/.openclaw/.env").expanduser()
+TARGETS = {
+    "openclaw": {
+        "db": "~/.openclaw/clawmson.db",
+        "signals": "~/openclaw/trading/signals.json",
+        "repo": "~/openclaw",
+        "source_files": [
+            "~/openclaw/scripts/mirofish/trading_brain.py",
+            "~/openclaw/scripts/mirofish/paper_wallet.py",
+            "~/openclaw/scripts/mirofish/polymarket_feed.py",
+            "~/openclaw/scripts/trading-bot.py",
+        ],
+        "chat_id": "mirofish",
+        "env_path": "~/.openclaw/.env",
+        "label": "OpenClaw (Clawmpson)",
+    },
+    "rivalclaw": {
+        "db": "~/rivalclaw/rivalclaw.db",
+        "signals": None,
+        "repo": "~/rivalclaw",
+        "source_files": [
+            "~/rivalclaw/trading_brain.py",
+            "~/rivalclaw/paper_wallet.py",
+            "~/rivalclaw/polymarket_feed.py",
+            "~/rivalclaw/kalshi_feed.py",
+        ],
+        "chat_id": "rivalclaw",
+        "env_path": "~/rivalclaw/.env",
+        "label": "RivalClaw",
+    },
+}
+
+ENV_PATH = Path("~/.openclaw/.env").expanduser()
 
 
 # ---------------------------------------------------------------------------
 # Env / Telegram helpers
 # ---------------------------------------------------------------------------
 
-def _load_env() -> dict:
-    """Read ~/.openclaw/.env, parse KEY=VALUE lines (skip # lines), return dict."""
+def _load_env(env_override: Optional[Path] = None) -> dict:
+    """Read .env, parse KEY=VALUE lines (skip # lines), return dict."""
     env: dict = {}
-    if not ENV_PATH.exists():
+    path = env_override or ENV_PATH
+    if not path.exists():
         return env
-    for line in ENV_PATH.read_text(encoding="utf-8").splitlines():
+    for line in path.read_text(encoding="utf-8").splitlines():
         line = line.strip()
         if not line or line.startswith("#"):
             continue
@@ -59,8 +90,8 @@ def _load_env() -> dict:
     return env
 
 
-def notify_telegram(msg: str) -> None:
-    env = _load_env()
+def notify_telegram(msg: str, env_override: Optional[Path] = None) -> None:
+    env = _load_env(env_override)
     token   = env.get("TELEGRAM_BOT_TOKEN", "")
     chat_id = env.get("TELEGRAM_ALLOWED_USERS", "").strip().strip('"[]').split(",")[0].strip()
     if not token or not chat_id:
@@ -92,11 +123,24 @@ def main() -> None:
                         help="Logic analyzer + repo scanner only")
     parser.add_argument("--report",        action="store_true",
                         help="Generate report from existing data (no API calls)")
+    parser.add_argument("--target",        default="openclaw",
+                        choices=list(TARGETS.keys()),
+                        help="Target bot to audit (default: openclaw)")
     args = parser.parse_args()
 
-    if not any(vars(args).values()):
+    if not any(v for k, v in vars(args).items() if k != "target"):
         parser.print_help()
         return
+
+    target = TARGETS[args.target]
+    target_db = target["db"]
+    signals_path = target["signals"]
+    chat_id = target["chat_id"]
+    env_path = Path(target["env_path"]).expanduser()
+    label = target["label"]
+
+    print(f"🎯 Target: {label}")
+    print(f"   DB: {target_db}")
 
     db   = InspectorDB(); db.init()
     poly = PolymarketClient()
@@ -106,17 +150,17 @@ def main() -> None:
     if args.full or args.verify_trades:
         print("🔍 Verifying trades...")
         tv = TradeVerifier(db=db, poly=poly)
-        results["verify"] = tv.run(CLAWMSON_DB)
+        results["verify"] = tv.run(target_db)
         print(f"   → {results['verify']}")
 
         print("📋 Auditing resolutions...")
         ra = ResolutionAuditor(db=db, poly=poly)
-        results["resolution"] = ra.run(CLAWMSON_DB)
+        results["resolution"] = ra.run(target_db)
         print(f"   → {results['resolution']}")
 
         print("📊 Statistical audit...")
         sa = StatsAuditor()
-        results["stats"] = sa.run(CLAWMSON_DB)
+        results["stats"] = sa.run(target_db, chat_id=chat_id)
         print(f"   → trust={results['stats'].get('trust_score', '?')}, "
               f"flags={len(results['stats'].get('red_flags', []))}")
 
@@ -134,18 +178,21 @@ def main() -> None:
 
         print("🧠 Hallucination detection...")
         hd = HallucinationDetector(db=db, poly=poly)
-        results["hallucination"]        = hd.run_on_signals(SIGNALS_JSON)
-        results["hallucination_trades"] = hd.run_on_llm_trades(CLAWMSON_DB)
+        if signals_path:
+            results["hallucination"] = hd.run_on_signals(signals_path)
+        else:
+            results["hallucination"] = {"checked": 0, "skipped": "no signals file for this target"}
+        results["hallucination_trades"] = hd.run_on_llm_trades(target_db)
         print(f"   → {results['hallucination']}")
 
     if args.full or args.scan_code:
         print("🔬 Analyzing source code...")
-        la = LogicAnalyzer(db=db)
+        la = LogicAnalyzer(db=db, target_files=target["source_files"])
         results["code"] = la.run()
         print(f"   → {results['code']}")
 
         print("📜 Scanning git history...")
-        rs = RepoScanner(db=db)
+        rs = RepoScanner(db=db, repo_root=target["repo"])
         results["repo"] = rs.run()
         print(f"   → {results['repo']}")
 
@@ -191,9 +238,9 @@ def main() -> None:
         if discrepancy > 5: reasons.append(f"⚠️ {discrepancy} discrepancies")
         if hallucinated > 0: reasons.append(f"🧠 {hallucinated} HALLUCINATED claim(s)")
         if critical_findings > 0: reasons.append(f"🔴 {critical_findings} CRITICAL code finding(s)")
-        notify_telegram(f"🚨 INSPECTOR GADGET ALERT\n{chr(10).join(reasons)}\n\n{summary}")
+        notify_telegram(f"🚨 INSPECTOR GADGET ALERT — {label}\n{chr(10).join(reasons)}\n\n{summary}", env_path)
     else:
-        notify_telegram(summary)
+        notify_telegram(summary, env_path)
 
 
 if __name__ == "__main__":

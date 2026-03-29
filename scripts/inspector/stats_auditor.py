@@ -180,7 +180,7 @@ class StatsAuditor:
     # Main runner
     # ------------------------------------------------------------------
 
-    def run(self, clawmson_db_path: str) -> dict:
+    def run(self, clawmson_db_path: str, chat_id: str = "mirofish") -> dict:
         """
         Read paper_trades and daily_pnl from clawmson.db, run all 4 checks,
         compute trust score, and return a summary dict.
@@ -199,7 +199,8 @@ class StatsAuditor:
             starting_balance = 1000.0
             try:
                 row = conn.execute(
-                    "SELECT value FROM context WHERE chat_id='mirofish' AND key='starting_balance'"
+                    "SELECT value FROM context WHERE chat_id=? AND key='starting_balance'",
+                    (chat_id,),
                 ).fetchone()
                 if row is not None:
                     starting_balance = float(row["value"])

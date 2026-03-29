@@ -14,7 +14,7 @@ import json
 import re
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 import httpx
 
@@ -80,8 +80,9 @@ Source code:
 # ---------------------------------------------------------------------------
 
 class LogicAnalyzer:
-    def __init__(self, db: InspectorDB) -> None:
+    def __init__(self, db: InspectorDB, target_files: Optional[List[str]] = None) -> None:
         self.db = db
+        self.target_files = target_files or list(TARGET_FILES)
 
     # ------------------------------------------------------------------
     # Deterministic checks
@@ -237,7 +238,7 @@ class LogicAnalyzer:
         total = 0
         by_severity: Dict[str, int] = {}
 
-        for filepath in TARGET_FILES:
+        for filepath in self.target_files:
             findings = self.analyze_file(filepath)
             for finding in findings:
                 try:
