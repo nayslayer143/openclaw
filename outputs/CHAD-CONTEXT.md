@@ -1,9 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> Auto-generated 2026-03-29T03:07:00-07:00. Do not edit manually.
+> Auto-generated 2026-03-29T04:07:00-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-03-29T03:07:00-07:00
+Generated: 2026-03-29T04:07:00-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -156,12 +156,21 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/rivalclaw/.codemonkey
 ~/rivalclaw/.git
 ~/rivalclaw/.gitignore
+~/rivalclaw/.pytest_cache
 ~/rivalclaw/CHANGELOG.md
 ~/rivalclaw/CLAUDE.md
 ~/rivalclaw/P0-001-diagnostic.md
 ~/rivalclaw/README.md
 ~/rivalclaw/__pycache__
 ~/rivalclaw/auto_changelog.py
+~/rivalclaw/bridge
+~/rivalclaw/bridge/__pycache__
+~/rivalclaw/bridge/auth.py
+~/rivalclaw/bridge/control_routes.py
+~/rivalclaw/bridge/db_routes.py
+~/rivalclaw/bridge/kalshi_routes.py
+~/rivalclaw/bridge/run.sh
+~/rivalclaw/bridge/server.py
 ~/rivalclaw/catalog_reader.py
 ~/rivalclaw/daily
 ~/rivalclaw/daily-update.log
@@ -170,6 +179,7 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/rivalclaw/daily/2026-03-26.md
 ~/rivalclaw/daily/2026-03-27.md
 ~/rivalclaw/daily/2026-03-28.md
+~/rivalclaw/daily/2026-03-29.md
 ~/rivalclaw/daily/hourly-latest.md
 ~/rivalclaw/daily/hourly-log.md
 ~/rivalclaw/daily/strategy-lab-2026-03-25.md
@@ -181,10 +191,12 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/rivalclaw/docs
 ~/rivalclaw/docs/superpowers
 ~/rivalclaw/event_logger.py
+~/rivalclaw/execution_router.py
 ~/rivalclaw/experiments
 ~/rivalclaw/experiments/ledger.json
 ~/rivalclaw/graduation.py
 ~/rivalclaw/hourly_report.py
+~/rivalclaw/kalshi_executor.py
 ~/rivalclaw/kalshi_feed.py
 ~/rivalclaw/logs
 ~/rivalclaw/market_classifier.py
@@ -228,6 +240,11 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/rivalclaw/strategy_lab/reports
 ~/rivalclaw/strategy_lab/run_cycle.py
 ~/rivalclaw/strategy_registry.json
+~/rivalclaw/tests
+~/rivalclaw/tests/__init__.py
+~/rivalclaw/tests/test_execution_router.py
+~/rivalclaw/tests/test_kalshi_executor.py
+~/rivalclaw/tests/test_shadow_integration.py
 ~/rivalclaw/trading_brain.py
 ~/rivalclaw/venv
 ~/rivalclaw/weather_feed.py
@@ -1021,6 +1038,19 @@ V1 build, paper trading only. Part of the [OpenClaw](https://gitlab.com/jordan29
 
 ```
 
+### ~/rivalclaw/.pytest_cache/README.md
+```
+# pytest cache directory #
+
+This directory contains data from the pytest's cache plugin,
+which provides the `--lf` and `--ff` options, as well as the `cache` fixture.
+
+**Do not** commit this to version control.
+
+See [the docs](https://docs.pytest.org/en/stable/how-to/cache.html) for more information.
+
+```
+
 ### ~/rivalclaw/README.md
 ```
 # RivalClaw
@@ -1249,16 +1279,16 @@ pytest-asyncio>=0.23
 ### openclaw
 ```
 Branch: main
-Last commit: f69cb2e auto: 2026-03-29 03:00 state snapshot
+Last commit: 15c5846 auto: 2026-03-29 04:00 state snapshot
 Uncommitted files: 7
 Remote: 
 ```
 
 ### rivalclaw
 ```
-Branch: main
-Last commit: b105fbc auto: hourly sync 2026-03-29 09:47 UTC
-Uncommitted files: 7
+Branch: feat/kalshi-live-bridge
+Last commit: 9e00e78 docs: add ERS Dashboard implementation plan
+Uncommitted files: 10
 Remote: 
 ```
 
@@ -1273,7 +1303,7 @@ Remote: https://oauth2:glpat-gpKuP2MCJ523PLVy2Rez7mM6MQpvOjEKdTpsMmJnZg8.01.170u
 ### quantumentalclaw
 ```
 Branch: main
-Last commit: 6d87f35 hourly: 2026-03-29 10:00 | $10,000 | 0W/0closed | $+0 | quiet
+Last commit: 04e389a hourly: 2026-03-29 11:00 | $10,000 | 0W/0closed | $+0 | quiet
 Uncommitted files: 0
 Remote: https://oauth2:glpat-gpKuP2MCJ523PLVy2Rez7mM6MQpvOjEKdTpsMmJnZg8.01.170uc249y@gitlab.com/jordan291/quantumentalclaw.git
 ```
@@ -1373,5 +1403,5 @@ Remote: https://github.com/nayslayer143/shiny-new.git
 ```
 
 ---
-End of context. Generated 2026-03-29T03:07:00-07:00.
+End of context. Generated 2026-03-29T04:07:00-07:00.
 For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw
