@@ -7,7 +7,7 @@ import os, json, asyncio, secrets, time, hashlib, subprocess, re, uuid, base64, 
 import pty, fcntl, termios, struct, select
 from pathlib import Path
 from typing import AsyncGenerator, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from fastapi import FastAPI, Request, Response, HTTPException, Depends, UploadFile, File, Form, WebSocket, Body
 from fastapi.responses import HTMLResponse, StreamingResponse, RedirectResponse, JSONResponse, FileResponse
@@ -2711,7 +2711,7 @@ async def cinema_render(request: Request, user: str = Depends(get_current_user))
         job_id,
         status="queued",
         prompt=prompt,
-        created_at=datetime.utcnow().isoformat(),
+        created_at=datetime.now(timezone.utc).isoformat(),
     )
 
     log_path = LOGS_DIR / f"cinema-{job_id}.log"

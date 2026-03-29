@@ -147,24 +147,41 @@ def _render_custom(job_id: str, jsx_code: str, duration_frames: int) -> str:
     comp_file.write_text(jsx_code)
 
     check = subprocess.run(
-        ["node", "--check", str(comp_file)],
+        [
+            "npx", "tsc", "--noEmit", "--allowJs", "--jsx", "react",
+            "--esModuleInterop", "--target", "ES2020", "--module", "ESNext",
+            "--moduleResolution", "bundler", "--skipLibCheck",
+            str(comp_file),
+        ],
+        cwd=str(REMOTION_DIR),
         capture_output=True,
         text=True,
-        timeout=30,
+        timeout=60,
     )
     if check.returncode != 0:
-        _update_status(job_id, warning="Custom JSX invalid, falling back to TextReveal")
+        _update_status(job_id, warning="Custom TSX invalid, falling back to TextReveal")
         return _render_template(
             job_id, "TextReveal",
             {"text": "Custom render failed", "accent_color": "#e86800"},
             duration_frames,
         )
 
+    # Create a wrapper entrypoint that registers the custom component
+    wrapper_file = custom_dir / f"{job_id}_root.tsx"
+    wrapper_file.write_text(
+        f'import {{registerRoot}} from "remotion";\n'
+        f'import DynamicComp from "./{job_id}";\n'
+        f'registerRoot(() => <></>);\n'
+        f'export {{DynamicComp}};\n'
+    )
+
     output = RENDERS_DIR / f"{job_id}.mp4"
     result = subprocess.run(
         [
-            "npx", "remotion", "render", str(comp_file), "DynamicComp",
+            "npx", "remotion", "render",
+            f"src/custom/{job_id}_root.tsx", "DynamicComp",
             "--output", str(output),
+            "--width", "1080", "--height", "1920",
         ],
         cwd=str(REMOTION_DIR),
         capture_output=True,
