@@ -229,6 +229,227 @@ body {
 .milestone { font-size: 0.46rem; color: var(--grey3); letter-spacing: 1px; }
 .milestone.reached { color: var(--orange); }
 
+/* ── Page Header ────────────────────────────────────────────────────── */
+.page-header { margin-bottom: 28px; }
+.page-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--orange);
+  letter-spacing: 4px;
+  margin-bottom: 4px;
+}
+.page-subtitle {
+  font-size: 0.50rem;
+  color: var(--grey2);
+  letter-spacing: 2px;
+}
+
+/* ── Cinema Studio ──────────────────────────────────────────────────── */
+.cinema-section {
+  margin-bottom: 32px;
+}
+.cinema-step-label {
+  font-size: 0.52rem;
+  color: var(--grey2);
+  letter-spacing: 2.5px;
+  margin-bottom: 12px;
+}
+.cinema-dropzone {
+  border: 1px dashed var(--orange-dim);
+  border-radius: 2px;
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+.cinema-dropzone:hover, .cinema-dropzone.drag-over {
+  border-color: var(--orange);
+  background: rgba(232,104,0,0.05);
+}
+.cinema-drop-hint {
+  color: var(--grey2);
+  font-size: 0.68rem;
+  letter-spacing: 1.5px;
+  margin-bottom: 6px;
+}
+.cinema-drop-types {
+  color: var(--grey3);
+  font-size: 0.50rem;
+  letter-spacing: 1px;
+}
+.cinema-file-list {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cinema-file-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border: 1px solid var(--grey3);
+  border-radius: 1px;
+  font-size: 0.50rem;
+  color: var(--grey2);
+}
+.cinema-file-chip .chip-type {
+  background: var(--orange);
+  color: #000;
+  font-size: 0.42rem;
+  padding: 1px 5px;
+  letter-spacing: 1px;
+  font-weight: 700;
+}
+.cinema-file-chip .chip-remove {
+  background: none;
+  border: none;
+  color: var(--grey2);
+  cursor: pointer;
+  font-size: 0.55rem;
+  padding: 0 2px;
+  line-height: 1;
+}
+.cinema-file-chip .chip-remove:hover { color: var(--orange); }
+.cinema-prompt {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--grey3);
+  color: var(--fg);
+  font-family: inherit;
+  font-size: 0.62rem;
+  padding: 14px;
+  resize: vertical;
+  letter-spacing: 0.5px;
+  line-height: 1.6;
+  box-sizing: border-box;
+  transition: border-color 0.2s;
+}
+.cinema-prompt:focus {
+  outline: none;
+  border-color: var(--orange);
+  box-shadow: 0 0 8px rgba(232,104,0,0.15);
+}
+.cinema-magic-btn {
+  width: 100%;
+  padding: 22px;
+  background: var(--orange);
+  color: #000;
+  font-family: inherit;
+  font-size: 0.80rem;
+  font-weight: 700;
+  letter-spacing: 4px;
+  border: none;
+  cursor: pointer;
+  animation: magic-pulse 2.4s ease-in-out infinite;
+  transition: opacity 0.2s;
+}
+.cinema-magic-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  animation: none;
+}
+@keyframes magic-pulse {
+  0%, 100% { box-shadow: 0 0 14px rgba(232,104,0,0.5), 0 0 28px rgba(232,104,0,0.2); }
+  50%       { box-shadow: 0 0 22px rgba(255,124,26,0.7), 0 0 44px rgba(255,124,26,0.3); }
+}
+.cinema-status-track {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.cinema-status-step {
+  font-size: 0.52rem;
+  letter-spacing: 1.5px;
+  color: var(--grey2);
+  transition: color 0.3s;
+}
+.cinema-status-step.active { color: var(--orange-hi); }
+.cinema-status-step.done   { color: var(--neon-green); }
+.cinema-status-arrow { color: var(--grey3); font-size: 0.55rem; }
+.cinema-status-info {
+  font-size: 0.52rem;
+  color: var(--grey2);
+  letter-spacing: 0.5px;
+  min-height: 16px;
+}
+.cinema-status-info.error { color: #ff4444; }
+.cinema-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+@media (max-width: 700px) { .cinema-gallery { grid-template-columns: repeat(2, 1fr); } }
+.cinema-card {
+  border: 1px solid var(--grey3);
+  border-radius: 2px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  aspect-ratio: 9/16;
+  background: #0a0a0a;
+  position: relative;
+}
+.cinema-card:hover { border-color: var(--orange); }
+.cinema-card video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.cinema-card-meta {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 8px;
+  background: linear-gradient(transparent, rgba(0,0,0,0.85));
+  font-size: 0.42rem;
+  color: var(--grey2);
+  letter-spacing: 0.5px;
+}
+.cinema-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.92);
+  z-index: 9000;
+  align-items: center;
+  justify-content: center;
+}
+.cinema-modal.active { display: flex; }
+.cinema-modal-inner {
+  position: relative;
+  max-height: 92vh;
+  aspect-ratio: 9/16;
+}
+.cinema-modal-inner video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.cinema-modal-close {
+  position: absolute;
+  top: -36px;
+  right: 0;
+  background: none;
+  border: none;
+  color: var(--grey2);
+  font-size: 1.1rem;
+  cursor: pointer;
+  z-index: 10;
+}
+.cinema-modal-close:hover { color: var(--orange); }
+.cinema-modal-meta {
+  margin-top: 8px;
+  font-size: 0.46rem;
+  color: var(--grey2);
+  text-align: center;
+  letter-spacing: 1px;
+}
+
 /* ── Columns ───────────────────────────────────────────────────── */
 .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--grey3); }
 @media (max-width:900px) { .cols { grid-template-columns: 1fr; } }
@@ -1861,6 +2082,7 @@ body {
     <button class="nav-tab" id="tabIntel" onclick="showPage('intel')">⌬ INTEL</button>
     <button class="nav-tab" id="tabResearch" onclick="showPage('research')">◎ RESEARCH<span id="researchBadge" style="display:none;margin-left:5px;background:#ff4444;color:#fff;border-radius:8px;padding:1px 6px;font-size:0.45rem;vertical-align:middle;">0</span></button>
     <button class="nav-tab" id="tabStrategies" onclick="showPage('strategies')">◇ STRATEGIES</button>
+    <button class="nav-tab" id="tabCinema" onclick="showPage('cinema')">✦ CINEMA</button>
   </div>
   <div class="nav-right">
     <button class="clawmpson-btn" id="clawmpsonBtn" onclick="toggleClawmpson()">◈ CLAWMPSON MODE</button>
@@ -2463,6 +2685,69 @@ body {
 
   </div><!-- /pageStrategies -->
 
+  <!-- ✦ CINEMA STUDIO ─────────────────────────────── -->
+  <div class="page" id="pageCinema">
+    <div class="page-header">
+      <div class="page-title">◈ CINEMA STUDIO</div>
+      <div class="page-subtitle">MAKE VIDEOS. TELL STORIES.</div>
+    </div>
+
+    <!-- STEP 1: Drop Assets -->
+    <div class="cinema-section">
+      <div class="cinema-step-label">STEP 1 — DROP YOUR ASSETS</div>
+      <div class="cinema-dropzone" id="cinemaDropzone">
+        <div class="cinema-drop-hint">drag files here · or click</div>
+        <div class="cinema-drop-types">audio · video · images · text</div>
+        <input type="file" id="cinemaFileInput" multiple style="display:none">
+      </div>
+      <div class="cinema-file-list" id="cinemaFileList"></div>
+    </div>
+
+    <!-- STEP 2: Describe Vision -->
+    <div class="cinema-section">
+      <div class="cinema-step-label">STEP 2 — DESCRIBE YOUR VISION</div>
+      <textarea class="cinema-prompt" id="cinemaPrompt" rows="6" placeholder="what story do you want to tell?"></textarea>
+    </div>
+
+    <!-- STEP 3: Render -->
+    <div class="cinema-section">
+      <div class="cinema-step-label">STEP 3 — RENDER</div>
+      <button class="cinema-magic-btn" id="cinemaMagicBtn" onclick="cinemaTriggerRender()">
+        ✦&nbsp; MAKE IT MAGICAL &nbsp;✦
+      </button>
+    </div>
+
+    <!-- STEP 4: Status (hidden until job submitted) -->
+    <div class="cinema-section" id="cinemaStatusSection" style="display:none">
+      <div class="cinema-step-label">STEP 4 — STATUS</div>
+      <div class="cinema-status-track" id="cinemaStatusTrack">
+        <span class="cinema-status-step" id="cstat-queued">▸ QUEUED</span>
+        <span class="cinema-status-arrow">→</span>
+        <span class="cinema-status-step" id="cstat-composing">COMPOSING</span>
+        <span class="cinema-status-arrow">→</span>
+        <span class="cinema-status-step" id="cstat-rendering">RENDERING</span>
+        <span class="cinema-status-arrow">→</span>
+        <span class="cinema-status-step" id="cstat-complete">✓ DONE</span>
+      </div>
+      <div class="cinema-status-info" id="cinemaStatusInfo"></div>
+    </div>
+
+    <!-- STEP 5: Videos (hidden until first render) -->
+    <div class="cinema-section" id="cinemaGallerySection" style="display:none">
+      <div class="cinema-step-label">STEP 5 — YOUR VIDEOS</div>
+      <div class="cinema-gallery" id="cinemaGallery"></div>
+    </div>
+
+    <!-- Fullscreen modal player -->
+    <div class="cinema-modal" id="cinemaModal" onclick="if(event.target===this)cinemaCloseModal()">
+      <div class="cinema-modal-inner">
+        <button class="cinema-modal-close" onclick="cinemaCloseModal()">✕</button>
+        <video id="cinemaModalVideo" controls playsinline></video>
+        <div class="cinema-modal-meta" id="cinemaModalMeta"></div>
+      </div>
+    </div>
+  </div><!-- /pageCinema -->
+
   <!-- Intel Approve Modal -->
   <div class="modal-overlay" id="intelApproveModal" onclick="if(event.target===this)this.classList.remove('active')">
     <div class="modal-box" style="max-width:420px;">
@@ -2872,6 +3157,10 @@ function showPage(page, pushState) {
     document.getElementById('pageStrategies').classList.add('active')
     document.getElementById('tabStrategies').classList.add('active')
     loadStrategies()
+  } else if (page === 'cinema') {
+    document.getElementById('pageCinema').classList.add('active')
+    document.getElementById('tabCinema').classList.add('active')
+    cinemaLoadGallery()
   } else {
     page = 'dashboard'
     document.getElementById('pageDashboard').classList.add('active')
@@ -2887,7 +3176,7 @@ function showPage(page, pushState) {
 
 // Route on initial page load
 ;(function() {
-  const validPages = ['dashboard','ops','jordan','ideas','projects','agents','trading','terminal','intel','research','strategies']
+  const validPages = ['dashboard','ops','jordan','ideas','projects','agents','trading','terminal','intel','research','strategies','cinema']
   const path = location.pathname.replace(/^\//, '') || 'ops'
   const page = validPages.includes(path) ? path : 'ops'
   showPage(page, false)
