@@ -60,7 +60,7 @@
       "what_to_take": "Extract the LLM agent framework for strategy decision-making and strategy ensembling module to enhance Clawmpson's LLM strategy and graduation engine.",
       "risk": "Suspicious future update date (2026-03-26) suggests possible data inaccuracy; requires license verification; integration needs adaptation to existing SQLite/strategy architecture.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -120,7 +120,7 @@
       "what_to_take": "Columnar storage design for time-series data (not the C code), to inform potential Python-based storage improvements for feed handling.",
       "risk": "C language mismatch requires heavy binding work, unknown license (repo lacks license file), future-dated last update (2026-03-25) suggests data error, and SQLite already meets current stack needs.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "Study the deep learning and genetic programming algorithms for stock prediction to inform new strategy development, but avoid direct notebook integration due to production-readiness issues.",
       "risk": "Unclear license (no LICENSE file visible), outdated code (last updated 2026-03-20 - likely typo), and high refactoring burden to convert Jupyter notebooks to production Python modules.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "Study the modular DRL agent architecture and reward function design patterns for potential adaptation to prediction markets, but avoid direct code integration due to stock-specific implementation.",
       "risk": "Market mismatch (stocks vs. prediction markets), notebook format requiring significant refactoring, suspicious last update date (2026), and low maintenance activity despite moderate stars/forks.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "Exchange integration patterns and order management architecture for Python adaptation",
       "risk": "Java vs Python language mismatch requires full reimplementation; Apache 2.0 license is acceptable but design patterns must be decoupled from Spring Boot specifics",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "Study the composable architecture patterns for real-time data pipelines and execution systems, but avoid direct code porting due to Elixir/Python mismatch.",
       "risk": "License unknown (must verify), suspicious 2026 last update date (likely typo), and high complexity from language mismatch. Elixir code cannot be directly integrated into Python stack.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
