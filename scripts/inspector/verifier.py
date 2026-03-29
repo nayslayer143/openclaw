@@ -13,11 +13,13 @@ Results written to verified_trades table in inspector_gadget.db.
 from __future__ import annotations
 
 import sqlite3
+import time
 from datetime import datetime, timezone
 from enum import Enum
 from typing import Any, Dict, Optional
 
 from inspector.inspector_db import InspectorDB
+from inspector.kalshi_client import KalshiClient
 from inspector.polymarket_client import PolymarketClient
 
 # ---------------------------------------------------------------------------
@@ -44,9 +46,10 @@ class VerificationStatus(str, Enum):
 # ---------------------------------------------------------------------------
 
 class TradeVerifier:
-    def __init__(self, db: InspectorDB, poly: PolymarketClient) -> None:
+    def __init__(self, db: InspectorDB, poly: PolymarketClient, kalshi: Optional[KalshiClient] = None) -> None:
         self.db = db
         self.poly = poly
+        self.kalshi = kalshi
 
     # ------------------------------------------------------------------
     # Internal checks
@@ -96,22 +99,27 @@ class TradeVerifier:
         entry_price = trade.get("entry_price", 0) or 0
         opened_at   = trade.get("opened_at", "")
 
-        # Non-Polymarket markets (e.g., Kalshi KX* IDs) cannot be verified
-        # against the Polymarket API — mark UNVERIFIABLE, not IMPOSSIBLE.
-        if not market_id.startswith("0x"):
+        # Route to the correct exchange client based on market ID prefix
+        if market_id.startswith("0x"):
+            client = self.poly
+            exchange = "Polymarket"
+        elif market_id.startswith("KX") and self.kalshi is not None:
+            client = self.kalshi
+            exchange = "Kalshi"
+        else:
             return {
                 "status": VerificationStatus.UNVERIFIABLE,
-                "detail": f"Market {market_id} is not a Polymarket market (no cross-exchange client yet)",
+                "detail": f"Market {market_id} has no supported exchange client",
             }
 
-        market = self.poly.get_market(market_id)
+        market = client.get_market(market_id)
         if market is None:
             return {
                 "status": VerificationStatus.IMPOSSIBLE,
-                "detail": f"Market {market_id} not found on Polymarket",
+                "detail": f"Market {market_id} not found on {exchange}",
             }
 
-        hist_price = self.poly.get_price_at(market_id, opened_at)
+        hist_price = client.get_price_at(market_id, opened_at)
         if hist_price is None:
             return {
                 "status": VerificationStatus.UNVERIFIABLE,
@@ -222,6 +230,8 @@ class TradeVerifier:
                 result = self.verify_trade(dict(trade))
                 self.db.insert("verified_trades", result)
                 counts[result["status"]] += 1
+                # Rate-limit API calls (Kalshi 429 protection)
+                time.sleep(0.05)
             except Exception:
                 errors += 1
                 continue

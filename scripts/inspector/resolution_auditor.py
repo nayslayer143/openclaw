@@ -23,6 +23,7 @@ from pathlib import Path
 from typing import Optional
 
 from inspector.inspector_db import InspectorDB
+from inspector.kalshi_client import KalshiClient
 from inspector.polymarket_client import PolymarketClient
 
 # ---------------------------------------------------------------------------
@@ -66,9 +67,10 @@ def _resolution_matches(direction: str, bot_status: str, actual_resolution: str)
 # ---------------------------------------------------------------------------
 
 class ResolutionAuditor:
-    def __init__(self, db: InspectorDB, poly: PolymarketClient) -> None:
+    def __init__(self, db: InspectorDB, poly: PolymarketClient, kalshi: Optional[KalshiClient] = None) -> None:
         self.db = db
         self.poly = poly
+        self.kalshi = kalshi
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -102,8 +104,13 @@ class ResolutionAuditor:
         direction  = trade.get("direction", "")
         claimed_pnl = trade.get("pnl")
 
-        # Fetch resolution from Polymarket
-        resolution_data = self.poly.get_resolution(market_id)
+        # Route to the correct exchange client
+        if market_id.startswith("0x"):
+            resolution_data = self.poly.get_resolution(market_id)
+        elif market_id.startswith("KX") and self.kalshi is not None:
+            resolution_data = self.kalshi.get_resolution(market_id)
+        else:
+            resolution_data = None
 
         if resolution_data is None:
             match = -1

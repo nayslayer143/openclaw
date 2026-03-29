@@ -13,7 +13,9 @@ Usage:
 
 import argparse
 import json
+import os
 import sys
+import time
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
@@ -25,6 +27,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from inspector.dashboard import Dashboard
 from inspector.hallucination_detector import HallucinationDetector
 from inspector.inspector_db import InspectorDB
+from inspector.kalshi_client import KalshiClient
 from inspector.logic_analyzer import LogicAnalyzer
 from inspector.polymarket_client import PolymarketClient
 from inspector.repo_scanner import RepoScanner
@@ -144,17 +147,30 @@ def main() -> None:
 
     db   = InspectorDB(); db.init()
     poly = PolymarketClient()
+
+    # Initialize Kalshi client if credentials are available
+    target_env = _load_env(env_path)
+    kalshi_key = target_env.get("KALSHI_API_KEY_ID") or os.environ.get("KALSHI_API_KEY_ID", "")
+    kalshi_pk  = target_env.get("KALSHI_PRIVATE_KEY_PATH") or os.environ.get("KALSHI_PRIVATE_KEY_PATH", "")
+    kalshi_env = target_env.get("KALSHI_API_ENV") or os.environ.get("KALSHI_API_ENV", "demo")
+    kalshi: Optional[KalshiClient] = None
+    if kalshi_key and kalshi_pk:
+        kalshi = KalshiClient(api_key_id=kalshi_key, private_key_path=kalshi_pk, api_env=kalshi_env)
+        print(f"   Kalshi client: {kalshi_env}")
+    else:
+        print("   Kalshi client: not available (no credentials)")
+
     results: dict = {}
     start = datetime.now(timezone.utc)
 
     if args.full or args.verify_trades:
         print("🔍 Verifying trades...")
-        tv = TradeVerifier(db=db, poly=poly)
+        tv = TradeVerifier(db=db, poly=poly, kalshi=kalshi)
         results["verify"] = tv.run(target_db)
         print(f"   → {results['verify']}")
 
         print("📋 Auditing resolutions...")
-        ra = ResolutionAuditor(db=db, poly=poly)
+        ra = ResolutionAuditor(db=db, poly=poly, kalshi=kalshi)
         results["resolution"] = ra.run(target_db)
         print(f"   → {results['resolution']}")
 
@@ -177,7 +193,7 @@ def main() -> None:
             })
 
         print("🧠 Hallucination detection...")
-        hd = HallucinationDetector(db=db, poly=poly)
+        hd = HallucinationDetector(db=db, poly=poly, kalshi=kalshi)
         if signals_path:
             results["hallucination"] = hd.run_on_signals(signals_path)
         else:
@@ -241,6 +257,11 @@ def main() -> None:
         notify_telegram(f"🚨 INSPECTOR GADGET ALERT — {label}\n{chr(10).join(reasons)}\n\n{summary}", env_path)
     else:
         notify_telegram(summary, env_path)
+
+    # Cleanup
+    poly.close()
+    if kalshi is not None:
+        kalshi.close()
 
 
 if __name__ == "__main__":

@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 from inspector.inspector_db import InspectorDB
+from inspector.kalshi_client import KalshiClient
 from inspector.polymarket_client import PolymarketClient
 
 # ---------------------------------------------------------------------------
@@ -48,9 +49,10 @@ class GroundingResult(str, Enum):
 # ---------------------------------------------------------------------------
 
 class HallucinationDetector:
-    def __init__(self, db: InspectorDB, poly: PolymarketClient) -> None:
+    def __init__(self, db: InspectorDB, poly: PolymarketClient, kalshi: Optional[KalshiClient] = None) -> None:
         self.db = db
         self.poly = poly
+        self.kalshi = kalshi
 
     # ------------------------------------------------------------------
     # Core grounding checks (pure — no DB writes)
@@ -63,7 +65,10 @@ class HallucinationDetector:
         timestamp_iso: str,
     ):
         """Returns (GroundingResult, actual_price_or_None)"""
-        actual = self.poly.get_price_at(market_id, timestamp_iso)
+        if market_id.startswith("KX") and self.kalshi is not None:
+            actual = self.kalshi.get_price_at(market_id, timestamp_iso)
+        else:
+            actual = self.poly.get_price_at(market_id, timestamp_iso)
         if actual is None:
             return GroundingResult.UNVERIFIABLE, None
 
@@ -95,11 +100,14 @@ class HallucinationDetector:
 
     def check_market_existence(self, market_id: str) -> GroundingResult:
         """
-        Verify that the referenced market exists on Polymarket.
+        Verify that the referenced market exists on the relevant exchange.
 
         Returns GROUNDED if found, HALLUCINATED if not.
         """
-        info = self.poly.get_market(market_id)
+        if market_id.startswith("KX") and self.kalshi is not None:
+            info = self.kalshi.get_market(market_id)
+        else:
+            info = self.poly.get_market(market_id)
         if info is None:
             return GroundingResult.HALLUCINATED
         return GroundingResult.GROUNDED

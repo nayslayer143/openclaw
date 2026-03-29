@@ -7,6 +7,10 @@
     "gamma_api": "https://gamma-api.polymarket.com",
     "clob_api": "https://clob.polymarket.com"
   },
+  "kalshi": {
+    "prod_api": "https://api.elections.kalshi.com/trade-api/v2",
+    "demo_api": "https://demo-api.kalshi.co/trade-api/v2"
+  },
   "ollama": {
     "base_url": "http://localhost:11434",
     "model": "qwen3:30b",

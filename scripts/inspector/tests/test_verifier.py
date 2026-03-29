@@ -62,13 +62,37 @@ def test_price_impossible_market_not_found():
 
 
 def test_price_unverifiable_non_polymarket_market():
-    """Non-0x market IDs (e.g., Kalshi KX* IDs) should be UNVERIFIABLE, not IMPOSSIBLE."""
+    """Non-0x market IDs without a Kalshi client should be UNVERIFIABLE."""
     poly = MagicMock()
-    tv = TradeVerifier(db=MagicMock(), poly=poly)
+    tv = TradeVerifier(db=MagicMock(), poly=poly, kalshi=None)
     result = tv._check_price(_make_trade({"market_id": "KXBTC-26MAR2402-T77699.99"}))
     assert result["status"] == VerificationStatus.UNVERIFIABLE
     # Polymarket client should NOT be called for non-Polymarket markets
     poly.get_market.assert_not_called()
+
+
+def test_price_kalshi_routing():
+    """KX* market IDs should route to the Kalshi client when available."""
+    poly = MagicMock()
+    kalshi = MagicMock()
+    kalshi.get_market.return_value = {"title": "BTC market"}
+    kalshi.get_price_at.return_value = 0.68
+    tv = TradeVerifier(db=MagicMock(), poly=poly, kalshi=kalshi)
+    trade = _make_trade({"market_id": "KXBTC-26MAR2817-B66425", "entry_price": 0.68})
+    result = tv._check_price(trade)
+    assert result["status"] == VerificationStatus.VERIFIED
+    # Kalshi client should be called, not Polymarket
+    kalshi.get_market.assert_called_once()
+    poly.get_market.assert_not_called()
+
+
+def test_price_kalshi_impossible_market_not_found():
+    """KX* market not found on Kalshi should be IMPOSSIBLE."""
+    kalshi = MagicMock()
+    kalshi.get_market.return_value = None
+    tv = TradeVerifier(db=MagicMock(), poly=MagicMock(), kalshi=kalshi)
+    result = tv._check_price(_make_trade({"market_id": "KXFAKE-NONEXIST"}))
+    assert result["status"] == VerificationStatus.IMPOSSIBLE
 
 
 def test_price_unverifiable_no_history():

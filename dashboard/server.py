@@ -364,8 +364,6 @@ def _get_running_processes():
                 procs.append("ollama")
             elif "build-agent" in line or "build_agent" in line:
                 procs.append("build-agent")
-            elif "mirofish" in line:
-                procs.append("mirofish")
             elif "uvicorn" in line and "server:app" in line:
                 procs.append("dashboard-server")
             else:
@@ -913,385 +911,95 @@ async def get_trading(user: str = Depends(get_current_user)):
 # ── Trading Dashboard (comprehensive) ────────────────────────────────────────
 import sqlite3
 
-def _trading_db():
-    db_path = Path.home() / ".openclaw" / "clawmson.db"
-    if not db_path.exists():
-        return None
-    conn = sqlite3.connect(str(db_path))
-    conn.row_factory = sqlite3.Row
-    return conn
-
 _trading_cache = {"data": None, "ts": 0}
 
 @app.get("/api/trading/dashboard")
 async def get_trading_dashboard(user: str = Depends(get_current_user)):
-    """Comprehensive trading dashboard data for the TRADING tab. Cached 5s."""
+    """Trading dashboard: RivalClaw + QuantumentalClaw. Cached 5s."""
     now = time.time()
     if _trading_cache["data"] and (now - _trading_cache["ts"]) < 5:
         return _trading_cache["data"]
 
-    conn = _trading_db()
-    if not conn:
-        return {"error": "Database not found"}
+    # RivalClaw state
+    rc_state = None
+    rivalclaw_positions = []
     try:
-        # 1. Wallet state
-        starting = 1000.0
-        ctx = conn.execute("SELECT value FROM context WHERE chat_id='mirofish' AND key='starting_balance'").fetchone()
-        if ctx:
-            starting = float(ctx[0])
-
-        closed_pnl = conn.execute("SELECT COALESCE(SUM(pnl), 0) as total FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')").fetchone()[0]
-        open_trades = conn.execute("SELECT * FROM paper_trades WHERE status='open' ORDER BY opened_at DESC").fetchall()
-
-        # Mark-to-market open positions
-        unrealized = 0.0
-        open_list = []
-        for t in open_trades:
-            latest = conn.execute("SELECT yes_price, no_price FROM market_data WHERE market_id=? ORDER BY fetched_at DESC LIMIT 1", (t["market_id"],)).fetchone()
-            current_price = t["entry_price"]
-            if latest:
-                current_price = latest["yes_price"] if t["direction"] == "YES" else latest["no_price"]
-                if current_price is None:
-                    current_price = t["entry_price"]
-            pnl = t["shares"] * (current_price - t["entry_price"])
-            pnl_pct = (pnl / t["amount_usd"] * 100) if t["amount_usd"] > 0 else 0
-            unrealized += pnl
-            # Look up close_time from kalshi_markets or market_data
-            close_time = None
-            km = conn.execute("SELECT close_time FROM kalshi_markets WHERE ticker=? ORDER BY fetched_at DESC LIMIT 1", (t["market_id"],)).fetchone()
-            if km and km["close_time"]:
-                close_time = km["close_time"]
-            else:
-                md = conn.execute("SELECT end_date FROM market_data WHERE market_id=? ORDER BY fetched_at DESC LIMIT 1", (t["market_id"],)).fetchone()
-                if md and md["end_date"]:
-                    close_time = md["end_date"]
-            open_list.append({
-                "id": t["id"], "market_id": t["market_id"],
-                "question": t["question"][:80], "direction": t["direction"],
-                "strategy": t["strategy"], "entry_price": t["entry_price"],
-                "current_price": current_price, "shares": t["shares"],
-                "amount_usd": t["amount_usd"], "pnl": round(pnl, 2),
-                "pnl_pct": round(pnl_pct, 1), "confidence": t["confidence"],
-                "opened_at": t["opened_at"], "close_time": close_time,
-            })
-
-        balance = starting + closed_pnl + unrealized
-        roi_pct = ((balance - starting) / starting * 100) if starting > 0 else 0
-
-        # 2. Closed trades (recent 50)
-        recent_closed = conn.execute("""
-            SELECT id, market_id, question, direction, strategy, entry_price,
-                   exit_price, shares, amount_usd, pnl, status, confidence,
-                   opened_at, closed_at
-            FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')
-            ORDER BY closed_at DESC LIMIT 50
-        """).fetchall()
-        closed_list = [dict(r) for r in recent_closed]
-
-        # 3. Daily P&L curve
-        daily_pnl = conn.execute("SELECT date, balance, roi_pct, win_rate FROM daily_pnl ORDER BY date ASC").fetchall()
-        pnl_curve = [{"date": r["date"], "balance": r["balance"], "roi_pct": r["roi_pct"], "win_rate": r["win_rate"]} for r in daily_pnl]
-
-        # 4. Win/loss stats
-        all_closed = conn.execute("SELECT status, strategy, pnl FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')").fetchall()
-        total_closed = len(all_closed)
-        wins = sum(1 for t in all_closed if t["status"] == "closed_win")
-        win_rate = wins / total_closed if total_closed > 0 else 0
-
-        # Per-strategy breakdown
-        strat_map = {}
-        for t in all_closed:
-            s = t["strategy"]
-            if s not in strat_map:
-                strat_map[s] = {"wins": 0, "losses": 0, "pnl": 0}
-            if t["status"] == "closed_win":
-                strat_map[s]["wins"] += 1
-            else:
-                strat_map[s]["losses"] += 1
-            strat_map[s]["pnl"] += t["pnl"] or 0
-
-        strategy_breakdown = [
-            {"strategy": k, "wins": v["wins"], "losses": v["losses"],
-             "total": v["wins"] + v["losses"], "pnl": round(v["pnl"], 2),
-             "win_rate": round(v["wins"] / (v["wins"] + v["losses"]) * 100, 1) if (v["wins"] + v["losses"]) > 0 else 0}
-            for k, v in strat_map.items()
-        ]
-        strategy_breakdown.sort(key=lambda x: x["pnl"], reverse=True)
-
-        # 5. Strategy tournament (from strategy_stats)
-        tournament = []
-        try:
-            strat_stats = conn.execute("""
-                SELECT ss.* FROM strategy_stats ss
-                INNER JOIN (SELECT strategy, MAX(snapshot_date) as latest FROM strategy_stats GROUP BY strategy) l
-                ON ss.strategy = l.strategy AND ss.snapshot_date = l.latest
+        rc_db = Path.home() / "rivalclaw" / "rivalclaw.db"
+        if rc_db.exists():
+            rc_conn = sqlite3.connect(str(rc_db))
+            rc_conn.row_factory = sqlite3.Row
+            rc_state = _rivalclaw_state(rc_conn)
+            # Also build rivalclaw_positions for unified feed with close_time
+            rc_open = rc_conn.execute("""
+                SELECT market_id, question, direction, strategy, entry_price, amount_usd,
+                       confidence, opened_at, pnl
+                FROM paper_trades WHERE status='open' ORDER BY opened_at DESC
             """).fetchall()
-            tournament = [dict(r) for r in strat_stats]
-        except Exception:
-            pass
-
-        # 6. Polymarket markets (latest)
-        poly_markets = conn.execute("""
-            SELECT md.market_id, md.question, md.category, md.yes_price, md.no_price, md.volume
-            FROM market_data md
-            INNER JOIN (SELECT market_id, MAX(fetched_at) as latest FROM market_data GROUP BY market_id) l
-            ON md.market_id = l.market_id AND md.fetched_at = l.latest
-            ORDER BY md.volume DESC LIMIT 30
-        """).fetchall()
-        poly_list = [dict(r) for r in poly_markets]
-
-        # 7. Kalshi markets (latest)
-        kalshi_list = []
-        try:
-            kalshi_markets = conn.execute("""
-                SELECT km.ticker, km.title, km.category, km.yes_bid, km.yes_ask,
-                       km.no_bid, km.no_ask, km.last_price, km.volume_24h, km.status
-                FROM kalshi_markets km
-                INNER JOIN (SELECT ticker, MAX(fetched_at) as latest FROM kalshi_markets GROUP BY ticker) l
-                ON km.ticker = l.ticker AND km.fetched_at = l.latest
-                ORDER BY km.volume_24h DESC LIMIT 30
-            """).fetchall()
-            kalshi_list = [dict(r) for r in kalshi_markets]
-        except Exception:
-            pass
-
-        # 8. Cross-venue arb trades
-        xv_arb = []
-        try:
-            xv_rows = conn.execute("SELECT * FROM cross_venue_arb_trades ORDER BY detected_at DESC LIMIT 20").fetchall()
-            xv_arb = [dict(r) for r in xv_rows]
-        except Exception:
-            pass
-
-        # 9. Graduation status
-        from statistics import mean, stdev
-        grad = {"has_min_history": False, "roi_7d_pass": False, "win_rate_pass": False, "sharpe_pass": False, "drawdown_pass": False, "all_pass": False}
-        if len(daily_pnl) >= 7:
-            grad["has_min_history"] = True
-            last7 = [r["roi_pct"] for r in daily_pnl[-7:] if r["roi_pct"] is not None]
-            grad["roi_7d_pass"] = sum(last7) > 0
-            grad["win_rate_pass"] = win_rate >= 0.55
-            returns = [r["roi_pct"] for r in daily_pnl if r["roi_pct"] is not None]
-            if len(returns) >= 7:
-                s = stdev(returns)
-                sharpe = mean(returns) / s if s > 0 else 0
-                grad["sharpe_pass"] = sharpe >= 1.0
-            balances = [r["balance"] for r in daily_pnl]
-            peak = balances[0]
-            max_dd = 0
-            for b_val in balances:
-                peak = max(peak, b_val)
-                dd = (peak - b_val) / peak if peak > 0 else 0
-                max_dd = max(max_dd, dd)
-            grad["drawdown_pass"] = max_dd < 0.25
-            grad["all_pass"] = all([grad["roi_7d_pass"], grad["win_rate_pass"], grad["sharpe_pass"], grad["drawdown_pass"]])
-
-        # 10. PhantomClaw stats (RivalClaw strategy running inside Clawmpson)
-        phantom_stats = {"trades": 0, "wins": 0, "losses": 0, "pnl": 0, "open": 0, "positions": []}
-        try:
-            phantom_closed = conn.execute("""
-                SELECT COUNT(*) as n,
-                       SUM(CASE WHEN status='closed_win' THEN 1 ELSE 0 END) as w,
-                       COALESCE(SUM(pnl), 0) as p
-                FROM paper_trades WHERE strategy LIKE 'phantomclaw%' AND status IN ('closed_win','closed_loss','expired')
-            """).fetchone()
-            phantom_open = conn.execute("""
-                SELECT id, market_id, question, direction, entry_price, amount_usd, confidence, opened_at, strategy
-                FROM paper_trades WHERE strategy LIKE 'phantomclaw%' AND status='open'
-                ORDER BY opened_at DESC
-            """).fetchall()
-            # Get close_time for each
-            phantom_positions = []
-            for po in phantom_open:
-                pdict = dict(po)
-                km = conn.execute("SELECT close_time FROM kalshi_markets WHERE ticker=? ORDER BY fetched_at DESC LIMIT 1", (po["market_id"],)).fetchone()
-                pdict["close_time"] = km["close_time"] if km and km["close_time"] else None
-                # Mark to market
-                latest_k = conn.execute("SELECT yes_bid, no_bid FROM kalshi_markets WHERE ticker=? ORDER BY fetched_at DESC LIMIT 1", (po["market_id"],)).fetchone()
-                ep = po["entry_price"] or 0.01
-                cp = ep  # default
-                if latest_k:
-                    raw_cp = latest_k["yes_bid"] if po["direction"] == "YES" else latest_k["no_bid"]
-                    if raw_cp is not None:
-                        cp = raw_cp / 100.0 if raw_cp > 1 else raw_cp
-                pdict["current_price"] = cp
-                pdict["pnl"] = round((cp - ep) * (po["amount_usd"] / ep) if ep > 0 else 0, 2)
-                amt = po["amount_usd"] or 1
-                pdict["pnl_pct"] = round(pdict["pnl"] / amt * 100, 1) if amt > 0 else 0
-                phantom_positions.append(pdict)
-
-            pc_n = phantom_closed["n"] or 0
-            pc_w = phantom_closed["w"] or 0
-            pc_p = phantom_closed["p"] or 0
-            phantom_stats = {
-                "trades": pc_n,
-                "wins": pc_w,
-                "losses": pc_n - pc_w,
-                "pnl": round(pc_p, 2),
-                "open": len(phantom_open),
-                "win_rate": round(pc_w / pc_n * 100, 1) if pc_n > 0 else 0,
-                "positions": phantom_positions,
-            }
-        except Exception as phantom_err:
-            phantom_stats["error"] = str(phantom_err)
-
-        # 10b. Per-agent stats for CalendarClaw, NewsClaw, SentimentClaw
-        agent_stats = {}
-        for agent_name in ("calendarclaw", "newsclaw", "sentimentclaw", "dataharvester"):
-            try:
-                ac = conn.execute("""
-                    SELECT COUNT(*) as n,
-                           SUM(CASE WHEN status='closed_win' THEN 1 ELSE 0 END) as w,
-                           COALESCE(SUM(pnl), 0) as p
-                    FROM paper_trades WHERE strategy=? AND status IN ('closed_win','closed_loss','expired')
-                """, (agent_name,)).fetchone()
-                ao = conn.execute("""
-                    SELECT id, market_id, question, direction, entry_price, shares, amount_usd, opened_at
-                    FROM paper_trades WHERE strategy=? AND status='open' ORDER BY opened_at DESC
-                """, (agent_name,)).fetchall()
-                positions = []
-                agent_unrealized = 0.0
-                for po in ao:
-                    pd = dict(po)
-                    # Mark-to-market: get current price from kalshi_markets or market_data
-                    current_price = po["entry_price"]
-                    km = conn.execute("SELECT yes_ask, no_ask, yes_bid, no_bid, close_time FROM kalshi_markets WHERE ticker=? ORDER BY fetched_at DESC LIMIT 1", (po["market_id"],)).fetchone()
-                    if km:
-                        pd["close_time"] = km["close_time"] if km["close_time"] else None
-                        if po["direction"] == "YES":
-                            current_price = km["yes_bid"] or km["yes_ask"] or po["entry_price"]
-                        else:
-                            current_price = km["no_bid"] or km["no_ask"] or po["entry_price"]
-                    else:
-                        # Try polymarket market_data
-                        md = conn.execute("SELECT yes_price, no_price, end_date FROM market_data WHERE market_id=? ORDER BY fetched_at DESC LIMIT 1", (po["market_id"],)).fetchone()
-                        if md:
-                            pd["close_time"] = md["end_date"] if md["end_date"] else None
-                            current_price = md["yes_price"] if po["direction"] == "YES" else md["no_price"]
-                        else:
-                            pd["close_time"] = None
-                    pnl = (po["shares"] or 0) * (current_price - po["entry_price"])
-                    pd["pnl"] = round(pnl, 2)
-                    pd["current_price"] = current_price
-                    agent_unrealized += pnl
-                    positions.append(pd)
-                n = ac["n"] or 0
-                w = ac["w"] or 0
-                realized = ac["p"] or 0
-                total_pnl = round(realized + agent_unrealized, 2)
-                agent_stats[agent_name] = {
-                    "trades": n, "wins": w, "losses": n - w,
-                    "pnl": total_pnl,
-                    "balance": round(1000.0 + total_pnl, 2),
-                    "starting_balance": 1000.0,
-                    "open": len(ao),
-                    "win_rate": round(w / n * 100, 1) if n > 0 else 0,
-                    "positions": positions,
-                }
-            except Exception:
-                agent_stats[agent_name] = {"trades": 0, "wins": 0, "losses": 0, "pnl": 0, "balance": 1000.0, "starting_balance": 1000.0, "open": 0, "win_rate": 0, "positions": []}
-
-        # 10c. RivalClaw open positions (separate DB) for unified feed
-        rivalclaw_positions = []
-        try:
-            rc_db = Path.home() / "rivalclaw" / "rivalclaw.db"
-            if rc_db.exists():
-                rc_conn = sqlite3.connect(str(rc_db))
-                rc_conn.row_factory = sqlite3.Row
-                rc_open = rc_conn.execute("""
-                    SELECT market_id, question, direction, strategy, entry_price, amount_usd,
-                           confidence, opened_at, pnl
-                    FROM paper_trades WHERE status='open' ORDER BY opened_at DESC
-                """).fetchall()
-                for ro in rc_open:
-                    rd = dict(ro)
-                    # Try to get close_time from rivalclaw's kalshi data or our kalshi_markets
-                    km = conn.execute("SELECT close_time FROM kalshi_markets WHERE ticker=? ORDER BY fetched_at DESC LIMIT 1", (ro["market_id"],)).fetchone()
+            for ro in rc_open:
+                rd = dict(ro)
+                # Try to get close_time from rivalclaw's own kalshi_markets table
+                try:
+                    km = rc_conn.execute("SELECT close_time FROM kalshi_markets WHERE ticker=? ORDER BY fetched_at DESC LIMIT 1", (ro["market_id"],)).fetchone()
                     rd["close_time"] = km["close_time"] if km and km["close_time"] else None
-                    rd["current_price"] = ro["entry_price"]
-                    rivalclaw_positions.append(rd)
-                rc_conn.close()
-        except Exception:
-            pass
+                except Exception:
+                    rd["close_time"] = None
+                rd["current_price"] = ro["entry_price"]
+                rivalclaw_positions.append(rd)
+            rc_conn.close()
+    except Exception:
+        pass
 
-        # 10d. QuantumentalClaw positions (separate DB)
-        quantclaw_data = {"wallet": {}, "positions": []}
-        try:
-            qc_db = Path.home() / "quantumentalclaw" / "quantumentalclaw.db"
-            if qc_db.exists():
-                qc_conn = sqlite3.connect(str(qc_db))
-                qc_conn.row_factory = sqlite3.Row
-                quantclaw_data = _quantumentalclaw_state(qc_conn)
-                qc_conn.close()
-        except Exception as qe:
-            quantclaw_data["error"] = str(qe)
+    # QuantumentalClaw state
+    quantclaw_data = {"wallet": {}, "positions": []}
+    try:
+        qc_db = Path.home() / "quantumentalclaw" / "quantumentalclaw.db"
+        if qc_db.exists():
+            qc_conn = sqlite3.connect(str(qc_db))
+            qc_conn.row_factory = sqlite3.Row
+            quantclaw_data = _quantumentalclaw_state(qc_conn)
+            qc_conn.close()
+    except Exception as qe:
+        quantclaw_data["error"] = str(qe)
 
-        # 11. Missed opportunities summary
-        missed_summary = []
-        try:
-            missed = conn.execute("""
-                SELECT strategy, COUNT(*) as total,
-                       SUM(CASE WHEN counterfactual_pnl > 0 THEN 1 ELSE 0 END) as would_win,
-                       COALESCE(SUM(counterfactual_pnl), 0) as total_cf_pnl
-                FROM missed_opportunities WHERE status='resolved'
-                GROUP BY strategy
-            """).fetchall()
-            missed_summary = [dict(r) for r in missed]
-        except Exception:
-            pass
+    # Aggregated wallet from both systems
+    rc_w = rc_state["wallet"] if rc_state else {}
+    qc_w = quantclaw_data.get("wallet", {})
+    agg_balance = rc_w.get("balance", 0) + qc_w.get("balance", 0)
+    agg_starting = rc_w.get("starting_balance", 0) + qc_w.get("starting_balance", 0)
+    agg_trades = rc_w.get("total_trades", 0) + qc_w.get("total_trades", 0)
+    agg_wins = rc_w.get("wins", 0) + qc_w.get("wins", 0)
+    agg_unrealized = rc_w.get("unrealized_pnl", 0) + qc_w.get("unrealized_pnl", 0)
+    agg_realized = rc_w.get("total_pnl", 0) + qc_w.get("total_pnl", 0)
+    agg_open = rc_w.get("open_positions", 0) + qc_w.get("open_positions", 0)
 
-        # 12. Calibration status
-        calibration = []
-        try:
-            cal_rows = conn.execute(
-                "SELECT bot, param, old_value, new_value, reason, mode, win_rate, sample_size, logged_at "
-                "FROM calibration_log ORDER BY logged_at DESC LIMIT 10"
-            ).fetchall()
-            calibration = [dict(r) for r in cal_rows]
-        except Exception:
-            pass
+    pnl_curve = rc_state.get("pnl_curve", []) if rc_state else []
 
-        result = {
-            "wallet": {
-                "balance": round(balance, 2),
-                "starting_balance": starting,
-                "roi_pct": round(roi_pct, 2),
-                "unrealized_pnl": round(unrealized, 2),
-                "realized_pnl": round(closed_pnl, 2),
-                "total_trades": total_closed,
-                "wins": wins,
-                "win_rate": round(win_rate * 100, 1),
-                "open_positions": len(open_list),
-            },
-            "graduation": grad,
-            "open_positions": open_list,
-            "recent_trades": closed_list,
-            "pnl_curve": pnl_curve,
-            "strategy_breakdown": strategy_breakdown,
-            "tournament": tournament,
-            "polymarket": poly_list,
-            "kalshi": kalshi_list,
-            "cross_venue_arb": xv_arb,
-            "phantom": phantom_stats,
-            "agents": agent_stats,
-            "rivalclaw_positions": rivalclaw_positions,
-            "quantclaw": quantclaw_data,
-            "missed_opportunities": missed_summary,
-            "calibration": calibration,
-        }
-        _trading_cache["data"] = result
-        _trading_cache["ts"] = time.time()
-        return result
-    finally:
-        conn.close()
+    result = {
+        "wallet": {
+            "balance": round(agg_balance, 2),
+            "starting_balance": round(agg_starting, 2),
+            "roi_pct": round(((agg_balance - agg_starting) / agg_starting * 100) if agg_starting > 0 else 0, 2),
+            "unrealized_pnl": round(agg_unrealized, 2),
+            "realized_pnl": round(agg_realized, 2),
+            "total_trades": agg_trades,
+            "wins": agg_wins,
+            "win_rate": round(agg_wins / agg_trades * 100, 1) if agg_trades > 0 else 0,
+            "open_positions": agg_open,
+        },
+        "pnl_curve": pnl_curve,
+        "rivalclaw_positions": rivalclaw_positions,
+        "quantclaw": quantclaw_data,
+    }
+    _trading_cache["data"] = result
+    _trading_cache["ts"] = time.time()
+    return result
 
 
-# ── ArbClaw / RivalClaw Experiment ────────────────────────────────────────────
+# ── RivalClaw / QuantumentalClaw Experiment ───────────────────────────────────
 
 def _experiment_db(instance):
-    """Open SQLite DB for an experiment instance (arbclaw, rivalclaw, or quantumentalclaw)."""
+    """Open SQLite DB for an experiment instance (rivalclaw or quantumentalclaw)."""
     paths = {
-        "arbclaw": Path.home() / "arbclaw" / "arbclaw.db",
         "rivalclaw": Path.home() / "rivalclaw" / "rivalclaw.db",
         "quantumentalclaw": Path.home() / "quantumentalclaw" / "quantumentalclaw.db",
     }
@@ -1301,69 +1009,6 @@ def _experiment_db(instance):
     conn = sqlite3.connect(str(db_path))
     conn.row_factory = sqlite3.Row
     return conn
-
-
-def _arbclaw_state(conn):
-    """Read ArbClaw wallet state (different schema: positions/trades tables)."""
-    starting = 1000.0
-    total_pnl = conn.execute("SELECT COALESCE(SUM(pnl), 0) FROM trades").fetchone()[0]
-    locked = conn.execute("SELECT COALESCE(SUM(amount_usd), 0) FROM positions WHERE status='open'").fetchone()[0]
-    balance = starting + total_pnl - locked
-
-    open_pos = conn.execute("SELECT * FROM positions WHERE status='open' ORDER BY opened_at DESC").fetchall()
-    open_list = []
-    for p in open_pos:
-        latest = conn.execute(
-            "SELECT yes_price, no_price FROM market_snapshots WHERE market_id=? ORDER BY fetched_at DESC LIMIT 1",
-            (p["market_id"],)
-        ).fetchone()
-        current = p["entry_price"]
-        if latest:
-            current = latest["yes_price"] if p["direction"] == "YES" else latest["no_price"]
-        pnl = (current - p["entry_price"]) * p["shares"] if p["shares"] else 0
-        pnl_pct = (pnl / p["amount_usd"] * 100) if p["amount_usd"] and p["amount_usd"] > 0 else 0
-        open_list.append({
-            "market_id": p["market_id"], "question": (p["question"] or "")[:80],
-            "direction": p["direction"], "entry_price": p["entry_price"],
-            "current_price": current, "amount_usd": p["amount_usd"],
-            "pnl": round(pnl, 2), "pnl_pct": round(pnl_pct, 1),
-            "latency_ms": p["signal_to_trade_latency_ms"] or 0,
-            "opened_at": p["opened_at"],
-        })
-
-    recent = conn.execute(
-        "SELECT * FROM trades ORDER BY closed_at DESC LIMIT 20"
-    ).fetchall()
-    recent_list = [{
-        "market_id": r["market_id"], "direction": r["direction"],
-        "entry_price": r["entry_price"], "exit_price": r["exit_price"],
-        "pnl": round(r["pnl"] or 0, 2),
-        "latency_ms": r["signal_to_trade_latency_ms"] or 0,
-        "opened_at": r["opened_at"], "closed_at": r["closed_at"],
-    } for r in recent]
-
-    total_trades = conn.execute("SELECT COUNT(*) FROM trades").fetchone()[0]
-    wins = conn.execute("SELECT COUNT(*) FROM trades WHERE pnl > 0").fetchone()[0]
-    avg_latency = conn.execute("SELECT AVG(signal_to_trade_latency_ms) FROM trades WHERE signal_to_trade_latency_ms > 0").fetchone()[0]
-
-    # Daily PnL curve
-    daily = conn.execute("SELECT date, balance FROM daily_pnl ORDER BY date ASC").fetchall()
-    pnl_curve = [{"date": r["date"], "balance": r["balance"]} for r in daily]
-
-    return {
-        "instance": "arbclaw",
-        "wallet": {
-            "balance": round(balance, 2), "starting_balance": starting,
-            "total_pnl": round(total_pnl, 2),
-            "total_trades": total_trades, "wins": wins,
-            "win_rate": round(wins / total_trades * 100, 1) if total_trades > 0 else 0,
-            "open_positions": len(open_list),
-            "avg_latency_ms": round(avg_latency or 0, 1),
-        },
-        "open_positions": open_list,
-        "recent_trades": recent_list,
-        "pnl_curve": pnl_curve,
-    }
 
 
 def _rivalclaw_state(conn):
@@ -1591,16 +1236,14 @@ def _quantumentalclaw_state(conn):
 
 @app.get("/api/trading/experiment")
 async def get_experiment_dashboard(user: str = Depends(get_current_user)):
-    """Four-way experiment dashboard: ArbClaw + RivalClaw + QuantumentalClaw."""
-    result = {"arbclaw": None, "rivalclaw": None, "quantumentalclaw": None}
-    for instance in ("arbclaw", "rivalclaw", "quantumentalclaw"):
+    """Experiment dashboard: RivalClaw + QuantumentalClaw."""
+    result = {"rivalclaw": None, "quantumentalclaw": None}
+    for instance in ("rivalclaw", "quantumentalclaw"):
         conn = _experiment_db(instance)
         if not conn:
             continue
         try:
-            if instance == "arbclaw":
-                result[instance] = _arbclaw_state(conn)
-            elif instance == "rivalclaw":
+            if instance == "rivalclaw":
                 result[instance] = _rivalclaw_state(conn)
             else:
                 result[instance] = _quantumentalclaw_state(conn)
@@ -1948,7 +1591,6 @@ async def claw_status():
     health_file = Path.home() / ".openclaw" / "claw-health-log.jsonl"
 
     DISPLAY_NAMES = {
-        "claw-clawmpson": "CLAWMPSON", "clawmpson": "CLAWMPSON",
         "claw-rival": "RIVALCLAW", "rival": "RIVALCLAW",
         "claw-quant": "QUANTCLAW", "quant": "QUANTCLAW",
         "claw-monkey": "CODEMONKEY", "monkey": "CODEMONKEY",
@@ -2059,7 +1701,7 @@ def _write_intel_archive(archive: list):
 async def intel_list(sort: str = "composite", user: str = Depends(get_current_user)):
     """Latest recommendations with flexible sorting.
     Sort options: composite, integration_value, signal_score, complexity, stars,
-                  clawmpson_relevance, arbclaw_relevance, rivalclaw_relevance, recency, value_per_complexity
+                  rivalclaw_relevance, recency, value_per_complexity
     """
     data = _read_intel_recs()
     recs = data.get("recommendations", [])
@@ -2067,7 +1709,7 @@ async def intel_list(sort: str = "composite", user: str = Depends(get_current_us
     if sort == "composite":
         # Weighted composite: integration_value*3 + signal_score*2 + max_relevance - complexity*0.5
         def composite(r):
-            max_rel = max(r.get("clawmpson_relevance", 0), r.get("arbclaw_relevance", 0), r.get("rivalclaw_relevance", 0))
+            max_rel = r.get("rivalclaw_relevance", 0)
             return r.get("integration_value", 0) * 3 + r.get("signal_score", 0) * 2 + max_rel - r.get("complexity", 0) * 0.5
         recs.sort(key=composite, reverse=True)
     elif sort == "value_per_complexity":
@@ -2079,7 +1721,7 @@ async def intel_list(sort: str = "composite", user: str = Depends(get_current_us
         sort_desc = False
     elif sort == "recency":
         recs.sort(key=lambda r: r.get("last_updated", "") or "", reverse=True)
-    elif sort in ("integration_value", "signal_score", "stars", "clawmpson_relevance", "arbclaw_relevance", "rivalclaw_relevance"):
+    elif sort in ("integration_value", "signal_score", "stars", "rivalclaw_relevance"):
         recs.sort(key=lambda r: r.get(sort, 0), reverse=True)
     else:
         recs.sort(key=lambda r: r.get("integration_value", 0), reverse=True)
@@ -2126,7 +1768,7 @@ async def intel_approve(request: Request, user: str = Depends(get_current_user))
     targets = body.get("targets", [])
     notes = body.get("notes", "")
 
-    valid_targets = {"clawmpson", "arbclaw", "rivalclaw"}
+    valid_targets = {"clawmpson", "rivalclaw", "quantumentalclaw"}
     targets = [t for t in targets if t in valid_targets]
     if not targets:
         raise HTTPException(400, "At least one target bot required")
@@ -2839,7 +2481,7 @@ async def chatgpt_deploy(request: Request, user: str = Depends(get_current_user)
         raise HTTPException(400, "Already deployed")
 
     target = rec.get("recommended_target", "clawmpson")
-    valid_targets = {"clawmpson", "arbclaw", "rivalclaw", "quantumentalclaw"}
+    valid_targets = {"clawmpson", "rivalclaw", "quantumentalclaw"}
     if target not in valid_targets:
         target = "clawmpson"
 
@@ -2901,7 +2543,7 @@ async def chatgpt_deploy_all(request: Request, user: str = Depends(get_current_u
         if rec.get("deployed"):
             continue
         target = rec.get("recommended_target", "clawmpson")
-        valid_targets = {"clawmpson", "arbclaw", "rivalclaw", "quantumentalclaw"}
+        valid_targets = {"clawmpson", "rivalclaw", "quantumentalclaw"}
         if target not in valid_targets:
             target = "clawmpson"
 

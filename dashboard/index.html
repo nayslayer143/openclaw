@@ -2138,26 +2138,6 @@ body {
     <!-- 6-Agent Hero Grid: 3×2 -->
     <div style="display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:14px" id="heroGrid">
 
-      <!-- PhantomClaw -->
-      <div class="t-section" data-pnl="0" data-bot="phantomclaw" style="border-color:rgba(255,0,200,0.25);background:linear-gradient(135deg,rgba(15,0,20,0.95),rgba(5,0,10,0.98));margin-bottom:0">
-        <div class="t-section-title" style="color:#ff00c8;border-bottom-color:rgba(255,0,200,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
-          PHANTOMCLAW
-          <span class="t-live-dot" style="background:#ff00c8;box-shadow:0 0 6px #ff00c8;width:6px;height:6px"></span>
-        </div>
-        <div style="font-size:0.38rem;color:rgba(255,0,200,0.4);letter-spacing:1px;margin:-8px 0 8px 0">BS FAIR VALUE × CLAWMPSON ARCH · */2 CRON</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px">
-          <div><div class="t-card-label">START</div><div class="t-card-value" id="phStart" style="font-size:1rem">$1,000</div></div>
-          <div><div class="t-card-label">BALANCE</div><div class="t-card-value" id="phBalance" style="font-size:1rem">$1,000</div></div>
-          <div><div class="t-card-label">P&L</div><div class="t-card-value" id="phPnl" style="font-size:1rem">$0</div></div>
-          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="phWL" style="font-size:1rem">0W / 0L (0%)</div></div>
-          <div><div class="t-card-label">TRADES</div><div class="t-card-value" id="phTrades" style="font-size:1rem;color:#ff00c8">0</div></div>
-        </div>
-        <div class="t-table-wrap" style="max-height:200px;overflow-y:auto">
-          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>BET</th><th>UPSIDE</th><th>P&L</th><th>RESOLVES</th></tr></thead>
-          <tbody id="phBody"></tbody></table>
-        </div>
-      </div>
-
       <!-- RivalClaw -->
       <div class="t-section" data-pnl="0" data-bot="rivalclaw" style="border-color:rgba(180,140,255,0.25);background:linear-gradient(135deg,rgba(10,0,20,0.95),rgba(5,0,10,0.98));margin-bottom:0">
         <div class="t-section-title" style="color:rgba(180,140,255,0.9);border-bottom-color:rgba(180,140,255,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
@@ -2175,106 +2155,6 @@ body {
         <div class="t-table-wrap" style="max-height:200px;overflow-y:auto">
           <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>BET</th><th>UPSIDE</th><th>P&L</th><th>RESOLVES</th></tr></thead>
           <tbody id="rcTradesBody"></tbody></table>
-        </div>
-      </div>
-
-      <!-- Clawmpson/MiroFish -->
-      <div class="t-section" data-pnl="0" data-bot="clawmpson" style="border-color:rgba(232,104,0,0.25);background:linear-gradient(135deg,rgba(15,8,0,0.95),rgba(8,4,0,0.98));margin-bottom:0">
-        <div class="t-section-title" style="color:var(--orange-hi);border-bottom-color:rgba(232,104,0,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
-          CLAWMPSON
-          <span class="t-live-dot" style="background:var(--orange);box-shadow:0 0 6px var(--orange);width:6px;height:6px"></span>
-        </div>
-        <div style="font-size:0.38rem;color:rgba(232,104,0,0.4);letter-spacing:1px;margin:-8px 0 8px 0">LLM + MATH STRATEGIES · */30 CRON</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px">
-          <div><div class="t-card-label">START</div><div class="t-card-value" id="tStart" style="font-size:1rem">$1,000</div></div>
-          <div><div class="t-card-label">BALANCE</div><div class="t-card-value" id="tBalance" style="font-size:1rem">$1,000</div></div>
-          <div><div class="t-card-label">P&L</div><div class="t-card-value" id="tPnl" style="font-size:1rem">$0</div></div>
-          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="tWL" style="font-size:1rem">0W / 0L (0%)</div></div>
-          <div><div class="t-card-label">TRADES</div><div class="t-card-value" id="tTrades" style="font-size:1rem;color:var(--orange)">0</div></div>
-        </div>
-        <div class="t-table-wrap" style="max-height:200px;overflow-y:auto">
-          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>BET</th><th>UPSIDE</th><th>P&L</th><th>RESOLVES</th></tr></thead>
-          <tbody id="clawmpsonBody"></tbody></table>
-        </div>
-      </div>
-
-      <!-- CalendarClaw -->
-      <div class="t-section" data-pnl="0" data-bot="calendarclaw" style="border-color:rgba(0,200,255,0.25);background:linear-gradient(135deg,rgba(0,8,15,0.95),rgba(0,4,10,0.98));margin-bottom:0">
-        <div class="t-section-title" style="color:#00c8ff;border-bottom-color:rgba(0,200,255,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
-          CALENDARCLAW
-          <span class="t-live-dot" style="background:#00c8ff;box-shadow:0 0 6px #00c8ff;width:6px;height:6px"></span>
-        </div>
-        <div style="font-size:0.38rem;color:rgba(0,200,255,0.4);letter-spacing:1px;margin:-8px 0 8px 0">EVENT TIMING · PRE/POST CATALYST · */5</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px">
-          <div><div class="t-card-label">START</div><div class="t-card-value" id="calStart" style="font-size:1rem">$1,000</div></div>
-          <div><div class="t-card-label">BALANCE</div><div class="t-card-value" id="calBalance" style="font-size:1rem">$1,000</div></div>
-          <div><div class="t-card-label">P&L</div><div class="t-card-value" id="calPnl" style="font-size:1rem">$0</div></div>
-          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="calWL" style="font-size:1rem">0W / 0L (0%)</div></div>
-          <div><div class="t-card-label">TRADES</div><div class="t-card-value" id="calTrades" style="font-size:1rem;color:#00c8ff">0</div></div>
-        </div>
-        <div class="t-table-wrap" style="max-height:160px;overflow-y:auto">
-          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>BET</th><th>UPSIDE</th><th>P&L</th><th>RESOLVES</th></tr></thead>
-          <tbody id="calBody"><tr><td colspan="6" style="color:rgba(0,200,255,0.3);text-align:center">collecting event data...</td></tr></tbody></table>
-        </div>
-      </div>
-
-      <!-- NewsClaw -->
-      <div class="t-section" data-pnl="0" data-bot="newsclaw" style="border-color:rgba(255,200,0,0.25);background:linear-gradient(135deg,rgba(15,10,0,0.95),rgba(10,5,0,0.98));margin-bottom:0">
-        <div class="t-section-title" style="color:#ffc800;border-bottom-color:rgba(255,200,0,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
-          NEWSCLAW
-          <span class="t-live-dot" style="background:#ffc800;box-shadow:0 0 6px #ffc800;width:6px;height:6px"></span>
-        </div>
-        <div style="font-size:0.38rem;color:rgba(255,200,0,0.4);letter-spacing:1px;margin:-8px 0 8px 0">BREAKING NEWS · RSS → MARKET · */5 LLM</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px">
-          <div><div class="t-card-label">START</div><div class="t-card-value" id="newsStart" style="font-size:1rem">$1,000</div></div>
-          <div><div class="t-card-label">BALANCE</div><div class="t-card-value" id="newsBalance" style="font-size:1rem">$1,000</div></div>
-          <div><div class="t-card-label">P&L</div><div class="t-card-value" id="newsPnl" style="font-size:1rem">$0</div></div>
-          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="newsWL" style="font-size:1rem">0W / 0L (0%)</div></div>
-          <div><div class="t-card-label">TRADES</div><div class="t-card-value" id="newsTrades" style="font-size:1rem;color:#ffc800">0</div></div>
-        </div>
-        <div class="t-table-wrap" style="max-height:160px;overflow-y:auto">
-          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>BET</th><th>UPSIDE</th><th>P&L</th><th>RESOLVES</th></tr></thead>
-          <tbody id="newsBody"><tr><td colspan="6" style="color:rgba(255,200,0,0.3);text-align:center">scanning headlines...</td></tr></tbody></table>
-        </div>
-      </div>
-
-      <!-- SentimentClaw -->
-      <div class="t-section" data-pnl="0" data-bot="sentimentclaw" style="border-color:rgba(0,255,136,0.25);background:linear-gradient(135deg,rgba(0,10,5,0.95),rgba(0,5,2,0.98));margin-bottom:0">
-        <div class="t-section-title" style="color:#00ff88;border-bottom-color:rgba(0,255,136,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
-          SENTIMENTCLAW
-          <span class="t-live-dot" style="background:#00ff88;box-shadow:0 0 6px #00ff88;width:6px;height:6px"></span>
-        </div>
-        <div style="font-size:0.38rem;color:rgba(0,255,136,0.4);letter-spacing:1px;margin:-8px 0 8px 0">ATTENTION GAP · VOLUME SPIKE · */5</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px">
-          <div><div class="t-card-label">START</div><div class="t-card-value" id="sentStart" style="font-size:1rem">$1,000</div></div>
-          <div><div class="t-card-label">BALANCE</div><div class="t-card-value" id="sentBalance" style="font-size:1rem">$1,000</div></div>
-          <div><div class="t-card-label">P&L</div><div class="t-card-value" id="sentPnl" style="font-size:1rem">$0</div></div>
-          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="sentWL" style="font-size:1rem">0W / 0L (0%)</div></div>
-          <div><div class="t-card-label">TRADES</div><div class="t-card-value" id="sentTrades" style="font-size:1rem;color:#00ff88">0</div></div>
-        </div>
-        <div class="t-table-wrap" style="max-height:160px;overflow-y:auto">
-          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>BET</th><th>UPSIDE</th><th>P&L</th><th>RESOLVES</th></tr></thead>
-          <tbody id="sentBody"><tr><td colspan="6" style="color:rgba(0,255,136,0.3);text-align:center">building baseline...</td></tr></tbody></table>
-        </div>
-      </div>
-
-      <!-- DataHarvester -->
-      <div class="t-section" data-pnl="0" data-bot="dataharvester" style="border-color:rgba(255,102,0,0.25);background:linear-gradient(135deg,rgba(10,5,0,0.95),rgba(5,2,0,0.98));margin-bottom:0">
-        <div class="t-section-title" style="color:#ff6600;border-bottom-color:rgba(255,102,0,0.2);display:flex;align-items:center;gap:6px;font-size:0.56rem">
-          DATAHARVESTER
-          <span class="t-live-dot" style="background:#ff6600;box-shadow:0 0 6px #ff6600;width:6px;height:6px"></span>
-        </div>
-        <div style="font-size:0.38rem;color:rgba(255,102,0,0.4);letter-spacing:1px;margin:-8px 0 8px 0">PURE MATH · NO LLM · */2</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:6px;margin-bottom:8px">
-          <div><div class="t-card-label">START</div><div class="t-card-value" id="dhStart" style="font-size:1rem">$1,000</div></div>
-          <div><div class="t-card-label">BALANCE</div><div class="t-card-value" id="dhBalance" style="font-size:1rem">$1,000</div></div>
-          <div><div class="t-card-label">P&L</div><div class="t-card-value" id="dhPnl" style="font-size:1rem">$0</div></div>
-          <div><div class="t-card-label">W / L</div><div class="t-card-value" id="dhWL" style="font-size:1rem">0W / 0L (0%)</div></div>
-          <div><div class="t-card-label">TRADES</div><div class="t-card-value" id="dhTrades" style="font-size:1rem;color:#ff6600">0</div></div>
-        </div>
-        <div class="t-table-wrap" style="max-height:160px;overflow-y:auto">
-          <table class="t-table"><thead><tr><th>MARKET</th><th>DIR</th><th>BET</th><th>UPSIDE</th><th>P&L</th><th>RESOLVES</th></tr></thead>
-          <tbody id="dhBody"><tr><td colspan="6" style="color:rgba(255,102,0,0.3);text-align:center">harvesting data...</td></tr></tbody></table>
         </div>
       </div>
 
@@ -2462,8 +2342,6 @@ body {
           <option value="signal_score">Signal Score</option>
           <option value="complexity_asc">Easiest First</option>
           <option value="stars">Stars</option>
-          <option value="clawmpson_relevance">Clawmpson Relevance</option>
-          <option value="arbclaw_relevance">ArbClaw Relevance</option>
           <option value="rivalclaw_relevance">RivalClaw Relevance</option>
         </select>
         <select class="intel-filter-select" id="intelFilterLang" onchange="renderIntelCards()">
@@ -2591,8 +2469,7 @@ body {
       <div class="modal-title">DEPLOY TO BOTS</div>
       <input type="hidden" id="intelApproveId">
       <div style="margin:14px 0;">
-        <label class="intel-target-label"><input type="checkbox" id="intelTargetClawmpson" value="clawmpson" checked> Clawmpson <span style="color:var(--grey2);font-size:0.5rem;">(main system)</span></label>
-        <label class="intel-target-label"><input type="checkbox" id="intelTargetArbclaw" value="arbclaw"> ArbClaw <span style="color:var(--grey2);font-size:0.5rem;">(lean arb)</span></label>
+        <label class="intel-target-label"><input type="checkbox" id="intelTargetClawmpson" value="clawmpson" checked> Clawmpson <span style="color:var(--grey2);font-size:0.5rem;">(deploy target)</span></label>
         <label class="intel-target-label"><input type="checkbox" id="intelTargetRivalclaw" value="rivalclaw"> RivalClaw <span style="color:var(--grey2);font-size:0.5rem;">(rival instance)</span></label>
       </div>
       <div class="modal-field">
@@ -3723,16 +3600,14 @@ const GONZO_NARRATE = {
     if (!d || !d.wallet) return null
     const bal = d.wallet.balance || 0
     const pnl = d.wallet.realized_pnl || 0
-    const open = d.wallet.open_positions || 0
-    const ph = d.phantom || {}
-    const agents = d.agents || {}
     const rc = d.rivalclaw_positions || []
-    const totalOpen = open + rc.length + (ph.open || 0)
+    const qc = (d.quantclaw || {}).open_positions || []
+    const totalOpen = rc.length + qc.length
     return _v([
-      `<span class="hst-name">${totalOpen} positions open</span> across the fleet. The prediction markets don't know we're here yet. By the time they figure it out, we'll own the spread on everything that moves between now and Friday.`,
-      `The trading floor — and I use the word loosely, since it's really just a SQLite database and a fever dream — has <span class="hst-name">${totalOpen} bets</span> running. Some will die. The survivors will pay for the funeral.`,
-      `Clawmpson P&L: <span class="${pnl >= 0 ? 'hst-ok' : 'hst-bad'}">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(0)}</span>. ${totalOpen} positions cooking in the oven. The market is a casino and we brought our own dice. They are loaded. They are ours.`,
-      `${totalOpen} open bets scattered across Kalshi like landmines in a field of bad predictions. RivalClaw is up five figures. PhantomClaw is learning expensive lessons. CalendarClaw just showed up to the party with a weather forecast and a dream.`,
+      `<span class="hst-name">${totalOpen} positions open</span> across the fleet. RivalClaw and QuantClaw, two independent brains hunting the same prey from different angles. The prediction markets don't know we're here yet. By the time they figure it out, we'll own the spread.`,
+      `The trading floor — and I use the word loosely, since it's really just two SQLite databases and a fever dream — has <span class="hst-name">${totalOpen} bets</span> running. Some will die. The survivors will pay for the funeral.`,
+      `Fleet P&L: <span class="${pnl >= 0 ? 'hst-ok' : 'hst-bad'}">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(0)}</span>. ${totalOpen} positions cooking across RivalClaw and QuantClaw. Two claws, two databases, one relentless appetite for mispriced contracts.`,
+      `${totalOpen} open bets scattered across Kalshi and the equities market. RivalClaw is running its 8-strategy quant engine. QuantClaw is fusing five signal types into asymmetric bets. Together they are a swarm. A profitable, terrifying swarm.`,
     ])
   },
 
@@ -3749,37 +3624,6 @@ const GONZO_NARRATE = {
     ])
   },
 
-  trading_phantomclaw: () => {
-    const d = tradingData
-    if (!d || !d.phantom) return null
-    const ph = d.phantom
-    if (!ph.positions || !ph.positions.length) return null
-    const pnl = ph.pnl || 0
-    return _v([
-      `<span class="hst-name">PhantomClaw</span> — ${ph.open || 0} positions, ${ph.wins||0}W ${ph.losses||0}L. The strategy was recently lobotomized and reassembled with better price buckets. The patient is recovering. The prognosis is cautiously optimistic. The morphine is local inference.`,
-      `PhantomClaw ${ph.wins||0} wins, ${ph.losses||0} losses. The Black-Scholes model is doing its best, which is to say it's making slightly better guesses than a coin flip in a room full of degenerate prediction market traders. We have recalibrated. We believe.`,
-      `The phantom is out there — ${ph.open||0} open positions, burning through the quality price zone like a bat out of hell with a very specific entry threshold. <span class="${pnl >= 0 ? 'hst-ok' : 'hst-bad'}">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(0)}</span> P&L. It's learning. God help us, it's learning.`,
-      `PhantomClaw was hemorrhaging money on cheap contracts. We cut it off. Now it only trades above 0.55 entry — the zone where it wins 89% of the time. The old PhantomClaw is dead. Long live the new PhantomClaw, who has taste.`,
-    ])
-  },
-
-  trading_newbots: () => {
-    const d = tradingData
-    if (!d || !d.agents) return null
-    const agents = d.agents
-    const names = ['calendarclaw', 'newsclaw', 'sentimentclaw', 'dataharvester']
-    const active = names.filter(n => (agents[n]?.open || 0) > 0)
-    if (!active.length) return null
-    const totalOpen = active.reduce((s, n) => s + (agents[n]?.open || 0), 0)
-    const dh = agents.dataharvester || {}
-    return _v([
-      `The new recruits are deployed: ${active.map(n => `<span class="hst-name">${n}</span>`).join(', ')} — ${totalOpen} positions between them. None have closed a trade yet. They are paper-trading with the wide-eyed enthusiasm of interns who haven't been fired yet. Give them time.`,
-      `<span class="hst-name">DataHarvester</span> has ${dh.open || 0} positions open. No LLM. No feelings. Pure math. It walks into every available Kalshi market, looks at the spread, and puts four dollars on the table with the cold efficiency of a machine that will never know the taste of whiskey. I envy it.`,
-      `CalendarClaw is trading weather and gold. NewsClaw is matching headlines to markets. SentimentClaw is watching for volume spikes. DataHarvester is betting on everything that moves. This is not a trading desk. This is an invasion.`,
-      `${totalOpen} positions across the new claws. Every one of them was built tonight. Every one is paper-trading with its own $1,000 wallet. Every one has an auto-calibrator watching its back, ready to tighten the filters if the win rate drops below 40%. Evolution in real time. Darwin would be proud. Darwin would also be confused.`,
-    ])
-  },
-
   trading_quantclaw: () => {
     const d = tradingData
     if (!d || !d.quantclaw) return null
@@ -3792,19 +3636,6 @@ const GONZO_NARRATE = {
       `<span class="hst-name">QuantumentalClaw</span> is running from a separate bunker — ~/quantumentalclaw/ — with its own database, its own signal fusion engine, and $${(w.balance||10000).toLocaleString()} in paper capital. ${positions.length} positions. It trades equities AND crypto. It has a learning loop. It adjusts its own weights. It is the closest thing we have to a self-aware trading entity and I am choosing not to think too hard about that.`,
       `QuantClaw: ${positions.length} open, ${w.cycles_completed || 0} learning cycles completed. It fuses signals from 5 modules — asymmetry, narrative, events, edgar filings, and quant models — then bets on the consensus. It is, in every way that matters, a committee of robots that votes on your money. The committee is in session.`,
       `The signal fusion engine at ~/quantumentalclaw/ is awake and betting. ${positions.length} positions across crypto and equities — JPM, MSFT, Bitcoin, all in the same portfolio. It doesn't see asset classes. It sees mispricing. It is refreshingly free of the biases that make human traders lose money on things they "believe in."`,
-    ])
-  },
-
-  trading_calibration: () => {
-    const d = tradingData
-    if (!d || !d.calibration || !d.calibration.length) return null
-    const c = d.calibration[0]
-    const ago = Math.round((Date.now() - new Date(c.logged_at + 'Z').getTime()) / 60000)
-    if (ago > 60) return null
-    return _v([
-      `The calibrator just fired — <span class="hst-name">${c.bot}.${c.param}</span> adjusted from ${Number(c.old_value).toFixed(3)} to ${Number(c.new_value).toFixed(3)}. Reason: ${c.reason}. The machine is teaching itself to trade better. I had nothing to do with it. I am merely the narrator of a system that improves while I watch.`,
-      `<span class="hst-name">AUTO-CALIBRATION</span> event: ${c.bot} just had its ${c.param} tweaked by the calibrator. The robots are optimizing the robots. We are ${ago} minutes into a future I was not emotionally prepared for.`,
-      `${c.bot}'s ${c.param} was just changed by the calibrator — ${Number(c.old_value).toFixed(3)} → ${Number(c.new_value).toFixed(3)}. No human involved. The system analyzed its own trades, found a pattern, and adjusted. This is either the beginning of machine consciousness or a really good cron job. I choose to believe both.`,
     ])
   },
 
@@ -3920,10 +3751,7 @@ async function narrateTick() {
         const td = tradingData
         if (td.wallet)                        pool.push(['trading_pnl',        () => GONZO_NARRATE.trading_pnl()])
         if (td.rivalclaw_positions?.length)    pool.push(['trading_rivalclaw',  () => GONZO_NARRATE.trading_rivalclaw()])
-        if (td.phantom?.positions?.length)     pool.push(['trading_phantom',    () => GONZO_NARRATE.trading_phantomclaw()])
-        if (td.agents)                         pool.push(['trading_newbots',    () => GONZO_NARRATE.trading_newbots()])
         if (td.quantclaw?.open_positions?.length) pool.push(['trading_quantclaw', () => GONZO_NARRATE.trading_quantclaw()])
-        if (td.calibration?.length)            pool.push(['trading_calibration',() => GONZO_NARRATE.trading_calibration()])
       }
       // Research & recon narrations
       pool.push(['research_intel', () => GONZO_NARRATE.research_intel()])
@@ -5119,271 +4947,11 @@ function renderTrading() {
   // Build ticker tape
   try { buildTickerTape(d) } catch(e) { console.error('Ticker:', e) }
 
-  // Portfolio cards — Clawmpson normalized 5-card layout
-  try {
-  const w = d.wallet || {}
-  const tStartBal = w.starting_balance || 1000
-  const tCurBal = w.balance || 0
-  const tPnlVal = w.realized_pnl || 0
-  const tWins = w.wins || 0
-  const tLosses = (w.total_trades || 0) - tWins
-  const tWlTotal = tWins + tLosses
-  const tWlPct = tWlTotal > 0 ? ((tWins / tWlTotal) * 100).toFixed(0) : '0'
-  const tTradeCount = (w.open_positions || 0) + (w.total_trades || 0)
-
-  const tStartEl = document.getElementById('tStart')
-  if (tStartEl) tStartEl.textContent = '$' + tStartBal.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0})
-
-  const balEl = document.getElementById('tBalance')
-  if (balEl) {
-    balEl.textContent = '$' + tCurBal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})
-    balEl.style.color = tCurBal >= tStartBal ? 'var(--neon-green)' : 'var(--neon-red)'
-  }
-
-  const tPnlEl = document.getElementById('tPnl')
-  if (tPnlEl) {
-    tPnlEl.textContent = (tPnlVal >= 0 ? '+' : '') + '$' + tPnlVal.toFixed(2)
-    tPnlEl.style.color = tPnlVal >= 0 ? 'var(--neon-green)' : 'var(--neon-red)'
-  }
-
-  const tWLEl = document.getElementById('tWL')
-  if (tWLEl) {
-    tWLEl.innerHTML = `<span style="color:var(--neon-green)">${tWins}W</span> / <span style="color:var(--neon-red)">${tLosses}L</span> <span style="color:var(--grey2)">(${tWlPct}%)</span>`
-  }
-
-  const tTradesEl = document.getElementById('tTrades')
-  if (tTradesEl) tTradesEl.textContent = tTradeCount
-
-  // Update data-pnl for sorting
-  const tPanel = document.querySelector('[data-bot="clawmpson"]')
-  if (tPanel) tPanel.dataset.pnl = tPnlVal.toString()
-  } catch(e) { console.error('Wallet render:', e) }
-
-  // Graduation status
-  try {
-  const g = d.graduation || {}
-  const gradEl = document.getElementById('tGradStatus')
-  if (gradEl) {
-    if (g.all_pass) {
-      gradEl.textContent = 'READY FOR LIVE'
-      gradEl.style.color = 'var(--neon-green)'
-    } else if (g.has_min_history) {
-      gradEl.textContent = 'TESTING — some gates failing'
-      gradEl.style.color = 'var(--orange)'
-    } else {
-      gradEl.textContent = 'COLLECTING DATA — need 7d'
-      gradEl.style.color = 'var(--grey2)'
-    }
-  }
-  } catch(e) { console.error('Graduation render:', e) }
-
-  // Live balance chart
+  // Live balance chart (aggregated wallet)
   try {
     seedBalanceHistory(d)
     trackBalance((d.wallet || {}).balance || 0)
   } catch(e) { console.error('Balance chart:', e) }
-
-  // Gates
-  try {
-    const gates = [
-      ['gateRoi', g.roi_7d_pass], ['gateWin', g.win_rate_pass],
-      ['gateSharpe', g.sharpe_pass], ['gateDD', g.drawdown_pass]
-    ]
-    gates.forEach(([id, pass]) => {
-      const el = document.getElementById(id)
-      if (el) el.className = 't-gate ' + (g.has_min_history ? (pass ? 'pass' : 'fail') : '')
-    })
-  } catch(e) { console.error('Gates:', e) }
-
-  // Calibration status
-  try {
-    const cal = d.calibration || []
-    const calEl = document.getElementById('calibrationStatus')
-    if (calEl) {
-      if (cal.length > 0) {
-        const last = cal[0]
-        const ago = Math.round((Date.now() - new Date(last.logged_at + 'Z').getTime()) / 60000)
-        calEl.innerHTML = `<span style="color:var(--orange)">AUTO-CALIBRATION</span> <span style="color:var(--grey1)">last: ${ago}m ago</span> | <span style="color:var(--orange)">${last.bot}.${last.param}</span>: ${Number(last.old_value).toFixed(3)} → ${Number(last.new_value).toFixed(3)} <span style="color:var(--grey2)">| ${cal.length} recent changes</span>`
-      } else {
-        calEl.innerHTML = '<span style="color:var(--grey2)">AUTO-CALIBRATION: awaiting first cycle (runs every 30min)</span>'
-      }
-    }
-  } catch(e) {}
-
-  // PhantomClaw hero card
-  try {
-    const ph = d.phantom || {}
-    const phPnl = ph.pnl || 0
-    const phWins = ph.wins || 0
-    const phLosses = ph.losses || 0
-    const phTotal = phWins + phLosses
-    const phPct = phTotal > 0 ? ((phWins / phTotal) * 100).toFixed(0) : '0'
-    const phStartBal = ph.starting_balance || 1000
-    const phBal = ph.balance != null ? ph.balance : (phStartBal + phPnl)
-    const phOpenCount = ph.open || 0
-
-    const phStartEl = document.getElementById('phStart')
-    if (phStartEl) phStartEl.textContent = '$' + phStartBal.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0})
-
-    const phBalEl = document.getElementById('phBalance')
-    if (phBalEl) {
-      phBalEl.textContent = '$' + phBal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})
-      phBalEl.style.color = phBal >= phStartBal ? '#00e5ff' : '#ff2d95'
-    }
-
-    const phPnlEl = document.getElementById('phPnl')
-    if (phPnlEl) {
-      phPnlEl.textContent = (phPnl >= 0 ? '+' : '') + '$' + phPnl.toFixed(2)
-      phPnlEl.style.color = phPnl >= 0 ? '#00e5ff' : '#ff2d95'
-    }
-    const phWLEl = document.getElementById('phWL')
-    if (phWLEl) {
-      phWLEl.innerHTML = `<span style="color:#00e5ff">${phWins}W</span> / <span style="color:#ff2d95">${phLosses}L</span> <span style="color:var(--grey2)">(${phPct}%)</span>`
-    }
-    const phTradesEl = document.getElementById('phTrades')
-    if (phTradesEl) phTradesEl.textContent = phOpenCount + phTotal
-
-    // Update data-pnl for sorting
-    const phPanel = document.querySelector('[data-bot="phantomclaw"]')
-    if (phPanel) phPanel.dataset.pnl = phPnl.toString()
-
-    const phBody = document.getElementById('phBody')
-    const phPositions = ph.positions || []
-    if (phBody) {
-      if (phPositions.length) {
-        phBody.innerHTML = phPositions.map(p => {
-          const pnlClass = (p.pnl || 0) >= 0 ? 't-pnl-pos' : 't-pnl-neg'
-          const bet = p.amount_usd || p.amount || 0
-          const upside = p.direction === 'YES'
-            ? (p.shares || 0) * (1.0 - (p.entry_price || 0))
-            : (p.shares || 0) * (p.entry_price || 0)
-          return `<tr>
-            <td style="color:rgba(255,0,200,0.7)">${(p.question || '').substring(0,30)}</td>
-            <td>${p.direction}</td>
-            <td>$${bet.toFixed(2)}</td>
-            <td>$${upside.toFixed(2)}</td>
-            <td class="${pnlClass}">${(p.pnl||0) >= 0 ? '+' : ''}$${(p.pnl||0).toFixed(2)}</td>
-            <td class="t-countdown" data-close="${p.close_time || ''}">${formatCountdown(p.close_time)}</td>
-          </tr>`
-        }).join('')
-      } else {
-        phBody.innerHTML = '<tr><td colspan="6" style="color:rgba(255,0,200,0.3);text-align:center">scanning...</td></tr>'
-      }
-    }
-  } catch(e) {
-    console.error('PhantomClaw render:', e)
-    const phErrBody = document.getElementById('phBody')
-    if (phErrBody) phErrBody.innerHTML = `<tr><td colspan="6" style="color:red">JS ERROR: ${e.message}</td></tr>`
-  }
-
-  // Clawmpson hero card (try/catch isolated)
-  try {
-  // Clawmpson hero card — open positions + recent trades (exclude phantom)
-  const clawBody = document.getElementById('clawmpsonBody')
-  const clawOpen = (d.open_positions || []).filter(p => !(p.strategy||'').startsWith('phantomclaw'))
-  const clawRecent = (d.recent_trades || []).filter(t => !(t.strategy||'').startsWith('phantomclaw'))
-  const clawAll = [...clawOpen.map(p => ({...p, _status: 'OPEN'})), ...clawRecent.slice(0,5).map(t => ({...t, _status: t.status === 'closed_win' ? 'WIN' : 'LOSS'}))]
-  if (clawAll.length) {
-    clawBody.innerHTML = clawAll.slice(0,8).map(p => {
-      const pnl = p.pnl || 0
-      const cls = p._status === 'OPEN' ? 't-status-open' : (p._status === 'WIN' ? 't-pnl-pos' : 't-pnl-neg')
-      const bet = p.amount_usd || p.amount || 0
-      const upside = p.direction === 'YES'
-        ? (p.shares || 0) * (1.0 - (p.entry_price || 0))
-        : (p.shares || 0) * (p.entry_price || 0)
-      return `<tr>
-        <td style="color:var(--orange)">${(p.question || '').substring(0,30)}</td>
-        <td>${p.direction}</td>
-        <td>$${bet.toFixed(2)}</td>
-        <td>$${upside.toFixed(2)}</td>
-        <td class="${cls}">${p._status === 'OPEN' ? 'OPEN' : (pnl >= 0 ? '+' : '') + '$' + pnl.toFixed(2)}</td>
-        <td class="t-countdown" data-close="${p.close_time || ''}">${formatCountdown(p.close_time)}</td>
-      </tr>`
-    }).join('')
-  } else {
-    clawBody.innerHTML = '<tr><td colspan="6" style="color:var(--grey2);text-align:center">awaiting trades...</td></tr>'
-  }
-
-  } catch(e) {
-    console.error('Clawmpson render:', e)
-    const clErrBody = document.getElementById('clawmpsonBody')
-    if (clErrBody) clErrBody.innerHTML = `<tr><td colspan="6" style="color:red">JS ERROR: ${e.message}</td></tr>`
-  }
-
-  // New agents: CalendarClaw, NewsClaw, SentimentClaw, DataHarvester
-  const agentConfigs = [
-    {name: 'calendarclaw', bot: 'calendarclaw', start: 'calStart', balance: 'calBalance', pnl: 'calPnl', wl: 'calWL', trades: 'calTrades', body: 'calBody', color: '#00c8ff'},
-    {name: 'newsclaw', bot: 'newsclaw', start: 'newsStart', balance: 'newsBalance', pnl: 'newsPnl', wl: 'newsWL', trades: 'newsTrades', body: 'newsBody', color: '#ffc800'},
-    {name: 'sentimentclaw', bot: 'sentimentclaw', start: 'sentStart', balance: 'sentBalance', pnl: 'sentPnl', wl: 'sentWL', trades: 'sentTrades', body: 'sentBody', color: '#00ff88'},
-    {name: 'dataharvester', bot: 'dataharvester', start: 'dhStart', balance: 'dhBalance', pnl: 'dhPnl', wl: 'dhWL', trades: 'dhTrades', body: 'dhBody', color: '#ff6600'},
-  ]
-  const agents = d.agents || {}
-  for (const cfg of agentConfigs) {
-    const ag = agents[cfg.name] || {}
-    const agStart = ag.starting_balance || 1000
-    const agPnlVal = ag.pnl || 0
-    const agBal = ag.balance != null ? ag.balance : (agStart + agPnlVal)
-    const agWins = ag.wins || 0
-    const agLosses = ag.losses || 0
-    const agWlTotal = agWins + agLosses
-    const agPct = agWlTotal > 0 ? ((agWins / agWlTotal) * 100).toFixed(0) : '0'
-    const agOpenCount = ag.open || 0
-    const agTradeCount = agOpenCount + agWlTotal
-
-    const startEl = document.getElementById(cfg.start)
-    if (startEl) startEl.textContent = '$' + agStart.toLocaleString(undefined, {minimumFractionDigits:0, maximumFractionDigits:0})
-
-    const balEl = document.getElementById(cfg.balance)
-    if (balEl) {
-      balEl.textContent = '$' + agBal.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})
-      balEl.style.color = agBal >= agStart ? cfg.color : '#ff2d95'
-    }
-
-    const pnlEl = document.getElementById(cfg.pnl)
-    if (pnlEl) {
-      pnlEl.textContent = (agPnlVal >= 0 ? '+' : '') + '$' + agPnlVal.toFixed(2)
-      pnlEl.style.color = agPnlVal >= 0 ? cfg.color : '#ff2d95'
-    }
-
-    const wlEl = document.getElementById(cfg.wl)
-    if (wlEl) {
-      wlEl.innerHTML = `<span style="color:${cfg.color}">${agWins}W</span> / <span style="color:#ff2d95">${agLosses}L</span> <span style="color:var(--grey2)">(${agPct}%)</span>`
-    }
-
-    const tradesEl = document.getElementById(cfg.trades)
-    if (tradesEl) {
-      tradesEl.textContent = agTradeCount
-      tradesEl.style.color = cfg.color
-    }
-
-    // Update data-pnl for sorting
-    const agPanel = document.querySelector(`[data-bot="${cfg.bot}"]`)
-    if (agPanel) agPanel.dataset.pnl = agPnlVal.toString()
-
-    const bEl = document.getElementById(cfg.body)
-    if (bEl) {
-      const pos = ag.positions || []
-      if (pos.length) {
-        bEl.innerHTML = pos.map(p => {
-          const bet = p.amount_usd || p.amount || 0
-          const upside = p.direction === 'YES'
-            ? (p.shares || 0) * (1.0 - (p.entry_price || 0))
-            : (p.shares || 0) * (p.entry_price || 0)
-          return `<tr>
-          <td style="color:${cfg.color}80">${(p.question || '').substring(0,30)}</td>
-          <td>${p.direction}</td>
-          <td>$${bet.toFixed(2)}</td>
-          <td>$${upside.toFixed(2)}</td>
-          <td>${(p.pnl||0) >= 0 ? '+' : ''}$${(p.pnl||0).toFixed(2)}</td>
-          <td class="t-countdown" data-close="${p.close_time || ''}">${formatCountdown(p.close_time)}</td>
-        </tr>`
-        }).join('')
-      } else {
-        const msgs = {calendarclaw: 'scanning events...', newsclaw: 'scanning headlines...', sentimentclaw: 'building baseline...', dataharvester: 'harvesting data...'}
-        bEl.innerHTML = `<tr><td colspan="6" style="color:${cfg.color}40;text-align:center">${msgs[cfg.name] || 'waiting...'}</td></tr>`
-      }
-    }
-  }
 
   // QuantumentalClaw hero card (separate DB)
   try {
@@ -5452,29 +5020,13 @@ function renderTrading() {
   // Debug: write trade count directly
   try {
     const _dbg = document.getElementById('ufBody')
-    if (_dbg) _dbg.innerHTML = `<tr><td colspan="10" style="color:yellow">Loading ${(d.open_positions||[]).length} + ${((d.phantom||{}).positions||[]).length}ph + ${(d.rivalclaw_positions||[]).length}rv trades...</td></tr>`
+    if (_dbg) _dbg.innerHTML = `<tr><td colspan="10" style="color:yellow">Loading ${(d.rivalclaw_positions||[]).length}rv + ${((d.quantclaw||{}).open_positions||[]).length}qc trades...</td></tr>`
   } catch(e){}
 
   try { buildUnifiedFeed(d) } catch(e) {
     console.error('UnifiedFeed render:', e)
     const ufErrBody = document.getElementById('ufBody')
     if (ufErrBody) ufErrBody.innerHTML = `<tr><td colspan="10" style="color:red">FEED ERROR: ${e.message}</td></tr>`
-  }
-
-  // Missed opportunities
-  const missed = d.missed_opportunities || []
-  const missedSection = document.getElementById('tMissedSection')
-  if (missed.length) {
-    missedSection.style.display = 'block'
-    document.getElementById('tMissedBody').innerHTML = missed.map(m => {
-      const cfClass = m.total_cf_pnl >= 0 ? 't-pnl-pos' : 't-pnl-neg'
-      return `<tr>
-        <td>${m.strategy}</td>
-        <td>${m.total}</td>
-        <td>${m.would_win || 0}</td>
-        <td class="${cfClass}">${m.total_cf_pnl >= 0 ? '+' : ''}$${m.total_cf_pnl.toFixed(2)}</td>
-      </tr>`
-    }).join('')
   }
 
   // Sort panels by P&L (best on top)
@@ -5563,44 +5115,33 @@ function buildTickerTape(d) {
 
   const items = []
 
-  // Balance
-  const w = d.wallet
-  const balColor = w.roi_pct >= 0 ? 'tick-change-up' : 'tick-change-down'
-  items.push(`<span class="tick-item"><span class="tick-symbol">PORTFOLIO</span><span class="tick-price">$${w.balance.toFixed(2)}</span><span class="${balColor}">${w.roi_pct >= 0 ? '+' : ''}${w.roi_pct.toFixed(2)}%</span></span>`)
+  // Aggregated wallet
+  const w = d.wallet || {}
+  if (w.balance != null) {
+    const balColor = (w.roi_pct || 0) >= 0 ? 'tick-change-up' : 'tick-change-down'
+    items.push(`<span class="tick-item"><span class="tick-symbol">PORTFOLIO</span><span class="tick-price">$${(w.balance||0).toFixed(2)}</span><span class="${balColor}">${(w.roi_pct||0) >= 0 ? '+' : ''}${(w.roi_pct||0).toFixed(2)}%</span></span>`)
 
-  // W/L
-  const wins = w.wins || 0
-  const losses = w.total_trades - wins
-  items.push(`<span class="tick-item"><span class="tick-symbol">W/L</span><span class="tick-win">${wins}W</span><span class="tick-loss">${losses}L</span><span class="tick-price">${w.win_rate.toFixed(0)}%</span></span>`)
-
-  // Open positions as live entries
-  for (const p of (d.open_positions || []).slice(0, 6)) {
-    const pnlClass = p.pnl >= 0 ? 'tick-change-up' : 'tick-change-down'
-    const arrow = p.pnl >= 0 ? '\u25B2' : '\u25BC'
-    const sym = p.question.substring(0, 20).toUpperCase()
-    items.push(`<span class="tick-item"><span class="tick-pending">${p.direction}</span><span class="tick-symbol">${sym}</span><span class="tick-price">${p.entry_price.toFixed(3)}</span><span class="${pnlClass}">${arrow} ${p.pnl >= 0 ? '+' : ''}$${p.pnl.toFixed(2)}</span></span>`)
+    const wins = w.wins || 0
+    const losses = (w.total_trades || 0) - wins
+    items.push(`<span class="tick-item"><span class="tick-symbol">W/L</span><span class="tick-win">${wins}W</span><span class="tick-loss">${losses}L</span><span class="tick-price">${(w.win_rate||0).toFixed(0)}%</span></span>`)
   }
 
-  // Recent closed trades
-  for (const t of (d.recent_trades || []).slice(0, 8)) {
-    const pnl = t.pnl || 0
-    const cls = t.status === 'closed_win' ? 'tick-win' : 'tick-loss'
-    const label = t.status === 'closed_win' ? 'WIN' : 'LOSS'
-    const sym = (t.question || '').substring(0, 18).toUpperCase()
-    items.push(`<span class="tick-item"><span class="${cls}">${label}</span><span class="tick-symbol">${sym}</span><span class="${cls}">${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)}</span></span>`)
+  // RivalClaw open positions
+  for (const p of (d.rivalclaw_positions || []).slice(0, 6)) {
+    const pnl = p.pnl || 0
+    const pnlClass = pnl >= 0 ? 'tick-change-up' : 'tick-change-down'
+    const arrow = pnl >= 0 ? '\u25B2' : '\u25BC'
+    const sym = (p.question || '').substring(0, 20).toUpperCase()
+    items.push(`<span class="tick-item"><span class="tick-pending">${p.direction}</span><span class="tick-symbol">${sym}</span><span class="tick-price">${(p.entry_price||0).toFixed(3)}</span><span class="${pnlClass}">${arrow} ${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)}</span></span>`)
   }
 
-  // Top Polymarket markets
-  for (const m of (d.polymarket || []).slice(0, 5)) {
-    const q = (m.question || '').substring(0, 22)
-    items.push(`<span class="tick-item"><span class="tick-symbol">${q}</span><span class="tick-change-up">Y:${(m.yes_price||0).toFixed(2)}</span><span class="tick-change-down">N:${(m.no_price||0).toFixed(2)}</span></span>`)
-  }
-
-  // Top Kalshi
-  for (const m of (d.kalshi || []).slice(0, 5)) {
-    const q = (m.title || '').substring(0, 22)
-    const bid = m.yes_bid != null ? m.yes_bid.toFixed(2) : '-'
-    items.push(`<span class="tick-item"><span class="tick-symbol">${q}</span><span class="tick-price">BID:${bid}</span></span>`)
+  // QuantClaw open positions
+  for (const p of ((d.quantclaw || {}).open_positions || []).slice(0, 6)) {
+    const pnl = p.pnl || 0
+    const pnlClass = pnl >= 0 ? 'tick-change-up' : 'tick-change-down'
+    const arrow = pnl >= 0 ? '\u25B2' : '\u25BC'
+    const sym = (p.ticker || '').substring(0, 20).toUpperCase()
+    items.push(`<span class="tick-item"><span class="tick-pending">${p.direction}</span><span class="tick-symbol">${sym}</span><span class="tick-price">${(p.entry_price||0).toFixed(3)}</span><span class="${pnlClass}">${arrow} ${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)}</span></span>`)
   }
 
   // Duplicate for seamless loop
@@ -5707,28 +5248,7 @@ function renderPnlChart(curve) {
 // ── Countdown timers ──────────────────────────────────────────────────
 // Bot color map
 const BOT_COLORS = {
-  'phantomclaw_fv': {name: 'PHANTOM', color: '#ff00c8'},
-  'calendarclaw': {name: 'CALENDAR', color: '#00c8ff'},
-  'newsclaw': {name: 'NEWS', color: '#ffc800'},
-  'sentimentclaw': {name: 'SENTIMENT', color: '#00ff88'},
-  'dataharvester': {name: 'HARVESTER', color: '#ff6600'},
   'quantclaw': {name: 'QUANT', color: '#00d4ff'},
-  'contrarian': {name: 'CLAWMPSON', color: '#e86800'},
-  'momentum': {name: 'CLAWMPSON', color: '#e86800'},
-  'news_catalyst': {name: 'CLAWMPSON', color: '#e86800'},
-  'hedged_bracket_main': {name: 'HEDGED', color: '#e86800'},
-  'hedged_bracket_hedge': {name: 'HEDGED', color: '#e86800'},
-  'fade_public': {name: 'HEDGED', color: '#e86800'},
-  'vol_straddle_yes': {name: 'HEDGED', color: '#e86800'},
-  'vol_straddle_no': {name: 'HEDGED', color: '#e86800'},
-  'cross_bracket_arb': {name: 'MATH', color: '#e86800'},
-  'expiry_convergence': {name: 'MATH', color: '#e86800'},
-  'correlation_arb': {name: 'MATH', color: '#e86800'},
-  'mean_reversion': {name: 'MATH', color: '#e86800'},
-  'fast_arb': {name: 'FAST', color: '#e86800'},
-  'fast_spot_lag': {name: 'FAST', color: '#e86800'},
-  'fast_15m_trend': {name: 'FAST', color: '#e86800'},
-  'arbclaw_single_venue': {name: 'ARBCLAW', color: '#00ff88'},
   'crypto_spot_mean_rev': {name: 'CRYPTO', color: '#00e5ff'},
   'crypto_spot_momentum': {name: 'CRYPTO', color: '#00e5ff'},
 }
@@ -5740,56 +5260,7 @@ function getBotInfo(strategy) {
 function buildUnifiedFeed(d) {
   const allTrades = []
 
-  // MiroFish/Clawmpson open positions (exclude phantom — they're added separately)
-  const seenIds = new Set()
-  for (const p of (d.open_positions || [])) {
-    if ((p.strategy || '').startsWith('phantomclaw')) continue // handled below
-    const bot = getBotInfo(p.strategy)
-    const mid = p.market_id || ''
-    let platform = 'POLY'
-    if (mid.startsWith('KX') || mid.startsWith('INX') || mid.startsWith('NAS')) platform = 'KALSHI'
-    else if (mid.startsWith('SPOT:')) platform = 'CRYPTO'
-    seenIds.add(p.id)
-    allTrades.push({
-      bot: bot.name, botColor: bot.color, strategy: p.strategy,
-      question: p.question || '', platform, direction: p.direction,
-      entry: p.entry_price || 0, current: p.current_price || p.entry_price || 0,
-      pnl: p.pnl || 0, pnlPct: p.pnl_pct || 0, size: p.amount_usd || 0,
-      confidence: p.confidence || 0, closeTime: p.close_time || '',
-      openedAt: p.opened_at || '', id: p.id,
-    })
-  }
-
-  // PhantomClaw positions (dedup by id)
-  for (const p of ((d.phantom || {}).positions || [])) {
-    if (seenIds.has(p.id)) continue
-    seenIds.add(p.id)
-    allTrades.push({
-      bot: 'PHANTOM', botColor: '#ff00c8', strategy: 'phantomclaw_fv',
-      question: p.question || '', platform: 'KALSHI', direction: p.direction,
-      entry: p.entry_price || 0, current: p.current_price || p.entry_price || 0,
-      pnl: p.pnl || 0, pnlPct: p.pnl_pct || 0, size: p.amount_usd || 0,
-      confidence: p.confidence || 0, closeTime: p.close_time || '',
-      openedAt: p.opened_at || '',
-    })
-  }
-
-  // Agent positions (calendar, news, sentiment)
-  for (const [name, cfg] of [['calendarclaw','#00c8ff'],['newsclaw','#ffc800'],['sentimentclaw','#00ff88'],['dataharvester','#ff6600']]) {
-    const ag = (d.agents || {})[name] || {}
-    for (const p of (ag.positions || [])) {
-      allTrades.push({
-        bot: name.replace('claw','').toUpperCase(), botColor: cfg,
-        strategy: name, question: p.question || '', platform: 'KALSHI',
-        direction: p.direction, entry: p.entry_price || 0, current: p.entry_price || 0,
-        pnl: p.pnl || 0, pnlPct: 0, size: p.amount_usd || 0,
-        confidence: p.confidence || 0, closeTime: p.close_time || '',
-        openedAt: p.opened_at || '',
-      })
-    }
-  }
-
-  // RivalClaw positions (separate DB)
+  // RivalClaw positions
   for (const p of (d.rivalclaw_positions || [])) {
     const bot = BOT_COLORS[p.strategy] || {name: 'RIVAL', color: 'rgba(180,140,255,0.9)'}
     allTrades.push({
@@ -5903,22 +5374,10 @@ function seedBalanceHistory(d) {
   if (balanceSeeded) return
   balanceSeeded = true
 
-  // Build balance curve from closed trades
-  const starting = d.wallet.starting_balance || 1000
-  let running = starting
-  const trades = (d.recent_trades || []).slice().reverse() // oldest first
-
-  // Start point
-  balanceHistory.push({t: Date.now() - trades.length * 60000, b: starting})
-
-  for (let i = 0; i < trades.length; i++) {
-    const pnl = trades[i].pnl || 0
-    running += pnl
-    balanceHistory.push({t: Date.now() - (trades.length - i - 1) * 60000, b: running})
-  }
-
-  // Add open position unrealized
-  balanceHistory.push({t: Date.now(), b: d.wallet.balance})
+  // Seed with current aggregated wallet balance
+  const starting = (d.wallet || {}).starting_balance || 1000
+  balanceHistory.push({t: Date.now() - 60000, b: starting})
+  balanceHistory.push({t: Date.now(), b: (d.wallet || {}).balance || starting})
 }
 
 function trackBalance(balance) {
@@ -6641,7 +6100,7 @@ function renderIntelCards() {
   // Sort
   if (sortBy === 'composite') {
     recs.sort((a, b) => {
-      const sc = r => (r.integration_value||0)*3 + (r.signal_score||0)*2 + Math.max(r.clawmpson_relevance||0, r.arbclaw_relevance||0, r.rivalclaw_relevance||0) - (r.complexity||0)*0.5
+      const sc = r => (r.integration_value||0)*3 + (r.signal_score||0)*2 + (r.rivalclaw_relevance||0) - (r.complexity||0)*0.5
       return sc(b) - sc(a)
     })
   } else if (sortBy === 'value_per_complexity') {
@@ -6710,7 +6169,6 @@ function renderIntelCard(r) {
     <div class="intel-card-insight">${esc(r.what_to_take || 'No analysis available')}</div>
     <div class="intel-relevance">
       <span class="intel-rel-item">CLAWMPSON ${relBar(r.clawmpson_relevance)}</span>
-      <span class="intel-rel-item">ARBCLAW ${relBar(r.arbclaw_relevance)}</span>
       <span class="intel-rel-item">RIVALCLAW ${relBar(r.rivalclaw_relevance)}</span>
     </div>
     ${r.risk && r.risk !== 'analysis_failed' ? `<div class="intel-risk">⚠ ${esc(r.risk)}</div>` : ''}
@@ -6736,7 +6194,6 @@ function intelShowApprove(id) {
   document.getElementById('intelApproveId').value = id
   document.getElementById('intelApproveNotes').value = ''
   document.getElementById('intelTargetClawmpson').checked = true
-  document.getElementById('intelTargetArbclaw').checked = false
   document.getElementById('intelTargetRivalclaw').checked = false
   document.getElementById('intelApproveModal').classList.add('active')
 }
@@ -6745,7 +6202,6 @@ async function intelConfirmApprove() {
   const id = document.getElementById('intelApproveId').value
   const targets = []
   if (document.getElementById('intelTargetClawmpson').checked) targets.push('clawmpson')
-  if (document.getElementById('intelTargetArbclaw').checked) targets.push('arbclaw')
   if (document.getElementById('intelTargetRivalclaw').checked) targets.push('rivalclaw')
   const notes = document.getElementById('intelApproveNotes').value
 
