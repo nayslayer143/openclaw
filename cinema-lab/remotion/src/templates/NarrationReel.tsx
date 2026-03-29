@@ -14,10 +14,11 @@ const ClipFrame: React.FC<{ src: string; caption: string; totalFrames: number }>
   totalFrames,
 }) => {
   const frame = useCurrentFrame();
-  const fadeOutStart = Math.max(8, totalFrames - 8);
+  const fadeIn = Math.min(8, Math.floor(totalFrames / 3));
+  const fadeOutStart = Math.max(fadeIn, totalFrames - Math.floor(totalFrames / 3));
   const opacity = interpolate(
     frame,
-    [0, 8, fadeOutStart, totalFrames],
+    [0, fadeIn, fadeOutStart, totalFrames],
     [0, 1, 1, 0],
     { extrapolateRight: 'clamp', extrapolateLeft: 'clamp' }
   );
@@ -68,7 +69,7 @@ export const NarrationReel: React.FC<NarrationReelProps> = ({
         const isLast = i === clips.length - 1;
         const clipDuration = isLast ? duration_frames - i * framesPerClip : framesPerClip;
         return (
-          <Sequence key={clip} from={i * framesPerClip} durationInFrames={clipDuration}>
+          <Sequence key={`${i}-${clip}`} from={i * framesPerClip} durationInFrames={clipDuration}>
             <ClipFrame src={clip} caption={captions[i] ?? ''} totalFrames={clipDuration} />
           </Sequence>
         );
