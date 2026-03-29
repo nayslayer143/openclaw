@@ -101,3 +101,60 @@ def test_update_status_merges(pipeline, tmp_path):
     data = json.loads((tmp_path / "jobs.json").read_text())
     assert data["job001"]["status"] == "rendering"
     assert data["job001"]["template"] == "TextReveal"
+
+
+# ── Render tests ──────────────────────────────────────────────────────────────
+
+def test_render_template_calls_npx_remotion(pipeline, tmp_path):
+    (tmp_path / "remotion" / "src" / "custom").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "renders").mkdir(exist_ok=True)
+
+    mock_result = MagicMock()
+    mock_result.returncode = 0
+    mock_result.stderr = ""
+
+    with patch("subprocess.run", return_value=mock_result) as mock_run:
+        output = pipeline._render_template(
+            "job001", "TextReveal",
+            {"text": "hello", "accent_color": "#e86800"}, 150
+        )
+
+    assert "job001.mp4" in output
+    cmd = mock_run.call_args[0][0]
+    assert "npx" in cmd
+    assert "remotion" in cmd
+    assert "TextReveal" in cmd
+
+
+def test_render_custom_falls_back_on_invalid_jsx(pipeline, tmp_path):
+    (tmp_path / "remotion" / "src" / "custom").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "renders").mkdir(exist_ok=True)
+
+    check_fail = MagicMock()
+    check_fail.returncode = 1
+    check_fail.stderr = "SyntaxError"
+
+    fallback_output = str(tmp_path / "renders" / "job001.mp4")
+
+    with patch("subprocess.run", return_value=check_fail):
+        with patch.object(pipeline, "_render_template", return_value=fallback_output) as mock_tmpl:
+            out = pipeline._render_custom("job001", "bad jsx !!!", 150)
+
+    mock_tmpl.assert_called_once_with(
+        "job001", "TextReveal",
+        {"text": "Custom render failed", "accent_color": "#e86800"}, 150
+    )
+    assert out == fallback_output
+
+
+def test_run_pipeline_updates_status_on_failure(pipeline, tmp_path):
+    (tmp_path / "assets" / "job001").mkdir(parents=True)
+    (tmp_path / "remotion" / "public").mkdir(parents=True)
+    (tmp_path / "renders").mkdir()
+
+    with patch.object(pipeline, "_llm_compose", side_effect=RuntimeError("Ollama down")):
+        pipeline.run_pipeline("job001", "make a video")
+
+    data = json.loads((tmp_path / "jobs.json").read_text())
+    assert data["job001"]["status"] == "failed"
+    assert "Ollama down" in data["job001"]["error"]

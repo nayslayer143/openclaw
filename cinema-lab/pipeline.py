@@ -113,3 +113,104 @@ def _llm_compose(prompt: str, manifest: list) -> dict:
         if raw.startswith("json"):
             raw = raw[4:]
     return json.loads(raw.strip())
+
+
+def _render_template(job_id: str, template: str, scenes: dict, duration_frames: int) -> str:
+    """Invoke npx remotion render for a named template with scene props."""
+    props = dict(scenes)
+    props["duration_frames"] = duration_frames
+
+    output = RENDERS_DIR / f"{job_id}.mp4"
+    RENDERS_DIR.mkdir(exist_ok=True)
+
+    result = subprocess.run(
+        [
+            "npx", "remotion", "render", "src/index.ts", template,
+            "--output", str(output),
+            "--props", json.dumps(props),
+        ],
+        cwd=str(REMOTION_DIR),
+        capture_output=True,
+        text=True,
+        timeout=600,
+    )
+    if result.returncode != 0:
+        raise RuntimeError(f"Remotion render failed:\n{result.stderr[-600:]}")
+    return str(output)
+
+
+def _render_custom(job_id: str, jsx_code: str, duration_frames: int) -> str:
+    """Write LLM JSX, validate with node --check, fallback to TextReveal on failure."""
+    custom_dir = REMOTION_DIR / "src" / "custom"
+    custom_dir.mkdir(parents=True, exist_ok=True)
+    comp_file = custom_dir / f"{job_id}.tsx"
+    comp_file.write_text(jsx_code)
+
+    check = subprocess.run(
+        ["node", "--check", str(comp_file)],
+        capture_output=True,
+        text=True,
+    )
+    if check.returncode != 0:
+        _update_status(job_id, warning="Custom JSX invalid, falling back to TextReveal")
+        return _render_template(
+            job_id, "TextReveal",
+            {"text": "Custom render failed", "accent_color": "#e86800"},
+            duration_frames,
+        )
+
+    output = RENDERS_DIR / f"{job_id}.mp4"
+    result = subprocess.run(
+        [
+            "npx", "remotion", "render", str(comp_file), "DynamicComp",
+            "--output", str(output),
+        ],
+        cwd=str(REMOTION_DIR),
+        capture_output=True,
+        text=True,
+        timeout=600,
+    )
+    if result.returncode != 0:
+        _update_status(job_id, warning="Custom render failed, falling back to TextReveal")
+        return _render_template(
+            job_id, "TextReveal",
+            {"text": "Custom render failed", "accent_color": "#e86800"},
+            duration_frames,
+        )
+    return str(output)
+
+
+def run_pipeline(job_id: str, prompt: str) -> None:
+    """Main entry point. Orchestrates manifest → LLM → render → status."""
+    try:
+        _update_status(job_id, status="composing")
+        manifest = _build_manifest(job_id)
+        scene_plan = _llm_compose(prompt, manifest)
+
+        template        = scene_plan.get("template", "TextReveal")
+        duration_frames = int(scene_plan.get("duration_frames", 450))
+        scenes          = scene_plan.get("scenes", {})
+
+        _update_status(job_id, status="rendering", template=template)
+
+        if template == "custom":
+            output = _render_custom(job_id, scene_plan.get("jsx_code", ""), duration_frames)
+        else:
+            output = _render_template(job_id, template, scenes, duration_frames)
+
+        _update_status(
+            job_id,
+            status="complete",
+            output_path=f"renders/{job_id}.mp4",
+            completed_at=datetime.datetime.utcnow().isoformat(),
+        )
+
+    except Exception as exc:
+        _update_status(job_id, status="failed", error=str(exc)[:500])
+
+
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        print("Usage: pipeline.py <job_id> <prompt>")
+        sys.exit(1)
+    run_pipeline(sys.argv[1], sys.argv[2])
