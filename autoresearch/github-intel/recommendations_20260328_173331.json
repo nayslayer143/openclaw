@@ -100,7 +100,7 @@
       "what_to_take": "None; JavaScript crypto focus and language mismatch prevent useful integration with Python prediction market stack.",
       "risk": "JavaScript vs Python language barrier; crypto trading domain mismatch; suspicious future last-update date (2026-03-27) indicates potential maintenance issues; no relevant prediction market strategy patterns.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
