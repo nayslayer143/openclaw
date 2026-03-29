@@ -120,7 +120,7 @@
       "what_to_take": "Conceptual multi-exchange architecture patterns (not code) for handling 100+ exchanges via CCXT-like abstraction",
       "risk": "License unknown (must verify), future-dated last update (2026-03-28) suggests possible data error or abandonment, TypeScript/Python language mismatch requires heavy translation effort",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "This repo is a curated list of external resources, not a codebase. No reusable code exists for direct integration; use the list to identify external libraries for potential future research.",
       "risk": "Repo is a reference list (not code), making integration impossible. Last updated in 2026 (likely typo) suggests potential maintenance issues. No license concerns but zero direct utility for code integration.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "No transferable code; repo focuses on traditional options trading (not prediction markets) with market-specific indicators and data structures incompatible with Polymarket/Kalshi feeds.",
       "risk": "License unknown (potential legal risk), suspicious future-dated last update (2026-03-26), and high adaptation complexity due to fundamental market mismatch (options vs prediction markets).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "No actionable code; repo focuses on stock market RL tape-reading (not prediction markets) and lacks prediction market data integration.",
       "risk": "Domain mismatch (stocks vs. prediction markets), high complexity for integration, and unverified license (repo lacks license file).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "Nothing; the JavaScript charting library is incompatible with our Python stack and lacks maintenance for production use.",
       "risk": "Not maintained (explicitly stated), language mismatch (JS vs Python), and requires building a separate frontend layer for minimal UI value.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "Not a code repository; contains a curated HTML list of resources, not integrable code. Cannot extract executable patterns or libraries for trading systems.",
       "risk": "Repo is a static HTML list (not code), so no actual trading algorithms or libraries to integrate. Manual review of linked resources would be required for any potential use, but this is outside the scope of direct integration.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
