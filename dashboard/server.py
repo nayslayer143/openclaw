@@ -1105,40 +1105,63 @@ def _quantumentalclaw_state(conn):
     if ctx:
         starting = float(ctx[0])
 
-    # Closed trades PnL
+    # Closed trades PnL (check paper_trades, fall back to backup table)
     closed_pnl = 0.0
+    total_closed = 0
+    wins = 0
+    recent_list = []
     try:
         closed_pnl = conn.execute(
             "SELECT COALESCE(SUM(pnl_usd), 0) FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')"
         ).fetchone()[0]
+        all_closed = conn.execute(
+            "SELECT status, pnl_usd FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')"
+        ).fetchall()
+        total_closed = len(all_closed)
+        wins = sum(1 for t in all_closed if t["status"] == "closed_win")
     except Exception:
         pass
 
-    # Open positions
-    open_trades = conn.execute(
-        "SELECT pt.*, td.event_id, td.venue, td.ticker, td.direction, td.final_score, "
-        "td.confidence, td.amount_usd as decision_amount, td.signal_snapshot, td.reasoning "
-        "FROM paper_trades pt "
-        "JOIN trade_decisions td ON pt.decision_id = td.decision_id "
-        "WHERE pt.status='open' ORDER BY pt.executed_at DESC"
-    ).fetchall()
+    # If paper_trades is empty, pull historical stats from backup table
+    if total_closed == 0:
+        for backup_tbl in ("paper_trades_pre_protocol_20260327", "paper_trades_pre_audit_2026_03_26"):
+            try:
+                bc = conn.execute(f'SELECT COUNT(*) FROM "{backup_tbl}" WHERE status IN ("closed_win","closed_loss","expired")').fetchone()[0]
+                if bc > 0:
+                    closed_pnl = conn.execute(f'SELECT COALESCE(SUM(pnl_usd), 0) FROM "{backup_tbl}" WHERE status IN ("closed_win","closed_loss","expired")').fetchone()[0]
+                    all_closed = conn.execute(f'SELECT status, pnl_usd FROM "{backup_tbl}" WHERE status IN ("closed_win","closed_loss","expired")').fetchall()
+                    total_closed = len(all_closed)
+                    wins = sum(1 for t in all_closed if t["status"] == "closed_win")
+                    break
+            except Exception:
+                continue
+
+    # Open positions from paper_trades
+    open_trades = []
+    try:
+        open_trades = conn.execute(
+            "SELECT pt.*, td.event_id, td.venue, td.ticker, td.direction, td.final_score, "
+            "td.confidence, td.amount_usd as decision_amount, td.signal_snapshot, td.reasoning "
+            "FROM paper_trades pt "
+            "JOIN trade_decisions td ON pt.decision_id = td.decision_id "
+            "WHERE pt.status='open' ORDER BY pt.executed_at DESC"
+        ).fetchall()
+    except Exception:
+        pass
 
     unrealized = 0.0
     open_list = []
     for t in open_trades:
         entry = t["fill_price"]
-        current = entry  # No live price tracking yet; will improve
+        current = entry
         pnl = t["fill_shares"] * (current - entry)
         pnl_pct = (pnl / t["fill_amount_usd"] * 100) if t["fill_amount_usd"] > 0 else 0
         unrealized += pnl
-
-        # Parse signal snapshot
         snapshot = {}
         try:
             snapshot = json.loads(t["signal_snapshot"]) if t["signal_snapshot"] else {}
         except Exception:
             pass
-
         open_list.append({
             "event_id": t["event_id"], "venue": t["venue"],
             "ticker": t["ticker"], "direction": t["direction"],
@@ -1151,33 +1174,67 @@ def _quantumentalclaw_state(conn):
             "opened_at": t["executed_at"],
         })
 
+    # If no open positions from paper_trades, show latest trade_decisions as active signals
+    if not open_list:
+        try:
+            # Get most recent decision per (venue, ticker, direction) — represents current signal state
+            signals = conn.execute("""
+                SELECT td1.decision_id, td1.venue, td1.ticker, td1.direction, td1.final_score,
+                       td1.confidence, td1.amount_usd, td1.entry_price, td1.shares,
+                       td1.signal_snapshot, td1.reasoning, td1.decided_at
+                FROM trade_decisions td1
+                INNER JOIN (
+                    SELECT venue, ticker, direction, MAX(decided_at) as latest
+                    FROM trade_decisions
+                    WHERE ticker IS NOT NULL
+                    GROUP BY venue, ticker, direction
+                ) td2 ON td1.venue = td2.venue AND td1.ticker = td2.ticker
+                        AND td1.direction = td2.direction AND td1.decided_at = td2.latest
+                ORDER BY td1.decided_at DESC LIMIT 20
+            """).fetchall()
+            for s in signals:
+                snapshot = {}
+                try:
+                    snapshot = json.loads(s["signal_snapshot"]) if s["signal_snapshot"] else {}
+                except Exception:
+                    pass
+                open_list.append({
+                    "event_id": s["decision_id"], "venue": s["venue"],
+                    "ticker": s["ticker"], "direction": s["direction"],
+                    "entry_price": s["entry_price"] or 0,
+                    "current_price": s["entry_price"] or 0,
+                    "amount_usd": s["amount_usd"] or 0,
+                    "final_score": s["final_score"], "confidence": s["confidence"],
+                    "signal_scores": snapshot,
+                    "pnl": 0, "pnl_pct": 0,
+                    "reasoning": s["reasoning"] or "",
+                    "opened_at": s["decided_at"],
+                })
+        except Exception:
+            pass
+
     balance = starting + closed_pnl + unrealized
 
     # Recent closed trades
-    recent = conn.execute(
-        "SELECT pt.*, td.event_id, td.venue, td.ticker, td.direction, td.final_score, td.signal_snapshot "
-        "FROM paper_trades pt "
-        "JOIN trade_decisions td ON pt.decision_id = td.decision_id "
-        "WHERE pt.status IN ('closed_win','closed_loss','expired') "
-        "ORDER BY pt.exit_at DESC LIMIT 20"
-    ).fetchall()
-    recent_list = []
-    for r in recent:
-        recent_list.append({
-            "event_id": r["event_id"], "venue": r["venue"],
-            "ticker": r["ticker"], "direction": r["direction"],
-            "entry_price": r["fill_price"], "exit_price": r["exit_price"],
-            "pnl": round(r["pnl_usd"] or 0, 2), "status": r["status"],
-            "final_score": r["final_score"],
-            "opened_at": r["executed_at"], "closed_at": r["exit_at"],
-        })
-
-    # Stats
-    all_closed = conn.execute(
-        "SELECT status, pnl_usd FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')"
-    ).fetchall()
-    total_closed = len(all_closed)
-    wins = sum(1 for t in all_closed if t["status"] == "closed_win")
+    try:
+        recent = conn.execute(
+            "SELECT pt.*, td.event_id, td.venue, td.ticker, td.direction, td.final_score, td.signal_snapshot "
+            "FROM paper_trades pt "
+            "JOIN trade_decisions td ON pt.decision_id = td.decision_id "
+            "WHERE pt.status IN ('closed_win','closed_loss','expired') "
+            "ORDER BY pt.exit_at DESC LIMIT 20"
+        ).fetchall()
+        for r in recent:
+            recent_list.append({
+                "event_id": r["event_id"], "venue": r["venue"],
+                "ticker": r["ticker"], "direction": r["direction"],
+                "entry_price": r["fill_price"], "exit_price": r["exit_price"],
+                "pnl": round(r["pnl_usd"] or 0, 2), "status": r["status"],
+                "final_score": r["final_score"],
+                "opened_at": r["executed_at"], "closed_at": r["exit_at"],
+            })
+    except Exception:
+        pass
 
     # Cycle count
     cycle_count = 0
@@ -1215,6 +1272,13 @@ def _quantumentalclaw_state(conn):
     except Exception:
         pass
 
+    # Total decisions (shows engine activity even when paper_trades is empty)
+    total_decisions = 0
+    try:
+        total_decisions = conn.execute("SELECT COUNT(*) FROM trade_decisions").fetchone()[0]
+    except Exception:
+        pass
+
     return {
         "instance": "quantumentalclaw",
         "wallet": {
@@ -1225,6 +1289,7 @@ def _quantumentalclaw_state(conn):
             "win_rate": round(wins / total_closed * 100, 1) if total_closed > 0 else 0,
             "open_positions": len(open_list),
             "cycles_completed": cycle_count,
+            "total_decisions": total_decisions,
         },
         "open_positions": open_list,
         "recent_trades": recent_list,
