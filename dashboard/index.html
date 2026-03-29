@@ -7155,34 +7155,33 @@ async function cinemaTriggerRender() {
 
   btn.disabled = true
 
-  // Upload files first
+  // Upload files (or create an empty job) to get a server-issued job_id
   let jobId = null
-  if (cinemaState.files.length > 0) {
+  try {
     const fd = new FormData()
     cinemaState.files.forEach(f => fd.append('files', f.file, f.name))
-    try {
-      const r = await fetch('/api/cinema/upload', { method: 'POST', body: fd })
-      const d = await r.json()
-      jobId = d.job_id
-    } catch (e) {
-      btn.disabled = false
-      cinemaShowStatusError('Upload failed: ' + e.message)
-      return
-    }
-  } else {
-    // No files — create a text-only job via render directly
-    jobId = Math.random().toString(36).slice(2, 10)
+    const r = await fetch('/api/cinema/upload', { method: 'POST', body: fd })
+    if (!r.ok) throw new Error(`Upload error ${r.status}`)
+    const d = await r.json()
+    jobId = d.job_id
+  } catch (e) {
+    btn.disabled = false
+    cinemaShowStatusError('Upload failed: ' + e.message)
+    return
   }
 
   cinemaState.jobId = jobId
 
   // Trigger render
   try {
-    await fetch('/api/cinema/render', {
+    const r = await fetch('/api/cinema/render', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ job_id: jobId, prompt }),
     })
+    if (!r.ok) throw new Error(`Render error ${r.status}`)
+    const rd = await r.json()
+    if (rd.job_id) jobId = rd.job_id
   } catch (e) {
     btn.disabled = false
     cinemaShowStatusError('Render request failed: ' + e.message)
@@ -7222,9 +7221,11 @@ function cinemaStartPolling(jobId) {
 }
 
 async function cinemaPollStatus(jobId) {
+  cinemaState._pollErrors = (cinemaState._pollErrors || 0)
   try {
     const r = await fetch(`/api/cinema/status/${jobId}`)
     if (!r.ok) return
+    cinemaState._pollErrors = 0
     const d = await r.json()
 
     const status = d.status || 'queued'
@@ -7243,13 +7244,21 @@ async function cinemaPollStatus(jobId) {
     if (status === 'complete' || status === 'failed') {
       clearInterval(cinemaState.pollTimer)
       cinemaState.pollTimer = null
-      document.getElementById('cinemaMagicBtn').disabled = false
+      if (cinemaState.jobId === jobId) document.getElementById('cinemaMagicBtn').disabled = false
       if (status === 'complete') {
         cinemaLoadGallery()
         document.getElementById('cinemaGallerySection').style.display = ''
       }
     }
-  } catch (_) {}
+  } catch (e) {
+    cinemaState._pollErrors++
+    if (cinemaState._pollErrors >= 5) {
+      clearInterval(cinemaState.pollTimer)
+      cinemaState.pollTimer = null
+      cinemaShowStatusError('Connection lost — check server')
+      if (cinemaState.jobId === jobId) document.getElementById('cinemaMagicBtn').disabled = false
+    }
+  }
 }
 
 async function cinemaLoadGallery() {
