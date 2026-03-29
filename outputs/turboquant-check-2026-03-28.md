@@ -24,6 +24,7 @@ TurboQuant dropped publicly on ~March 25, 2026 via Google Research blog. It's be
 - **NOT merged upstream yet.** Still in discussion/PR phase.
 
 ### Ollama
+- **Feature request filed:** [ollama/ollama Issue #15051](https://github.com/ollama/ollama/issues/15051) — native ollama-go-engine TurboQuant+RotorQuant implementation requested.
 - **No native support yet.** Ollama inherits from llama.cpp, so it won't land until llama.cpp merges it upstream.
 - Once llama.cpp merges TurboQuant, expect Ollama support within a release cycle or two.
 
