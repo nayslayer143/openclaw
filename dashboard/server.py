@@ -25,6 +25,29 @@ PENDING_JSON   = OPENCLAW_ROOT / "queue" / "pending.json"
 LOGS_DIR       = OPENCLAW_ROOT / "logs"
 IDEAS_DIR      = OPENCLAW_ROOT / "ideas"
 IDEAS_MEDIA    = IDEAS_DIR / "media"
+
+# ── Cinema Studio ─────────────────────────────────────────────────────────────
+CINEMA_DIR     = OPENCLAW_ROOT / "cinema-lab"
+CINEMA_ASSETS  = CINEMA_DIR / "assets"
+CINEMA_RENDERS = CINEMA_DIR / "renders"
+CINEMA_JOBS    = CINEMA_DIR / "jobs.json"
+
+
+def _load_cinema_jobs() -> dict:
+    if not CINEMA_JOBS.exists():
+        return {}
+    try:
+        return json.loads(CINEMA_JOBS.read_text())
+    except Exception:
+        return {}
+
+
+def _update_cinema_job(job_id: str, **kwargs) -> None:
+    jobs = _load_cinema_jobs()
+    if job_id not in jobs:
+        jobs[job_id] = {}
+    jobs[job_id].update(kwargs)
+    CINEMA_JOBS.write_text(json.dumps(jobs, indent=2))
 PROJECTS_FILE  = OPENCLAW_ROOT / "projects" / "projects.json"
 CHATGPT_REPORTS_DIR = OPENCLAW_ROOT / "outputs" / "chatgpt-reports"
 STRATEGY_CATALOG   = Path(__file__).parent / "strategy-catalog.json"
@@ -2653,6 +2676,91 @@ async def get_strategies(user: str = Depends(get_current_user)):
         data = json.loads(STRATEGY_CATALOG.read_text(encoding="utf-8"))
         _strategy_cache.update(mtime=mtime, data=data)
     return _strategy_cache["data"]
+
+
+# ── Cinema Studio endpoints ───────────────────────────────────────────────────
+
+@app.post("/api/cinema/upload")
+async def cinema_upload(request: Request, user: str = Depends(get_current_user)):
+    """Accept multipart file upload. Creates job_id, saves to cinema-lab/assets/{job_id}/."""
+    form = await request.form()
+    job_id = uuid.uuid4().hex[:8]
+    job_dir = CINEMA_ASSETS / job_id
+    job_dir.mkdir(parents=True, exist_ok=True)
+
+    files_info = []
+    for _key, value in form.multi_items():
+        if hasattr(value, "filename") and value.filename:
+            content = await value.read()
+            (job_dir / value.filename).write_bytes(content)
+            files_info.append({"name": value.filename, "size": len(content)})
+
+    return {"job_id": job_id, "files": files_info}
+
+
+@app.post("/api/cinema/render")
+async def cinema_render(request: Request, user: str = Depends(get_current_user)):
+    """Queue a render job. Spawns pipeline.py as non-blocking subprocess."""
+    data = await request.json()
+    job_id = data["job_id"]
+    prompt = data.get("prompt", "")
+
+    _update_cinema_job(
+        job_id,
+        status="queued",
+        prompt=prompt,
+        created_at=datetime.utcnow().isoformat(),
+    )
+
+    log_path = LOGS_DIR / f"cinema-{job_id}.log"
+    subprocess.Popen(
+        [sys.executable, str(CINEMA_DIR / "pipeline.py"), job_id, prompt],
+        stdout=open(log_path, "w"),
+        stderr=subprocess.STDOUT,
+    )
+
+    return {"job_id": job_id, "status": "queued"}
+
+
+@app.get("/api/cinema/status/{job_id}")
+async def cinema_status(job_id: str, user: str = Depends(get_current_user)):
+    """Return current status of a render job."""
+    jobs = _load_cinema_jobs()
+    if job_id not in jobs:
+        raise HTTPException(404, "Job not found")
+    return jobs[job_id]
+
+
+@app.get("/api/cinema/renders")
+async def cinema_list_renders(user: str = Depends(get_current_user)):
+    """List all completed render MP4s with metadata."""
+    jobs = _load_cinema_jobs()
+    renders = []
+    if CINEMA_RENDERS.exists():
+        for f in sorted(CINEMA_RENDERS.glob("*.mp4"), key=lambda x: x.stat().st_mtime, reverse=True):
+            job_id = f.stem
+            meta = jobs.get(job_id, {})
+            renders.append({
+                "job_id": job_id,
+                "filename": f.name,
+                "size_bytes": f.stat().st_size,
+                "created_at": meta.get("completed_at"),
+                "template": meta.get("template"),
+            })
+    return renders
+
+
+@app.get("/api/cinema/renders/{filename}")
+async def cinema_serve_render(filename: str, user: str = Depends(get_current_user)):
+    """Serve an MP4 file with range request support for video playback."""
+    fpath = CINEMA_RENDERS / filename
+    if not fpath.exists():
+        raise HTTPException(404, "Render not found")
+    return FileResponse(
+        fpath,
+        media_type="video/mp4",
+        headers={"Accept-Ranges": "bytes"},
+    )
 
 
 @app.get("/{path:path}")
