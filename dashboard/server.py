@@ -48,6 +48,8 @@ def _update_cinema_job(job_id: str, **kwargs) -> None:
         jobs[job_id] = {}
     jobs[job_id].update(kwargs)
     CINEMA_JOBS.write_text(json.dumps(jobs, indent=2))
+
+
 PROJECTS_FILE  = OPENCLAW_ROOT / "projects" / "projects.json"
 CHATGPT_REPORTS_DIR = OPENCLAW_ROOT / "outputs" / "chatgpt-reports"
 STRATEGY_CATALOG   = Path(__file__).parent / "strategy-catalog.json"
