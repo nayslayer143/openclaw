@@ -68,6 +68,28 @@ TARGETS = {
         "env_path": "~/rivalclaw/.env",
         "label": "RivalClaw",
     },
+    "quantclaw": {
+        "db": "~/quantumentalclaw/quantumentalclaw.db",
+        "signals": None,
+        "repo": "~/quantumentalclaw",
+        "source_files": [
+            "~/quantumentalclaw/simulator.py",
+            "~/quantumentalclaw/execution/paper_wallet.py",
+            "~/quantumentalclaw/execution/trade_router.py",
+            "~/quantumentalclaw/learning/trade_logger.py",
+        ],
+        "chat_id": None,
+        "env_path": "~/quantumentalclaw/.env",
+        "label": "QuantumentalClaw",
+        "trade_query": """
+            SELECT decision_id AS id, event_id AS market_id, direction,
+                   shares, entry_price, NULL AS exit_price,
+                   amount_usd, NULL AS pnl, 'open' AS status,
+                   decided_at AS opened_at, NULL AS closed_at,
+                   confidence AS strategy, reasoning, venue
+            FROM trade_decisions
+        """,
+    },
 }
 
 ENV_PATH = Path("~/.openclaw/.env").expanduser()
@@ -138,9 +160,10 @@ def main() -> None:
     target = TARGETS[args.target]
     target_db = target["db"]
     signals_path = target["signals"]
-    chat_id = target["chat_id"]
+    chat_id = target.get("chat_id") or "default"
     env_path = Path(target["env_path"]).expanduser()
     label = target["label"]
+    trade_query = target.get("trade_query")
 
     print(f"🎯 Target: {label}")
     print(f"   DB: {target_db}")
@@ -166,17 +189,17 @@ def main() -> None:
     if args.full or args.verify_trades:
         print("🔍 Verifying trades...")
         tv = TradeVerifier(db=db, poly=poly, kalshi=kalshi)
-        results["verify"] = tv.run(target_db)
+        results["verify"] = tv.run(target_db, trade_query=trade_query)
         print(f"   → {results['verify']}")
 
         print("📋 Auditing resolutions...")
         ra = ResolutionAuditor(db=db, poly=poly, kalshi=kalshi)
-        results["resolution"] = ra.run(target_db)
+        results["resolution"] = ra.run(target_db, trade_query=trade_query)
         print(f"   → {results['resolution']}")
 
         print("📊 Statistical audit...")
         sa = StatsAuditor()
-        results["stats"] = sa.run(target_db, chat_id=chat_id)
+        results["stats"] = sa.run(target_db, chat_id=chat_id, trade_query=trade_query)
         print(f"   → trust={results['stats'].get('trust_score', '?')}, "
               f"flags={len(results['stats'].get('red_flags', []))}")
 
@@ -198,7 +221,7 @@ def main() -> None:
             results["hallucination"] = hd.run_on_signals(signals_path)
         else:
             results["hallucination"] = {"checked": 0, "skipped": "no signals file for this target"}
-        results["hallucination_trades"] = hd.run_on_llm_trades(target_db)
+        results["hallucination_trades"] = hd.run_on_llm_trades(target_db, trade_query=trade_query)
         print(f"   → {results['hallucination']}")
 
     if args.full or args.scan_code:

@@ -180,7 +180,7 @@ class StatsAuditor:
     # Main runner
     # ------------------------------------------------------------------
 
-    def run(self, clawmson_db_path: str, chat_id: str = "mirofish") -> dict:
+    def run(self, clawmson_db_path: str, chat_id: str = "mirofish", trade_query: Optional[str] = None) -> dict:
         """
         Read paper_trades and daily_pnl from clawmson.db, run all 4 checks,
         compute trust score, and return a summary dict.
@@ -189,7 +189,8 @@ class StatsAuditor:
         conn = sqlite3.connect(db_path)
         conn.row_factory = sqlite3.Row
         try:
-            trades = [dict(r) for r in conn.execute("SELECT * FROM paper_trades").fetchall()]
+            query = trade_query or "SELECT * FROM paper_trades"
+            trades = [dict(r) for r in conn.execute(query).fetchall()]
             try:
                 daily_pnl = [dict(r) for r in conn.execute("SELECT * FROM daily_pnl").fetchall()]
             except Exception:
@@ -198,10 +199,15 @@ class StatsAuditor:
             # Read starting balance from context table
             starting_balance = 1000.0
             try:
+                # Try with chat_id first (openclaw/rivalclaw), then without (quantclaw)
                 row = conn.execute(
                     "SELECT value FROM context WHERE chat_id=? AND key='starting_balance'",
                     (chat_id,),
                 ).fetchone()
+                if row is None:
+                    row = conn.execute(
+                        "SELECT value FROM context WHERE key='starting_balance'"
+                    ).fetchone()
                 if row is not None:
                     starting_balance = float(row["value"])
             except Exception:

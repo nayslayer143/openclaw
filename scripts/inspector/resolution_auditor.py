@@ -151,7 +151,7 @@ class ResolutionAuditor:
             "checked_at":          checked_at,
         }
 
-    def run(self, clawmson_db_path: str) -> dict:
+    def run(self, clawmson_db_path: str, trade_query: Optional[str] = None) -> dict:
         """
         Read closed paper_trades from clawmson_db_path, audit each for resolution
         accuracy, write results to resolution_audits, and return a summary dict.
@@ -160,9 +160,14 @@ class ResolutionAuditor:
         try:
             conn = sqlite3.connect(db_path)
             conn.row_factory = sqlite3.Row
-            trades = conn.execute(
-                "SELECT * FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')"
-            ).fetchall()
+            if trade_query:
+                # Custom query — filter closed trades in Python
+                all_trades = conn.execute(trade_query).fetchall()
+                trades = [t for t in all_trades if dict(t).get("status") in CLOSED_STATUSES]
+            else:
+                trades = conn.execute(
+                    "SELECT * FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')"
+                ).fetchall()
         finally:
             conn.close()
 

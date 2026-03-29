@@ -196,7 +196,7 @@ class HallucinationDetector:
 
         return {"checked": checked, "counts": counts}
 
-    def run_on_llm_trades(self, clawmson_db_path: str) -> dict:
+    def run_on_llm_trades(self, clawmson_db_path: str, trade_query: Optional[str] = None) -> dict:
         """
         Read paper_trades with LLM strategy or non-empty reasoning from
         clawmson.db, check each price claim, and insert to hallucination_checks.
@@ -207,10 +207,16 @@ class HallucinationDetector:
         conn = sqlite3.connect(db_path)
         conn.row_factory = sqlite3.Row
         try:
-            trades = conn.execute(
-                "SELECT * FROM paper_trades "
-                "WHERE strategy LIKE '%llm%' OR (reasoning IS NOT NULL AND reasoning != '')"
-            ).fetchall()
+            if trade_query:
+                all_rows = conn.execute(trade_query).fetchall()
+                trades = [t for t in all_rows
+                          if (dict(t).get("strategy") or "").lower().find("llm") >= 0
+                          or (dict(t).get("reasoning") or "")]
+            else:
+                trades = conn.execute(
+                    "SELECT * FROM paper_trades "
+                    "WHERE strategy LIKE '%llm%' OR (reasoning IS NOT NULL AND reasoning != '')"
+                ).fetchall()
             trades = [dict(t) for t in trades]
         finally:
             conn.close()

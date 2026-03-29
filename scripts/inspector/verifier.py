@@ -212,7 +212,7 @@ class TradeVerifier:
             "checked_at":         checked_at,
         }
 
-    def run(self, clawmson_db_path: str) -> dict:
+    def run(self, clawmson_db_path: str, trade_query: Optional[str] = None) -> dict:
         """
         Read all paper_trades from clawmson_db_path, verify each, write
         results to verified_trades, and return a summary dict.
@@ -220,7 +220,8 @@ class TradeVerifier:
         from pathlib import Path
         conn = sqlite3.connect(str(Path(clawmson_db_path).expanduser()))
         conn.row_factory = sqlite3.Row
-        trades = conn.execute("SELECT * FROM paper_trades").fetchall()
+        query = trade_query or "SELECT * FROM paper_trades"
+        trades = conn.execute(query).fetchall()
         conn.close()
 
         counts = {s.value: 0 for s in VerificationStatus}
