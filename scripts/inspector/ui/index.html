@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inspector Gadget</title>
+<style>
+/* ------------------------------------------------------------------ */
+/* Reset & Base                                                        */
+/* ------------------------------------------------------------------ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --bg-deep:     #0a0a1a;
+    --bg-card:     #111128;
+    --bg-card-alt: #161638;
+    --magenta:     #ff00ff;
+    --hot-pink:    #ff1493;
+    --cyan:        #00e5ff;
+    --cyan-dim:    #00838f;
+    --amber:       #ff6600;
+    --green:       #00ff88;
+    --yellow:      #ffd600;
+    --red:         #ff1744;
+    --text:        #e0e0f0;
+    --text-dim:    #8888aa;
+    --border:      #222244;
+    --glow-mag:    0 0 20px rgba(255, 0, 255, 0.3);
+    --glow-cyan:   0 0 20px rgba(0, 229, 255, 0.3);
+    --glow-amber:  0 0 20px rgba(255, 102, 0, 0.3);
+}
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg-deep);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+/* ------------------------------------------------------------------ */
+/* Layout                                                              */
+/* ------------------------------------------------------------------ */
+.container {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+}
+
+.grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+@media (max-width: 900px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+}
+
+@media (min-width: 901px) and (max-width: 1100px) {
+    .grid-3 { grid-template-columns: 1fr 1fr; }
+    .grid-4 { grid-template-columns: 1fr 1fr; }
+}
+
+/* ------------------------------------------------------------------ */
+/* Header                                                              */
+/* ------------------------------------------------------------------ */
+.header {
+    text-align: center;
+    padding: 30px 0 20px;
+    position: relative;
+}
+
+.header h1 {
+    font-size: 3rem;
+    font-weight: 900;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, var(--magenta), var(--cyan), var(--magenta));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 4s linear infinite;
+    text-shadow: none;
+}
+
+@keyframes shimmer {
+    to { background-position: 200% center; }
+}
+
+.header .subtitle {
+    font-family: 'Courier New', Courier, monospace;
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-top: 4px;
+    letter-spacing: 2px;
+}
+
+/* Glitch effect on hover */
+.header h1:hover {
+    animation: shimmer 4s linear infinite, glitch 0.3s steps(2) infinite;
+}
+
+@keyframes glitch {
+    0%   { transform: translate(0); }
+    25%  { transform: translate(-2px, 1px); }
+    50%  { transform: translate(2px, -1px); }
+    75%  { transform: translate(-1px, -1px); }
+    100% { transform: translate(0); }
+}
+
+/* ------------------------------------------------------------------ */
+/* Cards                                                               */
+/* ------------------------------------------------------------------ */
+.card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--magenta), var(--cyan));
+}
+
+.card-title {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Controls bar                                                        */
+/* ------------------------------------------------------------------ */
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.controls label {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.controls select {
+    background: var(--bg-card);
+    color: var(--cyan);
+    border: 1px solid var(--cyan-dim);
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    font-family: monospace;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.controls select:focus {
+    border-color: var(--cyan);
+    box-shadow: var(--glow-cyan);
+}
+
+/* ------------------------------------------------------------------ */
+/* Buttons                                                             */
+/* ------------------------------------------------------------------ */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 2px solid;
+    border-radius: 8px;
+    cursor: pointer;
+    background: transparent;
+    transition: all 0.2s ease;
+    font-family: system-ui, sans-serif;
+}
+
+.btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.btn-magenta {
+    color: var(--magenta);
+    border-color: var(--magenta);
+}
+.btn-magenta:hover:not(:disabled) {
+    background: rgba(255, 0, 255, 0.1);
+    box-shadow: var(--glow-mag);
+}
+
+.btn-cyan {
+    color: var(--cyan);
+    border-color: var(--cyan);
+}
+.btn-cyan:hover:not(:disabled) {
+    background: rgba(0, 229, 255, 0.1);
+    box-shadow: var(--glow-cyan);
+}
+
+.btn-amber {
+    color: var(--amber);
+    border-color: var(--amber);
+}
+.btn-amber:hover:not(:disabled) {
+    background: rgba(255, 102, 0, 0.1);
+    box-shadow: var(--glow-amber);
+}
+
+.actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* ------------------------------------------------------------------ */
+/* Trust score                                                         */
+/* ------------------------------------------------------------------ */
+.trust-score-display {
+    text-align: center;
+}
+
+.trust-number {
+    font-size: 4.5rem;
+    font-weight: 900;
+    line-height: 1;
+    font-family: monospace;
+}
+
+.trust-label {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 4px;
+}
+
+.trust-green  { color: var(--green); text-shadow: 0 0 30px rgba(0, 255, 136, 0.4); }
+.trust-yellow { color: var(--yellow); text-shadow: 0 0 30px rgba(255, 214, 0, 0.4); }
+.trust-red    { color: var(--red); text-shadow: 0 0 30px rgba(255, 23, 68, 0.4); }
+
+/* ------------------------------------------------------------------ */
+/* Status & meta info                                                  */
+/* ------------------------------------------------------------------ */
+.meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 0.85rem;
+}
+
+.meta-row:last-child { border-bottom: none; }
+
+.meta-label {
+    color: var(--text-dim);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.meta-value {
+    font-family: monospace;
+    color: var(--text);
+}
+
+/* ------------------------------------------------------------------ */
+/* Badges                                                              */
+/* ------------------------------------------------------------------ */
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: monospace;
+    letter-spacing: 0.5px;
+}
+
+.badge-verified    { background: rgba(0,255,136,0.15); color: var(--green);  border: 1px solid rgba(0,255,136,0.3); }
+.badge-discrepancy { background: rgba(255,214,0,0.15); color: var(--yellow); border: 1px solid rgba(255,214,0,0.3); }
+.badge-impossible  { background: rgba(255,23,68,0.15); color: var(--red);    border: 1px solid rgba(255,23,68,0.3); }
+.badge-unverifiable{ background: rgba(136,136,170,0.15); color: var(--text-dim); border: 1px solid rgba(136,136,170,0.3); }
+.badge-critical    { background: rgba(255,23,68,0.15); color: var(--red);    border: 1px solid rgba(255,23,68,0.3); }
+.badge-high        { background: rgba(255,102,0,0.15); color: var(--amber);  border: 1px solid rgba(255,102,0,0.3); }
+.badge-medium      { background: rgba(255,214,0,0.15); color: var(--yellow); border: 1px solid rgba(255,214,0,0.3); }
+.badge-low         { background: rgba(0,229,255,0.15); color: var(--cyan);   border: 1px solid rgba(0,229,255,0.3); }
+
+/* ------------------------------------------------------------------ */
+/* Stat blocks for trade counts                                        */
+/* ------------------------------------------------------------------ */
+.stat-block {
+    text-align: center;
+    padding: 16px 8px;
+    border-radius: 8px;
+    background: var(--bg-card-alt);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 900;
+    font-family: monospace;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    margin-top: 4px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Run status banner                                                   */
+/* ------------------------------------------------------------------ */
+.run-banner {
+    display: none;
+    padding: 14px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-family: monospace;
+    font-size: 0.85rem;
+    border: 1px solid var(--cyan-dim);
+    background: rgba(0, 229, 255, 0.05);
+    color: var(--cyan);
+    align-items: center;
+    gap: 12px;
+}
+
+.run-banner.active { display: flex; }
+
+.run-banner .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--cyan-dim);
+    border-top-color: var(--cyan);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.run-banner.error {
+    border-color: var(--red);
+    background: rgba(255, 23, 68, 0.05);
+    color: var(--red);
+}
+
+/* ------------------------------------------------------------------ */
+/* Red flags list                                                      */
+/* ------------------------------------------------------------------ */
+.flag-item {
+    padding: 10px 14px;
+    border-left: 3px solid var(--red);
+    background: rgba(255, 23, 68, 0.05);
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    font-family: monospace;
+}
+
+.flag-item.flag-warn {
+    border-left-color: var(--amber);
+    background: rgba(255, 102, 0, 0.05);
+}
+
+.no-flags {
+    color: var(--green);
+    font-family: monospace;
+    font-size: 0.85rem;
+    padding: 8px 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Findings table                                                      */
+/* ------------------------------------------------------------------ */
+.findings-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+}
+
+.findings-table th {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.findings-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    font-family: monospace;
+    vertical-align: top;
+}
+
+.findings-table tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* ------------------------------------------------------------------ */
+/* Report section                                                      */
+/* ------------------------------------------------------------------ */
+.report-body {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.8rem;
+    line-height: 1.7;
+    white-space: pre-wrap;
+    color: var(--text-dim);
+    max-height: 500px;
+    overflow-y: auto;
+    padding: 16px;
+    background: var(--bg-card-alt);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+/* ------------------------------------------------------------------ */
+/* Section spacing                                                     */
+/* ------------------------------------------------------------------ */
+.section { margin-bottom: 24px; }
+.section-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--magenta);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Header -->
+    <div class="header">
+        <h1>Inspector Gadget</h1>
+        <div class="subtitle">Independent Trading Verification System</div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls">
+        <label for="target-select">Target:</label>
+        <select id="target-select">
+            <option value="openclaw">OpenClaw (Clawmpson)</option>
+            <option value="rivalclaw">RivalClaw</option>
+        </select>
+
+        <div class="actions">
+            <button class="btn btn-magenta" id="btn-full" onclick="runInspection('full')">Run Full Inspection</button>
+            <button class="btn btn-cyan" id="btn-verify" onclick="runInspection('verify')">Verify Trades</button>
+            <button class="btn btn-cyan" id="btn-scan" onclick="runInspection('scan')">Scan Code</button>
+            <button class="btn btn-amber" id="btn-report" onclick="loadReport()">Load Report</button>
+        </div>
+    </div>
+
+    <!-- Run status banner -->
+    <div class="run-banner" id="run-banner">
+        <div class="spinner" id="run-spinner"></div>
+        <span id="run-message">Initialising...</span>
+    </div>
+
+    <!-- Status + Trust Score row -->
+    <div class="grid-2 section">
+        <div class="card">
+            <div class="card-title">System Status</div>
+            <div class="meta-row">
+                <span class="meta-label">Database</span>
+                <span class="meta-value" id="status-db">--</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">Last Run</span>
+                <span class="meta-value" id="status-last-run">--</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">Trades Checked</span>
+                <span class="meta-value" id="status-trades">--</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">Reports Generated</span>
+                <span class="meta-value" id="status-reports">--</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">Target</span>
+                <span class="meta-value" id="status-target">openclaw</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">Trust Score</div>
+            <div class="trust-score-display">
+                <div class="trust-number" id="trust-number">--</div>
+                <div class="trust-label">out of 100</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trade verification breakdown -->
+    <div class="section">
+        <div class="section-title">Trade Verification</div>
+        <div class="grid-4" id="trade-counts">
+            <div class="stat-block">
+                <div class="stat-number" style="color: var(--green)" id="count-verified">0</div>
+                <div class="stat-label">Verified</div>
+            </div>
+            <div class="stat-block">
+                <div class="stat-number" style="color: var(--yellow)" id="count-discrepancy">0</div>
+                <div class="stat-label">Discrepancy</div>
+            </div>
+            <div class="stat-block">
+                <div class="stat-number" style="color: var(--red)" id="count-impossible">0</div>
+                <div class="stat-label">Impossible</div>
+            </div>
+            <div class="stat-block">
+                <div class="stat-number" style="color: var(--text-dim)" id="count-unverifiable">0</div>
+                <div class="stat-label">Unverifiable</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resolution + Findings side by side -->
+    <div class="grid-2 section">
+        <!-- Resolution audit -->
+        <div class="card">
+            <div class="card-title">Resolution Audit</div>
+            <div class="meta-row">
+                <span class="meta-label">Matched</span>
+                <span class="meta-value badge badge-verified" id="res-matched">0</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">Mismatched</span>
+                <span class="meta-value badge badge-impossible" id="res-mismatched">0</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">Unverifiable</span>
+                <span class="meta-value badge badge-unverifiable" id="res-unverifiable">0</span>
+            </div>
+        </div>
+
+        <!-- Code findings by severity -->
+        <div class="card">
+            <div class="card-title">Code Findings</div>
+            <div class="meta-row">
+                <span class="meta-label">Critical</span>
+                <span class="meta-value badge badge-critical" id="sev-critical">0</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">High</span>
+                <span class="meta-value badge badge-high" id="sev-high">0</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">Medium</span>
+                <span class="meta-value badge badge-medium" id="sev-medium">0</span>
+            </div>
+            <div class="meta-row">
+                <span class="meta-label">Low</span>
+                <span class="meta-value badge badge-low" id="sev-low">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Red flags -->
+    <div class="section">
+        <div class="section-title">Red Flags</div>
+        <div id="red-flags-container">
+            <div class="no-flags">No data loaded.</div>
+        </div>
+    </div>
+
+    <!-- Critical/high findings table -->
+    <div class="section">
+        <div class="section-title">Critical &amp; High Findings</div>
+        <div class="card" style="overflow-x: auto;">
+            <table class="findings-table" id="findings-table">
+                <thead>
+                    <tr>
+                        <th>Severity</th>
+                        <th>Type</th>
+                        <th>File</th>
+                        <th>Line</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody id="findings-tbody">
+                    <tr><td colspan="5" style="color: var(--text-dim);">No data loaded.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Latest report -->
+    <div class="section">
+        <div class="section-title">Latest Report</div>
+        <div class="report-body" id="report-body">No report loaded. Click "Load Report" or run an inspection.</div>
+    </div>
+
+</div>
+
+<script>
+/* ================================================================== */
+/* Inspector Gadget -- UI Logic                                        */
+/* ================================================================== */
+
+const API = '';  // relative to same origin
+
+let pollTimer = null;
+let currentTarget = 'openclaw';
+
+/* ------------------------------------------------------------------ */
+/* Helpers                                                             */
+/* ------------------------------------------------------------------ */
+
+function fmt(n) {
+    if (n === null || n === undefined) return '--';
+    return Number(n).toLocaleString();
+}
+
+function timeAgo(isoStr) {
+    if (!isoStr) return '--';
+    const d = new Date(isoStr);
+    if (isNaN(d.getTime())) return isoStr;
+    const seconds = Math.floor((Date.now() - d.getTime()) / 1000);
+    if (seconds < 60) return seconds + 's ago';
+    const minutes = Math.floor(seconds / 60);
+    if (minutes < 60) return minutes + 'm ago';
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return hours + 'h ago';
+    const days = Math.floor(hours / 24);
+    return days + 'd ago';
+}
+
+function trustClass(score) {
+    if (score === null || score === undefined) return '';
+    if (score >= 80) return 'trust-green';
+    if (score >= 50) return 'trust-yellow';
+    return 'trust-red';
+}
+
+async function api(path, opts) {
+    try {
+        const res = await fetch(API + path, opts);
+        return await res.json();
+    } catch (err) {
+        console.error('API error:', path, err);
+        return null;
+    }
+}
+
+function setButtons(disabled) {
+    ['btn-full', 'btn-verify', 'btn-scan', 'btn-report'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) el.disabled = disabled;
+    });
+}
+
+/* ------------------------------------------------------------------ */
+/* Data loaders                                                        */
+/* ------------------------------------------------------------------ */
+
+async function loadStatus() {
+    var data = await api('/api/status');
+    if (!data) return;
+
+    document.getElementById('status-db').textContent = data.db_exists ? 'Connected' : 'Not found';
+    document.getElementById('status-last-run').textContent = timeAgo(data.last_run);
+    document.getElementById('status-trades').textContent = fmt(data.total_trades);
+    document.getElementById('status-reports').textContent = fmt(data.report_count);
+    document.getElementById('status-target').textContent = currentTarget;
+
+    // Trust score
+    var tn = document.getElementById('trust-number');
+    if (data.trust_score !== null && data.trust_score !== undefined) {
+        tn.textContent = data.trust_score;
+        tn.className = 'trust-number ' + trustClass(data.trust_score);
+    } else {
+        tn.textContent = '--';
+        tn.className = 'trust-number';
+    }
+
+    // Run banner
+    var rs = data.run_status || {};
+    var banner = document.getElementById('run-banner');
+    var msg = document.getElementById('run-message');
+    var spinner = document.getElementById('run-spinner');
+
+    if (rs.running) {
+        banner.className = 'run-banner active';
+        spinner.style.display = 'block';
+        msg.textContent = (rs.run_type ? rs.run_type.toUpperCase() + ': ' : '') + (rs.progress || 'Running...');
+    } else if (rs.error) {
+        banner.className = 'run-banner active error';
+        spinner.style.display = 'none';
+        msg.textContent = 'ERROR: ' + rs.error;
+    } else if (rs.finished_at && rs.progress === 'Complete') {
+        banner.className = 'run-banner active';
+        spinner.style.display = 'none';
+        msg.textContent = 'Completed ' + timeAgo(rs.finished_at) + ' (' + (rs.run_type || '') + ')';
+        // Auto-hide after 10 seconds
+        setTimeout(function() {
+            if (!data.run_status || !data.run_status.running) {
+                banner.className = 'run-banner';
+            }
+        }, 10000);
+    } else {
+        banner.className = 'run-banner';
+    }
+
+    return rs.running;
+}
+
+async function loadTrades() {
+    var data = await api('/api/trades');
+    if (!data) return;
+
+    var counts = data.counts || {};
+    document.getElementById('count-verified').textContent = fmt(counts.VERIFIED);
+    document.getElementById('count-discrepancy').textContent = fmt(counts.DISCREPANCY);
+    document.getElementById('count-impossible').textContent = fmt(counts.IMPOSSIBLE);
+    document.getElementById('count-unverifiable').textContent = fmt(counts.UNVERIFIABLE);
+
+    // Resolution summary
+    var rs = data.resolution_summary || {};
+    document.getElementById('res-matched').textContent = fmt(rs.matched);
+    document.getElementById('res-mismatched').textContent = fmt(rs.mismatched);
+    document.getElementById('res-unverifiable').textContent = fmt(rs.unverifiable);
+}
+
+async function loadFindings() {
+    var data = await api('/api/findings');
+    if (!data) return;
+
+    var sc = data.severity_counts || {};
+    document.getElementById('sev-critical').textContent = fmt(sc.critical);
+    document.getElementById('sev-high').textContent = fmt(sc.high);
+    document.getElementById('sev-medium').textContent = fmt(sc.medium);
+    document.getElementById('sev-low').textContent = fmt(sc.low);
+
+    // Populate findings table (critical + high only)
+    var tbody = document.getElementById('findings-tbody');
+    var critical_high = (data.findings || []).filter(function(f) {
+        var s = (f.severity || '').toLowerCase();
+        return s === 'critical' || s === 'high';
+    });
+
+    if (critical_high.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="color: var(--text-dim);">No critical or high findings.</td></tr>';
+        return;
+    }
+
+    // Sort: critical first, then high
+    critical_high.sort(function(a, b) {
+        var order = { critical: 0, high: 1 };
+        return (order[(a.severity || '').toLowerCase()] || 2) - (order[(b.severity || '').toLowerCase()] || 2);
+    });
+
+    var html = '';
+    critical_high.slice(0, 20).forEach(function(f) {
+        var sev = (f.severity || 'low').toLowerCase();
+        var badgeClass = 'badge-' + sev;
+        html += '<tr>'
+            + '<td><span class="badge ' + badgeClass + '">' + sev.toUpperCase() + '</span></td>'
+            + '<td>' + escHtml(f.finding_type || '') + '</td>'
+            + '<td>' + escHtml(f.file_path || '') + '</td>'
+            + '<td>' + (f.line_number || '--') + '</td>'
+            + '<td>' + escHtml(f.description || '') + '</td>'
+            + '</tr>';
+    });
+    tbody.innerHTML = html;
+}
+
+async function loadTrustAndFlags() {
+    var data = await api('/api/trust-score');
+    if (!data) return;
+
+    var container = document.getElementById('red-flags-container');
+    var flags = data.red_flags || [];
+
+    if (flags.length === 0) {
+        container.innerHTML = '<div class="no-flags">No red flags detected.</div>';
+        return;
+    }
+
+    var html = '';
+    flags.forEach(function(flag) {
+        // red_flags_json stores an array of description strings
+        var text = typeof flag === 'string' ? flag : (flag.message || flag.description || JSON.stringify(flag));
+        html += '<div class="flag-item">' + escHtml(text) + '</div>';
+    });
+    container.innerHTML = html;
+}
+
+async function loadReport() {
+    var data = await api('/api/report/latest');
+    if (!data) {
+        document.getElementById('report-body').textContent = 'Failed to load report.';
+        return;
+    }
+
+    if (data.error) {
+        document.getElementById('report-body').textContent = data.error;
+        return;
+    }
+
+    var body = data.markdown_body || data.summary || 'No report body available.';
+    document.getElementById('report-body').textContent = body;
+}
+
+function escHtml(s) {
+    var div = document.createElement('div');
+    div.textContent = s;
+    return div.innerHTML;
+}
+
+/* ------------------------------------------------------------------ */
+/* Actions                                                             */
+/* ------------------------------------------------------------------ */
+
+async function runInspection(type) {
+    var target = document.getElementById('target-select').value;
+
+    var endpoint;
+    if (type === 'full') endpoint = '/api/inspect/full';
+    else if (type === 'verify') endpoint = '/api/inspect/verify';
+    else if (type === 'scan') endpoint = '/api/inspect/scan';
+    else return;
+
+    setButtons(true);
+
+    var result = await api(endpoint + '?target=' + encodeURIComponent(target), { method: 'POST' });
+
+    if (!result || result.error) {
+        var banner = document.getElementById('run-banner');
+        var msg = document.getElementById('run-message');
+        banner.className = 'run-banner active error';
+        document.getElementById('run-spinner').style.display = 'none';
+        msg.textContent = 'ERROR: ' + (result ? result.error : 'Request failed');
+        setButtons(false);
+        return;
+    }
+
+    // Start polling
+    startPolling();
+}
+
+function startPolling() {
+    if (pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(async function() {
+        var running = await loadStatus();
+        if (!running) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+            setButtons(false);
+            // Refresh all data
+            await loadAll();
+        }
+    }, 2000);
+}
+
+async function loadAll() {
+    await Promise.all([
+        loadStatus(),
+        loadTrades(),
+        loadFindings(),
+        loadTrustAndFlags(),
+        loadReport(),
+    ]);
+}
+
+/* ------------------------------------------------------------------ */
+/* Event listeners                                                     */
+/* ------------------------------------------------------------------ */
+
+document.getElementById('target-select').addEventListener('change', function() {
+    currentTarget = this.value;
+    document.getElementById('status-target').textContent = currentTarget;
+});
+
+/* ------------------------------------------------------------------ */
+/* Initialise                                                          */
+/* ------------------------------------------------------------------ */
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Populate targets dropdown dynamically
+    api('/api/targets').then(function(data) {
+        if (!data || !data.targets) return;
+        var sel = document.getElementById('target-select');
+        sel.innerHTML = '';
+        Object.keys(data.targets).forEach(function(key) {
+            var opt = document.createElement('option');
+            opt.value = key;
+            opt.textContent = data.targets[key].label || key;
+            if (key === currentTarget) opt.selected = true;
+            sel.appendChild(opt);
+        });
+    });
+
+    loadAll();
+});
+</script>
+
+</body>
+</html>
