@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "gonzoclaw",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["server.py"],
+      "port": 7080,
+      "cwd": "/Users/nayslayer/openclaw/dashboard"
+    }
+  ]
+}
