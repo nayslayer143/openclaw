@@ -150,6 +150,7 @@ def _render_custom(job_id: str, jsx_code: str, duration_frames: int) -> str:
         ["node", "--check", str(comp_file)],
         capture_output=True,
         text=True,
+        timeout=30,
     )
     if check.returncode != 0:
         _update_status(job_id, warning="Custom JSX invalid, falling back to TextReveal")
@@ -202,7 +203,7 @@ def run_pipeline(job_id: str, prompt: str) -> None:
             job_id,
             status="complete",
             output_path=f"renders/{job_id}.mp4",
-            completed_at=datetime.datetime.utcnow().isoformat(),
+            completed_at=datetime.datetime.now(datetime.timezone.utc).isoformat(),
         )
 
     except Exception as exc:

@@ -134,14 +134,14 @@ def test_render_custom_falls_back_on_invalid_jsx(pipeline, tmp_path):
     check_fail.returncode = 1
     check_fail.stderr = "SyntaxError"
 
-    fallback_output = str(tmp_path / "renders" / "job001.mp4")
+    fallback_output = str(tmp_path / "renders" / "job999.mp4")
 
     with patch("subprocess.run", return_value=check_fail):
         with patch.object(pipeline, "_render_template", return_value=fallback_output) as mock_tmpl:
-            out = pipeline._render_custom("job001", "bad jsx !!!", 150)
+            out = pipeline._render_custom("job999", "bad jsx !!!", 150)
 
     mock_tmpl.assert_called_once_with(
-        "job001", "TextReveal",
+        "job999", "TextReveal",
         {"text": "Custom render failed", "accent_color": "#e86800"}, 150
     )
     assert out == fallback_output
