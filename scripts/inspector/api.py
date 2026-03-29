@@ -120,23 +120,24 @@ def _run_full_inspection(target_key: str) -> None:
         poly, kalshi = _get_clients(target_key)
 
         target_db = target["db"]
-        chat_id = target["chat_id"]
+        chat_id = target.get("chat_id") or "default"
         signals_path = target["signals"]
+        trade_query = target.get("trade_query")
 
         # Trade verification
         _run_status["progress"] = "Verifying trades..."
         tv = TradeVerifier(db=db, poly=poly, kalshi=kalshi)
-        tv.run(target_db)
+        tv.run(target_db, trade_query=trade_query)
 
         # Resolution audits
         _run_status["progress"] = "Auditing resolutions..."
         ra = ResolutionAuditor(db=db, poly=poly, kalshi=kalshi)
-        ra.run(target_db)
+        ra.run(target_db, trade_query=trade_query)
 
         # Stats audit
         _run_status["progress"] = "Running statistical audit..."
         sa = StatsAuditor()
-        stats_result = sa.run(target_db, chat_id=chat_id)
+        stats_result = sa.run(target_db, chat_id=chat_id, trade_query=trade_query)
 
         # Persist stats red flags to code_findings
         for flag in stats_result.get("red_flags", []):
@@ -155,7 +156,7 @@ def _run_full_inspection(target_key: str) -> None:
         hd = HallucinationDetector(db=db, poly=poly, kalshi=kalshi)
         if signals_path:
             hd.run_on_signals(signals_path)
-        hd.run_on_llm_trades(target_db)
+        hd.run_on_llm_trades(target_db, trade_query=trade_query)
 
         # Code analysis
         _run_status["progress"] = "Analysing source code..."
@@ -210,20 +211,21 @@ def _run_verify_trades(target_key: str) -> None:
         poly, kalshi = _get_clients(target_key)
 
         target_db = target["db"]
-        chat_id = target["chat_id"]
+        chat_id = target.get("chat_id") or "default"
         signals_path = target["signals"]
+        trade_query = target.get("trade_query")
 
         _run_status["progress"] = "Verifying trades..."
         tv = TradeVerifier(db=db, poly=poly, kalshi=kalshi)
-        tv.run(target_db)
+        tv.run(target_db, trade_query=trade_query)
 
         _run_status["progress"] = "Auditing resolutions..."
         ra = ResolutionAuditor(db=db, poly=poly, kalshi=kalshi)
-        ra.run(target_db)
+        ra.run(target_db, trade_query=trade_query)
 
         _run_status["progress"] = "Running statistical audit..."
         sa = StatsAuditor()
-        stats_result = sa.run(target_db, chat_id=chat_id)
+        stats_result = sa.run(target_db, chat_id=chat_id, trade_query=trade_query)
 
         for flag in stats_result.get("red_flags", []):
             db.insert("code_findings", {
@@ -240,7 +242,7 @@ def _run_verify_trades(target_key: str) -> None:
         hd = HallucinationDetector(db=db, poly=poly, kalshi=kalshi)
         if signals_path:
             hd.run_on_signals(signals_path)
-        hd.run_on_llm_trades(target_db)
+        hd.run_on_llm_trades(target_db, trade_query=trade_query)
 
         # Generate report
         _run_status["progress"] = "Generating report..."

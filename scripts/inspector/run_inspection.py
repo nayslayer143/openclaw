@@ -88,6 +88,7 @@ TARGETS = {
                    decided_at AS opened_at, NULL AS closed_at,
                    confidence AS strategy, reasoning, venue
             FROM trade_decisions
+            WHERE venue = 'kalshi'
         """,
     },
 }
