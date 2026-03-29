@@ -1691,6 +1691,141 @@ body {
   font-size:13px; color:#ccc; background:none; border:none; cursor:pointer;
 }
 .claw-ctx-menu button:hover { background:#2a2a4a; color:#fff; }
+
+/* ── Strategy Library ─────────────────────────────────────────────────────── */
+.strat-toolbar {
+  display:flex; gap:8px; padding:12px 0; flex-wrap:wrap; align-items:center;
+}
+.strat-search {
+  flex:1; min-width:220px; background:#111; border:1px solid #2a2a2a; color:#e0e0e0;
+  font-family:inherit; font-size:0.6rem; padding:8px 12px; border-radius:2px;
+  outline:none; letter-spacing:0.5px; transition:border-color 0.2s;
+}
+.strat-search:focus { border-color:var(--orange); }
+.strat-search::placeholder { color:var(--grey3); letter-spacing:1px; }
+.strat-select {
+  background:#111; border:1px solid #2a2a2a; color:#ccc; font-family:inherit;
+  font-size:0.5rem; padding:8px 10px; border-radius:2px; cursor:pointer;
+  letter-spacing:0.8px; outline:none; min-width:130px;
+}
+.strat-select:focus { border-color:var(--orange); }
+.strat-table-wrap {
+  overflow-x:auto; overflow-y:auto; max-height:calc(100vh - 220px);
+  border:1px solid #1a1a1a; border-radius:2px;
+}
+.strat-table {
+  width:100%; border-collapse:collapse; font-size:0.56rem; letter-spacing:0.3px;
+}
+.strat-table thead { position:sticky; top:0; z-index:2; }
+.strat-table th {
+  background:#0d0d0d; color:var(--grey2); font-weight:600; text-align:left;
+  padding:10px 12px; border-bottom:1px solid #1e1e1e; letter-spacing:1.2px;
+  font-size:0.46rem; text-transform:uppercase;
+}
+.strat-table td {
+  padding:10px 12px; border-bottom:1px solid #111; color:#ccc; vertical-align:middle;
+}
+.strat-table tbody tr { cursor:pointer; transition:background 0.15s; }
+.strat-table tbody tr:hover { background:rgba(232,104,0,0.04); }
+.strat-table tbody tr.strat-expanded { background:rgba(232,104,0,0.06); }
+.strat-empty {
+  text-align:center; padding:60px 20px; color:var(--grey3); letter-spacing:1px; font-size:0.54rem;
+}
+/* Family badge */
+.strat-fam {
+  display:inline-block; padding:2px 8px; border-radius:2px; font-size:0.42rem;
+  letter-spacing:0.8px; font-weight:600; text-transform:uppercase;
+  background:rgba(232,104,0,0.1); color:var(--orange); border:1px solid rgba(232,104,0,0.25);
+}
+.strat-fam[data-f="arbitrage"] { background:rgba(0,229,255,0.08); color:var(--cyan,#00e5ff); border-color:rgba(0,229,255,0.25); }
+.strat-fam[data-f="market_making"] { background:rgba(0,255,136,0.08); color:var(--neon-green); border-color:rgba(0,255,136,0.25); }
+.strat-fam[data-f="trend_momentum"] { background:rgba(255,200,0,0.08); color:#ffc800; border-color:rgba(255,200,0,0.25); }
+.strat-fam[data-f="mean_reversion"] { background:rgba(180,100,255,0.08); color:#b464ff; border-color:rgba(180,100,255,0.25); }
+.strat-fam[data-f="volatility_options"] { background:rgba(255,0,100,0.08); color:#ff0064; border-color:rgba(255,0,100,0.25); }
+.strat-fam[data-f="prediction_market_native"] { background:rgba(0,200,255,0.1); color:#00c8ff; border-color:rgba(0,200,255,0.3); }
+.strat-fam[data-f="event_driven"] { background:rgba(255,140,0,0.08); color:#ff8c00; border-color:rgba(255,140,0,0.25); }
+.strat-fam[data-f="sentiment_nlp_attention"] { background:rgba(255,80,180,0.08); color:#ff50b4; border-color:rgba(255,80,180,0.25); }
+.strat-fam[data-f="ml_adaptive_meta"] { background:rgba(100,200,255,0.08); color:#64c8ff; border-color:rgba(100,200,255,0.25); }
+/* Alpha type pill */
+.strat-alpha {
+  display:inline-block; padding:2px 6px; border-radius:2px; font-size:0.40rem;
+  letter-spacing:0.6px; color:var(--grey1); background:#1a1a1a; border:1px solid #2a2a2a;
+}
+/* Instrument tags */
+.strat-inst-tag {
+  display:inline-block; padding:1px 5px; margin:1px 2px; border-radius:2px;
+  font-size:0.38rem; letter-spacing:0.5px; color:var(--grey2); background:#0f0f0f;
+  border:1px solid #1e1e1e;
+}
+/* Complexity bar */
+.strat-cbar { display:inline-flex; align-items:center; gap:6px; }
+.strat-cbar-track {
+  width:48px; height:4px; background:#1a1a1a; border-radius:2px; overflow:hidden;
+}
+.strat-cbar-fill { height:100%; border-radius:2px; transition:width 0.3s; }
+.strat-cbar-val { font-size:0.42rem; color:var(--grey2); min-width:18px; }
+/* Status badge */
+.strat-status {
+  display:inline-block; padding:2px 7px; border-radius:2px; font-size:0.40rem;
+  letter-spacing:0.8px; font-weight:600; text-transform:uppercase;
+}
+.strat-status[data-s="scoped"] { background:rgba(100,100,100,0.15); color:#888; border:1px solid #333; }
+.strat-status[data-s="feasible"] { background:rgba(0,229,255,0.08); color:var(--cyan,#00e5ff); border:1px solid rgba(0,229,255,0.2); }
+.strat-status[data-s="backtested"] { background:rgba(255,200,0,0.08); color:#ffc800; border:1px solid rgba(255,200,0,0.2); }
+.strat-status[data-s="paper_trading"],
+.strat-status[data-s="production"] { background:rgba(0,255,136,0.1); color:var(--neon-green); border:1px solid rgba(0,255,136,0.25); }
+.strat-status[data-s="retired"],
+.strat-status[data-s="banned"] { background:rgba(255,0,46,0.08); color:var(--neon-red); border:1px solid rgba(255,0,46,0.2); }
+/* Detail panel (expanded row) */
+.strat-detail-row td { padding:0 !important; border-bottom:1px solid #1a1a1a; }
+.strat-detail {
+  padding:16px 24px 20px; background:#0a0a0a; border-left:3px solid var(--orange);
+}
+.strat-detail-grid {
+  display:grid; grid-template-columns:1fr 1fr; gap:16px 32px;
+}
+@media (max-width:900px) { .strat-detail-grid { grid-template-columns:1fr; } }
+.strat-detail h4 {
+  font-size:0.46rem; color:var(--orange); letter-spacing:1.5px; text-transform:uppercase;
+  margin:0 0 6px; font-weight:600;
+}
+.strat-detail p, .strat-detail li {
+  font-size:0.54rem; color:#bbb; line-height:1.6; margin:0;
+}
+.strat-detail ul { margin:4px 0 0 16px; padding:0; }
+.strat-detail li { margin-bottom:3px; }
+.strat-detail .strat-warn {
+  color:var(--neon-red); font-size:0.50rem; padding:6px 10px;
+  background:rgba(255,0,46,0.05); border:1px solid rgba(255,0,46,0.15);
+  border-radius:2px; margin-top:4px;
+}
+.strat-detail .strat-usecase {
+  font-size:0.54rem; color:var(--cyan,#00e5ff); padding:8px 12px;
+  background:rgba(0,229,255,0.04); border:1px solid rgba(0,229,255,0.12);
+  border-radius:2px; line-height:1.6;
+}
+.strat-param-tbl {
+  width:100%; border-collapse:collapse; font-size:0.48rem; margin-top:6px;
+}
+.strat-param-tbl th {
+  text-align:left; padding:4px 8px; color:var(--grey2); font-weight:600;
+  border-bottom:1px solid #1e1e1e; font-size:0.40rem; letter-spacing:1px;
+}
+.strat-param-tbl td {
+  padding:4px 8px; color:#aaa; border-bottom:1px solid #111;
+}
+.strat-regime-tag {
+  display:inline-block; padding:2px 6px; margin:2px; border-radius:2px;
+  font-size:0.40rem; letter-spacing:0.5px;
+}
+.strat-regime-tag.good { background:rgba(0,255,136,0.08); color:var(--neon-green); border:1px solid rgba(0,255,136,0.2); }
+.strat-regime-tag.bad { background:rgba(255,0,46,0.06); color:var(--neon-red); border:1px solid rgba(255,0,46,0.15); }
+.strat-expand-btn {
+  background:none; border:1px solid #2a2a2a; color:var(--grey2); font-family:inherit;
+  font-size:0.46rem; padding:4px 10px; cursor:pointer; border-radius:2px;
+  letter-spacing:0.8px; transition:all 0.15s;
+}
+.strat-expand-btn:hover { border-color:var(--orange); color:var(--orange); }
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/xterm.min.css" />
 <script defer src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.min.js"></script>
@@ -1725,6 +1860,7 @@ body {
     <button class="nav-tab" id="tabTerminal" onclick="showPage('terminal')">⊡ TERMINAL</button>
     <button class="nav-tab" id="tabIntel" onclick="showPage('intel')">⌬ INTEL</button>
     <button class="nav-tab" id="tabResearch" onclick="showPage('research')">◎ RESEARCH<span id="researchBadge" style="display:none;margin-left:5px;background:#ff4444;color:#fff;border-radius:8px;padding:1px 6px;font-size:0.45rem;vertical-align:middle;">0</span></button>
+    <button class="nav-tab" id="tabStrategies" onclick="showPage('strategies')">◇ STRATEGIES</button>
   </div>
   <div class="nav-right">
     <button class="clawmpson-btn" id="clawmpsonBtn" onclick="toggleClawmpson()">◈ CLAWMPSON MODE</button>
@@ -2378,6 +2514,77 @@ body {
     </div>
   </div><!-- /pageIntel -->
 
+  <!-- ═══ STRATEGY LIBRARY PAGE ═══ -->
+  <div class="page" id="pageStrategies">
+
+    <div class="ideas-header">
+      <div>
+        <div class="ideas-title">STRATEGY LIBRARY</div>
+        <div class="ideas-subtitle" id="stratSubtitle">100 STRATEGIES · 15 ALPHA FAMILIES · SEARCH · FILTER · STUDY</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="idea-category" id="stratCount" style="font-size:0.54rem;padding:4px 12px">0 / 0</span>
+      </div>
+    </div>
+
+    <!-- Search + Filters -->
+    <div class="strat-toolbar">
+      <input type="text" id="stratSearch" class="strat-search" placeholder="Search strategies... (name, hypothesis, family, ID)" oninput="filterStrategies()">
+      <select id="stratFamilyFilter" class="strat-select" onchange="filterStrategies()">
+        <option value="">ALL FAMILIES</option>
+      </select>
+      <select id="stratAlphaFilter" class="strat-select" onchange="filterStrategies()">
+        <option value="">ALL ALPHA TYPES</option>
+        <option value="structural">Structural</option>
+        <option value="relative_value">Relative Value</option>
+        <option value="directional">Directional</option>
+        <option value="microstructure">Microstructure</option>
+        <option value="liquidity">Liquidity</option>
+        <option value="information">Information</option>
+      </select>
+      <select id="stratInstrFilter" class="strat-select" onchange="filterStrategies()">
+        <option value="">ALL INSTRUMENTS</option>
+        <option value="prediction_markets">Prediction Markets</option>
+        <option value="crypto_spot">Crypto Spot</option>
+        <option value="crypto_perps">Crypto Perps</option>
+        <option value="equities">Equities</option>
+        <option value="futures">Futures</option>
+        <option value="options">Options</option>
+        <option value="fx">FX</option>
+        <option value="fixed_income">Fixed Income</option>
+        <option value="commodities">Commodities</option>
+      </select>
+      <select id="stratSort" class="strat-select" onchange="filterStrategies()">
+        <option value="name">Sort: Name</option>
+        <option value="family">Sort: Family</option>
+        <option value="complexity">Sort: Complexity</option>
+        <option value="alpha_type">Sort: Alpha Type</option>
+        <option value="status">Sort: Status</option>
+      </select>
+    </div>
+
+    <!-- Strategy Table -->
+    <div class="strat-table-wrap">
+      <table class="strat-table">
+        <thead>
+          <tr>
+            <th style="width:28%">NAME</th>
+            <th style="width:14%">FAMILY</th>
+            <th style="width:12%">ALPHA TYPE</th>
+            <th style="width:18%">INSTRUMENTS</th>
+            <th style="width:10%">COMPLEXITY</th>
+            <th style="width:8%">STATUS</th>
+            <th style="width:10%"></th>
+          </tr>
+        </thead>
+        <tbody id="stratBody">
+          <tr><td colspan="7" class="strat-empty">loading strategies...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- /pageStrategies -->
+
   <!-- Intel Approve Modal -->
   <div class="modal-overlay" id="intelApproveModal" onclick="if(event.target===this)this.classList.remove('active')">
     <div class="modal-box" style="max-width:420px;">
@@ -2550,6 +2757,190 @@ function renderMilestones(done, target) {
   }
 }
 
+// ── Strategy Library ───────────────────────────────────────────────────────
+let _stratCatalog = []
+let _stratFiltered = []
+
+async function loadStrategies() {
+  try {
+    const r = await fetch('/api/strategies')
+    if (!r.ok) throw new Error('fetch failed')
+    const data = await r.json()
+    _stratCatalog = data.strategies || []
+    // Populate family dropdown
+    const famSel = document.getElementById('stratFamilyFilter')
+    if (famSel.options.length <= 1) {
+      ;(data.families || []).forEach(f => {
+        const o = document.createElement('option')
+        o.value = f; o.textContent = _stratFamilyLabel(f)
+        famSel.appendChild(o)
+      })
+    }
+    filterStrategies()
+  } catch(e) {
+    document.getElementById('stratBody').innerHTML = '<tr><td colspan="7" class="strat-empty">failed to load strategies</td></tr>'
+  }
+}
+
+function _stratFamilyLabel(f) {
+  return f.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+}
+
+function _stratAlphaLabel(a) {
+  return (a || '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+}
+
+function _stratInstrLabel(i) {
+  const map = {prediction_markets:'PM',crypto_spot:'Crypto',crypto_perps:'Perps',equities:'Eq',futures:'Fut',options:'Opt',fx:'FX',fixed_income:'FI',commodities:'Cmd'}
+  return map[i] || i.replace(/_/g,' ')
+}
+
+function _stratTimeHorizon(th) {
+  if (!th) return '—'
+  const fmt = s => {
+    if (s < 60) return s+'s'
+    if (s < 3600) return Math.round(s/60)+'m'
+    if (s < 86400) return Math.round(s/3600)+'h'
+    return Math.round(s/86400)+'d'
+  }
+  return fmt(th.min_seconds) + ' – ' + fmt(th.max_seconds)
+}
+
+function _stratComplexityColor(c) {
+  if (c <= 2) return 'var(--neon-green)'
+  if (c <= 4) return '#ffc800'
+  if (c <= 6) return 'var(--orange)'
+  return 'var(--neon-red)'
+}
+
+function _stratUseCase(s) {
+  const parts = []
+  const regimes = s.market_regimes?.favorable || []
+  if (regimes.length) parts.push('Best in ' + regimes.map(r => r.replace(/_/g,' ')).join(', ') + ' regimes.')
+  const instr = (s.instrument_types || []).map(_stratInstrLabel).join(', ')
+  if (instr) parts.push('Applicable to: ' + instr + '.')
+  const th = _stratTimeHorizon(s.time_horizon)
+  if (th !== '—') parts.push('Typical holding period: ' + th + '.')
+  if (s.alpha_type) parts.push('Exploits ' + s.alpha_type.replace(/_/g,' ') + ' edge.')
+  return parts.join(' ') || 'General-purpose strategy.'
+}
+
+function filterStrategies() {
+  const q = (document.getElementById('stratSearch').value || '').toLowerCase()
+  const fam = document.getElementById('stratFamilyFilter').value
+  const alpha = document.getElementById('stratAlphaFilter').value
+  const instr = document.getElementById('stratInstrFilter').value
+  const sort = document.getElementById('stratSort').value
+
+  _stratFiltered = _stratCatalog.filter(s => {
+    if (fam && s.family !== fam) return false
+    if (alpha && s.alpha_type !== alpha) return false
+    if (instr && !(s.instrument_types || []).includes(instr)) return false
+    if (q) {
+      const hay = [s.name, s.strategy_id, s.family, s.alpha_hypothesis, s.subfamily || ''].join(' ').toLowerCase()
+      if (!hay.includes(q)) return false
+    }
+    return true
+  })
+
+  _stratFiltered.sort((a, b) => {
+    if (sort === 'name') return (a.name || '').localeCompare(b.name || '')
+    if (sort === 'family') return (a.family || '').localeCompare(b.family || '') || (a.name || '').localeCompare(b.name || '')
+    if (sort === 'complexity') return (b.complexity_score || 0) - (a.complexity_score || 0)
+    if (sort === 'alpha_type') return (a.alpha_type || '').localeCompare(b.alpha_type || '')
+    if (sort === 'status') return (a.status || '').localeCompare(b.status || '')
+    return 0
+  })
+
+  document.getElementById('stratCount').textContent = _stratFiltered.length + ' / ' + _stratCatalog.length
+  renderStrategies()
+}
+
+function renderStrategies() {
+  const tbody = document.getElementById('stratBody')
+  if (!_stratFiltered.length) {
+    tbody.innerHTML = '<tr><td colspan="7" class="strat-empty">no strategies match filters</td></tr>'
+    return
+  }
+  tbody.innerHTML = _stratFiltered.map((s, i) => {
+    const instr = (s.instrument_types || []).map(t => '<span class="strat-inst-tag">' + _stratInstrLabel(t) + '</span>').join('')
+    const cx = s.complexity_score || 0
+    const pct = Math.min(100, (cx / 8) * 100)
+    return '<tr onclick="toggleStratDetail(' + i + ')" id="stratRow' + i + '">' +
+      '<td><span style="color:#e0e0e0;font-weight:500">' + (s.name || '—') + '</span><br><span style="font-size:0.40rem;color:var(--grey3);letter-spacing:0.5px">' + (s.strategy_id || '') + '</span></td>' +
+      '<td><span class="strat-fam" data-f="' + s.family + '">' + _stratFamilyLabel(s.family) + '</span></td>' +
+      '<td><span class="strat-alpha">' + _stratAlphaLabel(s.alpha_type) + '</span></td>' +
+      '<td>' + instr + '</td>' +
+      '<td><div class="strat-cbar"><div class="strat-cbar-track"><div class="strat-cbar-fill" style="width:' + pct + '%;background:' + _stratComplexityColor(cx) + '"></div></div><span class="strat-cbar-val">' + cx.toFixed(1) + '</span></div></td>' +
+      '<td><span class="strat-status" data-s="' + (s.status || '') + '">' + (s.status || '—').replace(/_/g,' ') + '</span></td>' +
+      '<td><button class="strat-expand-btn" onclick="event.stopPropagation();toggleStratDetail(' + i + ')">DETAIL</button></td>' +
+      '</tr>'
+  }).join('')
+}
+
+function toggleStratDetail(idx) {
+  const row = document.getElementById('stratRow' + idx)
+  const existing = document.getElementById('stratDetail' + idx)
+  if (existing) {
+    existing.remove()
+    row.classList.remove('strat-expanded')
+    return
+  }
+  // Close any other open detail
+  document.querySelectorAll('.strat-detail-row').forEach(el => el.remove())
+  document.querySelectorAll('.strat-expanded').forEach(el => el.classList.remove('strat-expanded'))
+
+  row.classList.add('strat-expanded')
+  const s = _stratFiltered[idx]
+
+  // Build parameters table
+  let paramHtml = ''
+  const params = s.parameters || {}
+  const paramKeys = Object.keys(params)
+  if (paramKeys.length) {
+    paramHtml = '<table class="strat-param-tbl"><thead><tr><th>PARAM</th><th>DEFAULT</th><th>RANGE</th><th>DESCRIPTION</th></tr></thead><tbody>' +
+      paramKeys.map(k => {
+        const p = params[k]
+        const range = (p.min_value != null && p.max_value != null) ? p.min_value + ' – ' + p.max_value : '—'
+        return '<tr><td style="color:var(--orange)">' + (p.name || k) + '</td><td>' + (p.default_value ?? '—') + '</td><td>' + range + '</td><td>' + (p.description || '') + '</td></tr>'
+      }).join('') + '</tbody></table>'
+  }
+
+  // Failure modes
+  let failHtml = ''
+  const fails = s.known_failure_modes || []
+  if (fails.length) {
+    failHtml = '<div>' + fails.map(f => '<div class="strat-warn">' + f + '</div>').join('') + '</div>'
+  }
+
+  // Market regimes
+  let regimeHtml = ''
+  const mr = s.market_regimes || {}
+  const fav = (mr.favorable || []).map(r => '<span class="strat-regime-tag good">' + r.replace(/_/g,' ') + '</span>').join('')
+  const unfav = (mr.unfavorable || []).map(r => '<span class="strat-regime-tag bad">' + r.replace(/_/g,' ') + '</span>').join('')
+  if (fav || unfav) {
+    regimeHtml = (fav ? '<div style="margin-bottom:4px">Favorable: ' + fav + '</div>' : '') +
+                 (unfav ? '<div>Unfavorable: ' + unfav + '</div>' : '')
+  }
+
+  const detailTr = document.createElement('tr')
+  detailTr.id = 'stratDetail' + idx
+  detailTr.className = 'strat-detail-row'
+  detailTr.innerHTML = '<td colspan="7"><div class="strat-detail">' +
+    '<div class="strat-usecase">' + _stratUseCase(s) + '</div>' +
+    '<div class="strat-detail-grid" style="margin-top:14px">' +
+      '<div><h4>ALPHA HYPOTHESIS</h4><p>' + (s.alpha_hypothesis || 'No hypothesis documented.') + '</p></div>' +
+      '<div><h4>TIME HORIZON</h4><p>' + _stratTimeHorizon(s.time_horizon) + '</p>' +
+        (regimeHtml ? '<h4 style="margin-top:10px">MARKET REGIMES</h4>' + regimeHtml : '') +
+      '</div>' +
+      '<div><h4>ENTRY LOGIC</h4><p>' + (s.entry_logic || '—') + '</p></div>' +
+      '<div><h4>EXIT LOGIC</h4><p>' + (s.exit_logic || '—') + '</p></div>' +
+      (paramKeys.length ? '<div style="grid-column:1/-1"><h4>PARAMETERS</h4>' + paramHtml + '</div>' : '') +
+      (fails.length ? '<div style="grid-column:1/-1"><h4>KNOWN FAILURE MODES</h4>' + failHtml + '</div>' : '') +
+    '</div></div></td>'
+  row.after(detailTr)
+}
+
 // ── Page navigation ────────────────────────────────────────────────────────
 // Map URL paths to internal page names and back
 const _pageToUrl = { dashboard: 'ops' }
@@ -2600,6 +2991,10 @@ function showPage(page, pushState) {
     document.getElementById('repoManFrame').src = 'https://research.asdfghjk.lol/embed'
     pollResearchBadge()
     chatgptRefreshReports()
+  } else if (page === 'strategies') {
+    document.getElementById('pageStrategies').classList.add('active')
+    document.getElementById('tabStrategies').classList.add('active')
+    loadStrategies()
   } else {
     page = 'dashboard'
     document.getElementById('pageDashboard').classList.add('active')
@@ -2615,7 +3010,7 @@ function showPage(page, pushState) {
 
 // Route on initial page load
 ;(function() {
-  const validPages = ['dashboard','ops','jordan','ideas','projects','agents','trading','terminal','intel','research']
+  const validPages = ['dashboard','ops','jordan','ideas','projects','agents','trading','terminal','intel','research','strategies']
   const path = location.pathname.replace(/^\//, '') || 'ops'
   const page = validPages.includes(path) ? path : 'ops'
   showPage(page, false)

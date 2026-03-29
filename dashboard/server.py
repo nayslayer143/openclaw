@@ -27,6 +27,7 @@ IDEAS_DIR      = OPENCLAW_ROOT / "ideas"
 IDEAS_MEDIA    = IDEAS_DIR / "media"
 PROJECTS_FILE  = OPENCLAW_ROOT / "projects" / "projects.json"
 CHATGPT_REPORTS_DIR = OPENCLAW_ROOT / "outputs" / "chatgpt-reports"
+STRATEGY_CATALOG   = Path(__file__).parent / "strategy-catalog.json"
 REPO_MAN_API = os.environ.get("REPO_MAN_API", "https://research.asdfghjk.lol")
 
 ENV_FILE = OPENCLAW_ROOT / ".env"
@@ -2931,6 +2932,20 @@ async def chatgpt_deploy_all(request: Request, user: str = Depends(get_current_u
     report_file.write_text(json.dumps(report, indent=2), encoding="utf-8")
 
     return {"ok": True, "task_ids": task_ids, "deployed_count": len(task_ids)}
+
+
+# ── Strategy Catalog ───────────────────────────────────────────────────────
+_strategy_cache: dict = {}
+
+@app.get("/api/strategies")
+async def get_strategies(user: str = Depends(get_current_user)):
+    if not STRATEGY_CATALOG.exists():
+        return {"strategies": [], "families": [], "strategy_count": 0}
+    mtime = STRATEGY_CATALOG.stat().st_mtime
+    if _strategy_cache.get("mtime") != mtime:
+        data = json.loads(STRATEGY_CATALOG.read_text(encoding="utf-8"))
+        _strategy_cache.update(mtime=mtime, data=data)
+    return _strategy_cache["data"]
 
 
 @app.get("/{path:path}")
