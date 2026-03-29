@@ -1,9 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> Auto-generated 2026-03-28T22:07:00-07:00. Do not edit manually.
+> Auto-generated 2026-03-28T23:07:00-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-03-28T22:07:00-07:00
+Generated: 2026-03-28T23:07:00-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -75,6 +75,7 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/openclaw/crawlers/openclaw-unusualwhales-crawler
 ~/openclaw/crawlers/openclaw-x-crawler
 ~/openclaw/dashboard
+~/openclaw/dashboard/.claude
 ~/openclaw/dashboard/.pytest_cache
 ~/openclaw/docs
 ~/openclaw/docs/superpowers
@@ -1246,16 +1247,16 @@ pytest-asyncio>=0.23
 ### openclaw
 ```
 Branch: main
-Last commit: c0c1199 auto: 2026-03-28 22:00 state snapshot
-Uncommitted files: 7
+Last commit: 43e7119 auto: hourly sync 2026-03-29 05:47 UTC
+Uncommitted files: 11
 Remote: 
 ```
 
 ### rivalclaw
 ```
 Branch: main
-Last commit: 7fa64b6 auto: hourly sync 2026-03-29 04:47 UTC
-Uncommitted files: 7
+Last commit: f384206 auto: hourly sync 2026-03-29 05:47 UTC
+Uncommitted files: 3
 Remote: 
 ```
 
@@ -1270,7 +1271,7 @@ Remote: https://oauth2:glpat-gpKuP2MCJ523PLVy2Rez7mM6MQpvOjEKdTpsMmJnZg8.01.170u
 ### quantumentalclaw
 ```
 Branch: main
-Last commit: de74d5c hourly: 2026-03-29 05:00 | $10,000 | 0W/0closed | $+0 | quiet
+Last commit: 90aa64c hourly: 2026-03-29 06:00 | $10,000 | 0W/0closed | $+0 | quiet
 Uncommitted files: 0
 Remote: https://oauth2:glpat-gpKuP2MCJ523PLVy2Rez7mM6MQpvOjEKdTpsMmJnZg8.01.170uc249y@gitlab.com/jordan291/quantumentalclaw.git
 ```
@@ -1370,5 +1371,5 @@ Remote: https://github.com/nayslayer143/shiny-new.git
 ```
 
 ---
-End of context. Generated 2026-03-28T22:07:00-07:00.
+End of context. Generated 2026-03-28T23:07:00-07:00.
 For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw
