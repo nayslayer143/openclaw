@@ -20,7 +20,7 @@
       "what_to_take": "Extract event-driven architecture patterns and async feed handling mechanisms for refactoring Clawmpson's strategy execution and RivalClaw's multi-feed processing.",
       "risk": "License not explicitly confirmed (MIT likely but must verify); future-dated last update (2026) is suspicious and requires metadata validation; framework is crypto-focused which may require adaptation for prediction markets.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "Extract the AI-driven risk management module and strategy evaluation framework for RivalClaw's self-tuning engine, focusing on position sizing and drawdown control.",
       "risk": "Future last-update date (2026) indicates potential repo inaccuracy or abandonment; license not specified in metadata; requires significant adaptation to fit existing SQLite/Python stack.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -100,7 +100,7 @@
       "what_to_take": "Extract the backtesting engine and optimization framework to enhance Clawmpson's strategy validation and refinement processes, adapting to its existing SQLite data model and strategy interfaces.",
       "risk": "MIT license is acceptable, but the repository's 2026-03-22 last update date appears to be a typo (likely a future date error), raising maintenance concerns; integration requires adapting AutoTrader's architecture to Clawmpson's existing modules, risking compatibility issues.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "Extract time-series prediction model architectures (LSTM/Transformer) and data preprocessing pipelines for adaptation to prediction market data.",
       "risk": "License not specified (must verify), data mismatch (stock-focused vs. prediction markets), and high complexity requiring model retraining on new data sources.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "Core grid order placement logic and Binance API integration patterns for potential new strategy module in Clawmpson",
       "risk": "Suspicious future-dated last update (2026-03-26) and unclear license may indicate repo inactivity or legal risk; grid strategy not aligned with current Clawmpson's 4 strategies",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "Extract the backtesting engine and Optuna-based hyperparameter optimization code for strategy parameter tuning, excluding TradingView-specific data handling and GUI components.",
       "risk": "License unknown (must verify), future-dated last update (suspect metadata error), and significant adaptation needed to align with our data sources and strategy structures.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "Conceptual signal tracking and trade execution pipeline design, but avoid Binance-specific code and focus on abstract signal processing patterns for Python integration.",
       "risk": "License unknown (potential GPL risk), Binance-specific implementation mismatch, and no relevance to our exchanges (Polymarket/Kalshi), making long-term maintenance risky.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -280,7 +280,7 @@
       "what_to_take": "Minimal exchange API integration patterns (e.g., REST client structure for Bitfinex/Kraken), but irrelevant to prediction markets and requires full Python rewrite",
       "risk": "Future-dated last update (2026-03-26) suggests potential data error; Java code incompatible with Python stack; Bitcoin focus misaligned with prediction market strategies",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -300,7 +300,7 @@
       "what_to_take": "The environment class structure for RL trading could be adapted as a template for future non-RL trading environments, but not for current systems.",
       "risk": "Future-dated last update (2026) indicates possible data error; Jupyter notebooks require significant conversion to production code; low relevance to existing strategies; license unknown (MIT likely but unverified).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -320,7 +320,7 @@
       "what_to_take": "Research genetic programming feature selection techniques for potential adaptation to prediction market data, but avoid stock-specific models and data pipelines.",
       "risk": "License uncertainty (no explicit license), asset class mismatch (stock vs. prediction markets), high refactoring complexity to adapt notebook code to production systems, and future-dated last update (2026) suggesting potential data error.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -340,7 +340,7 @@
       "what_to_take": "No direct code to integrate; study exchange connection patterns for inspiration only",
       "risk": "Java vs Python mismatch, crypto focus (not prediction markets), future-dated last update (2026) raises maintenance concerns",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -360,7 +360,7 @@
       "what_to_take": "This repo is a curated list of resources, not a codebase. No executable trading code or patterns to integrate. It contains links to other projects but no implementable code for our systems.",
       "risk": "Repo is a static list (README only), not a code repository. No actual trading code to integrate. Risk of misinterpreting it as a codebase. License not applicable as no code. Maintenance is irrelevant since it's not code.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
