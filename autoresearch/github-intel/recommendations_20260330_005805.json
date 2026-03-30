@@ -20,7 +20,7 @@
       "what_to_take": "Integrate ccxt's Python exchange API layer to replace custom exchange interfaces, enabling unified access to 100+ crypto exchanges with consistent market data/trade execution across all bots.",
       "risk": "MIT license is safe; active maintenance; moderate refactor needed to replace existing exchange code but well-documented API reduces risk.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "Extract the backtesting and optimization framework (particularly the strategy testing module) to enhance Clawmpson's graduation engine for more robust strategy validation and parameter tuning.",
       "risk": "License not explicitly stated in description (verify MIT or similar), potential adaptation needed for prediction market data structures (Polymarket/Kalshi vs Oanda/crypto focus), and future-dated last update (2026-03-22) raises minor maintenance concerns.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "Strategy template structure and backtesting framework for developing multi-strategy validation without crypto exchange dependencies.",
       "risk": "MIT license is compatible, but crypto-specific exchange integrations require heavy adaptation for prediction markets; future-dated last update (2026-03-29) suggests potential data error or inactivity risk.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "Study for strategy concepts only; avoid direct code integration due to FMZ platform dependencies. Extract simple Python strategy logic patterns for potential adaptation to our stack.",
       "risk": "Unknown license (critical risk), future-dated last update (2026-03-29) suggests data corruption, and high adaptation complexity due to FMZ-specific API dependencies.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "Modular DRL framework design patterns for future strategy development, not the actual code (notebook format unsuitable for integration).",
       "risk": "License not specified, last updated 2026 (impossible date indicating abandonment), notebook format requires major refactoring, and stock-focused DRL not applicable to prediction markets or arb detection.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "Extract standard indicator formulas (Bollinger Bands, MACD) for Python reimplementations, but avoid Go integration due to language mismatch",
       "risk": "Future last-update date (2026-03-28) indicates possible data error or abandoned repo; Go-to-Python integration requires significant effort (cgo/subprocess) with no direct value; license not specified in description",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "Model architectures for feature generation (e.g., genetic programming) but not direct code; requires domain adaptation to prediction markets",
       "risk": "Domain mismatch (stocks vs prediction markets), unclear license, future-dated update (2026) suggests abandonment, high refactoring effort from notebooks to production code",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -280,7 +280,7 @@
       "what_to_take": "Study composable architecture patterns for real-time data pipelines, but avoid direct code integration due to Elixir/Python mismatch.",
       "risk": "Elixir vs Python language barrier requires major refactoring. Last update date (2026-03-17) is future-dated, suggesting potential metadata error or abandonment. No clear license check in description.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -300,7 +300,7 @@
       "what_to_take": "Superalgos is crypto-focused with JavaScript architecture, incompatible with our prediction market stack and Python-based systems. No transferable patterns for strategy logic or data handling exist.",
       "risk": "Critical language mismatch (JavaScript vs Python) and market misalignment (crypto vs prediction markets) create unresolvable integration complexity. License (MIT) is acceptable but irrelevant due to architectural incompatibility.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -320,7 +320,7 @@
       "what_to_take": "No relevant code for backend trading systems; frontend charting library not applicable to Python-based bot stack.",
       "risk": "Not maintained, JavaScript frontend library mismatch with Python backend stack, requires full frontend development effort for minimal value.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -340,7 +340,7 @@
       "what_to_take": "Repo is a curated list of resources, not executable code; no patterns or code to integrate.",
       "risk": "No codebase to integrate (just a README list), potential for wasted effort; unknown license may require verification.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -360,7 +360,7 @@
       "what_to_take": "This repo is a curated list of resources (not code), so no actionable patterns or code can be integrated into any trading system. It serves only as a reference for external tools.",
       "risk": "Repo is an HTML-based list (not code), making integration impossible. Future-dated last update (2026-03-29) indicates potential data error. No license or maintenance concerns for integration since no code exists to integrate.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
