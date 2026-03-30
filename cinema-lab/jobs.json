@@ -1,1 +1,8 @@
-{}
+{
+  "9daeabd9": {
+    "status": "failed",
+    "prompt": "I want to transform this audio into an evolving psychedelic future noir video animation with the audio applied so i can hear the audio with the video. Translate the audio into gorgeous provocative visual animations.",
+    "created_at": "2026-03-30T22:14:35.122549+00:00",
+    "error": "HTTPConnectionPool(host='127.0.0.1', port=11434): Read timed out. (read timeout=120)"
+  }
+}

@@ -20,7 +20,7 @@
       "what_to_take": "Extract strategy registration/execution framework and plotting module for Clawmpson's strategy engine; avoid CCXT dependencies for prediction market integration.",
       "risk": "Potential GPL license risk (not specified), CCXT dependency mismatch with prediction market APIs, and future-dated last update (2026-03-19) suggests possible repo inaccuracy.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "Extract the backtesting module (specifically strategy evaluation and multi-feed data handling) to enhance Clawmpson's graduation engine and accelerate ArbClaw's development without adopting the full framework.",
       "risk": "Repo appears inactive (last updated 2026-03-27, likely a typo for 2023), with no recent commits. License not specified in description (must verify MIT/compatible). Risk of maintaining extracted code without framework support.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -100,7 +100,7 @@
       "what_to_take": "Study the event-driven architecture pattern and deterministic state management concepts for potential refactoring of Clawmpson's strategy engine and feed processing.",
       "risk": "Apache 2.0 license is acceptable, but Rust-Python integration would require significant effort (PyO3/FFI) with minimal direct code reuse. High complexity without proportional benefit for lean ArbClaw.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -120,7 +120,7 @@
       "what_to_take": "Adapt the backtesting framework for strategy validation in Clawmpson's graduation engine, and use its data pipeline for historical testing of new strategies in ArbClaw and RivalClaw.",
       "risk": "Suspicious future date (2026) in last updated field indicates possible repo inaccuracy; license not specified in description; requires adaptation to existing SQLite/data structures.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "Extract the dynamic risk management module (risk_engine.py) for Clawmpson's graduation engine and RivalClaw's hedge engine, focusing on position sizing algorithms and drawdown control.",
       "risk": "Unverified license (must check), suspicious future last update date (2026-03-29), and potential over-engineering risk if integrating full AI analysis components.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "Extract the mean-reversion pairs trading strategy logic (spread calculation, z-score thresholds, entry/exit conditions) and adapt it to work with our data feeds and execution system, excluding IB API dependencies.",
       "risk": "License not specified (high risk if restrictive), future-dated last update (2026-03-30) suggests possible data error, and IB API dependency requires significant adaptation to our broker-agnostic stack.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "Extract the time-series data pipeline and feature engineering modules for adaptation to prediction market data, and the supervised learning training framework for Clawmpson's LLM strategy and RivalClaw's self-tuning engine.",
       "risk": "MIT license is safe, but Qlib's stock-market focus requires significant adaptation for prediction markets. Future-dated last update (2026-03-30) suggests potential data error. High integration complexity due to dependency on Qlib's ecosystem.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "Extract modular strategy execution patterns and data feed handling architecture for Python adaptation, focusing on algorithm structure and pipeline design.",
       "risk": "C# to Python porting complexity creates high maintenance risk; MIT license is acceptable but porting effort outweighs benefits for our Python stack.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -300,7 +300,7 @@
       "what_to_take": "Feature engineering techniques for stock data, but requires complete domain adaptation to prediction markets and significant refactoring from Jupyter notebooks.",
       "risk": "Unspecified license (legal risk), domain mismatch (stocks vs. prediction markets), and high refactoring cost from Jupyter notebook format.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -320,7 +320,7 @@
       "what_to_take": "No relevant code; domain mismatch (stock price prediction vs. prediction market event outcomes).",
       "risk": "Domain mismatch (stock vs. prediction markets), suspicious future last updated date (2026), potential license issues (no license specified), non-production notebook code.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -340,7 +340,7 @@
       "what_to_take": "LSTM architecture and time-series preprocessing pipeline for adaptation to prediction market odds data, not stock prices.",
       "risk": "Domain mismatch (stock vs prediction markets), notebook format requires major refactoring, license unknown, and high effort to retrain on relevant data.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -360,7 +360,7 @@
       "what_to_take": "This repo is a curated HTML list of resources, not executable code. Extract no code; instead use it as a reference to discover other repositories for potential integration.",
       "risk": "Repo is HTML-based list (not code), last updated in future (2026-03-30 typo), no maintainable code to integrate. Risk of wasted time searching for non-existent code.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null

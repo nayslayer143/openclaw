@@ -2076,7 +2076,6 @@ body {
     <button class="nav-tab" id="tabJordan" onclick="showPage('jordan')">⚡ JORDAN</button>
     <button class="nav-tab" id="tabIdeas" onclick="showPage('ideas')">◉ IDEAS LAB</button>
     <button class="nav-tab" id="tabProjects" onclick="showPage('projects')">◎ PROJECTS</button>
-    <button class="nav-tab" id="tabAgents" onclick="showPage('agents')">⬡ AGENTS</button>
     <button class="nav-tab" id="tabTrading" onclick="showPage('trading')">$ TRADING</button>
     <button class="nav-tab" id="tabTerminal" onclick="showPage('terminal')">⊡ TERMINAL</button>
     <button class="nav-tab" id="tabIntel" onclick="showPage('intel')">⌬ INTEL</button>
@@ -2287,22 +2286,6 @@ body {
 
   </div><!-- /pageProjects -->
 
-  <!-- ═══ AGENTS PAGE ═══ -->
-  <div class="page" id="pageAgents">
-
-    <div class="ideas-header">
-      <div>
-        <div class="ideas-title">AGENT SWARM</div>
-        <div class="ideas-subtitle">OMEGA MEGACORP — CLAWMPSON SUBAGENTS</div>
-      </div>
-      <div id="agentsSummary" style="font-size:0.55rem;color:var(--grey2);letter-spacing:1px;text-align:right"></div>
-    </div>
-
-    <div class="agents-grid" id="agentsList">
-      <div class="empty"><span class="empty-char">⬡</span>loading agents...</div>
-    </div>
-
-  </div><!-- /pageAgents -->
 
   <!-- ══════════════════════════════════════════════════════════════ -->
   <!-- TRADING PAGE                                                  -->
@@ -3134,10 +3117,6 @@ function showPage(page, pushState) {
     document.getElementById('pageProjects').classList.add('active')
     document.getElementById('tabProjects').classList.add('active')
     loadProjects()
-  } else if (page === 'agents') {
-    document.getElementById('pageAgents').classList.add('active')
-    document.getElementById('tabAgents').classList.add('active')
-    loadAgents()
   } else if (page === 'trading') {
     document.getElementById('pageTrading').classList.add('active')
     document.getElementById('tabTrading').classList.add('active')
@@ -3188,7 +3167,7 @@ function showPage(page, pushState) {
 
 // Route on initial page load
 ;(function() {
-  const validPages = ['dashboard','ops','jordan','ideas','projects','agents','trading','terminal','intel','research','strategies','cinema','orchestrator']
+  const validPages = ['dashboard','ops','jordan','ideas','projects','trading','terminal','intel','research','strategies','cinema','orchestrator']
   const path = location.pathname.replace(/^\//, '') || 'ops'
   const page = validPages.includes(path) ? path : 'ops'
   showPage(page, false)
