@@ -60,7 +60,7 @@
       "what_to_take": "Extract the crypto news aggregation and sentiment scoring pipeline (including NLP processing) to feed into Clawmpson's LLM/momentum strategies for event-driven signal generation.",
       "risk": "Unknown license (must verify), suspicious 2026 last updated date (likely metadata error), potential API dependency costs, and non-core relevance to arb strategies.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "The event-driven engine core (event loop, strategy dispatcher) to improve modularity and scalability in Clawmpson and RivalClaw, avoiding redundant feed handling.",
       "risk": "License not specified in repo; last updated date (2026) is suspicious (likely typo) and may indicate abandoned maintenance. Requires license verification before integration.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "Extract backtesting framework and data handling utilities for Clawmpson's strategy development, avoiding broker-specific IB code.",
       "risk": "MIT license is safe but library is IB-centric; last update date (2026-03-27) appears erroneous. Must carefully isolate non-IB components to avoid dependency bloat.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "Extract async-iterable data handling patterns for tick-level market data (especially orderbook/tick streaming) to build Python equivalents for Clawmpson's feeds and ArbClaw's 5-min cycle data layer.",
       "risk": "Future-dated last update (2026-03-27) suggests possible repo abandonment; TypeScript vs Python language mismatch requires full rewrite; license not specified in description (must verify MIT/Apache).",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "Design patterns for multi-asset WebSocket data ingestion (forex/crypto/stock) and error handling, to guide Python implementation of Clawmpson's feed layer.",
       "risk": "Java codebase incompatible with Python stack; suspicious future last-update date (2026-03-26) indicating potential repo inaccuracy; license unknown; requires full reimplemention effort.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "No actionable patterns due to Java language mismatch and crypto-specific focus (not prediction markets)",
       "risk": "Java/Python integration complexity, crypto market patterns irrelevant to prediction markets, Apache 2.0 license but low practical value",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "Study composable architecture patterns for real-time data pipelines to inspire Python design, but avoid direct code integration due to Elixir/Python mismatch.",
       "risk": "Elixir language mismatch with Python stack; suspicious 2026-03-17 last update date suggests abandonment; high complexity for cross-language integration.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
