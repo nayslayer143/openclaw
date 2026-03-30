@@ -25,3 +25,15 @@
 {"ts": "2026-03-30T15:07:41.937994", "url": "http://localhost:7080/ops", "action": "dom_text", "selector": "body"}
 {"ts": "2026-03-30T15:07:47.500422", "url": "http://localhost:7080/ops", "action": "navigate", "title": "GONZOCLAW \u2726 Dashboard"}
 {"ts": "2026-03-30T15:07:47.708284", "url": "http://localhost:7080/ops", "action": "screenshot", "full_page": true, "saved": "/tmp/gonzo-no-agents.png"}
+{"ts": "2026-03-30T15:37:37.972183", "url": "http://localhost:7080/ops", "action": "navigate", "title": "GONZOCLAW \u2726 Dashboard"}
+{"ts": "2026-03-30T15:37:37.975835", "url": "http://localhost:7080/ops", "action": "evaluate", "js_snippet": "window.getComputedStyle(document.getElementById('pageOrchestrator')).display"}
+{"ts": "2026-03-30T15:37:45.508094", "url": "http://localhost:7080/ops", "action": "navigate", "title": "GONZOCLAW \u2726 Dashboard"}
+{"ts": "2026-03-30T15:37:45.721531", "url": "http://localhost:7080/ops", "action": "screenshot", "full_page": true, "saved": "/tmp/gonzo-ops-nofooter.png"}
+{"ts": "2026-03-30T15:37:54.595921", "url": "http://localhost:7080/orchestrator", "action": "navigate", "title": "GONZOCLAW \u2726 Dashboard"}
+{"ts": "2026-03-30T15:37:55.613996", "url": "http://localhost:7080/orchestrator", "action": "screenshot", "full_page": true, "saved": "/tmp/gonzo-orch-still-works.png"}
+{"ts": "2026-03-30T15:40:36.768839", "url": "http://localhost:7080/ops", "action": "navigate", "title": "GONZOCLAW \u2726 Dashboard"}
+{"ts": "2026-03-30T15:40:36.773357", "url": "http://localhost:7080/ops", "action": "evaluate", "js_snippet": "window.getComputedStyle(document.getElementById('pageResearch')).display"}
+{"ts": "2026-03-30T15:40:43.574195", "url": "http://localhost:7080/ops", "action": "navigate", "title": "GONZOCLAW \u2726 Dashboard"}
+{"ts": "2026-03-30T15:40:43.758493", "url": "http://localhost:7080/ops", "action": "screenshot", "full_page": true, "saved": "/tmp/gonzo-ops-no-research.png"}
+{"ts": "2026-03-30T15:40:51.721800", "url": "http://localhost:7080/research", "action": "navigate", "title": "GONZOCLAW \u2726 Dashboard"}
+{"ts": "2026-03-30T15:40:51.869453", "url": "http://localhost:7080/research", "action": "screenshot", "full_page": true, "saved": "/tmp/gonzo-research-works.png"}

@@ -1191,6 +1191,7 @@ body {
 /* ── Ideas Lab Page ───────────────────────────────────────────── */
 .page { display: none; }
 .page.active { display: block; }
+#pageOrchestrator.active, #pageResearch.active { display: flex; flex-direction: column; height: calc(100vh - 60px); padding: 0; }
 
 .ideas-header {
   display: flex; justify-content: space-between; align-items: center;
@@ -2735,7 +2736,7 @@ body {
   <!-- ══════════════════════════════════════════════════════════════ -->
   <!-- ORCHESTRATOR PAGE                                             -->
   <!-- ══════════════════════════════════════════════════════════════ -->
-  <div class="page" id="pageOrchestrator" style="display:flex;flex-direction:column;height:calc(100vh - 60px);padding:0;">
+  <div class="page" id="pageOrchestrator">
     <iframe id="orchestratorFrame" style="flex:1;border:none;width:100%;height:100%;" src="about:blank"></iframe>
   </div><!-- /pageOrchestrator -->
 
@@ -7301,7 +7302,7 @@ function cinemaCloseModal() {
 </script>
 
 <!-- RESEARCH PAGE — toolbar + sub-tabs + content areas -->
-<div class="page" id="pageResearch" style="display:flex;flex-direction:column;height:calc(100vh - 60px);padding:0;">
+<div class="page" id="pageResearch">
 
   <!-- Toolbar -->
   <div class="research-toolbar">
