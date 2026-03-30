@@ -16,5 +16,19 @@
     "prompt": "I want to transform this audio into an evolving psychedelic future noir video animation with the audio applied so i can hear the audio with the video. Translate the audio into gorgeous provocative visual animations.",
     "created_at": "2026-03-30T22:47:58.429892+00:00",
     "error": "HTTPConnectionPool(host='127.0.0.1', port=11434): Read timed out. (read timeout=300)"
+  },
+  "e6ef3236": {
+    "status": "failed",
+    "prompt": "I want to transform this audio into an evolving psychedelic future noir video animation with the audio applied so i can hear the audio with the video. Translate the audio into gorgeous provocative visual animations.",
+    "created_at": "2026-03-30T23:00:11.640837+00:00",
+    "template": "NarrationReel",
+    "error": "Remotion render failed:\n TypeError  Cannot read properties of null (reading '0')\n"
+  },
+  "e0ae6458": {
+    "status": "failed",
+    "prompt": "I want to transform this audio into an evolving psychedelic future noir video animation with the audio applied so i can hear the audio with the video. Translate the audio into gorgeous provocative visual animations.",
+    "created_at": "2026-03-30T23:05:47.420801+00:00",
+    "template": "NarrationReel",
+    "error": "Remotion render failed:\nders/8b/vkfpw3n90mq6pt99t2vbcf8h0000gn/T/remotion-webpack-bundle-aYOtA2/public/e0ae6458/The Mooon blessing 4444 a grand New Yaera \u266a\u2669\u266b_\ud83d\udd25\ud83e\udd1c\ud83c\udffd\ud83e\udef7\ud83c\udffd\u2122\ufe0f.m4a) could not be found\"}\n---\n    at readFile (/Users/nayslayer/openclaw/cinema-lab/remotion/node_modules/@remotion/renderer/dist/assets/read-file.js:59:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at /Users/nayslayer/openclaw/cinema-lab/remotion/node_modules/@remotion/renderer/dist/rend"
   }
 }

@@ -1,9 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> Auto-generated 2026-03-30T15:07:00-07:00. Do not edit manually.
+> Auto-generated 2026-03-30T16:07:00-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-03-30T15:07:00-07:00
+Generated: 2026-03-30T16:07:00-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -164,15 +164,14 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/rivalclaw/.gitignore
 ~/rivalclaw/.monitor_state.json
 ~/rivalclaw/.pytest_cache
+~/rivalclaw/.rivalclaw_run.lock
 ~/rivalclaw/CHANGELOG.md
 ~/rivalclaw/CLAUDE.md
 ~/rivalclaw/P0-001-diagnostic.md
 ~/rivalclaw/README.md
-~/rivalclaw/__pycache__
 ~/rivalclaw/auto_changelog.py
 ~/rivalclaw/balance_watchdog.py
 ~/rivalclaw/bridge
-~/rivalclaw/bridge/__pycache__
 ~/rivalclaw/bridge/auth.py
 ~/rivalclaw/bridge/control_routes.py
 ~/rivalclaw/bridge/db_routes.py
@@ -1406,15 +1405,15 @@ pytest-asyncio>=0.23
 ### openclaw
 ```
 Branch: main
-Last commit: 2917bc0 auto: 2026-03-30 15:00 state snapshot
-Uncommitted files: 8
+Last commit: dbfdd38 fix: null-guard clips/captions arrays, recover top-level LLM scene fields, add scene plan logging
+Uncommitted files: 12
 Remote: 
 ```
 
 ### rivalclaw
 ```
 Branch: feat/kalshi-live-bridge
-Last commit: 2b8ed7b auto: hourly sync 2026-03-30 21:47 UTC
+Last commit: 1b2b5a3 auto: hourly sync 2026-03-30 22:47 UTC
 Uncommitted files: 8
 Remote: 
 ```
@@ -1430,7 +1429,7 @@ Remote: https://oauth2:glpat-gpKuP2MCJ523PLVy2Rez7mM6MQpvOjEKdTpsMmJnZg8.01.170u
 ### quantumentalclaw
 ```
 Branch: main
-Last commit: 50d4f2e hourly: 2026-03-30 22:00 | $6,868 | 0W/0closed | $+0 | quiet
+Last commit: a4ef5db hourly: 2026-03-30 23:00 | $7,131 | 0W/0closed | $+0 | quiet
 Uncommitted files: 0
 Remote: https://oauth2:glpat-gpKuP2MCJ523PLVy2Rez7mM6MQpvOjEKdTpsMmJnZg8.01.170uc249y@gitlab.com/jordan291/quantumentalclaw.git
 ```
@@ -1530,5 +1529,5 @@ Remote: https://github.com/nayslayer143/shiny-new.git
 ```
 
 ---
-End of context. Generated 2026-03-30T15:07:00-07:00.
+End of context. Generated 2026-03-30T16:07:00-07:00.
 For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw
