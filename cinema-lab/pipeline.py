@@ -213,6 +213,12 @@ def run_pipeline(job_id: str, prompt: str) -> None:
         duration_frames = int(scene_plan.get("duration_frames", 450))
         scenes          = scene_plan.get("scenes", {})
 
+        # LLM sometimes puts template fields at top level instead of inside "scenes"
+        if not scenes:
+            top_level_keys = {"template", "duration_frames", "jsx_code"}
+            scenes = {k: v for k, v in scene_plan.items() if k not in top_level_keys}
+
+        print(f"[pipeline] template={template} duration={duration_frames} scenes={json.dumps(scenes)}", flush=True)
         _update_status(job_id, status="rendering", template=template)
 
         if template == "custom":

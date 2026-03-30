@@ -56,10 +56,12 @@ const ClipFrame: React.FC<{ src: string; caption: string; totalFrames: number }>
 
 export const NarrationReel: React.FC<NarrationReelProps> = ({
   audio,
-  clips,
-  captions,
+  clips: clipsRaw,
+  captions: captionsRaw,
   duration_frames,
 }) => {
+  const clips = Array.isArray(clipsRaw) ? clipsRaw : [];
+  const captions = Array.isArray(captionsRaw) ? captionsRaw : [];
   const framesPerClip = clips.length > 0 ? Math.floor(duration_frames / clips.length) : duration_frames;
 
   return (

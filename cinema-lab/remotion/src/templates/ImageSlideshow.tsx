@@ -51,10 +51,12 @@ const SlideFrame: React.FC<{ src: string; caption?: string; totalFrames: number 
 };
 
 export const ImageSlideshow: React.FC<ImageSlideshowProps> = ({
-  images,
-  captions,
+  images: imagesRaw,
+  captions: captionsRaw,
   duration_frames,
 }) => {
+  const images = Array.isArray(imagesRaw) ? imagesRaw : [];
+  const captions = Array.isArray(captionsRaw) ? captionsRaw : [];
   if (images.length === 0) return <AbsoluteFill style={{ backgroundColor: '#060606' }} />;
   const framesPerImage = Math.floor(duration_frames / images.length);
 
