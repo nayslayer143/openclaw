@@ -5343,7 +5343,7 @@ function renderExperiment(d) {
       const rcStartVal = w.starting_balance || 10000
       const rcBalVal = w.balance || (rcStartVal + (w.total_pnl || 0))
       const rcPnlVal = w.total_pnl || 0
-      const rcWins = w.win_count || 0
+      const rcWins = w.wins || 0
       const rcLosses = (w.total_trades || 0) - rcWins
       const rcWlTotal = rcWins + rcLosses
       const rcPct = rcWlTotal > 0 ? ((rcWins / rcWlTotal) * 100).toFixed(0) : '0'
