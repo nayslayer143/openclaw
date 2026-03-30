@@ -92,7 +92,8 @@ def _build_manifest(job_id: str) -> list:
 
 def _llm_compose(prompt: str, manifest: list) -> dict:
     """Ask Ollama to generate a scene plan. Returns parsed dict."""
-    user_msg = f"Prompt: {prompt}\n\nAssets:\n{json.dumps(manifest, indent=2)}"
+    # /no_think disables qwen3's extended reasoning mode (prevents multi-minute CoT)
+    user_msg = f"/no_think\nPrompt: {prompt}\n\nAssets:\n{json.dumps(manifest, indent=2)}"
     resp = requests.post(
         OLLAMA_URL,
         json={
@@ -100,12 +101,17 @@ def _llm_compose(prompt: str, manifest: list) -> dict:
             "prompt": user_msg,
             "system": _SYSTEM_PROMPT,
             "stream": False,
+            "think": False,
             "options": {"temperature": 0.7},
         },
         timeout=300,
     )
     resp.raise_for_status()
     raw = resp.json()["response"].strip()
+    # Strip <think>...</think> blocks if qwen3 emits them despite think:False
+    if "<think>" in raw:
+        import re as _re
+        raw = _re.sub(r"<think>.*?</think>", "", raw, flags=_re.DOTALL).strip()
     # Strip markdown code fences if present
     if raw.startswith("```"):
         parts = raw.split("```")
