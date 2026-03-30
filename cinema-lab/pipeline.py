@@ -19,7 +19,7 @@ REMOTION_PUBLIC = REMOTION_DIR / "public"
 JOBS_FILE       = CINEMA_DIR / "jobs.json"
 
 OLLAMA_URL  = "http://127.0.0.1:11434/api/generate"
-LLM_MODEL   = "qwen3:30b"
+LLM_MODEL   = "qwen2.5:14b"
 
 _EXT_TYPE = {
     ".mp3": "audio", ".wav": "audio", ".m4a": "audio", ".ogg": "audio",
@@ -92,8 +92,7 @@ def _build_manifest(job_id: str) -> list:
 
 def _llm_compose(prompt: str, manifest: list) -> dict:
     """Ask Ollama to generate a scene plan. Returns parsed dict."""
-    # /no_think disables qwen3's extended reasoning mode (prevents multi-minute CoT)
-    user_msg = f"/no_think\nPrompt: {prompt}\n\nAssets:\n{json.dumps(manifest, indent=2)}"
+    user_msg = f"Prompt: {prompt}\n\nAssets:\n{json.dumps(manifest, indent=2)}"
     resp = requests.post(
         OLLAMA_URL,
         json={
@@ -101,10 +100,9 @@ def _llm_compose(prompt: str, manifest: list) -> dict:
             "prompt": user_msg,
             "system": _SYSTEM_PROMPT,
             "stream": False,
-            "think": False,
             "options": {"temperature": 0.7},
         },
-        timeout=300,
+        timeout=120,
     )
     resp.raise_for_status()
     raw = resp.json()["response"].strip()
