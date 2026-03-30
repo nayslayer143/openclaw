@@ -20,7 +20,7 @@
       "what_to_take": "Integrate performance metrics (Sharpe ratio, drawdown, cumulative returns) and visualization functions for strategy evaluation, focusing on the `quantstats` core analytics module without full UI dependencies.",
       "risk": "MIT license is safe. Minor adaptation needed for data pipeline integration (converting trade logs to returns series), but no maintenance concerns as repo is actively maintained.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "The backtesting engine and strategy evaluation metrics for integration into Clawmpson's graduation engine and RivalClaw's self-tuner.",
       "risk": "Unknown license (must verify), suspicious future last updated date (2026-03-27), and potential refactoring of existing backtesting code in Clawmpson/RivalClaw.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "Extract Python strategies designed for prediction markets (Polymarket/Kalshi) and adapt to our data feed/execution APIs; avoid FMZ-platform-specific code.",
       "risk": "License unknown (check repo), strategies likely tied to FMZ platform requiring significant adaptation, future-dated last update (2026) suggests potential data error or inactive maintenance.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "Strategy base class and registry pattern for modular strategy implementation, if it exists in a modular way.",
       "risk": "License unknown (potential legal risk), last updated date is in the future (2026-03-19, suspicious), high integration complexity due to monolithic structure.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "Extract the AI-driven risk assessment module and self-tuning algorithm for RivalClaw's hedge engine, focusing on the market-agnostic risk management patterns applicable to prediction markets.",
       "risk": "License unknown (must verify), last updated in 2026 (likely a typo indicating abandonment), and potential mismatch in prediction market dynamics vs. general quantitative trading context.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "Study Lean's event-driven architecture and strategy lifecycle management patterns for Clawmpson's graduation engine, then reimplement core concepts in Python without porting C# code.",
       "risk": "C# vs Python language mismatch requires full pattern extraction and reimplemention (high effort), Lean's massive codebase complicates identifying relevant patterns, and no direct code reuse possible.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "Backtesting framework structure for strategy evaluation (not stock-specific logic), to adapt for prediction market data and 5-min cycles in ArbClaw.",
       "risk": "License uncertainty (no license file visible), future-dated last update (2026-03-28) suggests data error, and domain mismatch (stocks vs prediction markets) requires significant adaptation.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -280,7 +280,7 @@
       "what_to_take": "Only the DRL agent architecture patterns (state representation, reward function design) for potential strategy inspiration, not the Bitcoin-specific trading logic.",
       "risk": "Future-dated last update (2026-03-19) suggests data error or repo inaccuracy; Bitcoin market context mismatch with prediction markets; high adaptation complexity for our stack.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -300,7 +300,7 @@
       "what_to_take": "None. Repo lacks technical depth, has future-dated update (2026), and spammy description. No reusable patterns for our stack's architecture or strategies.",
       "risk": "No license specified, impossible future update date (2026), and unverified code quality. High risk of maintenance issues and legal exposure. Not suitable for production integration.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -320,7 +320,7 @@
       "what_to_take": "LSTM architecture code for time series modeling as a template, but requires complete recontextualization for prediction market data (not stock prices)",
       "risk": "Repo last updated 2026-03-27 (future date, likely error), no license specified, model designed for stock prices not prediction markets (high adaptation cost)",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -340,7 +340,7 @@
       "what_to_take": "Generic deep learning model architectures (e.g., LSTM/CNN) for time series, but not data pipelines or stock-specific features.",
       "risk": "Domain mismatch (stock prediction vs. prediction markets), Jupyter Notebook format requiring major refactoring, and suspicious 2026 last update date indicating potential repo inaccuracy.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -360,7 +360,7 @@
       "what_to_take": "None - repo is mislabeled as HTML (not code) with future update date (2026), indicating it's likely a placeholder or fake repo containing no actual predictive code.",
       "risk": "Repo is fundamentally mislabeled (HTML language) and contains a future update date (2026), making it unreliable. No actual LSTM code is present for integration. License and maintenance are irrelevant due to repo invalidity.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -380,7 +380,7 @@
       "what_to_take": "Repo is a curated list of resources, not executable code. No integration possible. Use list for research only.",
       "risk": "No code to integrate, but risks include wasted effort researching listed resources (many may be outdated or irrelevant) and potential scope creep from chasing external repos. License not verified for listed resources.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -400,7 +400,7 @@
       "what_to_take": "This repo is a curated list of resources, not code. No integrable patterns or code exist here. Use as reference for external library discovery only.",
       "risk": "HTML list with future last update date (2026-03-30) suggests potential inaccuracy. Links may be broken. No code to integrate, making direct use impossible.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -420,7 +420,7 @@
       "what_to_take": "None - this is a curated resource list, not a codebase. No executable patterns or code to integrate.",
       "risk": "No code to integrate; potential for misleading relevance due to list format. Future-dated last update (2026) suggests possible data error.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
