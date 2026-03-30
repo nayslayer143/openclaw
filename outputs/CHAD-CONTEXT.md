@@ -1,9 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> Auto-generated 2026-03-29T17:07:00-07:00. Do not edit manually.
+> Auto-generated 2026-03-29T21:07:00-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-03-29T17:07:00-07:00
+Generated: 2026-03-29T21:07:00-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -175,6 +175,7 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/rivalclaw/bridge/control_routes.py
 ~/rivalclaw/bridge/db_routes.py
 ~/rivalclaw/bridge/kalshi_routes.py
+~/rivalclaw/bridge/rivalclaw.db
 ~/rivalclaw/bridge/run.sh
 ~/rivalclaw/bridge/server.py
 ~/rivalclaw/bridge/tunnel.sh
@@ -299,6 +300,11 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/quantumentalclaw/CHANGELOG.md
 ~/quantumentalclaw/CLAUDE.md
 ~/quantumentalclaw/README.md
+~/quantumentalclaw/backups
+~/quantumentalclaw/backups/protocol_commands_20260329_173024.db
+~/quantumentalclaw/backups/protocol_cycles_20260329_173030.db
+~/quantumentalclaw/backups/protocol_events_20260329_173024.db
+~/quantumentalclaw/backups/protocol_rollout_20260329_173030.db
 ~/quantumentalclaw/crontab.txt
 ~/quantumentalclaw/daily
 ~/quantumentalclaw/daily-snapshot.py
@@ -394,6 +400,7 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/quantumentalclaw/utils/config.py
 ~/quantumentalclaw/utils/db.py
 ~/quantumentalclaw/utils/helpers.py
+~/quantumentalclaw/utils/protocol_reader.py
 ~/quantumentalclaw/utils/ticker_map.py
 ~/quantumentalclaw/utils/types.py
 ~/quantumentalclaw/venv
@@ -1392,15 +1399,15 @@ pytest-asyncio>=0.23
 ### openclaw
 ```
 Branch: main
-Last commit: f5f97c0 auto: hourly sync 2026-03-29 23:47 UTC
-Uncommitted files: 7
+Last commit: c1f23c9 auto: 2026-03-29 21:00 state snapshot
+Uncommitted files: 8
 Remote: 
 ```
 
 ### rivalclaw
 ```
 Branch: feat/kalshi-live-bridge
-Last commit: 12a54e1 auto: hourly sync 2026-03-29 23:47 UTC
+Last commit: 278bab6 auto: hourly sync 2026-03-30 03:47 UTC
 Uncommitted files: 7
 Remote: 
 ```
@@ -1416,7 +1423,7 @@ Remote: https://oauth2:glpat-gpKuP2MCJ523PLVy2Rez7mM6MQpvOjEKdTpsMmJnZg8.01.170u
 ### quantumentalclaw
 ```
 Branch: main
-Last commit: 294f21b hourly: 2026-03-30 00:00 | $10,000 | 0W/0closed | $+0 | quiet
+Last commit: 05c9c37 hourly: 2026-03-30 04:00 | $6,245 | 0W/0closed | $+0 | quiet
 Uncommitted files: 0
 Remote: https://oauth2:glpat-gpKuP2MCJ523PLVy2Rez7mM6MQpvOjEKdTpsMmJnZg8.01.170uc249y@gitlab.com/jordan291/quantumentalclaw.git
 ```
@@ -1516,5 +1523,5 @@ Remote: https://github.com/nayslayer143/shiny-new.git
 ```
 
 ---
-End of context. Generated 2026-03-29T17:07:00-07:00.
+End of context. Generated 2026-03-29T21:07:00-07:00.
 For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw
