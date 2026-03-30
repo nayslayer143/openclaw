@@ -102,7 +102,7 @@ def _llm_compose(prompt: str, manifest: list) -> dict:
             "stream": False,
             "options": {"temperature": 0.7},
         },
-        timeout=120,
+        timeout=300,
     )
     resp.raise_for_status()
     raw = resp.json()["response"].strip()
