@@ -1124,142 +1124,190 @@ def _rivalclaw_state(conn):
 
 
 def _quantumentalclaw_state(conn):
-    """Read QuantumentalClaw state — signal fusion engine with learning loop."""
+    """Read QuantumentalClaw state — protocol events engine (primary) with legacy fallback."""
     starting = 10000.0
     ctx = conn.execute("SELECT value FROM context WHERE key='starting_balance'").fetchone()
     if ctx:
         starting = float(ctx[0])
 
-    # Closed trades PnL (check paper_trades, fall back to backup table)
     closed_pnl = 0.0
     total_closed = 0
     wins = 0
     recent_list = []
-    try:
-        closed_pnl = conn.execute(
-            "SELECT COALESCE(SUM(pnl_usd), 0) FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')"
-        ).fetchone()[0]
-        all_closed = conn.execute(
-            "SELECT status, pnl_usd FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')"
-        ).fetchall()
-        total_closed = len(all_closed)
-        wins = sum(1 for t in all_closed if t["status"] == "closed_win")
-    except Exception:
-        pass
-
-    # If paper_trades is empty, pull historical stats from backup table
-    if total_closed == 0:
-        for backup_tbl in ("paper_trades_pre_protocol_20260327", "paper_trades_pre_audit_2026_03_26"):
-            try:
-                bc = conn.execute(f'SELECT COUNT(*) FROM "{backup_tbl}" WHERE status IN ("closed_win","closed_loss","expired")').fetchone()[0]
-                if bc > 0:
-                    closed_pnl = conn.execute(f'SELECT COALESCE(SUM(pnl_usd), 0) FROM "{backup_tbl}" WHERE status IN ("closed_win","closed_loss","expired")').fetchone()[0]
-                    all_closed = conn.execute(f'SELECT status, pnl_usd FROM "{backup_tbl}" WHERE status IN ("closed_win","closed_loss","expired")').fetchall()
-                    total_closed = len(all_closed)
-                    wins = sum(1 for t in all_closed if t["status"] == "closed_win")
-                    break
-            except Exception:
-                continue
-
-    # Open positions from paper_trades
-    open_trades = []
-    try:
-        open_trades = conn.execute(
-            "SELECT pt.*, td.event_id, td.venue, td.ticker, td.direction, td.final_score, "
-            "td.confidence, td.amount_usd as decision_amount, td.signal_snapshot, td.reasoning "
-            "FROM paper_trades pt "
-            "JOIN trade_decisions td ON pt.decision_id = td.decision_id "
-            "WHERE pt.status='open' ORDER BY pt.executed_at DESC"
-        ).fetchall()
-    except Exception:
-        pass
-
-    unrealized = 0.0
     open_list = []
-    for t in open_trades:
-        entry = t["fill_price"]
-        current = entry
-        pnl = t["fill_shares"] * (current - entry)
-        pnl_pct = (pnl / t["fill_amount_usd"] * 100) if t["fill_amount_usd"] > 0 else 0
-        unrealized += pnl
-        snapshot = {}
+    unrealized = 0.0
+    balance = starting
+    used_protocol = False
+
+    # Primary: read from protocol_events.db (the live trading engine)
+    proto_db = Path.home() / "quantumentalclaw" / "protocol_events.db"
+    if proto_db.exists():
         try:
-            snapshot = json.loads(t["signal_snapshot"]) if t["signal_snapshot"] else {}
+            pconn = sqlite3.connect(str(proto_db))
+            pconn.row_factory = sqlite3.Row
+
+            # Check if there are any events at all
+            evt_count = pconn.execute("SELECT COUNT(*) FROM protocol_events").fetchone()[0]
+            if evt_count > 0:
+
+                # Current balance from latest wallet event
+                bal_row = pconn.execute(
+                    "SELECT json_extract(payload, '$.balance_after') as bal "
+                    "FROM protocol_events WHERE event_type IN ('wallet_credit','wallet_debit') "
+                    "ORDER BY timestamp_ms DESC LIMIT 1"
+                ).fetchone()
+
+                # Closed trades from trade_close events
+                closed_rows = pconn.execute(
+                    "SELECT contract_id, "
+                    "json_extract(payload, '$.pnl_net') as pnl_net, "
+                    "json_extract(payload, '$.pnl_gross') as pnl_gross, "
+                    "json_extract(payload, '$.exit_price') as exit_price, "
+                    "json_extract(payload, '$.exit_reason') as exit_reason, "
+                    "json_extract(payload, '$.fees_exit') as fees_exit, "
+                    "timestamp_ms "
+                    "FROM protocol_events WHERE event_type='trade_close' "
+                    "ORDER BY timestamp_ms DESC"
+                ).fetchall()
+                total_closed = len(closed_rows)
+                closed_pnl = sum(float(r["pnl_net"] or 0) for r in closed_rows)
+                wins = sum(1 for r in closed_rows if float(r["pnl_net"] or 0) > 0)
+
+                # Recent closed trades for display
+                for r in closed_rows[:20]:
+                    # Get matching entry for this contract
+                    entry_row = pconn.execute(
+                        "SELECT json_extract(payload, '$.entry_price') as entry_price, "
+                        "json_extract(payload, '$.venue') as venue "
+                        "FROM protocol_events WHERE event_type='trade_entry' AND contract_id=? "
+                        "ORDER BY timestamp_ms ASC LIMIT 1",
+                        (r["contract_id"],)
+                    ).fetchone()
+                    pnl_val = float(r["pnl_net"] or 0)
+                    status = "closed_win" if pnl_val > 0 else "closed_loss"
+                    # Parse ticker from contract_id (e.g. KXBTC-26MAR2921-B66750 -> bitcoin)
+                    ticker = r["contract_id"] or ""
+                    if "BTC" in ticker:
+                        ticker = "bitcoin"
+                    elif "ETH" in ticker:
+                        ticker = "ethereum"
+                    elif "DOGE" in ticker:
+                        ticker = "dogecoin"
+                    elif "BNB" in ticker:
+                        ticker = "binancecoin"
+                    recent_list.append({
+                        "event_id": r["contract_id"], "venue": entry_row["venue"] if entry_row else "kalshi",
+                        "ticker": ticker, "direction": "YES",
+                        "entry_price": float(entry_row["entry_price"]) if entry_row else 0,
+                        "exit_price": float(r["exit_price"] or 0),
+                        "pnl": round(pnl_val, 2), "status": status,
+                        "final_score": 0,
+                        "opened_at": "", "closed_at": "",
+                    })
+
+                # Open positions: position_open not in position_close
+                open_rows = pconn.execute("""
+                    SELECT po.contract_id,
+                        json_extract(po.payload, '$.venue') as venue,
+                        json_extract(po.payload, '$.side') as side,
+                        json_extract(po.payload, '$.entry_price') as entry_price,
+                        json_extract(po.payload, '$.size') as size,
+                        po.timestamp_ms
+                    FROM protocol_events po
+                    WHERE po.event_type='position_open'
+                    AND po.contract_id NOT IN (
+                        SELECT contract_id FROM protocol_events WHERE event_type='position_close'
+                    )
+                    GROUP BY po.contract_id
+                    ORDER BY po.timestamp_ms DESC
+                """).fetchall()
+                for op in open_rows:
+                    entry_price = float(op["entry_price"] or 0)
+                    size = int(op["size"] or 0)
+                    amount_usd = round(entry_price * size, 2)
+                    ticker = op["contract_id"] or ""
+                    if "BTC" in ticker:
+                        ticker = "bitcoin"
+                    elif "ETH" in ticker:
+                        ticker = "ethereum"
+                    elif "DOGE" in ticker:
+                        ticker = "dogecoin"
+                    elif "BNB" in ticker:
+                        ticker = "binancecoin"
+                    open_list.append({
+                        "event_id": op["contract_id"], "venue": op["venue"] or "kalshi",
+                        "ticker": ticker, "direction": "YES" if op["side"] == "BUY" else "NO",
+                        "entry_price": entry_price, "current_price": entry_price,
+                        "amount_usd": amount_usd,
+                        "final_score": 0, "confidence": 0,
+                        "signal_scores": {},
+                        "pnl": 0, "pnl_pct": 0,
+                        "reasoning": "",
+                        "opened_at": "",
+                    })
+
+                # Use wallet balance directly if available, otherwise compute
+                if bal_row and bal_row["bal"]:
+                    balance = float(bal_row["bal"])
+                else:
+                    balance = starting + closed_pnl
+
+                used_protocol = True
+
+            pconn.close()
         except Exception:
             pass
-        open_list.append({
-            "event_id": t["event_id"], "venue": t["venue"],
-            "ticker": t["ticker"], "direction": t["direction"],
-            "entry_price": entry, "current_price": current,
-            "amount_usd": t["fill_amount_usd"],
-            "final_score": t["final_score"], "confidence": t["confidence"],
-            "signal_scores": snapshot,
-            "pnl": round(pnl, 2), "pnl_pct": round(pnl_pct, 1),
-            "reasoning": t["reasoning"] or "",
-            "opened_at": t["executed_at"],
-        })
 
-    # If no open positions from paper_trades, show latest trade_decisions as active signals
-    if not open_list:
+    # Fallback: legacy paper_trades if protocol_events unavailable
+    if not used_protocol:
         try:
-            # Get most recent decision per (venue, ticker, direction) — represents current signal state
-            signals = conn.execute("""
-                SELECT td1.decision_id, td1.venue, td1.ticker, td1.direction, td1.final_score,
-                       td1.confidence, td1.amount_usd, td1.entry_price, td1.shares,
-                       td1.signal_snapshot, td1.reasoning, td1.decided_at
-                FROM trade_decisions td1
-                INNER JOIN (
-                    SELECT venue, ticker, direction, MAX(decided_at) as latest
-                    FROM trade_decisions
-                    WHERE ticker IS NOT NULL
-                    GROUP BY venue, ticker, direction
-                ) td2 ON td1.venue = td2.venue AND td1.ticker = td2.ticker
-                        AND td1.direction = td2.direction AND td1.decided_at = td2.latest
-                ORDER BY td1.decided_at DESC LIMIT 20
-            """).fetchall()
-            for s in signals:
-                snapshot = {}
+            closed_pnl = conn.execute(
+                "SELECT COALESCE(SUM(pnl_usd), 0) FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')"
+            ).fetchone()[0]
+            all_closed = conn.execute(
+                "SELECT status, pnl_usd FROM paper_trades WHERE status IN ('closed_win','closed_loss','expired')"
+            ).fetchall()
+            total_closed = len(all_closed)
+            wins = sum(1 for t in all_closed if t["status"] == "closed_win")
+        except Exception:
+            pass
+
+        if total_closed == 0:
+            for backup_tbl in ("paper_trades_pre_protocol_20260327", "paper_trades_pre_audit_2026_03_26"):
                 try:
-                    snapshot = json.loads(s["signal_snapshot"]) if s["signal_snapshot"] else {}
+                    bc = conn.execute(f'SELECT COUNT(*) FROM "{backup_tbl}" WHERE status IN ("closed_win","closed_loss","expired")').fetchone()[0]
+                    if bc > 0:
+                        closed_pnl = conn.execute(f'SELECT COALESCE(SUM(pnl_usd), 0) FROM "{backup_tbl}" WHERE status IN ("closed_win","closed_loss","expired")').fetchone()[0]
+                        all_closed = conn.execute(f'SELECT status, pnl_usd FROM "{backup_tbl}" WHERE status IN ("closed_win","closed_loss","expired")').fetchall()
+                        total_closed = len(all_closed)
+                        wins = sum(1 for t in all_closed if t["status"] == "closed_win")
+                        break
                 except Exception:
-                    pass
-                open_list.append({
-                    "event_id": s["decision_id"], "venue": s["venue"],
-                    "ticker": s["ticker"], "direction": s["direction"],
-                    "entry_price": s["entry_price"] or 0,
-                    "current_price": s["entry_price"] or 0,
-                    "amount_usd": s["amount_usd"] or 0,
-                    "final_score": s["final_score"], "confidence": s["confidence"],
-                    "signal_scores": snapshot,
-                    "pnl": 0, "pnl_pct": 0,
-                    "reasoning": s["reasoning"] or "",
-                    "opened_at": s["decided_at"],
+                    continue
+
+        balance = starting + closed_pnl + unrealized
+
+    # Recent closed trades from legacy (only if protocol didn't provide them)
+    if not recent_list:
+        try:
+            recent = conn.execute(
+                "SELECT pt.*, td.event_id, td.venue, td.ticker, td.direction, td.final_score, td.signal_snapshot "
+                "FROM paper_trades pt "
+                "JOIN trade_decisions td ON pt.decision_id = td.decision_id "
+                "WHERE pt.status IN ('closed_win','closed_loss','expired') "
+                "ORDER BY pt.exit_at DESC LIMIT 20"
+            ).fetchall()
+            for r in recent:
+                recent_list.append({
+                    "event_id": r["event_id"], "venue": r["venue"],
+                    "ticker": r["ticker"], "direction": r["direction"],
+                    "entry_price": r["fill_price"], "exit_price": r["exit_price"],
+                    "pnl": round(r["pnl_usd"] or 0, 2), "status": r["status"],
+                    "final_score": r["final_score"],
+                    "opened_at": r["executed_at"], "closed_at": r["exit_at"],
                 })
         except Exception:
             pass
-
-    balance = starting + closed_pnl + unrealized
-
-    # Recent closed trades
-    try:
-        recent = conn.execute(
-            "SELECT pt.*, td.event_id, td.venue, td.ticker, td.direction, td.final_score, td.signal_snapshot "
-            "FROM paper_trades pt "
-            "JOIN trade_decisions td ON pt.decision_id = td.decision_id "
-            "WHERE pt.status IN ('closed_win','closed_loss','expired') "
-            "ORDER BY pt.exit_at DESC LIMIT 20"
-        ).fetchall()
-        for r in recent:
-            recent_list.append({
-                "event_id": r["event_id"], "venue": r["venue"],
-                "ticker": r["ticker"], "direction": r["direction"],
-                "entry_price": r["fill_price"], "exit_price": r["exit_price"],
-                "pnl": round(r["pnl_usd"] or 0, 2), "status": r["status"],
-                "final_score": r["final_score"],
-                "opened_at": r["executed_at"], "closed_at": r["exit_at"],
-            })
-    except Exception:
-        pass
 
     # Cycle count
     cycle_count = 0
