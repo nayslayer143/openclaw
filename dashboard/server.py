@@ -2814,6 +2814,19 @@ async def cinema_serve_render(filename: str, user: str = Depends(get_current_use
     )
 
 
+@app.get("/orchestrator-embed")
+async def orchestrator_embed(request: Request):
+    """Serve the self-contained orchestrator HTML for iframe embedding."""
+    token = request.cookies.get("oc_token")
+    if not token or not verify_token(token):
+        if not is_localhost(request):
+            return RedirectResponse(url="/login")
+    html = (Path(__file__).parent / "orchestrator-embed.html").read_text()
+    return HTMLResponse(content=html, headers={
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+    })
+
+
 @app.get("/{path:path}")
 async def spa(path: str, request: Request):
     # Let API and WebSocket routes through

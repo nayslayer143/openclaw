@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#06060a">
+<title>OpenClaw Orchestrator</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#06060a;--bg-surface:#0c0c14;--bg-raised:#12121e;--bg-overlay:#181828;
+  --border:#1e1e36;--border-glow:#2a2a50;
+  --text:#e2e2f0;--text-dim:#6a6a8e;--text-muted:#3e3e5e;
+  --accent:#7c6aff;--accent-dim:#7c6aff40;
+  --cyan:#00e5ff;--cyan-dim:#00e5ff30;
+  --green:#00ff88;--green-dim:#00ff8830;
+  --orange:#ff8a00;--orange-dim:#ff8a0030;
+  --red:#ff3366;--red-dim:#ff336630;
+  --pink:#ff66aa;--yellow:#ffdd00;
+  --mono:'JetBrains Mono',monospace;--sans:'Inter',-apple-system,sans-serif;
+  --radius:8px;--radius-lg:14px;
+  --transition:0.3s cubic-bezier(0.16,1,0.3,1);
+  --glow-accent:0 0 20px #7c6aff20,0 0 60px #7c6aff08;
+}
+html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-family:var(--sans);overflow:hidden;-webkit-font-smoothing:antialiased}
+#app{display:grid;grid-template-rows:48px 1fr;grid-template-columns:56px 1fr;height:100vh;width:100vw}
+#topbar{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:var(--bg-surface);border-bottom:1px solid var(--border);z-index:100;gap:12px}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-weight:700;font-size:13px;letter-spacing:1px;color:var(--accent);white-space:nowrap}
+.logo-icon{width:24px;height:24px;background:var(--accent);border-radius:6px;display:grid;place-items:center;position:relative;overflow:hidden}
+.logo-icon::after{content:'';width:10px;height:10px;border:2px solid var(--bg);border-radius:50%;animation:logoPulse 3s ease-in-out infinite}
+@keyframes logoPulse{0%,100%{transform:scale(.8);opacity:.6}50%{transform:scale(1.1);opacity:1}}
+.topbar-center{display:flex;gap:2px;background:var(--bg);border-radius:8px;padding:3px}
+.view-tab{font-family:var(--mono);font-size:11px;font-weight:500;padding:5px 14px;border-radius:6px;border:none;background:transparent;color:var(--text-dim);cursor:pointer;transition:var(--transition);white-space:nowrap;letter-spacing:.5px}
+.view-tab:hover{color:var(--text);background:var(--bg-raised)}
+.view-tab.active{color:var(--accent);background:var(--bg-raised);box-shadow:var(--glow-accent)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.status-pill{font-family:var(--mono);font-size:10px;padding:4px 10px;border-radius:20px;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.status-pill .dot{width:6px;height:6px;border-radius:50%;animation:blink 2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:.4}50%{opacity:1}}
+.status-online{background:var(--green-dim);color:var(--green)}
+.status-online .dot{background:var(--green)}
+.status-busy{background:var(--orange-dim);color:var(--orange)}
+.status-busy .dot{background:var(--orange)}
+#sidebar{background:var(--bg-surface);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;z-index:90}
+.sidebar-btn{width:40px;height:40px;border-radius:10px;border:none;background:transparent;color:var(--text-dim);cursor:pointer;display:grid;place-items:center;transition:var(--transition);position:relative}
+.sidebar-btn:hover{background:var(--bg-raised);color:var(--text)}
+.sidebar-btn.active{background:var(--accent-dim);color:var(--accent)}
+.sidebar-btn.active::before{content:'';position:absolute;left:-8px;width:3px;height:20px;background:var(--accent);border-radius:0 3px 3px 0}
+.sidebar-btn svg{width:18px;height:18px}
+.sidebar-spacer{flex:1}
+#main{position:relative;overflow:hidden;background:var(--bg)}
+#starfield{position:absolute;inset:0;z-index:0}
+#graph-canvas{position:absolute;inset:0;z-index:1;cursor:grab}
+#graph-canvas:active{cursor:grabbing}
+#main::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 40%,rgba(6,6,10,.6) 100%);pointer-events:none;z-index:2}
+.hud{position:absolute;z-index:10;pointer-events:none}
+.hud>*{pointer-events:auto}
+#live-feed{bottom:16px;left:16px;width:340px;max-height:240px}
+.feed-container{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.feed-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:1px;color:var(--text-dim);text-transform:uppercase}
+.feed-header .count{background:var(--accent-dim);color:var(--accent);padding:2px 7px;border-radius:10px;font-size:10px}
+.feed-scroll{max-height:180px;overflow-y:auto;padding:6px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.feed-item{display:flex;align-items:flex-start;gap:8px;padding:8px;border-radius:8px;transition:background .2s;cursor:pointer;animation:feedIn .4s ease-out}
+@keyframes feedIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.feed-item:hover{background:var(--bg-raised)}
+.feed-dot{width:8px;height:8px;border-radius:50%;margin-top:4px;flex-shrink:0}
+.feed-item-content{flex:1;min-width:0}
+.feed-item-text{font-size:12px;line-height:1.4;color:var(--text)}
+.feed-item-meta{font-family:var(--mono);font-size:10px;color:var(--text-muted);margin-top:2px}
+#stats-hud{top:12px;right:16px;display:flex;gap:8px}
+.stat-card{background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;min-width:110px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.stat-label{font-family:var(--mono);font-size:9px;font-weight:600;letter-spacing:1.2px;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px}
+.stat-value{font-family:var(--mono);font-size:22px;font-weight:700;line-height:1}
+.stat-delta{font-family:var(--mono);font-size:10px;margin-top:3px}
+.stat-delta.up{color:var(--green)}.stat-delta.down{color:var(--red)}
+#minimap-hud{bottom:16px;right:16px}
+#minimap{width:160px;height:110px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;position:relative}
+#minimap-canvas{width:100%;height:100%}
+#context-hud{top:12px;left:16px}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;color:var(--text-dim);background:var(--bg-surface);border:1px solid var(--border);border-radius:20px;padding:6px 14px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+.breadcrumb-sep{color:var(--text-muted)}.breadcrumb-current{color:var(--text);font-weight:600}
+#detail-panel{position:absolute;top:0;right:0;width:420px;max-width:90vw;height:100%;background:var(--bg-surface);border-left:1px solid var(--border);z-index:50;transform:translateX(100%);transition:transform .5s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column;overflow:hidden}
+#detail-panel.open{transform:translateX(0)}
+.panel-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);flex-shrink:0}
+.panel-title{font-family:var(--mono);font-size:13px;font-weight:700;letter-spacing:.5px}
+.panel-close{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:transparent;color:var(--text-dim);cursor:pointer;display:grid;place-items:center;transition:var(--transition);font-size:14px}
+.panel-close:hover{background:var(--bg-raised);color:var(--text)}
+.panel-body{flex:1;overflow-y:auto;padding:20px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.panel-section{margin-bottom:24px}
+.panel-section-title{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:1.2px;color:var(--text-muted);text-transform:uppercase;margin-bottom:12px}
+.panel-kv{display:grid;grid-template-columns:100px 1fr;gap:8px;font-size:12px}
+.panel-kv dt{color:var(--text-dim);font-family:var(--mono);font-size:11px}
+.panel-kv dd{color:var(--text)}
+.panel-tag{display:inline-block;font-family:var(--mono);font-size:10px;padding:2px 8px;border-radius:4px;margin:2px}
+.panel-progress{height:4px;background:var(--bg);border-radius:2px;overflow:hidden;margin-top:8px}
+.panel-progress-bar{height:100%;border-radius:2px;transition:width 1s ease}
+.task-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;background:var(--bg);margin-bottom:6px;font-size:12px;transition:var(--transition);cursor:pointer}
+.task-item:hover{background:var(--bg-raised)}
+.task-status{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.task-name{flex:1}.task-agent{font-family:var(--mono);font-size:10px;color:var(--text-dim)}
+#command-palette{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(6,6,10,.8);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);z-index:200;display:none;place-items:center;padding:20px}
+#command-palette.open{display:grid}
+.palette-box{width:100%;max-width:560px;background:var(--bg-surface);border:1px solid var(--border-glow);border-radius:var(--radius-lg);box-shadow:0 20px 60px rgba(0,0,0,.5),var(--glow-accent);overflow:hidden;animation:paletteIn .3s ease-out}
+@keyframes paletteIn{from{opacity:0;transform:scale(.95) translateY(-10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.palette-input-wrap{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border)}
+.palette-input-wrap svg{color:var(--text-dim);width:16px;height:16px;flex-shrink:0}
+#palette-input{flex:1;background:transparent;border:none;color:var(--text);font-family:var(--mono);font-size:14px;outline:none}
+#palette-input::placeholder{color:var(--text-muted)}
+.palette-results{max-height:320px;overflow-y:auto;padding:6px}
+.palette-result{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;transition:background .15s}
+.palette-result:hover,.palette-result.selected{background:var(--bg-raised)}
+.palette-result-icon{width:32px;height:32px;border-radius:8px;display:grid;place-items:center;font-size:14px;flex-shrink:0}
+.palette-result-text{flex:1}
+.palette-result-name{font-size:13px;font-weight:500}
+.palette-result-desc{font-size:11px;color:var(--text-dim);margin-top:1px}
+.palette-result-shortcut{font-family:var(--mono);font-size:10px;color:var(--text-muted);background:var(--bg);padding:2px 6px;border-radius:4px}
+@media(max-width:768px){
+  #app{grid-template-columns:1fr;grid-template-rows:48px 1fr 56px}
+  #sidebar{grid-row:3;flex-direction:row;border-right:none;border-top:1px solid var(--border);padding:0 8px;justify-content:center;gap:8px}
+  .sidebar-btn.active::before{display:none}.sidebar-spacer{display:none}
+  #stats-hud{gap:4px}.stat-card{min-width:80px;padding:8px 10px}.stat-value{font-size:16px}.stat-label{font-size:8px}
+  #live-feed{width:280px;max-height:200px}.topbar-center{display:none}
+  #detail-panel{width:100%;max-width:100vw}
+}
+@media(max-width:480px){#stats-hud{flex-wrap:wrap}#live-feed{width:calc(100vw - 32px);left:8px}#minimap-hud{display:none}}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <div class="logo"><div class="logo-icon"></div><span>OPENCLAW</span></div>
+    <div class="topbar-center">
+      <button class="view-tab active" data-view="workflow" onclick="switchView('workflow')">WORKFLOW</button>
+      <button class="view-tab" data-view="network" onclick="switchView('network')">NETWORK</button>
+      <button class="view-tab" data-view="agents" onclick="switchView('agents')">AGENTS</button>
+      <button class="view-tab" data-view="projects" onclick="switchView('projects')">PROJECTS</button>
+    </div>
+    <div class="topbar-right">
+      <div class="status-pill status-online"><span class="dot"></span>12 AGENTS</div>
+      <div class="status-pill status-busy"><span class="dot"></span>7 ACTIVE</div>
+    </div>
+  </header>
+  <nav id="sidebar">
+    <button class="sidebar-btn active" title="Graph View" data-view="workflow" onclick="switchView('workflow')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><line x1="7" y1="12" x2="17" y2="6"/><line x1="7" y1="12" x2="17" y2="18"/></svg>
+    </button>
+    <button class="sidebar-btn" title="Network Map" data-view="network" onclick="switchView('network')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="6" height="5" rx="1"/><rect x="16" y="3" width="6" height="5" rx="1"/><rect x="9" y="16" width="6" height="5" rx="1"/><path d="M5 8v3a2 2 0 002 2h10a2 2 0 002-2V8"/><line x1="12" y1="13" x2="12" y2="16"/></svg>
+    </button>
+    <button class="sidebar-btn" title="Agents" data-view="agents" onclick="switchView('agents')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M6 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/></svg>
+    </button>
+    <button class="sidebar-btn" title="Projects" data-view="projects" onclick="switchView('projects')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    </button>
+    <div class="sidebar-spacer"></div>
+    <button class="sidebar-btn" title="Search" onclick="togglePalette()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
+    <button class="sidebar-btn" title="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    </button>
+  </nav>
+  <main id="main">
+    <canvas id="starfield"></canvas>
+    <canvas id="graph-canvas"></canvas>
+    <div id="context-hud" class="hud">
+      <div class="breadcrumb"><span>OPENCLAW</span><span class="breadcrumb-sep">›</span><span class="breadcrumb-current" id="breadcrumb-text">Workflow Overview</span></div>
+    </div>
+    <div id="stats-hud" class="hud">
+      <div class="stat-card"><div class="stat-label">TASKS / HR</div><div class="stat-value" style="color:var(--cyan)" id="stat-tasks">24</div><div class="stat-delta up">↑ 18%</div></div>
+      <div class="stat-card"><div class="stat-label">THROUGHPUT</div><div class="stat-value" style="color:var(--green)" id="stat-throughput">89%</div><div class="stat-delta up">↑ 5%</div></div>
+      <div class="stat-card"><div class="stat-label">QUEUE</div><div class="stat-value" style="color:var(--orange)" id="stat-queue">13</div><div class="stat-delta down">↓ 3</div></div>
+    </div>
+    <div id="live-feed" class="hud">
+      <div class="feed-container">
+        <div class="feed-header"><span>LIVE ACTIVITY</span><span class="count" id="feed-count">0</span></div>
+        <div class="feed-scroll" id="feed-scroll"></div>
+      </div>
+    </div>
+    <div id="minimap-hud" class="hud"><div id="minimap"><canvas id="minimap-canvas"></canvas></div></div>
+    <div id="detail-panel">
+      <div class="panel-header"><div class="panel-title" id="panel-title">Details</div><button class="panel-close" onclick="closePanel()">✕</button></div>
+      <div class="panel-body" id="panel-body"></div>
+    </div>
+  </main>
+</div>
+<div id="command-palette">
+  <div class="palette-box">
+    <div class="palette-input-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input id="palette-input" type="text" placeholder="Search agents, projects, tasks..." autocomplete="off">
+    </div>
+    <div class="palette-results" id="palette-results"></div>
+  </div>
+</div>
+
+<script>
+const COLORS={accent:'#7c6aff',cyan:'#00e5ff',green:'#00ff88',orange:'#ff8a00',red:'#ff3366',pink:'#ff66aa',yellow:'#ffdd00',blue:'#4488ff',purple:'#aa66ff'};
+
+const MACHINES=[
+  {id:'m1',name:"Jordan's MacBook Pro",type:'local',os:'macOS',status:'online',ip:'192.168.1.10',agents:['a1','a2','a3','a4','a5']},
+  {id:'m2',name:'Build Server VPS',type:'vps',os:'Ubuntu 22',status:'online',ip:'64.23.xx.xx',provider:'DigitalOcean',agents:['a6','a7']},
+  {id:'m3',name:'Media Render Farm',type:'vps',os:'Ubuntu 22',status:'online',ip:'143.198.xx.xx',provider:'Hetzner',agents:['a8','a9']},
+  {id:'m4',name:"Partner Studio Mac",type:'remote',os:'macOS',status:'online',ip:'10.0.0.xx',agents:['a10','a11']},
+  {id:'m5',name:'Edge Worker (ARM)',type:'vps',os:'Debian',status:'idle',ip:'45.76.xx.xx',provider:'Vultr',agents:['a12']},
+];
+
+const AGENTS=[
+  {id:'a1',name:'Claude Opus (Primary)',role:'Lead Orchestrator',machine:'m1',status:'active',color:COLORS.accent,type:'orchestrator',tasks:3,model:'claude-opus-4'},
+  {id:'a2',name:'Claude Sonnet (Code)',role:'Software Engineer',machine:'m1',status:'active',color:COLORS.cyan,type:'developer',tasks:5,model:'claude-sonnet-4'},
+  {id:'a3',name:'Claude Sonnet (Design)',role:'Design Director',machine:'m1',status:'active',color:COLORS.pink,type:'creative',tasks:2,model:'claude-sonnet-4'},
+  {id:'a4',name:'Claude Haiku (Triage)',role:'Task Router',machine:'m1',status:'active',color:COLORS.yellow,type:'router',tasks:8,model:'claude-haiku-4'},
+  {id:'a5',name:'Cursor Agent',role:'IDE Copilot',machine:'m1',status:'idle',color:COLORS.green,type:'developer',tasks:0,model:'cursor'},
+  {id:'a6',name:'CI/CD Bot',role:'Build & Deploy',machine:'m2',status:'active',color:COLORS.orange,type:'devops',tasks:4,model:'github-actions'},
+  {id:'a7',name:'Test Runner',role:'QA Automation',machine:'m2',status:'active',color:COLORS.green,type:'qa',tasks:3,model:'claude-haiku-4'},
+  {id:'a8',name:'Video Gen Agent',role:'Video Production',machine:'m3',status:'active',color:COLORS.red,type:'creative',tasks:2,model:'runway-ml'},
+  {id:'a9',name:'Image Gen Agent',role:'Visual Asset Creation',machine:'m3',status:'idle',color:COLORS.purple,type:'creative',tasks:0,model:'midjourney'},
+  {id:'a10',name:'Music Agent',role:'Audio Production',machine:'m4',status:'active',color:COLORS.pink,type:'creative',tasks:1,model:'suno'},
+  {id:'a11',name:'Partner Claude',role:'Collaboration Agent',machine:'m4',status:'idle',color:COLORS.blue,type:'orchestrator',tasks:0,model:'claude-sonnet-4'},
+  {id:'a12',name:'Edge Monitor',role:'Health & Metrics',machine:'m5',status:'idle',color:COLORS.cyan,type:'monitoring',tasks:1,model:'lightweight'},
+];
+
+const PROJECTS=[
+  {id:'p1',name:'OpenClaw Platform',category:'Software',status:'active',progress:.65,color:COLORS.accent,agents:['a1','a2','a6','a7'],description:'Core orchestration platform and agent management system'},
+  {id:'p2',name:'Brand Identity System',category:'Design',status:'active',progress:.40,color:COLORS.pink,agents:['a3','a9'],description:'Visual identity, logo suite, brand guidelines'},
+  {id:'p3',name:'Consumer Product Line',category:'CPG',status:'active',progress:.25,color:COLORS.orange,agents:['a1','a3','a8'],description:'Physical product development — packaging, manufacturing specs'},
+  {id:'p4',name:'Marketing Video Campaign',category:'Digital Media',status:'active',progress:.55,color:COLORS.red,agents:['a8','a10','a3'],description:'Launch video series across social channels'},
+  {id:'p5',name:'Developer Tools Suite',category:'Software',status:'active',progress:.80,color:COLORS.cyan,agents:['a2','a5','a6','a7'],description:'CLI tools, SDK, and developer documentation'},
+  {id:'p6',name:'Mobile App v2',category:'Software',status:'queued',progress:.10,color:COLORS.green,agents:['a2','a1'],description:'Cross-platform mobile app redesign'},
+  {id:'p7',name:'Product Photography',category:'Digital Media',status:'active',progress:.70,color:COLORS.purple,agents:['a9','a3'],description:'AI-generated product shots and lifestyle imagery'},
+  {id:'p8',name:'E-Commerce Website',category:'Software',status:'active',progress:.50,color:COLORS.blue,agents:['a2','a3','a6'],description:'Shopify-integrated storefront'},
+];
+
+const WORKFLOW_ROUTES=[
+  {from:'a4',to:'a1',label:'Escalate complex',flow:.8},
+  {from:'a1',to:'a2',label:'Code tasks',flow:.9},
+  {from:'a1',to:'a3',label:'Design tasks',flow:.6},
+  {from:'a1',to:'a8',label:'Video tasks',flow:.4},
+  {from:'a2',to:'a6',label:'Build & deploy',flow:.85},
+  {from:'a6',to:'a7',label:'Run tests',flow:.9},
+  {from:'a7',to:'a2',label:'Bug reports',flow:.3},
+  {from:'a3',to:'a9',label:'Generate assets',flow:.7},
+  {from:'a3',to:'a8',label:'Video direction',flow:.5},
+  {from:'a8',to:'a10',label:'Audio sync',flow:.6},
+  {from:'a1',to:'a11',label:'Partner collab',flow:.2},
+  {from:'a12',to:'a4',label:'System alerts',flow:.15},
+  {from:'a2',to:'a5',label:'IDE assist',flow:.5},
+];
+
+const TASKS=[
+  {id:'t1',name:'Implement agent routing API',project:'p1',agent:'a2',status:'in_progress',priority:'high'},
+  {id:'t2',name:'Design dashboard wireframes',project:'p1',agent:'a3',status:'in_progress',priority:'high'},
+  {id:'t3',name:'Generate logo variations',project:'p2',agent:'a9',status:'queued',priority:'medium'},
+  {id:'t4',name:'Render product launch video',project:'p4',agent:'a8',status:'in_progress',priority:'high'},
+  {id:'t5',name:'Build CI pipeline for SDK',project:'p5',agent:'a6',status:'in_progress',priority:'medium'},
+  {id:'t6',name:'Package design for SKU-001',project:'p3',agent:'a3',status:'queued',priority:'medium'},
+  {id:'t7',name:'Integration test suite',project:'p5',agent:'a7',status:'in_progress',priority:'medium'},
+  {id:'t8',name:'Compose background tracks',project:'p4',agent:'a10',status:'in_progress',priority:'low'},
+  {id:'t9',name:'Route incoming Slack requests',project:'p1',agent:'a4',status:'in_progress',priority:'high'},
+  {id:'t10',name:'Product shoot — hero angles',project:'p7',agent:'a9',status:'queued',priority:'medium'},
+  {id:'t11',name:'Storefront Shopify theme',project:'p8',agent:'a2',status:'in_progress',priority:'high'},
+  {id:'t12',name:'Deploy staging environment',project:'p8',agent:'a6',status:'queued',priority:'medium'},
+  {id:'t13',name:'Coordinate manufacturing specs',project:'p3',agent:'a1',status:'in_progress',priority:'high'},
+];
+
+// ═══ GRAPH ENGINE ═══
+const canvas=document.getElementById('graph-canvas');
+const ctx=canvas.getContext('2d');
+const starCanvas=document.getElementById('starfield');
+const starCtx=starCanvas.getContext('2d');
+const minimapCanvas=document.getElementById('minimap-canvas');
+const minimapCtx=minimapCanvas.getContext('2d');
+
+let W,H,dpr;
+let camera={x:0,y:0,zoom:1,targetX:0,targetY:0,targetZoom:1};
+let mouse={x:0,y:0,worldX:0,worldY:0,down:false,dragStartX:0,dragStartY:0,camStartX:0,camStartY:0};
+let hoveredNode=null,selectedNode=null,currentView='workflow';
+let nodes=[],edges=[],stars=[];
+let time=0;
+
+function resize(){
+  dpr=Math.min(window.devicePixelRatio,2);
+  W=canvas.parentElement.clientWidth;H=canvas.parentElement.clientHeight;
+  canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';
+  ctx.setTransform(dpr,0,0,dpr,0,0);
+  starCanvas.width=W*dpr;starCanvas.height=H*dpr;starCanvas.style.width=W+'px';starCanvas.style.height=H+'px';
+  starCtx.setTransform(dpr,0,0,dpr,0,0);
+  const mm=document.getElementById('minimap');
+  minimapCanvas.width=mm.clientWidth*dpr;minimapCanvas.height=mm.clientHeight*dpr;
+  minimapCtx.setTransform(dpr,0,0,dpr,0,0);
+  if(!stars.length)initStars();drawStars();
+}
+
+function initStars(){
+  stars=[];
+  for(let i=0;i<200;i++)stars.push({x:Math.random()*W*3-W,y:Math.random()*H*3-H,r:Math.random()*1.2+.2,a:Math.random()*.5+.1,speed:Math.random()*.3+.05,phase:Math.random()*Math.PI*2});
+}
+
+function drawStars(){
+  starCtx.clearRect(0,0,W,H);
+  const t=time*.001;
+  stars.forEach(s=>{
+    const px=.1,sx=((s.x-camera.x*px)%(W*2)+W*2)%(W*2)-W*.5,sy=((s.y-camera.y*px)%(H*2)+H*2)%(H*2)-H*.5;
+    const alpha=s.a*(.5+.5*Math.sin(t*s.speed+s.phase));
+    starCtx.beginPath();starCtx.arc(sx,sy,s.r,0,Math.PI*2);
+    starCtx.fillStyle=`rgba(200,200,255,${alpha})`;starCtx.fill();
+  });
+}
+
+function buildWorkflowView(){
+  nodes=[];edges=[];const agentMap={};
+  AGENTS.forEach((agent,i)=>{
+    const angle=(i/AGENTS.length)*Math.PI*2-Math.PI/2;
+    const radius=220+(i%3)*80;
+    const node={id:agent.id,x:Math.cos(angle)*radius+(Math.random()-.5)*40,y:Math.sin(angle)*radius+(Math.random()-.5)*40,
+      vx:0,vy:0,radius:agent.status==='active'?22+agent.tasks*2:16,color:agent.color,
+      label:agent.name.split('(')[0].trim(),sublabel:agent.role,type:'agent',data:agent,
+      pulsePhase:Math.random()*Math.PI*2,pulseSpeed:agent.status==='active'?.03:.01};
+    nodes.push(node);agentMap[agent.id]=node;
+  });
+  WORKFLOW_ROUTES.forEach(route=>{
+    if(agentMap[route.from]&&agentMap[route.to])
+      edges.push({from:agentMap[route.from],to:agentMap[route.to],label:route.label,flow:route.flow,color:agentMap[route.from].color,particles:[]});
+  });
+  camera.targetX=0;camera.targetY=0;camera.targetZoom=1;
+}
+
+function buildNetworkView(){
+  nodes=[];edges=[];const machineNodes={};
+  MACHINES.forEach((machine,i)=>{
+    const angle=(i/MACHINES.length)*Math.PI*2-Math.PI/2,radius=200;
+    const mNode={id:machine.id,x:Math.cos(angle)*radius,y:Math.sin(angle)*radius,vx:0,vy:0,radius:36,
+      color:machine.status==='online'?COLORS.green:COLORS.orange,label:machine.name,
+      sublabel:`${machine.type} · ${machine.os}`,type:'machine',data:machine,
+      pulsePhase:Math.random()*Math.PI*2,pulseSpeed:.02};
+    nodes.push(mNode);machineNodes[machine.id]=mNode;
+    machine.agents.forEach((agentId,j)=>{
+      const agent=AGENTS.find(a=>a.id===agentId);if(!agent)return;
+      const childAngle=angle+((j-(machine.agents.length-1)/2)*.3),childRadius=radius+90;
+      const childNode={id:agent.id,x:Math.cos(childAngle)*childRadius,y:Math.sin(childAngle)*childRadius,
+        vx:0,vy:0,radius:16,color:agent.color,label:agent.name.split('(')[0].trim(),sublabel:agent.role,
+        type:'agent',data:agent,parent:machine.id,pulsePhase:Math.random()*Math.PI*2,
+        pulseSpeed:agent.status==='active'?.03:.01};
+      nodes.push(childNode);
+      edges.push({from:mNode,to:childNode,label:'',flow:.3,color:agent.color+'60',particles:[],style:'dashed'});
+    });
+  });
+  WORKFLOW_ROUTES.forEach(route=>{
+    const fa=AGENTS.find(a=>a.id===route.from),ta=AGENTS.find(a=>a.id===route.to);
+    if(fa&&ta&&fa.machine!==ta.machine){
+      const fn=nodes.find(n=>n.id===route.from),tn=nodes.find(n=>n.id===route.to);
+      if(fn&&tn)edges.push({from:fn,to:tn,label:route.label,flow:route.flow,color:COLORS.accent+'80',particles:[],style:'glow'});
+    }
+  });
+  camera.targetZoom=.8;
+}
+
+function buildAgentsView(){
+  nodes=[];edges=[];
+  const types=[...new Set(AGENTS.map(a=>a.type))];
+  const tc={orchestrator:COLORS.accent,developer:COLORS.cyan,creative:COLORS.pink,router:COLORS.yellow,devops:COLORS.orange,qa:COLORS.green,monitoring:COLORS.blue};
+  types.forEach((type,ti)=>{
+    const angle=(ti/types.length)*Math.PI*2-Math.PI/2,gr=180;
+    const gx=Math.cos(angle)*gr,gy=Math.sin(angle)*gr;
+    const gNode={id:'group_'+type,x:gx,y:gy,vx:0,vy:0,radius:30,color:tc[type]||COLORS.accent,
+      label:type.charAt(0).toUpperCase()+type.slice(1),sublabel:'Agent Group',type:'group',data:{type},
+      pulsePhase:Math.random()*Math.PI*2,pulseSpeed:.015};
+    nodes.push(gNode);
+    AGENTS.filter(a=>a.type===type).forEach((agent,ai)=>{
+      const ca=angle+((ai-(AGENTS.filter(a=>a.type===type).length-1)/2)*.45),cr=gr+100;
+      const an={id:agent.id,x:Math.cos(ca)*cr,y:Math.sin(ca)*cr,vx:0,vy:0,radius:18+agent.tasks*2,
+        color:agent.color,label:agent.name.split('(')[0].trim(),sublabel:`${agent.tasks} tasks`,
+        type:'agent',data:agent,pulsePhase:Math.random()*Math.PI*2,pulseSpeed:agent.status==='active'?.03:.01};
+      nodes.push(an);edges.push({from:gNode,to:an,label:'',flow:.5,color:agent.color+'40',particles:[]});
+    });
+  });
+}
+
+function buildProjectsView(){
+  nodes=[];edges=[];
+  PROJECTS.forEach((project,i)=>{
+    const cols=4,row=Math.floor(i/cols),col=i%cols,sp=200;
+    const ox=-((Math.min(PROJECTS.length,cols)-1)*sp)/2,oy=-((Math.ceil(PROJECTS.length/cols)-1)*sp)/2;
+    const pNode={id:project.id,x:ox+col*sp,y:oy+row*sp,vx:0,vy:0,radius:32,color:project.color,
+      label:project.name,sublabel:`${project.category} · ${Math.round(project.progress*100)}%`,
+      type:'project',data:project,progress:project.progress,pulsePhase:Math.random()*Math.PI*2,pulseSpeed:.02};
+    nodes.push(pNode);
+    project.agents.forEach(agentId=>{
+      const agent=AGENTS.find(a=>a.id===agentId);if(!agent)return;
+      const angle=Math.random()*Math.PI*2;
+      const cn={id:agentId+'_'+project.id,x:pNode.x+Math.cos(angle)*90,y:pNode.y+Math.sin(angle)*90,
+        vx:0,vy:0,radius:12,color:agent.color,label:agent.name.split('(')[0].trim(),sublabel:'',
+        type:'agent-mini',data:agent,pulsePhase:Math.random()*Math.PI*2,pulseSpeed:.02};
+      nodes.push(cn);edges.push({from:pNode,to:cn,label:'',flow:.4,color:project.color+'50',particles:[]});
+    });
+  });
+  camera.targetZoom=.85;
+}
+
+function applyForces(){
+  for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
+    const a=nodes[i],b=nodes[j],dx=b.x-a.x,dy=b.y-a.y,dist=Math.sqrt(dx*dx+dy*dy)||1;
+    const minDist=(a.radius+b.radius)*2.5;
+    if(dist<minDist){const f=(minDist-dist)/dist*.05;a.vx-=dx*f;a.vy-=dy*f;b.vx+=dx*f;b.vy+=dy*f;}
+  }
+  edges.forEach(e=>{
+    const dx=e.to.x-e.from.x,dy=e.to.y-e.from.y,dist=Math.sqrt(dx*dx+dy*dy)||1;
+    const ideal=(e.from.radius+e.to.radius)*3,f=(dist-ideal)*.002;
+    e.from.vx+=dx/dist*f;e.from.vy+=dy/dist*f;e.to.vx-=dx/dist*f;e.to.vy-=dy/dist*f;
+  });
+  nodes.forEach(n=>{n.vx*=.92;n.vy*=.92;n.x+=n.vx;n.y+=n.vy;});
+}
+
+function updateParticles(){
+  edges.forEach(edge=>{
+    if(Math.random()<edge.flow*.06)edge.particles.push({t:0,speed:.003+Math.random()*.005,size:1.5+Math.random()*1.5});
+    edge.particles=edge.particles.filter(p=>{p.t+=p.speed;return p.t<1;});
+  });
+}
+
+function worldToScreen(wx,wy){return{x:(wx-camera.x)*camera.zoom+W/2,y:(wy-camera.y)*camera.zoom+H/2}}
+function screenToWorld(sx,sy){return{x:(sx-W/2)/camera.zoom+camera.x,y:(sy-H/2)/camera.zoom+camera.y}}
+
+function drawEdge(edge){
+  const f=worldToScreen(edge.from.x,edge.from.y),t=worldToScreen(edge.to.x,edge.to.y);
+  const mx=(f.x+t.x)/2,my=(f.y+t.y)/2,dx=t.x-f.x,dy=t.y-f.y;
+  const cx1=mx-dy*.1,cy1=my+dx*.1;
+  ctx.beginPath();ctx.moveTo(f.x,f.y);ctx.quadraticCurveTo(cx1,cy1,t.x,t.y);
+  ctx.strokeStyle=edge.color||'rgba(124,106,255,0.15)';ctx.lineWidth=1+edge.flow*1.5;
+  if(edge.style==='dashed')ctx.setLineDash([4,4]);else ctx.setLineDash([]);
+  ctx.stroke();ctx.setLineDash([]);
+  if(edge.style==='glow'){ctx.strokeStyle=edge.color.replace('80','20');ctx.lineWidth=6;ctx.stroke();}
+  edge.particles.forEach(p=>{
+    const px=(1-p.t)*(1-p.t)*f.x+2*(1-p.t)*p.t*cx1+p.t*p.t*t.x;
+    const py=(1-p.t)*(1-p.t)*f.y+2*(1-p.t)*p.t*cy1+p.t*p.t*t.y;
+    const alpha=Math.sin(p.t*Math.PI);
+    ctx.beginPath();ctx.arc(px,py,p.size*camera.zoom,0,Math.PI*2);
+    ctx.fillStyle=(edge.from.color||COLORS.accent)+Math.round(alpha*200).toString(16).padStart(2,'0');ctx.fill();
+  });
+  const aT=.9,ax=(1-aT)*(1-aT)*f.x+2*(1-aT)*aT*cx1+aT*aT*t.x,ay=(1-aT)*(1-aT)*f.y+2*(1-aT)*aT*cy1+aT*aT*t.y;
+  const angle=Math.atan2(t.y-ay,t.x-ax),as=6*camera.zoom;
+  ctx.beginPath();ctx.moveTo(ax+Math.cos(angle)*as,ay+Math.sin(angle)*as);
+  ctx.lineTo(ax+Math.cos(angle+2.5)*as*.6,ay+Math.sin(angle+2.5)*as*.6);
+  ctx.lineTo(ax+Math.cos(angle-2.5)*as*.6,ay+Math.sin(angle-2.5)*as*.6);
+  ctx.closePath();ctx.fillStyle=edge.color||COLORS.accent;ctx.fill();
+}
+
+function getNodeIcon(node){
+  switch(node.type){
+    case'machine':return'\u2B21';case'project':return'\u25C8';case'group':return'\u25C9';case'agent-mini':return'\u00B7';
+    default:if(!node.data)return'\u2022';
+      switch(node.data.type){case'orchestrator':return'\u229B';case'developer':return'\u27E8\u27E9';case'creative':return'\u25C6';
+        case'router':return'\u21C4';case'devops':return'\u2699';case'qa':return'\u2713';case'monitoring':return'\u25CE';default:return'\u2022';}
+  }
+}
+
+function drawNode(node){
+  const s=worldToScreen(node.x,node.y),r=node.radius*camera.zoom;
+  if(s.x<-100||s.x>W+100||s.y<-100||s.y>H+100)return;
+  const isHovered=hoveredNode===node,isSelected=selectedNode===node;
+  const pulse=Math.sin(time*node.pulseSpeed+node.pulsePhase);
+  const isActive=node.data&&(node.data.status==='active'||node.data.status==='online');
+  if(isActive){
+    const glowR=r*(1.8+pulse*.3),grad=ctx.createRadialGradient(s.x,s.y,r*.5,s.x,s.y,glowR);
+    grad.addColorStop(0,node.color+'30');grad.addColorStop(1,node.color+'00');
+    ctx.beginPath();ctx.arc(s.x,s.y,glowR,0,Math.PI*2);ctx.fillStyle=grad;ctx.fill();
+  }
+  if(node.type==='machine'||node.type==='project'||node.type==='group'){
+    ctx.beginPath();ctx.arc(s.x,s.y,r+4,0,Math.PI*2);ctx.strokeStyle=node.color+'40';ctx.lineWidth=2;ctx.stroke();
+    if(node.progress!==undefined){
+      ctx.beginPath();ctx.arc(s.x,s.y,r+4,-Math.PI/2,-Math.PI/2+Math.PI*2*node.progress);
+      ctx.strokeStyle=node.color;ctx.lineWidth=2.5;ctx.stroke();
+    }
+  }
+  ctx.beginPath();ctx.arc(s.x,s.y,r*(isHovered?1.12:1),0,Math.PI*2);
+  const bg=ctx.createRadialGradient(s.x-r*.3,s.y-r*.3,0,s.x,s.y,r);
+  bg.addColorStop(0,node.color+'cc');bg.addColorStop(1,node.color+'66');ctx.fillStyle=bg;ctx.fill();
+  ctx.beginPath();ctx.arc(s.x,s.y,r*.6,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,0.06)';ctx.fill();
+  if(isSelected){ctx.beginPath();ctx.arc(s.x,s.y,r+8,0,Math.PI*2);ctx.strokeStyle='#ffffff60';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.stroke();ctx.setLineDash([]);}
+  const is=Math.max(8,r*.55);
+  ctx.font=`bold ${is}px ${getComputedStyle(document.body).getPropertyValue('--mono')}`;
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#ffffffdd';ctx.fillText(getNodeIcon(node),s.x,s.y+.5);
+  if(camera.zoom>.5||isHovered){
+    const ls=Math.max(9,11*camera.zoom);
+    ctx.font=`600 ${ls}px ${getComputedStyle(document.body).getPropertyValue('--sans')}`;
+    ctx.textAlign='center';ctx.textBaseline='top';ctx.fillStyle=isHovered?'#ffffff':'#e2e2f0cc';
+    ctx.fillText(node.label,s.x,s.y+r+8);
+    if(node.sublabel&&(camera.zoom>.7||isHovered)){
+      ctx.font=`400 ${Math.max(8,9*camera.zoom)}px ${getComputedStyle(document.body).getPropertyValue('--mono')}`;
+      ctx.fillStyle='#6a6a8ecc';ctx.fillText(node.sublabel,s.x,s.y+r+8+ls+3);
+    }
+  }
+}
+
+function drawMinimap(){
+  const mw=minimapCanvas.width/dpr,mh=minimapCanvas.height/dpr;
+  minimapCtx.clearRect(0,0,mw,mh);if(!nodes.length)return;
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+  nodes.forEach(n=>{minX=Math.min(minX,n.x);maxX=Math.max(maxX,n.x);minY=Math.min(minY,n.y);maxY=Math.max(maxY,n.y);});
+  const p=60;minX-=p;maxX+=p;minY-=p;maxY+=p;
+  const rX=maxX-minX||1,rY=maxY-minY||1,sc=Math.min(mw/rX,mh/rY),oX=(mw-rX*sc)/2,oY=(mh-rY*sc)/2;
+  edges.forEach(e=>{
+    minimapCtx.beginPath();minimapCtx.moveTo(oX+(e.from.x-minX)*sc,oY+(e.from.y-minY)*sc);
+    minimapCtx.lineTo(oX+(e.to.x-minX)*sc,oY+(e.to.y-minY)*sc);
+    minimapCtx.strokeStyle='#ffffff10';minimapCtx.lineWidth=.5;minimapCtx.stroke();
+  });
+  nodes.forEach(n=>{
+    minimapCtx.beginPath();minimapCtx.arc(oX+(n.x-minX)*sc,oY+(n.y-minY)*sc,Math.max(1.5,n.radius*sc*.3),0,Math.PI*2);
+    minimapCtx.fillStyle=n.color+'80';minimapCtx.fill();
+  });
+  minimapCtx.strokeStyle=COLORS.accent+'80';minimapCtx.lineWidth=1;
+  minimapCtx.strokeRect(oX+(camera.x-W/(2*camera.zoom)-minX)*sc,oY+(camera.y-H/(2*camera.zoom)-minY)*sc,(W/camera.zoom)*sc,(H/camera.zoom)*sc);
+}
+
+function render(){
+  camera.x+=(camera.targetX-camera.x)*.08;camera.y+=(camera.targetY-camera.y)*.08;camera.zoom+=(camera.targetZoom-camera.zoom)*.08;
+  ctx.clearRect(0,0,W,H);
+  if(time%2===0)applyForces();updateParticles();
+  edges.forEach(drawEdge);nodes.forEach(drawNode);
+  if(time%10===0)drawMinimap();if(time%3===0)drawStars();
+  time++;requestAnimationFrame(render);
+}
+
+// ═══ INTERACTION ═══
+canvas.addEventListener('mousemove',e=>{
+  const rect=canvas.getBoundingClientRect();mouse.x=e.clientX-rect.left;mouse.y=e.clientY-rect.top;
+  const world=screenToWorld(mouse.x,mouse.y);mouse.worldX=world.x;mouse.worldY=world.y;
+  if(mouse.down){camera.targetX=mouse.camStartX-(e.clientX-mouse.dragStartX)/camera.zoom;camera.targetY=mouse.camStartY-(e.clientY-mouse.dragStartY)/camera.zoom;return;}
+  hoveredNode=null;
+  for(let i=nodes.length-1;i>=0;i--){const n=nodes[i],dx=mouse.worldX-n.x,dy=mouse.worldY-n.y;
+    if(dx*dx+dy*dy<(n.radius+5)*(n.radius+5)){hoveredNode=n;break;}}
+  canvas.style.cursor=hoveredNode?'pointer':(mouse.down?'grabbing':'grab');
+});
+canvas.addEventListener('mousedown',e=>{mouse.down=true;mouse.dragStartX=e.clientX;mouse.dragStartY=e.clientY;mouse.camStartX=camera.targetX;mouse.camStartY=camera.targetY;});
+canvas.addEventListener('mouseup',e=>{
+  const wasDrag=Math.abs(e.clientX-mouse.dragStartX)>5||Math.abs(e.clientY-mouse.dragStartY)>5;mouse.down=false;
+  if(!wasDrag&&hoveredNode){selectedNode=hoveredNode;openDetailPanel(hoveredNode);}
+  else if(!wasDrag){selectedNode=null;closePanel();}
+});
+canvas.addEventListener('wheel',e=>{e.preventDefault();const zf=e.deltaY>0?.9:1.1;camera.targetZoom=Math.max(.2,Math.min(3,camera.targetZoom*zf));
+  const world=screenToWorld(mouse.x,mouse.y);camera.targetX+=(world.x-camera.targetX)*(1-1/zf)*.3;camera.targetY+=(world.y-camera.targetY)*(1-1/zf)*.3;},{passive:false});
+canvas.addEventListener('dblclick',()=>{if(hoveredNode){camera.targetX=hoveredNode.x;camera.targetY=hoveredNode.y;camera.targetZoom=Math.min(camera.targetZoom*1.5,3);}});
+
+let lastTouchDist=0;
+canvas.addEventListener('touchstart',e=>{if(e.touches.length===1){mouse.down=true;mouse.dragStartX=e.touches[0].clientX;mouse.dragStartY=e.touches[0].clientY;mouse.camStartX=camera.targetX;mouse.camStartY=camera.targetY;}
+  if(e.touches.length===2){const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY;lastTouchDist=Math.sqrt(dx*dx+dy*dy);}},{passive:true});
+canvas.addEventListener('touchmove',e=>{e.preventDefault();
+  if(e.touches.length===1&&mouse.down){camera.targetX=mouse.camStartX-(e.touches[0].clientX-mouse.dragStartX)/camera.zoom;camera.targetY=mouse.camStartY-(e.touches[0].clientY-mouse.dragStartY)/camera.zoom;}
+  if(e.touches.length===2){const dx=e.touches[0].clientX-e.touches[1].clientX,dy=e.touches[0].clientY-e.touches[1].clientY,dist=Math.sqrt(dx*dx+dy*dy);
+    if(lastTouchDist>0)camera.targetZoom=Math.max(.2,Math.min(3,camera.targetZoom*(dist/lastTouchDist)));lastTouchDist=dist;}},{passive:false});
+canvas.addEventListener('touchend',e=>{mouse.down=false;lastTouchDist=0;
+  if(e.changedTouches.length===1){const rect=canvas.getBoundingClientRect(),tx=e.changedTouches[0].clientX-rect.left,ty=e.changedTouches[0].clientY-rect.top,world=screenToWorld(tx,ty);
+    for(let i=nodes.length-1;i>=0;i--){const n=nodes[i],dx=world.x-n.x,dy=world.y-n.y;
+      if(dx*dx+dy*dy<(n.radius+10)*(n.radius+10)){selectedNode=n;openDetailPanel(n);return;}}}});
+
+// ═══ VIEW SWITCHING ═══
+function switchView(view){
+  currentView=view;
+  document.querySelectorAll('.view-tab').forEach(t=>t.classList.toggle('active',t.dataset.view===view));
+  document.querySelectorAll('.sidebar-btn[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
+  const titles={workflow:'Workflow Overview',network:'Network Topology',agents:'Agent Teams',projects:'Project Map'};
+  document.getElementById('breadcrumb-text').textContent=titles[view]||view;
+  camera.targetX=0;camera.targetY=0;camera.targetZoom=1;selectedNode=null;closePanel();
+  ({workflow:buildWorkflowView,network:buildNetworkView,agents:buildAgentsView,projects:buildProjectsView})[view]();
+}
+
+// ═══ DETAIL PANEL ═══
+function openDetailPanel(node){
+  const panel=document.getElementById('detail-panel'),title=document.getElementById('panel-title'),body=document.getElementById('panel-body');
+  title.textContent=node.label;title.style.color=node.color;let html='';
+  if(node.type==='agent'||node.type==='agent-mini'){
+    const agent=node.data,machine=MACHINES.find(m=>m.id===agent.machine),agentTasks=TASKS.filter(t=>t.agent===agent.id),agentProjects=PROJECTS.filter(p=>p.agents.includes(agent.id));
+    html=`<div class="panel-section"><div class="panel-section-title">Agent Info</div><dl class="panel-kv">
+      <dt>Role</dt><dd>${agent.role}</dd><dt>Model</dt><dd><span class="panel-tag" style="background:${agent.color}20;color:${agent.color}">${agent.model}</span></dd>
+      <dt>Status</dt><dd><span class="panel-tag" style="background:${agent.status==='active'?'var(--green-dim)':'var(--orange-dim)'};color:${agent.status==='active'?'var(--green)':'var(--orange)'}">${agent.status}</span></dd>
+      <dt>Machine</dt><dd>${machine?machine.name:'Unknown'}</dd><dt>Type</dt><dd>${agent.type}</dd><dt>Active Tasks</dt><dd>${agent.tasks}</dd></dl></div>
+      <div class="panel-section"><div class="panel-section-title">Current Tasks (${agentTasks.length})</div>
+      ${agentTasks.map(t=>`<div class="task-item"><div class="task-status" style="background:${t.status==='in_progress'?'var(--green)':'var(--orange)'}"></div><div class="task-name">${t.name}</div><div class="task-agent">${t.priority}</div></div>`).join('')}</div>
+      <div class="panel-section"><div class="panel-section-title">Assigned Projects (${agentProjects.length})</div>
+      ${agentProjects.map(p=>`<div class="task-item" onclick="focusProject('${p.id}')"><div class="task-status" style="background:${p.color}"></div><div class="task-name">${p.name}</div><div class="task-agent">${Math.round(p.progress*100)}%</div></div>`).join('')}</div>
+      <div class="panel-section"><div class="panel-section-title">Workflow Connections</div>
+      ${WORKFLOW_ROUTES.filter(r=>r.from===agent.id||r.to===agent.id).map(r=>{const other=r.from===agent.id?AGENTS.find(a=>a.id===r.to):AGENTS.find(a=>a.id===r.from);const dir=r.from===agent.id?'\u2192':'\u2190';
+        return`<div class="task-item"><div class="task-status" style="background:${other?other.color:'#fff'}"></div><div class="task-name">${dir} ${other?other.name.split('(')[0].trim():'?'}</div><div class="task-agent">${r.label}</div></div>`;}).join('')}</div>`;
+  }else if(node.type==='machine'){
+    const machine=node.data,ma=AGENTS.filter(a=>a.machine===machine.id);
+    html=`<div class="panel-section"><div class="panel-section-title">Machine Info</div><dl class="panel-kv">
+      <dt>Type</dt><dd>${machine.type}</dd><dt>OS</dt><dd>${machine.os}</dd>
+      <dt>Status</dt><dd><span class="panel-tag" style="background:${machine.status==='online'?'var(--green-dim)':'var(--orange-dim)'};color:${machine.status==='online'?'var(--green)':'var(--orange)'}">${machine.status}</span></dd>
+      <dt>IP</dt><dd style="font-family:var(--mono)">${machine.ip}</dd>${machine.provider?`<dt>Provider</dt><dd>${machine.provider}</dd>`:''}<dt>Agents</dt><dd>${ma.length}</dd></dl></div>
+      <div class="panel-section"><div class="panel-section-title">Running Agents (${ma.length})</div>
+      ${ma.map(a=>`<div class="task-item"><div class="task-status" style="background:${a.color}"></div><div class="task-name">${a.name}</div><div class="task-agent">${a.status} \u00B7 ${a.tasks} tasks</div></div>`).join('')}</div>`;
+  }else if(node.type==='project'){
+    const project=node.data,pt=TASKS.filter(t=>t.project===project.id),pa=project.agents.map(id=>AGENTS.find(a=>a.id===id)).filter(Boolean);
+    html=`<div class="panel-section"><div class="panel-section-title">Project Info</div><dl class="panel-kv">
+      <dt>Category</dt><dd><span class="panel-tag" style="background:${project.color}20;color:${project.color}">${project.category}</span></dd>
+      <dt>Status</dt><dd>${project.status}</dd><dt>Description</dt><dd>${project.description}</dd></dl>
+      <div class="panel-progress" style="margin-top:12px"><div class="panel-progress-bar" style="width:${project.progress*100}%;background:${project.color}"></div></div>
+      <div style="font-family:var(--mono);font-size:11px;color:var(--text-dim);margin-top:6px">${Math.round(project.progress*100)}% complete</div></div>
+      <div class="panel-section"><div class="panel-section-title">Tasks (${pt.length})</div>
+      ${pt.map(t=>{const ag=AGENTS.find(a=>a.id===t.agent);return`<div class="task-item"><div class="task-status" style="background:${t.status==='in_progress'?'var(--green)':'var(--orange)'}"></div><div class="task-name">${t.name}</div><div class="task-agent">${ag?ag.name.split('(')[0].trim():'?'}</div></div>`;}).join('')}</div>
+      <div class="panel-section"><div class="panel-section-title">Assigned Agents (${pa.length})</div>
+      ${pa.map(a=>`<div class="task-item"><div class="task-status" style="background:${a.color}"></div><div class="task-name">${a.name}</div><div class="task-agent">${a.role}</div></div>`).join('')}</div>`;
+  }else if(node.type==='group'){
+    const ga=AGENTS.filter(a=>a.type===node.data.type);
+    html=`<div class="panel-section"><div class="panel-section-title">${node.label} Agents (${ga.length})</div>
+      ${ga.map(a=>`<div class="task-item"><div class="task-status" style="background:${a.color}"></div><div class="task-name">${a.name}</div><div class="task-agent">${a.role} \u00B7 ${a.tasks} tasks</div></div>`).join('')}</div>`;
+  }
+  body.innerHTML=html;panel.classList.add('open');
+}
+function closePanel(){document.getElementById('detail-panel').classList.remove('open');}
+function focusProject(pid){if(currentView!=='projects'){switchView('projects');setTimeout(()=>{const n=nodes.find(n2=>n2.id===pid);if(n){camera.targetX=n.x;camera.targetY=n.y;camera.targetZoom=1.5;selectedNode=n;openDetailPanel(n);}},100);}}
+
+// ═══ COMMAND PALETTE ═══
+function togglePalette(){const p=document.getElementById('command-palette');if(p.classList.contains('open')){p.classList.remove('open');}else{p.classList.add('open');document.getElementById('palette-input').value='';document.getElementById('palette-input').focus();updatePaletteResults('');}}
+document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();togglePalette();}if(e.key==='Escape'){const p=document.getElementById('command-palette');if(p.classList.contains('open'))togglePalette();else{closePanel();selectedNode=null;}}});
+document.getElementById('command-palette').addEventListener('click',e=>{if(e.target===document.getElementById('command-palette'))togglePalette();});
+document.getElementById('palette-input').addEventListener('input',e=>updatePaletteResults(e.target.value));
+
+function updatePaletteResults(query){
+  const results=document.getElementById('palette-results'),q=query.toLowerCase();let items=[];
+  AGENTS.forEach(a=>{if(!q||a.name.toLowerCase().includes(q)||a.role.toLowerCase().includes(q))
+    items.push({name:a.name,desc:a.role,color:a.color,type:'Agent',action:()=>{switchView('workflow');setTimeout(()=>{const n=nodes.find(n2=>n2.id===a.id);if(n){camera.targetX=n.x;camera.targetY=n.y;camera.targetZoom=1.5;selectedNode=n;openDetailPanel(n);}},200);}});});
+  PROJECTS.forEach(p=>{if(!q||p.name.toLowerCase().includes(q)||p.category.toLowerCase().includes(q))
+    items.push({name:p.name,desc:p.category+' \u00B7 '+Math.round(p.progress*100)+'%',color:p.color,type:'Project',action:()=>focusProject(p.id)});});
+  MACHINES.forEach(m=>{if(!q||m.name.toLowerCase().includes(q)||m.type.toLowerCase().includes(q))
+    items.push({name:m.name,desc:m.type+' \u00B7 '+m.os,color:m.status==='online'?COLORS.green:COLORS.orange,type:'Machine',action:()=>switchView('network')});});
+  TASKS.forEach(t=>{if(!q||t.name.toLowerCase().includes(q)){const ag=AGENTS.find(a=>a.id===t.agent);
+    items.push({name:t.name,desc:ag?ag.name.split('(')[0].trim():'',color:COLORS.cyan,type:'Task',action:()=>{}});}});
+  items=items.slice(0,8);
+  results.innerHTML=items.map((item,i)=>`<div class="palette-result ${i===0?'selected':''}" onclick="paletteActions[${i}]();togglePalette();">
+    <div class="palette-result-icon" style="background:${item.color}20;color:${item.color}">${item.type[0]}</div>
+    <div class="palette-result-text"><div class="palette-result-name">${item.name}</div><div class="palette-result-desc">${item.desc}</div></div>
+    <div class="palette-result-shortcut">${item.type}</div></div>`).join('');
+  window.paletteActions=items.map(i=>i.action);
+}
+
+// ═══ LIVE FEED ═══
+const feedMessages=[
+  {agent:'a2',text:'Committed 14 files to openclaw-platform/main',color:COLORS.cyan},
+  {agent:'a6',text:'Build #247 passed \u2014 deploying to staging',color:COLORS.green},
+  {agent:'a4',text:'Routed 3 new tasks from Slack inbox',color:COLORS.yellow},
+  {agent:'a8',text:'Rendering video sequence 4/12 (38%)',color:COLORS.red},
+  {agent:'a1',text:'Orchestrating sprint review \u2014 8 tasks complete',color:COLORS.accent},
+  {agent:'a7',text:'Integration tests: 142 passed, 0 failed',color:COLORS.green},
+  {agent:'a3',text:'Generated 4 packaging mockups for review',color:COLORS.pink},
+  {agent:'a10',text:'Composed 2 background tracks \u2014 awaiting approval',color:COLORS.pink},
+  {agent:'a12',text:'All systems healthy \u2014 latency avg 42ms',color:COLORS.cyan},
+  {agent:'a9',text:'Queued: 6 product hero shots for Brand Identity',color:COLORS.purple},
+  {agent:'a2',text:'Shopify theme: checkout flow implemented',color:COLORS.cyan},
+  {agent:'a1',text:'Delegated video direction to creative team',color:COLORS.accent},
+  {agent:'a5',text:'IDE session idle \u2014 awaiting next code request',color:COLORS.green},
+  {agent:'a6',text:'SDK v0.9.3 published to npm registry',color:COLORS.orange},
+  {agent:'a4',text:'Priority escalation: CPG deadline moved up',color:COLORS.yellow},
+];
+let feedIndex=0,feedCount=0;
+function addFeedItem(){
+  const msg=feedMessages[feedIndex%feedMessages.length],agent=AGENTS.find(a=>a.id===msg.agent),scroll=document.getElementById('feed-scroll');
+  const item=document.createElement('div');item.className='feed-item';
+  item.innerHTML=`<div class="feed-dot" style="background:${msg.color}"></div><div class="feed-item-content"><div class="feed-item-text">${msg.text}</div><div class="feed-item-meta">${agent?agent.name.split('(')[0].trim():'?'} \u00B7 just now</div></div>`;
+  scroll.insertBefore(item,scroll.firstChild);
+  while(scroll.children.length>20)scroll.removeChild(scroll.lastChild);
+  feedCount++;feedIndex++;document.getElementById('feed-count').textContent=feedCount;
+  Array.from(scroll.children).forEach((el,i)=>{if(i>0){const meta=el.querySelector('.feed-item-meta');if(meta){const parts=meta.textContent.split(' \u00B7 ');parts[1]=i===1?'1m ago':i+'m ago';meta.textContent=parts.join(' \u00B7 ');}}});
+}
+for(let i=0;i<5;i++)addFeedItem();
+setInterval(addFeedItem,4000+Math.random()*3000);
+
+setInterval(()=>{
+  const t=document.getElementById('stat-tasks'),tp=document.getElementById('stat-throughput'),q=document.getElementById('stat-queue');
+  t.textContent=Math.max(15,Math.min(40,parseInt(t.textContent)+Math.floor(Math.random()*3)-1));
+  tp.textContent=Math.max(75,Math.min(98,parseInt(tp.textContent)+Math.floor(Math.random()*5)-2))+'%';
+  q.textContent=Math.max(5,Math.min(25,parseInt(q.textContent)+Math.floor(Math.random()*3)-1));
+},5000);
+
+window.addEventListener('resize',resize);resize();buildWorkflowView();render();
+</script>
+</body>
+</html>

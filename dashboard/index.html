@@ -2083,6 +2083,7 @@ body {
     <button class="nav-tab" id="tabResearch" onclick="showPage('research')">◎ RESEARCH<span id="researchBadge" style="display:none;margin-left:5px;background:#ff4444;color:#fff;border-radius:8px;padding:1px 6px;font-size:0.45rem;vertical-align:middle;">0</span></button>
     <button class="nav-tab" id="tabStrategies" onclick="showPage('strategies')">◇ STRATEGIES</button>
     <button class="nav-tab" id="tabCinema" onclick="showPage('cinema')">✦ CINEMA</button>
+    <button class="nav-tab" id="tabOrchestrator" onclick="showPage('orchestrator')">⬡ ORCHESTRATOR</button>
   </div>
   <div class="nav-right">
     <button class="clawmpson-btn" id="clawmpsonBtn" onclick="toggleClawmpson()">◈ CLAWMPSON MODE</button>
@@ -2748,6 +2749,13 @@ body {
     </div>
   </div><!-- /pageCinema -->
 
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <!-- ORCHESTRATOR PAGE                                             -->
+  <!-- ══════════════════════════════════════════════════════════════ -->
+  <div class="page" id="pageOrchestrator" style="display:flex;flex-direction:column;height:calc(100vh - 60px);padding:0;">
+    <iframe id="orchestratorFrame" style="flex:1;border:none;width:100%;height:100%;" src="about:blank"></iframe>
+  </div><!-- /pageOrchestrator -->
+
   <!-- Intel Approve Modal -->
   <div class="modal-overlay" id="intelApproveModal" onclick="if(event.target===this)this.classList.remove('active')">
     <div class="modal-box" style="max-width:420px;">
@@ -3161,6 +3169,10 @@ function showPage(page, pushState) {
     document.getElementById('pageCinema').classList.add('active')
     document.getElementById('tabCinema').classList.add('active')
     cinemaLoadGallery()
+  } else if (page === 'orchestrator') {
+    document.getElementById('pageOrchestrator').classList.add('active')
+    document.getElementById('tabOrchestrator').classList.add('active')
+    document.getElementById('orchestratorFrame').src = '/orchestrator-embed'
   } else {
     page = 'dashboard'
     document.getElementById('pageDashboard').classList.add('active')
@@ -3176,7 +3188,7 @@ function showPage(page, pushState) {
 
 // Route on initial page load
 ;(function() {
-  const validPages = ['dashboard','ops','jordan','ideas','projects','agents','trading','terminal','intel','research','strategies','cinema']
+  const validPages = ['dashboard','ops','jordan','ideas','projects','agents','trading','terminal','intel','research','strategies','cinema','orchestrator']
   const path = location.pathname.replace(/^\//, '') || 'ops'
   const page = validPages.includes(path) ? path : 'ops'
   showPage(page, false)
