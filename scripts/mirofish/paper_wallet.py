@@ -315,7 +315,7 @@ def execute_trade(decision: Any) -> dict | None:
     """
     Execute a paper trade with optional execution simulation.
     Returns trade dict or None if rejected.
-    Rejects if: amount_usd > 10% of balance.
+    Caps position at 10% of current balance (never exceeds).
     Manual /bet trades: pass decision with strategy='manual', confidence=1.0.
 
     When MIROFISH_EXECUTION_SIM=1 (default), applies:
@@ -336,14 +336,28 @@ def execute_trade(decision: Any) -> dict | None:
         conn_check.close()
 
     state = get_state()
-    cap = state["balance"] * MAX_POSITION_PCT
+    balance = state["balance"]
+    cap = balance * MAX_POSITION_PCT
 
-    if decision.amount_usd > cap:
-        return None  # position cap breached
-
-    entry_price = decision.entry_price
+    # --- Kelly position cap enforcement (at execution time) ---
+    # Cap oversized positions to 10% of current balance instead of rejecting.
+    # This catches stale sizing from signal generation when balance has changed.
     amount_usd = decision.amount_usd
+    entry_price = decision.entry_price
     shares = decision.shares
+
+    if amount_usd > cap:
+        original_amount = amount_usd
+        amount_usd = cap
+        # Re-derive shares from capped amount at current entry price
+        shares = amount_usd / entry_price if entry_price > 0 else 0
+        pct = original_amount / balance if balance > 0 else 0
+        print(
+            f"[mirofish/wallet] KELLY CAP: position ${original_amount:.2f} "
+            f"({pct:.1%} of ${balance:.2f}) capped to ${cap:.2f} "
+            f"(10% limit) for {decision.market_id}"
+        )
+
     sim_metadata = None
     venue = getattr(decision, "venue", None) or ("kalshi" if decision.market_id.startswith("KX") else "polymarket")
     entry_fee = 0.0
@@ -353,9 +367,16 @@ def execute_trade(decision: Any) -> dict | None:
             entry_price, amount_usd, shares, decision.direction, venue=venue,
         )
         entry_fee = sim_metadata.get("entry_fee", 0.0)
-        # Re-check cap after simulation adjustments
+        # Re-check cap after simulation (slippage can change effective amount).
+        # Simulation typically reduces amount (partial fills, fees), but cap anyway.
         if amount_usd > cap:
-            return None
+            original_post_sim = amount_usd
+            amount_usd = cap
+            shares = amount_usd / entry_price if entry_price > 0 else 0
+            print(
+                f"[mirofish/wallet] KELLY CAP (post-sim): ${original_post_sim:.2f} "
+                f"capped to ${cap:.2f} for {decision.market_id}"
+            )
 
     # Build reasoning with sim info
     reasoning = getattr(decision, "reasoning", "manual via /bet")

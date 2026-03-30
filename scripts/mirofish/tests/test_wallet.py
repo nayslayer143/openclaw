@@ -71,17 +71,21 @@ def test_balance_includes_unrealized_pnl(temp_db):
 
 
 # ── Position cap ───────────────────────────────────────────────────────────
-def test_position_cap_rejects_over_10pct(temp_db):
+def test_position_cap_caps_over_10pct(temp_db):
+    """Trades exceeding 10% of balance are capped (not rejected)."""
     pw = _get_wallet()
     from types import SimpleNamespace
     decision = SimpleNamespace(
         market_id="mkt3", question="big bet", direction="YES",
-        amount_usd=101.0,  # 10.1% of $1000
-        entry_price=0.50, shares=202.0,
+        amount_usd=225.0,  # 22.5% of $1000 — worst case from audit
+        entry_price=0.50, shares=450.0,
         confidence=0.8, reasoning="test", strategy="momentum"
     )
     result = pw.execute_trade(decision)
-    assert result is None  # rejected
+    assert result is not None  # accepted, but capped
+    assert result["status"] == "open"
+    # Verify it was capped to 10% of balance ($100)
+    assert result["amount_usd"] <= 100.0
 
 
 def test_position_cap_allows_exactly_10pct(temp_db):
