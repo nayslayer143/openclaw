@@ -497,3 +497,4 @@ Synthesis unavailable — Ollama not responding
 - Completed overnight: 0
 - Pending queue: 3
 [2026-03-30 23:30] Idea engine ran — wrote /Users/nayslayer/openclaw/outputs/ideas-2026-03-30-08.md, ingested to Ideas Lab
+[2026-03-30] Upstream check failed — gh API error
