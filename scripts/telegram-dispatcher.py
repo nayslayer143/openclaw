@@ -136,6 +136,12 @@ _QUANT_BOT_ACTIVE = bool(QUANT_BOT_TOKEN and not QUANT_BOT_TOKEN.startswith("PAS
 QUANT_API         = f"https://api.telegram.org/bot{QUANT_BOT_TOKEN}" if _QUANT_BOT_ACTIVE else None
 QUANT_OFFSET_FILE = Path("/tmp/quantclaw-tg-offset.txt")
 
+# ── CodeMonkeyClaw bot (@Codemonkeyclaw_bot) ──────────────────────────────────
+MONKEY_BOT_TOKEN   = os.environ.get("CODEMONKEY_BOT_TOKEN", "").strip()
+_MONKEY_BOT_ACTIVE = bool(MONKEY_BOT_TOKEN and not MONKEY_BOT_TOKEN.startswith("PASTE"))
+MONKEY_API         = f"https://api.telegram.org/bot{MONKEY_BOT_TOKEN}" if _MONKEY_BOT_ACTIVE else None
+MONKEY_OFFSET_FILE = Path("/tmp/codemonkeyclaw-tg-offset.txt")
+
 # Init media module with bot token
 media.init(BOT_TOKEN)
 
@@ -289,7 +295,7 @@ def save_quant_offset(offset: int):
 
 
 def handle_quant_bot_message(msg: dict):
-    """Handle messages sent to @QuantiusMaximus_bot — relay to QuantumentalClaw inbox."""
+    """Handle messages sent to @QuantiusMaximus_bot — relay to inbox + respond via Ollama."""
     chat_id = str(msg.get("chat", {}).get("id", ""))
     user_id = str(msg.get("from", {}).get("id", ""))
     text    = msg.get("text", "").strip()
@@ -297,9 +303,78 @@ def handle_quant_bot_message(msg: dict):
     if user_id not in ALLOWED_USERS:
         print(f"[quant-bot] Ignored from non-allowed user {user_id}")
         return
+    if not text:
+        return
     _write_inbox(_QUANT_INBOX, chat_id, user_id, msg_id, text)
-    print(f"[quant-bot] Relayed to QuantumentalClaw: {text[:80]}")
-    send_quant(chat_id, f"🧪 QuantumentalClaw received: {text[:100]}")
+    print(f"[quant-bot] Message from {user_id}: {text[:80]}")
+    try:
+        requests.post(f"{QUANT_API}/sendChatAction",
+                      json={"chat_id": chat_id, "action": "typing"}, timeout=5)
+    except Exception:
+        pass
+    dispatch_sub_claw_response(chat_id, text, "quant", send_quant)
+
+
+# ── CodeMonkeyClaw bot helpers ────────────────────────────────────────────────
+
+def send_monkey(chat_id: str, text: str):
+    """Send a message via the @Codemonkeyclaw_bot token."""
+    if not MONKEY_API or not text:
+        return
+    for chunk in _split_message(text):
+        try:
+            requests.post(f"{MONKEY_API}/sendMessage", json={
+                "chat_id": chat_id, "text": chunk, "parse_mode": ""
+            }, timeout=10)
+        except Exception as e:
+            print(f"[monkey send error] {e}")
+
+
+def get_monkey_updates(offset: int = 0) -> list:
+    if not MONKEY_API:
+        return []
+    try:
+        r = requests.get(f"{MONKEY_API}/getUpdates", params={
+            "offset": offset, "timeout": 5, "allowed_updates": ["message"]
+        }, timeout=15)
+        return r.json().get("result", [])
+    except Exception as e:
+        print(f"[monkey poll error] {e}")
+        return []
+
+
+def load_monkey_offset() -> int:
+    if MONKEY_OFFSET_FILE.exists():
+        try:
+            return int(MONKEY_OFFSET_FILE.read_text().strip())
+        except Exception:
+            pass
+    return 0
+
+
+def save_monkey_offset(offset: int):
+    MONKEY_OFFSET_FILE.write_text(str(offset))
+
+
+def handle_monkey_bot_message(msg: dict):
+    """Handle messages sent to @Codemonkeyclaw_bot — relay to inbox + respond via Ollama."""
+    chat_id = str(msg.get("chat", {}).get("id", ""))
+    user_id = str(msg.get("from", {}).get("id", ""))
+    text    = msg.get("text", "").strip()
+    msg_id  = msg.get("message_id")
+    if user_id not in ALLOWED_USERS:
+        print(f"[monkey-bot] Ignored from non-allowed user {user_id}")
+        return
+    if not text:
+        return
+    _write_inbox(_CODEMONKEY_INBOX, chat_id, user_id, msg_id, text)
+    print(f"[monkey-bot] Message from {user_id}: {text[:80]}")
+    try:
+        requests.post(f"{MONKEY_API}/sendChatAction",
+                      json={"chat_id": chat_id, "action": "typing"}, timeout=5)
+    except Exception:
+        pass
+    dispatch_sub_claw_response(chat_id, text, "monkey", send_monkey)
 
 
 # ── Shared relay helpers ──────────────────────────────────────────────────────
@@ -325,7 +400,7 @@ def handle_claws(chat_id: str):
         ("clawmpson", "🦞", "@ogdenclashbot"),
         ("rival",     "🥊", "@rivalclaw_bot" if _RIVAL_ACTIVE else "@rivalclaw_bot (no token)"),
         ("quant",     "🧪", "@QuantiusMaximus_bot" if _QUANT_BOT_ACTIVE else "@QuantiusMaximus_bot (no token)"),
-        ("monkey",    "🐒", "codemonkey"),
+        ("monkey",    "🐒", "@Codemonkeyclaw_bot" if _MONKEY_BOT_ACTIVE else "@Codemonkeyclaw_bot (no token)"),
     ]
     lines = ["Claw status:"]
     for name, icon, label in claw_defs:
@@ -346,7 +421,7 @@ def handle_claws(chat_id: str):
 
 
 def handle_rival_bot_message(msg: dict):
-    """Handle messages sent directly to @rivalclaw_bot — relay to RivalClaw inbox."""
+    """Handle messages sent to @rivalclaw_bot — relay to inbox + respond via Ollama."""
     chat_id = str(msg.get("chat", {}).get("id", ""))
     user_id = str(msg.get("from", {}).get("id", ""))
     text    = msg.get("text", "").strip()
@@ -354,9 +429,105 @@ def handle_rival_bot_message(msg: dict):
     if user_id not in ALLOWED_USERS:
         print(f"[rival-bot] Ignored from non-allowed user {user_id}")
         return
+    if not text:
+        return
     _write_inbox(_RIVALCLAW_INBOX, chat_id, user_id, msg_id, text)
-    print(f"[rival-bot] Relayed to RivalClaw: {text[:80]}")
-    send_rival(chat_id, f"🥊 RivalClaw received: {text[:100]}")
+    print(f"[rival-bot] Message from {user_id}: {text[:80]}")
+    # Send typing indicator then generate real response
+    try:
+        requests.post(f"{RIVAL_API}/sendChatAction",
+                      json={"chat_id": chat_id, "action": "typing"}, timeout=5)
+    except Exception:
+        pass
+    dispatch_sub_claw_response(chat_id, text, "rival", send_rival)
+
+
+# ── Sub-claw response engine ─────────────────────────────────────────────────
+# Each sub-claw (rival, quant, monkey) gets its own Ollama chat loop with
+# claw-specific context, exactly like Clawmpson does for itself.
+
+# Per-claw conversation history: {claw_name: {chat_id: [{"role":..,"content":..}]}}
+_SUB_CLAW_HISTORIES: dict = {}
+_SUB_CLAW_HISTORY_LOCK = threading.Lock()
+_HISTORY_MAX = 20  # entries per (claw, chat_id)
+
+_CLAW_ROOTS = {
+    "rival":  Path.home() / "rivalclaw",
+    "quant":  Path.home() / "quantumentalclaw",
+    "monkey": Path.home() / "codemonkeyclaw",
+}
+
+_CLAW_ICONS = {"rival": "🥊", "quant": "🧪", "monkey": "🐒"}
+
+_CLAW_SEND_FNS: dict = {}  # populated after functions are defined (see below)
+
+
+def _load_claw_context(claw_name: str) -> str:
+    """Load CLAUDE.md + latest daily report for claw — injected as memory context."""
+    root = _CLAW_ROOTS.get(claw_name)
+    if not root:
+        return ""
+    parts = []
+    # 1. CLAUDE.md (identity + mission)
+    claude_md = root / "CLAUDE.md"
+    if claude_md.exists():
+        text = claude_md.read_text()[:3000]
+        parts.append(f"=== {claw_name} CLAUDE.md ===\n{text}")
+    # 2. Latest daily report
+    daily_dir = root / "daily"
+    if daily_dir.exists():
+        reports = sorted(daily_dir.glob("*.md"), reverse=True) or sorted(daily_dir.glob("*.txt"), reverse=True)
+        if reports:
+            text = reports[0].read_text()[-2500:]
+            parts.append(f"=== Latest daily report ({reports[0].name}) ===\n{text}")
+    return "\n\n".join(parts)
+
+
+def _get_claw_history(claw_name: str, chat_id: str) -> list:
+    with _SUB_CLAW_HISTORY_LOCK:
+        return list(_SUB_CLAW_HISTORIES.get(claw_name, {}).get(chat_id, []))
+
+
+def _save_claw_history(claw_name: str, chat_id: str, role: str, content: str):
+    with _SUB_CLAW_HISTORY_LOCK:
+        claw_hist = _SUB_CLAW_HISTORIES.setdefault(claw_name, {})
+        hist = claw_hist.setdefault(chat_id, [])
+        hist.append({"role": role, "content": content})
+        if len(hist) > _HISTORY_MAX:
+            claw_hist[chat_id] = hist[-_HISTORY_MAX:]
+
+
+def _sub_claw_response_thread(chat_id: str, text: str,
+                              claw_name: str, send_fn):
+    """Generate an Ollama response for a sub-claw and send it back."""
+    try:
+        context  = _load_claw_context(claw_name)
+        history  = _get_claw_history(claw_name, chat_id)
+        icon     = _CLAW_ICONS.get(claw_name, "")
+        # Use fast model — sub-claws don't need the heavy 32b model for chat
+        reply    = llm.chat(history, text, model="qwen2.5:7b",
+                            memory_context=context)
+        _save_claw_history(claw_name, chat_id, "user",      text)
+        _save_claw_history(claw_name, chat_id, "assistant", reply)
+        send_fn(chat_id, reply)
+        print(f"[{claw_name}-bot] Responded ({len(reply)} chars)")
+    except Exception as e:
+        print(f"[{claw_name}-bot] Response error: {e}")
+        try:
+            send_fn(chat_id, f"Error generating response: {e}")
+        except Exception:
+            pass
+
+
+def dispatch_sub_claw_response(chat_id: str, text: str,
+                               claw_name: str, send_fn):
+    """Start a background thread to generate and send a sub-claw response."""
+    t = threading.Thread(
+        target=_sub_claw_response_thread,
+        args=(chat_id, text, claw_name, send_fn),
+        daemon=True,
+    )
+    t.start()
 
 
 # ── Task packet builder ───────────────────────────────────────────────────────
@@ -446,9 +617,9 @@ def handle_help(chat_id: str):
         "!queue           — pending task packets\n"
         "!help            — this message\n\n"
         "Claw Relay:\n"
-        "🐒 <msg> or /monkey <msg>  — CodeMonkeyClaw (@codemonkey)\n"
-        "🥊 <msg> or /rival <msg>   — RivalClaw (@rivalclaw_bot)\n"
-        "🧪 <msg> or /quant <msg>   — QuantumentalClaw (@QuantiusMaximus_bot)\n\n"
+        "🐒 <msg> or /monkey <msg>  — @Codemonkeyclaw_bot\n"
+        "🥊 <msg> or /rival <msg>   — @rivalclaw_bot\n"
+        "🧪 <msg> or /quant <msg>   — @QuantiusMaximus_bot\n\n"
         "Commands:\n"
         "/claws           — status of all 4 claws\n"
         "/approve <id>    — merge a passing build into main\n"
@@ -1102,7 +1273,11 @@ def handle_message(msg: dict):
         relay_text = text[1:].strip() if text.startswith("\U0001f412") else text[8:].strip()
         _write_inbox(_CODEMONKEY_INBOX, chat_id, user_id, msg_id, relay_text or text)
         print(f"[dispatcher] CodeMonkeyClaw relay: {(relay_text or text)[:80]}")
-        send(chat_id, "🐒 Relayed to CodeMonkeyClaw.")
+        ack = "🐒 Relayed to CodeMonkeyClaw."
+        if _MONKEY_BOT_ACTIVE:
+            send_monkey(chat_id, ack)
+        else:
+            send(chat_id, ack)
         return
 
     # ── RivalClaw relay (🥊 prefix or /rival command) ────────────────────────
@@ -1418,6 +1593,29 @@ def handle_message(msg: dict):
 
 # ── RivalClaw bot poll loop ───────────────────────────────────────────────────
 
+def _monkey_bot_loop():
+    """Background thread: poll @Codemonkeyclaw_bot and relay messages to CodeMonkeyClaw inbox."""
+    if not _MONKEY_BOT_ACTIVE:
+        print("[dispatcher] CODEMONKEY_BOT_TOKEN not set — monkey bot thread idle")
+        return
+    print("[dispatcher] CodeMonkeyClaw bot poll thread started")
+    offset = load_monkey_offset()
+    while True:
+        if _SHUTDOWN_REQUESTED:
+            return
+        updates = get_monkey_updates(offset)
+        for update in updates:
+            offset = update["update_id"] + 1
+            save_monkey_offset(offset)
+            msg = update.get("message", {})
+            if msg:
+                try:
+                    handle_monkey_bot_message(msg)
+                except Exception as e:
+                    print(f"[monkey-bot] Unhandled error: {e}")
+        time.sleep(POLL_INTERVAL)
+
+
 def _quant_bot_loop():
     """Background thread: poll @QuantiusMaximus_bot and relay messages to QuantumentalClaw inbox."""
     if not _QUANT_BOT_ACTIVE:
@@ -1492,13 +1690,16 @@ def main():
     print(f"[dispatcher] Ollama: {os.environ.get('OLLAMA_BASE_URL', 'http://localhost:11434')}"
           f" / model routing active")
     rival_status = "active" if _RIVAL_ACTIVE else "no token (set RIVALCLAW_BOT_TOKEN in .env)"
-    quant_status = "active" if _QUANT_BOT_ACTIVE else "no token (set QUANTCLAW_BOT_TOKEN in .env)"
+    quant_status   = "active" if _QUANT_BOT_ACTIVE else "no token (set QUANTCLAW_BOT_TOKEN in .env)"
+    monkey_status  = "active" if _MONKEY_BOT_ACTIVE else "no token (set CODEMONKEY_BOT_TOKEN in .env)"
     print(f"[dispatcher] RivalClaw bot (@rivalclaw_bot): {rival_status}")
     print(f"[dispatcher] QuantumentalClaw bot (@QuantiusMaximus_bot): {quant_status}")
+    print(f"[dispatcher] CodeMonkeyClaw bot (@Codemonkeyclaw_bot): {monkey_status}")
 
-    # Start sub-bot polling threads
-    threading.Thread(target=_rival_bot_loop, daemon=True, name="rival-bot-poll").start()
-    threading.Thread(target=_quant_bot_loop, daemon=True, name="quant-bot-poll").start()
+    # Start sub-bot polling threads (one per claw)
+    threading.Thread(target=_rival_bot_loop,  daemon=True, name="rival-bot-poll").start()
+    threading.Thread(target=_quant_bot_loop,  daemon=True, name="quant-bot-poll").start()
+    threading.Thread(target=_monkey_bot_loop, daemon=True, name="monkey-bot-poll").start()
 
     offset = load_offset()
 
