@@ -20,7 +20,7 @@
       "what_to_take": "Integrate CCXT's exchange API client for standardized market data fetching across exchanges, replacing custom feed implementations with its robust, well-documented interface for order books/trades.",
       "risk": "MIT license is safe; active maintenance; minimal dependency risk; no major complexity concerns as it's a mature library with clear usage patterns.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "The columnar storage design and time-series query language concepts for building a more efficient data layer in Python, avoiding direct C code integration due to language mismatch.",
       "risk": "License unknown (must verify), future last updated date (2026) suggests possible data error or lack of maintenance, and C/Python language mismatch requires significant effort for wrapper development.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "Extract pairs-trading statistical arbitrage patterns from 'pairs_trading.ipynb' for ArbClaw's detection logic and machine learning strategy examples from 'ml_trading.ipynb' for Clawmpson's LLM strategy enhancement.",
       "risk": "License unknown (requires verification), educational code lacks production safeguards, Jupyter format necessitates significant refactoring, and future-dated last update (2026) suggests potential repo inaccuracy.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "Extract the backtesting and optimization framework for RivalClaw's self-tuning engine, and strategy execution patterns for Clawmpson's strategy development.",
       "risk": "MIT license is acceptable but future-dated last update (2026-03-30) suggests potential maintenance issues; integration requires significant refactoring (complexity 8) and may introduce unnecessary bloat.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "Extract portfolio optimization and risk management patterns, avoiding Kalshi-specific market logic; adapt LLM strategy integration structure for multi-feed compatibility",
       "risk": "Future last update date (2026) indicates metadata error; Grok-4 reference is fictional (non-functional placeholder); Kalshi-exclusive code requires heavy adaptation; unknown license (must verify)",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "Consider the environment and agent interface patterns for building a custom RL strategy, but note the current stack is rule-based and integration would require significant adaptation to fit existing data feeds and SQLite workflows.",
       "risk": "MIT license is safe, but high complexity and need for RL expertise pose integration risks; future-dated last update (2026) suggests potential maintenance issues or data error.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "Extract data preprocessing and model training patterns for ML pipelines as reference, but avoid direct code integration due to Jupyter format and tutorial nature.",
       "risk": "Lacks clear license; tutorial code is not production-ready, requires heavy refactoring; last updated in 2026 (likely typo) suggests potential obsolescence.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -280,7 +280,7 @@
       "what_to_take": "Systematic feature selection methodology and LSTM+ResNet model architecture for potential adaptation to prediction market factor research, after adjusting for market-specific data pipelines and features.",
       "risk": "Domain mismatch (stock market vs prediction markets) requires significant re-engineering; Jupyter Notebook format not production-ready; suspicious last update date (2026) suggests possible repo inaccuracy; license not specified in description.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -300,7 +300,7 @@
       "what_to_take": "Conceptual modular DRL framework design for portfolio management, not code implementation",
       "risk": "Non-production Jupyter Notebook format; domain mismatch (stocks vs prediction markets); last update date (2026) suggests possible error or abandonment",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -320,7 +320,7 @@
       "what_to_take": "Dynamic order book management and spread adjustment algorithms, but only if ported to Python and adapted for prediction markets (not directly applicable as-is).",
       "risk": "JavaScript-to-Python porting complexity, domain mismatch (crypto tokens vs prediction markets), unclear license, and future-dated last update (2026) suggesting potential repo inaccuracy.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -340,7 +340,7 @@
       "what_to_take": "Extract model training patterns for basic ML algorithms (e.g., linear regression, random forest) as conceptual references for strategy development, not production code.",
       "risk": "Packt Publishing book repo likely has restrictive license (not MIT/Apache), outdated content (2026 last update), and Jupyter format requires heavy refactoring for production use.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -360,7 +360,7 @@
       "what_to_take": "Environment class structure for RL trading (observation/action spaces, reward function) for potential future self-tuner enhancement in RivalClaw, not for immediate integration.",
       "risk": "License unknown (must verify), repo last updated in 2026 (likely typo indicating inactivity), Jupyter Notebook format requires major refactoring for production use.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -380,7 +380,7 @@
       "what_to_take": "Extract LSTM/GRU model architectures for potential adaptation to momentum strategy, but note market mismatch (stocks vs prediction markets) and high refactoring cost.",
       "risk": "Market mismatch (stocks vs prediction markets) causing poor performance, high integration complexity due to Jupyter format, and potential license ambiguity (repo lacks explicit license).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
