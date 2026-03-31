@@ -545,3 +545,7 @@ Tasks: 0
 0 | Blocked: 0
 0
 Synthesis unavailable — Ollama not responding
+
+### Market Intel Skip — 2026-03-31 06:30
+- No scout reports found for today
+- Skipped market intel run
