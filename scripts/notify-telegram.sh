@@ -17,12 +17,23 @@ set -euo pipefail
 OPENCLAW_ROOT="${HOME}/openclaw"
 ENV_FILE="${OPENCLAW_ROOT}/.env"
 
-# Load .env
+# Load .env safely via Python (avoids bash issues with unquoted spaces in values)
 if [[ -f "$ENV_FILE" ]]; then
-  # shellcheck disable=SC1090
-  set -a
-  source "$ENV_FILE"
-  set +a
+  eval "$(python3 - "$ENV_FILE" <<'PYEOF'
+import sys
+path = sys.argv[1]
+with open(path) as f:
+    for line in f:
+        line = line.strip()
+        if not line or line.startswith('#') or '=' not in line:
+            continue
+        k, _, v = line.partition('=')
+        k = k.strip()
+        v = v.strip()
+        if all(c.isalnum() or c == '_' for c in k):
+            print(f"export {k}={v!r}")
+PYEOF
+  )"
 else
   echo "ERROR: .env not found at ${ENV_FILE}" >&2
   exit 1

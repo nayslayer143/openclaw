@@ -462,25 +462,64 @@ _CLAW_ICONS = {"rival": "🥊", "quant": "🧪", "monkey": "🐒"}
 _CLAW_SEND_FNS: dict = {}  # populated after functions are defined (see below)
 
 
-def _load_claw_context(claw_name: str) -> str:
-    """Load CLAUDE.md + latest daily report for claw — injected as memory context."""
+def _load_claw_system_prompt(claw_name: str) -> str:
+    """Load the claw's own CLAUDE.md as its system prompt — never Clawmpson's."""
+    root = _CLAW_ROOTS.get(claw_name)
+    if not root:
+        return f"You are {claw_name}, a specialized AI agent in the OpenClaw ecosystem."
+    claude_md = root / "CLAUDE.md"
+    if claude_md.exists():
+        return claude_md.read_text()[:4000]
+    return f"You are {claw_name}, a specialized AI agent in the OpenClaw ecosystem."
+
+
+def _load_claw_daily_context(claw_name: str) -> str:
+    """Load the claw's latest daily report for additional context."""
     root = _CLAW_ROOTS.get(claw_name)
     if not root:
         return ""
-    parts = []
-    # 1. CLAUDE.md (identity + mission)
-    claude_md = root / "CLAUDE.md"
-    if claude_md.exists():
-        text = claude_md.read_text()[:3000]
-        parts.append(f"=== {claw_name} CLAUDE.md ===\n{text}")
-    # 2. Latest daily report
     daily_dir = root / "daily"
-    if daily_dir.exists():
-        reports = sorted(daily_dir.glob("*.md"), reverse=True) or sorted(daily_dir.glob("*.txt"), reverse=True)
-        if reports:
-            text = reports[0].read_text()[-2500:]
-            parts.append(f"=== Latest daily report ({reports[0].name}) ===\n{text}")
-    return "\n\n".join(parts)
+    if not daily_dir.exists():
+        return ""
+    reports = sorted(daily_dir.glob("*.md"), reverse=True) or sorted(daily_dir.glob("*.txt"), reverse=True)
+    if not reports:
+        return ""
+    return f"=== Latest daily report ({reports[0].name}) ===\n{reports[0].read_text()[-2500:]}"
+
+
+def _ollama_chat_direct(history: list, user_message: str,
+                        system_prompt: str, model: str = "qwen2.5:7b") -> str:
+    """Call Ollama with an explicit system prompt — bypasses clawmson_chat defaults."""
+    messages = [{"role": "system", "content": system_prompt}]
+    for entry in history:
+        role    = entry.get("role", "user")
+        content = entry.get("content", "")
+        if role in ("user", "assistant") and content:
+            messages.append({"role": role, "content": content})
+    messages.append({"role": "user", "content": user_message})
+
+    base_url = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
+    response = requests.post(
+        f"{base_url}/api/chat",
+        json={"model": model, "messages": messages, "stream": True},
+        stream=True,
+        timeout=300,
+    )
+    response.raise_for_status()
+    parts = []
+    for raw_line in response.iter_lines():
+        if not raw_line:
+            continue
+        try:
+            chunk   = json.loads(raw_line)
+            content = chunk.get("message", {}).get("content", "")
+            if content:
+                parts.append(content)
+            if chunk.get("done"):
+                break
+        except Exception:
+            continue
+    return "".join(parts).strip() or "..."
 
 
 def _get_claw_history(claw_name: str, chat_id: str) -> list:
@@ -499,14 +538,14 @@ def _save_claw_history(claw_name: str, chat_id: str, role: str, content: str):
 
 def _sub_claw_response_thread(chat_id: str, text: str,
                               claw_name: str, send_fn):
-    """Generate an Ollama response for a sub-claw and send it back."""
+    """Generate an Ollama response for a sub-claw using its own identity, not Clawmpson's."""
     try:
-        context  = _load_claw_context(claw_name)
-        history  = _get_claw_history(claw_name, chat_id)
-        icon     = _CLAW_ICONS.get(claw_name, "")
-        # Use fast model — sub-claws don't need the heavy 32b model for chat
-        reply    = llm.chat(history, text, model="qwen2.5:7b",
-                            memory_context=context)
+        system_prompt = _load_claw_system_prompt(claw_name)
+        daily_ctx     = _load_claw_daily_context(claw_name)
+        if daily_ctx:
+            system_prompt = f"{system_prompt}\n\n{daily_ctx}"
+        history = _get_claw_history(claw_name, chat_id)
+        reply   = _ollama_chat_direct(history, text, system_prompt, model="qwen2.5:7b")
         _save_claw_history(claw_name, chat_id, "user",      text)
         _save_claw_history(claw_name, chat_id, "assistant", reply)
         send_fn(chat_id, reply)
@@ -1271,29 +1310,37 @@ def handle_message(msg: dict):
     # ── CodeMonkeyClaw relay (🐒 prefix or /monkey command) ─────────────────
     if text and (text.startswith("\U0001f412") or text.lower().startswith("/monkey ")):
         relay_text = text[1:].strip() if text.startswith("\U0001f412") else text[8:].strip()
-        _write_inbox(_CODEMONKEY_INBOX, chat_id, user_id, msg_id, relay_text or text)
-        print(f"[dispatcher] CodeMonkeyClaw relay: {(relay_text or text)[:80]}")
-        ack = "🐒 Relayed to CodeMonkeyClaw."
-        if _MONKEY_BOT_ACTIVE:
-            send_monkey(chat_id, ack)
-        else:
-            send(chat_id, ack)
+        msg_for_claw = relay_text or text
+        _write_inbox(_CODEMONKEY_INBOX, chat_id, user_id, msg_id, msg_for_claw)
+        print(f"[dispatcher] CodeMonkeyClaw relay: {msg_for_claw[:80]}")
+        send_typing(chat_id)
+        def _monkey_relay_send(cid, txt, _send=send):
+            _send(cid, f"🐒 CodeMonkeyClaw: {txt}")
+        dispatch_sub_claw_response(chat_id, msg_for_claw, "monkey", _monkey_relay_send)
         return
 
     # ── RivalClaw relay (🥊 prefix or /rival command) ────────────────────────
     if text and (text.startswith("\U0001f94a") or text.lower().startswith("/rival ")):
         relay_text = text[1:].strip() if text.startswith("\U0001f94a") else text[7:].strip()
-        _write_inbox(_RIVALCLAW_INBOX, chat_id, user_id, msg_id, relay_text or text)
-        print(f"[dispatcher] RivalClaw relay: {(relay_text or text)[:80]}")
-        send(chat_id, "🥊 Relayed to RivalClaw.")
+        msg_for_claw = relay_text or text
+        _write_inbox(_RIVALCLAW_INBOX, chat_id, user_id, msg_id, msg_for_claw)
+        print(f"[dispatcher] RivalClaw relay: {msg_for_claw[:80]}")
+        send_typing(chat_id)
+        def _rival_relay_send(cid, txt, _send=send):
+            _send(cid, f"🥊 RivalClaw: {txt}")
+        dispatch_sub_claw_response(chat_id, msg_for_claw, "rival", _rival_relay_send)
         return
 
     # ── QuantumentalClaw relay (🧪 prefix or /quant command) ─────────────────
     if text and (text.startswith("\U0001f9ea") or text.lower().startswith("/quant ")):
         relay_text = text[1:].strip() if text.startswith("\U0001f9ea") else text[7:].strip()
-        _write_inbox(_QUANT_INBOX, chat_id, user_id, msg_id, relay_text or text)
-        print(f"[dispatcher] QuantumentalClaw relay: {(relay_text or text)[:80]}")
-        send(chat_id, "🧪 Relayed to QuantumentalClaw.")
+        msg_for_claw = relay_text or text
+        _write_inbox(_QUANT_INBOX, chat_id, user_id, msg_id, msg_for_claw)
+        print(f"[dispatcher] QuantumentalClaw relay: {msg_for_claw[:80]}")
+        send_typing(chat_id)
+        def _quant_relay_send(cid, txt, _send=send):
+            _send(cid, f"🧪 QuantumentalClaw: {txt}")
+        dispatch_sub_claw_response(chat_id, msg_for_claw, "quant", _quant_relay_send)
         return
 
     # ── 0. Twitter/X scout pre-route (runs before all other routing) ─────────
