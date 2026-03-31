@@ -91,6 +91,11 @@ POLL_INTERVAL  = 5   # seconds
 _TWITTER_RE = scout.TWITTER_RE  # shared with clawmson_scout — single source of truth
 OFFSET_FILE    = Path("/tmp/openclaw-tg-offset.txt")
 
+# ── Claw relay inbox files (JSONL) ────────────────────────────────────────────
+_CODEMONKEY_INBOX = Path("/tmp/codemonkey-inbox.jsonl")
+_RIVALCLAW_INBOX  = Path("/tmp/rivalclaw-inbox.jsonl")
+_QUANT_INBOX      = Path("/tmp/quant-inbox.jsonl")
+
 DEFAULT_REPO      = "EmergentWebActions"
 DEFAULT_REPO_PATH = str(Path.home() / "projects" / "EmergentWebActions")
 
@@ -118,6 +123,18 @@ except Exception:
     ALLOWED_USERS = {_raw.strip()}
 
 API = f"https://api.telegram.org/bot{BOT_TOKEN}"
+
+# ── RivalClaw bot (@rivalclaw_bot) ────────────────────────────────────────────
+RIVAL_BOT_TOKEN   = os.environ.get("RIVALCLAW_BOT_TOKEN", "").strip()
+_RIVAL_ACTIVE     = bool(RIVAL_BOT_TOKEN and not RIVAL_BOT_TOKEN.startswith("PASTE"))
+RIVAL_API         = f"https://api.telegram.org/bot{RIVAL_BOT_TOKEN}" if _RIVAL_ACTIVE else None
+RIVAL_OFFSET_FILE = Path("/tmp/rivalclaw-tg-offset.txt")
+
+# ── QuantumentalClaw bot (@QuantiusMaximus_bot) ───────────────────────────────
+QUANT_BOT_TOKEN   = os.environ.get("QUANTCLAW_BOT_TOKEN", "").strip()
+_QUANT_BOT_ACTIVE = bool(QUANT_BOT_TOKEN and not QUANT_BOT_TOKEN.startswith("PASTE"))
+QUANT_API         = f"https://api.telegram.org/bot{QUANT_BOT_TOKEN}" if _QUANT_BOT_ACTIVE else None
+QUANT_OFFSET_FILE = Path("/tmp/quantclaw-tg-offset.txt")
 
 # Init media module with bot token
 media.init(BOT_TOKEN)
@@ -187,6 +204,159 @@ def load_offset() -> int:
 
 def save_offset(offset: int):
     OFFSET_FILE.write_text(str(offset))
+
+
+# ── RivalClaw bot helpers ─────────────────────────────────────────────────────
+
+def send_rival(chat_id: str, text: str):
+    """Send a message via the @rivalclaw_bot token."""
+    if not RIVAL_API or not text:
+        return
+    for chunk in _split_message(text):
+        try:
+            requests.post(f"{RIVAL_API}/sendMessage", json={
+                "chat_id": chat_id, "text": chunk, "parse_mode": ""
+            }, timeout=10)
+        except Exception as e:
+            print(f"[rival send error] {e}")
+
+
+def get_rival_updates(offset: int = 0) -> list:
+    if not RIVAL_API:
+        return []
+    try:
+        r = requests.get(f"{RIVAL_API}/getUpdates", params={
+            "offset": offset, "timeout": 5, "allowed_updates": ["message"]
+        }, timeout=15)
+        return r.json().get("result", [])
+    except Exception as e:
+        print(f"[rival poll error] {e}")
+        return []
+
+
+def load_rival_offset() -> int:
+    if RIVAL_OFFSET_FILE.exists():
+        try:
+            return int(RIVAL_OFFSET_FILE.read_text().strip())
+        except Exception:
+            pass
+    return 0
+
+
+def save_rival_offset(offset: int):
+    RIVAL_OFFSET_FILE.write_text(str(offset))
+
+
+# ── QuantumentalClaw bot helpers ──────────────────────────────────────────────
+
+def send_quant(chat_id: str, text: str):
+    """Send a message via the @QuantiusMaximus_bot token."""
+    if not QUANT_API or not text:
+        return
+    for chunk in _split_message(text):
+        try:
+            requests.post(f"{QUANT_API}/sendMessage", json={
+                "chat_id": chat_id, "text": chunk, "parse_mode": ""
+            }, timeout=10)
+        except Exception as e:
+            print(f"[quant send error] {e}")
+
+
+def get_quant_updates(offset: int = 0) -> list:
+    if not QUANT_API:
+        return []
+    try:
+        r = requests.get(f"{QUANT_API}/getUpdates", params={
+            "offset": offset, "timeout": 5, "allowed_updates": ["message"]
+        }, timeout=15)
+        return r.json().get("result", [])
+    except Exception as e:
+        print(f"[quant poll error] {e}")
+        return []
+
+
+def load_quant_offset() -> int:
+    if QUANT_OFFSET_FILE.exists():
+        try:
+            return int(QUANT_OFFSET_FILE.read_text().strip())
+        except Exception:
+            pass
+    return 0
+
+
+def save_quant_offset(offset: int):
+    QUANT_OFFSET_FILE.write_text(str(offset))
+
+
+def handle_quant_bot_message(msg: dict):
+    """Handle messages sent to @QuantiusMaximus_bot — relay to QuantumentalClaw inbox."""
+    chat_id = str(msg.get("chat", {}).get("id", ""))
+    user_id = str(msg.get("from", {}).get("id", ""))
+    text    = msg.get("text", "").strip()
+    msg_id  = msg.get("message_id")
+    if user_id not in ALLOWED_USERS:
+        print(f"[quant-bot] Ignored from non-allowed user {user_id}")
+        return
+    _write_inbox(_QUANT_INBOX, chat_id, user_id, msg_id, text)
+    print(f"[quant-bot] Relayed to QuantumentalClaw: {text[:80]}")
+    send_quant(chat_id, f"🧪 QuantumentalClaw received: {text[:100]}")
+
+
+# ── Shared relay helpers ──────────────────────────────────────────────────────
+
+def _write_inbox(inbox_path: Path, chat_id: str, user_id: str, msg_id, text: str):
+    """Append a relay payload to a JSONL inbox file."""
+    payload = json.dumps({
+        "ts": datetime.datetime.now(datetime.timezone.utc).isoformat(),
+        "chat_id": chat_id, "user_id": user_id, "msg_id": msg_id, "text": text,
+    })
+    with open(inbox_path, "a") as f:
+        f.write(payload + "\n")
+
+
+def handle_claws(chat_id: str):
+    """Show health status of all 4 claw instances."""
+    state_file = Path.home() / ".openclaw" / "claw-sessions.json"
+    try:
+        state = json.loads(state_file.read_text()) if state_file.exists() else {}
+    except Exception:
+        state = {}
+    claw_defs = [
+        ("clawmpson", "🦞", "@ogdenclashbot"),
+        ("rival",     "🥊", "@rivalclaw_bot" if _RIVAL_ACTIVE else "@rivalclaw_bot (no token)"),
+        ("quant",     "🧪", "@QuantiusMaximus_bot" if _QUANT_BOT_ACTIVE else "@QuantiusMaximus_bot (no token)"),
+        ("monkey",    "🐒", "codemonkey"),
+    ]
+    lines = ["Claw status:"]
+    for name, icon, label in claw_defs:
+        info    = state.get(name, {})
+        status  = info.get("status", "unknown")
+        pid     = info.get("pid") or "—"
+        reboots = info.get("reboots", 0)
+        s_icon  = "🟢" if status == "running" else ("🟡" if status in ("starting", "restarting") else "🔴")
+        lines.append(f"{s_icon} {icon} {name} ({label}): {status} | pid={pid} | boots={reboots}")
+    for name, inbox_file in [("rival", _RIVALCLAW_INBOX), ("quant", _QUANT_INBOX), ("monkey", _CODEMONKEY_INBOX)]:
+        if inbox_file.exists():
+            try:
+                age = int(time.time() - inbox_file.stat().st_mtime)
+                lines.append(f"  📬 {name} inbox: last activity {age // 60}m ago")
+            except Exception:
+                pass
+    send(chat_id, "\n".join(lines))
+
+
+def handle_rival_bot_message(msg: dict):
+    """Handle messages sent directly to @rivalclaw_bot — relay to RivalClaw inbox."""
+    chat_id = str(msg.get("chat", {}).get("id", ""))
+    user_id = str(msg.get("from", {}).get("id", ""))
+    text    = msg.get("text", "").strip()
+    msg_id  = msg.get("message_id")
+    if user_id not in ALLOWED_USERS:
+        print(f"[rival-bot] Ignored from non-allowed user {user_id}")
+        return
+    _write_inbox(_RIVALCLAW_INBOX, chat_id, user_id, msg_id, text)
+    print(f"[rival-bot] Relayed to RivalClaw: {text[:80]}")
+    send_rival(chat_id, f"🥊 RivalClaw received: {text[:100]}")
 
 
 # ── Task packet builder ───────────────────────────────────────────────────────
@@ -272,14 +442,20 @@ def handle_help(chat_id: str):
         "Clawmson — OpenClaw AI Assistant\n\n"
         "Shortcuts:\n"
         "!status          — last 5 build results\n"
+        "!claws           — health of all 4 claw instances\n"
         "!queue           — pending task packets\n"
         "!help            — this message\n\n"
+        "Claw Relay:\n"
+        "🐒 <msg> or /monkey <msg>  — CodeMonkeyClaw (@codemonkey)\n"
+        "🥊 <msg> or /rival <msg>   — RivalClaw (@rivalclaw_bot)\n"
+        "🧪 <msg> or /quant <msg>   — QuantumentalClaw (@QuantiusMaximus_bot)\n\n"
         "Commands:\n"
+        "/claws           — status of all 4 claws\n"
         "/approve <id>    — merge a passing build into main\n"
         "/forget          — clear conversation history\n"
         "/context         — show persistent notes\n"
         "/references      — list saved links\n"
-        "/scout              — digest of recently scouted Twitter links\n"
+        "/scout           — digest of recently scouted Twitter links\n"
         "/audit <name>    — security audit a skill\n"
         "/skills          — list registered skills with trust scores\n"
         "/block <name>    — manually block a skill\n\n"
@@ -921,24 +1097,29 @@ def handle_message(msg: dict):
         print(f"[dispatcher] Ignored from non-allowed user {user_id}")
         return
 
-    # ── CodeMonkeyClaw relay ─────────────────────────────────────────────────
-    # Messages starting with 🐒 are written to a JSONL inbox file for
-    # CodeMonkeyClaw's Claude Code session to poll. The message continues
-    # through normal dispatch too (so Clawmson can ack it).
-    _CODEMONKEY_INBOX = Path("/tmp/codemonkey-inbox.jsonl")
-    if text and text.startswith("\U0001f412"):  # 🐒
-        relay_payload = json.dumps({
-            "ts": datetime.datetime.now(datetime.timezone.utc).isoformat(),
-            "chat_id": chat_id,
-            "user_id": user_id,
-            "msg_id": msg_id,
-            "text": text,
-        })
-        with open(_CODEMONKEY_INBOX, "a") as f:
-            f.write(relay_payload + "\n")
-        print(f"[dispatcher] CodeMonkeyClaw relay: {text[:80]}")
-        send(chat_id, f"🐒 Relayed to CodeMonkeyClaw.")
-        return  # don't process further — this is for CodeMonkeyClaw only
+    # ── CodeMonkeyClaw relay (🐒 prefix or /monkey command) ─────────────────
+    if text and (text.startswith("\U0001f412") or text.lower().startswith("/monkey ")):
+        relay_text = text[1:].strip() if text.startswith("\U0001f412") else text[8:].strip()
+        _write_inbox(_CODEMONKEY_INBOX, chat_id, user_id, msg_id, relay_text or text)
+        print(f"[dispatcher] CodeMonkeyClaw relay: {(relay_text or text)[:80]}")
+        send(chat_id, "🐒 Relayed to CodeMonkeyClaw.")
+        return
+
+    # ── RivalClaw relay (🥊 prefix or /rival command) ────────────────────────
+    if text and (text.startswith("\U0001f94a") or text.lower().startswith("/rival ")):
+        relay_text = text[1:].strip() if text.startswith("\U0001f94a") else text[7:].strip()
+        _write_inbox(_RIVALCLAW_INBOX, chat_id, user_id, msg_id, relay_text or text)
+        print(f"[dispatcher] RivalClaw relay: {(relay_text or text)[:80]}")
+        send(chat_id, "🥊 Relayed to RivalClaw.")
+        return
+
+    # ── QuantumentalClaw relay (🧪 prefix or /quant command) ─────────────────
+    if text and (text.startswith("\U0001f9ea") or text.lower().startswith("/quant ")):
+        relay_text = text[1:].strip() if text.startswith("\U0001f9ea") else text[7:].strip()
+        _write_inbox(_QUANT_INBOX, chat_id, user_id, msg_id, relay_text or text)
+        print(f"[dispatcher] QuantumentalClaw relay: {(relay_text or text)[:80]}")
+        send(chat_id, "🧪 Relayed to QuantumentalClaw.")
+        return
 
     # ── 0. Twitter/X scout pre-route (runs before all other routing) ─────────
     if text and _TWITTER_RE.search(text):
@@ -984,6 +1165,9 @@ def handle_message(msg: dict):
             return
         if lower in ("!status", "/status"):
             handle_status(chat_id)
+            return
+        if lower in ("!claws", "/claws"):
+            handle_claws(chat_id)
             return
         if lower in ("!queue", "/queue"):
             handle_queue(chat_id)
@@ -1232,6 +1416,54 @@ def handle_message(msg: dict):
     dispatch_conversation(chat_id, effective_text, has_image=has_image, intent=intent)
 
 
+# ── RivalClaw bot poll loop ───────────────────────────────────────────────────
+
+def _quant_bot_loop():
+    """Background thread: poll @QuantiusMaximus_bot and relay messages to QuantumentalClaw inbox."""
+    if not _QUANT_BOT_ACTIVE:
+        print("[dispatcher] QUANTCLAW_BOT_TOKEN not set — quant bot thread idle")
+        return
+    print("[dispatcher] QuantumentalClaw bot poll thread started")
+    offset = load_quant_offset()
+    while True:
+        if _SHUTDOWN_REQUESTED:
+            return
+        updates = get_quant_updates(offset)
+        for update in updates:
+            offset = update["update_id"] + 1
+            save_quant_offset(offset)
+            msg = update.get("message", {})
+            if msg:
+                try:
+                    handle_quant_bot_message(msg)
+                except Exception as e:
+                    print(f"[quant-bot] Unhandled error: {e}")
+        time.sleep(POLL_INTERVAL)
+
+
+def _rival_bot_loop():
+    """Background thread: poll @rivalclaw_bot and relay messages to RivalClaw inbox."""
+    if not _RIVAL_ACTIVE:
+        print("[dispatcher] RIVALCLAW_BOT_TOKEN not set — rival bot thread idle")
+        return
+    print("[dispatcher] RivalClaw bot poll thread started")
+    offset = load_rival_offset()
+    while True:
+        if _SHUTDOWN_REQUESTED:
+            return
+        updates = get_rival_updates(offset)
+        for update in updates:
+            offset = update["update_id"] + 1
+            save_rival_offset(offset)
+            msg = update.get("message", {})
+            if msg:
+                try:
+                    handle_rival_bot_message(msg)
+                except Exception as e:
+                    print(f"[rival-bot] Unhandled error: {e}")
+        time.sleep(POLL_INTERVAL)
+
+
 # ── Main loop ─────────────────────────────────────────────────────────────────
 
 def _signal_handler(sig, frame):
@@ -1259,6 +1491,15 @@ def main():
     print(f"[dispatcher] Default repo: {DEFAULT_REPO} @ {DEFAULT_REPO_PATH}")
     print(f"[dispatcher] Ollama: {os.environ.get('OLLAMA_BASE_URL', 'http://localhost:11434')}"
           f" / model routing active")
+    rival_status = "active" if _RIVAL_ACTIVE else "no token (set RIVALCLAW_BOT_TOKEN in .env)"
+    quant_status = "active" if _QUANT_BOT_ACTIVE else "no token (set QUANTCLAW_BOT_TOKEN in .env)"
+    print(f"[dispatcher] RivalClaw bot (@rivalclaw_bot): {rival_status}")
+    print(f"[dispatcher] QuantumentalClaw bot (@QuantiusMaximus_bot): {quant_status}")
+
+    # Start sub-bot polling threads
+    threading.Thread(target=_rival_bot_loop, daemon=True, name="rival-bot-poll").start()
+    threading.Thread(target=_quant_bot_loop, daemon=True, name="quant-bot-poll").start()
+
     offset = load_offset()
 
     while True:

@@ -24,19 +24,18 @@ if [ -f "$RELAY_PID" ]; then
   fi
 fi
 
-# Dispatcher — PID-file guarded (prevents duplicate instances)
-DISP_PID="$HOME/openclaw/.dispatcher.pid"
-if [[ -f "$DISP_PID" ]] && kill -0 "$(cat "$DISP_PID")" 2>/dev/null; then
-  : # already running
+# Dispatcher — managed by launchd (com.openclaw.dispatcher) with KeepAlive=true.
+# Watchdog only intervenes if launchd service is NOT loaded (e.g. plist was unloaded).
+if launchctl list com.openclaw.dispatcher >/dev/null 2>&1; then
+  : # launchd manages it — do not spawn a duplicate
 else
-  # Kill any stale instances before starting fresh
-  pkill -f "telegram-dispatcher" 2>/dev/null || true
-  sleep 1
-  cd "$HOME/openclaw/scripts"
-  OLLAMA_CHAT_MODEL=qwen3:32b OLLAMA_CLASSIFY_MODEL=qwen2.5:7b PYTHONUNBUFFERED=1 \
-    nohup python3 telegram-dispatcher.py >> /tmp/openclaw-dispatcher.log 2>&1 &
-  echo $! > "$DISP_PID"
-  echo "[$(date)] Dispatcher restarted (PID $!)" >> "$HOME/openclaw/logs/watchdog.log"
+  # launchd plist not loaded — fall back to manual start
+  if ! pgrep -f "telegram-dispatcher" > /dev/null; then
+    cd "$HOME/openclaw/scripts"
+    OLLAMA_CHAT_MODEL=qwen3:32b OLLAMA_CLASSIFY_MODEL=qwen2.5:7b PYTHONUNBUFFERED=1 \
+      nohup python3 telegram-dispatcher.py >> "$HOME/openclaw/logs/dispatcher.log" 2>&1 &
+    echo "[$(date)] Dispatcher started (launchd not loaded, PID $!)" >> "$HOME/openclaw/logs/watchdog.log"
+  fi
 fi
 
 # ── Session Manager ─────────────────────────────────────────────────
