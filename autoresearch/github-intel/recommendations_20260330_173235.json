@@ -20,7 +20,7 @@
       "what_to_take": "Adapt the exchange-agnostic data stream design pattern (with real-time/historical tick handling) for Python using ccxt, replacing Clawmpson's current feed layer",
       "risk": "TypeScript vs Python mismatch requires significant adaptation; suspicious 2026 last-update date suggests potential repo inactivity; license not specified in description",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "Adopt Blankly's strategy template and exchange abstraction layer for ArbClaw to simplify 5-min arb detection implementation, and leverage its backtesting framework for Clawmpson's strategy validation.",
       "risk": "MIT license is safe, but integration requires refactoring existing exchange logic and may conflict with current SQLite data models; risk of over-engineering for Clawmpson's established architecture.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -100,7 +100,7 @@
       "what_to_take": "Backtesting and optimization framework (without GUI) for strategy validation and graduation engine enhancement.",
       "risk": "License not confirmed (MIT likely but unverified), last updated 2026-03-25 (future date indicates possible maintenance issues), crypto-specific data handling requires adaptation for prediction markets.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -120,7 +120,7 @@
       "what_to_take": "The crypto news aggregation pipeline and AI sentiment scoring module for integration into Clawmpson's LLM strategy as a new data feed, excluding the UI and non-essential components.",
       "risk": "License not specified in repo (must verify MIT/Apache), potential dependency on external news APIs requiring keys, and the 2026 last-update date suggests possible data error. AI model may require adaptation for trading context.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "Extract the pairs trading strategy implementation from the 'Pairs Trading' notebook for adaptation into ArbClaw's arb detector, focusing on statistical arbitrage and mean-reversion patterns.",
       "risk": "License not specified (potential legal risk), educational code not production-ready, requires significant refactoring for integration into ArbClaw's 5-min cycle framework.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "The backtesting framework and strategy base class for potential adaptation to prediction market data, excluding crypto-specific exchange integrations.",
       "risk": "License unknown (must verify), crypto-focused design requires significant adaptation for prediction markets, and may introduce unnecessary crypto dependencies into our market-agnostic stack.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "Kalshi API client implementation and portfolio optimization logic for RivalClaw's Kalshi integration and self-tuning engine.",
       "risk": "Unclear license (no license file visible), last updated 2026 (future date indicating possible repo inaccuracy), and fictional Grok-4 integration suggesting unreliable code patterns.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "Extract the strategy interface and minimal backtesting engine for strategy validation, avoiding the GUI and heavy dependencies.",
       "risk": "Potential GPL license (requires verification), over-engineering risk for lean systems, and future-dated last update (2026) suggests possible data error.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "Columnar storage design patterns and JSON/SQL query interface for time-series data, not the C implementation",
       "risk": "Unknown license, questionable maintenance (last update 2026), and high language mismatch (C vs Python) requiring major integration effort",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -320,7 +320,7 @@
       "what_to_take": "Strategy registration pattern and event-driven architecture for multi-strategy management, excluding crypto exchange adapters",
       "risk": "Domain mismatch (crypto-focused vs prediction markets), future-dated last update (2026-03-25) raises maintenance concerns, and exchange adapter replacement would require significant work",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -340,7 +340,7 @@
       "what_to_take": "CCXT data fetching patterns for market data processing, but avoid crypto-specific strategy logic and exchange integrations",
       "risk": "Unclear license, last updated date (2026-03-26) is invalid (future date), high domain mismatch (crypto vs prediction markets), and repo appears to be educational content not production-ready",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -360,7 +360,7 @@
       "what_to_take": "Extract basic ML data preprocessing and model training patterns for potential adaptation to Clawmpson's LLM strategy, avoiding notebook-specific code.",
       "risk": "License unknown (must verify), outdated future-dated last update (2026), and Jupyter format requires significant refactoring for production use; tutorial-level code lacks production safeguards.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -380,7 +380,7 @@
       "what_to_take": "Extract technical analysis indicator implementations (e.g., moving averages, RSI) for potential adaptation to prediction market data streams.",
       "risk": "License unknown (requires verification), market mismatch (crypto spot vs. prediction markets), and suspicious future last updated date (2026-03-30) indicating possible repo inaccuracy.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -400,7 +400,7 @@
       "what_to_take": "Extract RL training loop and self-tuning components for potential adaptation to RivalClaw's self-tuner, ignoring market context mismatch.",
       "risk": "License unknown, market context mismatch (stocks vs prediction markets), high complexity from Jupyter Notebook format requiring full refactoring.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -420,7 +420,7 @@
       "what_to_take": "Study event-driven architecture patterns and data-oriented state management for potential Python adaptation in Clawmpson's graduation engine",
       "risk": "Rust/Python language mismatch requires major refactoring; future-dated last update (2026-03-30) indicates possible data error; license not verified",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -440,7 +440,7 @@
       "what_to_take": "None; standard technical indicators (Bollinger Bands, MACD) are easily reimplementable in Python without external dependencies.",
       "risk": "Language mismatch (Go vs Python stack) requires significant reimplementation; future last update date (2026-03-29) is suspicious; license not specified in description.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -460,7 +460,7 @@
       "what_to_take": "None - book companion code is Jupyter-based, not production-ready, and lacks strategy-specific patterns for prediction markets.",
       "risk": "License ambiguity (book companion, no explicit license), maintenance risk (last updated 2026, likely error), and high refactoring cost due to notebook format.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -480,7 +480,7 @@
       "what_to_take": "Core DRL algorithm structure (agent/environment/training loop) for potential future strategy research, but not the stock-specific Jupyter code or data pipelines.",
       "risk": "Domain mismatch (stock trading vs prediction markets), Jupyter notebooks not production-ready, suspicious future-dated last update (2026), and no clear license in repo. High refactoring needed for prediction market context.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -500,7 +500,7 @@
       "what_to_take": "No actionable code for Python stack; design patterns for exchange adapters could inform future integrations but not immediately applicable.",
       "risk": "Java/Python language mismatch creates high integration complexity; last updated date (2026) is suspicious (likely typo) but not a primary concern; no license red flags noted.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -520,7 +520,7 @@
       "what_to_take": "The composable architecture patterns for real-time data pipelines, but not the Elixir implementation due to language mismatch with Python stack.",
       "risk": "Critical language mismatch (Elixir vs Python) requires major refactoring; future-dated last update (2026) suggests possible data error; no clear Python integration path.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -540,7 +540,7 @@
       "what_to_take": "None of the code is directly integrable; concepts like dynamic order book management could be studied for algorithmic inspiration but require full Python reimplementation.",
       "risk": "JavaScript vs Python language mismatch requires significant porting effort; domain mismatch (crypto token market-making vs prediction markets) reduces applicability; license unknown but likely permissive (MIT-like), though maintenance risk exists due to 2026-03-27 future-dated update.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -560,7 +560,7 @@
       "what_to_take": "This is a curated resource list, not a codebase. No executable code to integrate; use it only for reference to find other repositories.",
       "risk": "Repo contains no code to integrate (only markdown links). Risk of wasting time on non-code resources. Future-dated last update (2026) suggests possible data error.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
