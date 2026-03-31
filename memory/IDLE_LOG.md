@@ -506,3 +506,17 @@ Tasks: 0
 0
 Synthesis unavailable — Ollama not responding
 [2026-03-30 23:30] Idea engine ran — wrote /Users/nayslayer/openclaw/outputs/ideas-2026-03-30-14.md, ingested to Ideas Lab
+
+### Memory Librarian — 2026-03-30 18:00
+Tasks: 0
+0 | Errors: 0
+0 | Blocked: 0
+0
+Synthesis unavailable — Ollama not responding
+
+### Evening Summary — 2026-03-30 18:03
+- Tasks completed: 0
+- Tasks pending: 3
+- Log activity: 78 lines
+- Errors: 0
+- Nightly consolidation: scheduled for 23:03
