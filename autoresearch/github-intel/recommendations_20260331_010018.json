@@ -120,7 +120,7 @@
       "what_to_take": "The backtesting framework structure for strategy evaluation (not stock-specific logic), to be adapted for prediction market data and 5-min cycles instead of daily stock data.",
       "risk": "Domain mismatch (stocks vs prediction markets), timeframes mismatch (daily vs 5-min), and repo last updated in 2026 (likely typo indicating potential inactivity). License not specified in description.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "Study environment/agent patterns for potential RL strategy integration in Clawmpson's graduation engine, avoiding full framework adoption.",
       "risk": "Suspicious future-dated last update (2026-03-29) suggests possible repo inaccuracy; MIT license is safe but high integration complexity may outweigh benefits.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "Minimal reusable components; avoid RL framework due to stock-market focus. Consider data preprocessing patterns for prediction markets but require major domain adaptation.",
       "risk": "Apache 2.0 license acceptable but high risk of misalignment with prediction markets (not stocks), Jupyter Notebook format incompatible with production stack, and significant refactoring needed for domain adaptation.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "No actionable code; domain mismatch (stocks vs prediction markets) invalidates all core functionality. Avoid integration.",
       "risk": "Domain mismatch (stocks vs prediction markets), potential license issues (no license specified), and high refactoring cost for irrelevant features.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "Do not integrate the list; use it as a reference to identify specific libraries (e.g., 'pyalgotrade' or 'vectorbt') for later integration into strategies, but extract no code directly from this repo.",
       "risk": "Repo is a static HTML list (not code), making direct integration impossible. Future-dated last update (2026-03-30) suggests data error. No actionable code patterns for our stack; risks wasting time on non-integratable content.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "This repo is a curated list of resources, not executable code. No patterns or code can be integrated directly. It may serve as a reference to identify other repositories for deeper investigation.",
       "risk": "Repo is a non-code resource list (not a library/codebase). Risk of misinterpreting it as a code repository. Last updated date (2026) is implausible, indicating possible data error. No license concerns but integration is impossible.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
