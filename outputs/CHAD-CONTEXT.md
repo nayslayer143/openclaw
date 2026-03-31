@@ -1,9 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> Auto-generated 2026-03-31T14:07:00-07:00. Do not edit manually.
+> Auto-generated 2026-03-31T15:07:00-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-03-31T14:07:00-07:00
+Generated: 2026-03-31T15:07:00-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -160,6 +160,7 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/rivalclaw
 ~/rivalclaw/.claude
 ~/rivalclaw/.codemonkey
+~/rivalclaw/.dispatcher.lock
 ~/rivalclaw/.git
 ~/rivalclaw/.gitignore
 ~/rivalclaw/.monitor_state.json
@@ -239,8 +240,10 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/rivalclaw/rivalclaw.db-shm
 ~/rivalclaw/rivalclaw.db-wal
 ~/rivalclaw/rivalclaw.log
+~/rivalclaw/rivalclaw_dispatcher.py
 ~/rivalclaw/run.py
 ~/rivalclaw/self_tuner.py
+~/rivalclaw/sentiment_feed.py
 ~/rivalclaw/simulator.py
 ~/rivalclaw/spot_feed.py
 ~/rivalclaw/status_ping.py
@@ -1414,16 +1417,16 @@ pytest-asyncio>=0.23
 ### openclaw
 ```
 Branch: main
-Last commit: 691d0fd auto: 2026-03-31 14:00 state snapshot
-Uncommitted files: 9
+Last commit: f59cd8f auto: hourly sync 2026-03-31 21:47 UTC
+Uncommitted files: 7
 Remote: 
 ```
 
 ### rivalclaw
 ```
 Branch: feat/kalshi-live-bridge
-Last commit: e515c54 auto: hourly sync 2026-03-31 20:47 UTC
-Uncommitted files: 5
+Last commit: f3b4e9c feat: crypto sentiment feed for paper trades (experimental)
+Uncommitted files: 7
 Remote: 
 ```
 
@@ -1438,7 +1441,7 @@ Remote: https://oauth2:glpat-gpKuP2MCJ523PLVy2Rez7mM6MQpvOjEKdTpsMmJnZg8.01.170u
 ### quantumentalclaw
 ```
 Branch: main
-Last commit: 236eda9 hourly: 2026-03-31 21:00 | $5,757 | 0W/0closed | $+0 | quiet
+Last commit: 34fabdf hourly: 2026-03-31 22:00 | $5,784 | 0W/0closed | $+0 | quiet
 Uncommitted files: 0
 Remote: https://oauth2:glpat-gpKuP2MCJ523PLVy2Rez7mM6MQpvOjEKdTpsMmJnZg8.01.170uc249y@gitlab.com/jordan291/quantumentalclaw.git
 ```
@@ -1538,5 +1541,5 @@ Remote: https://github.com/nayslayer143/shiny-new.git
 ```
 
 ---
-End of context. Generated 2026-03-31T14:07:00-07:00.
+End of context. Generated 2026-03-31T15:07:00-07:00.
 For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw
