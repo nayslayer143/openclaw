@@ -4,7 +4,7 @@
     "schema_version": "1.0",
     "max_entries": 200,
     "max_age_days": 90,
-    "last_trimmed": "2026-03-31",
+    "last_trimmed": "2026-04-01",
     "inject_script": "agents/tools/design-inject.py"
   },
   "entries": [
