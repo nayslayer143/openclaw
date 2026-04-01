@@ -60,7 +60,7 @@
       "what_to_take": "Extract the backtesting framework and OHLC data handling utilities to enhance strategy validation in Clawmpson and RivalClaw, avoiding IB-specific execution code.",
       "risk": "Future-dated last update (2026-03-31) suggests possible metadata error, but high stars/forks indicate active maintenance; MIT license is safe but requires careful extraction to avoid dependency bloat.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "Extract the crypto news aggregation pipeline and AI rating model for generating trading signals, to integrate as a new feed for Clawmpson's LLM strategy.",
       "risk": "Unclear license (requires verification), suspicious future last update date (2026), and integration requires adapting to Clawmpson's feed system and SQLite schema.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -100,7 +100,7 @@
       "what_to_take": "Strategy ensembling logic and multi-timeframe analysis patterns for Clawmpson's graduation engine, avoiding full LangChain integration.",
       "risk": "Suspicious future last update date (2026-03-29) suggests potential repo inaccuracy; license not specified (must verify MIT/Apache); LangChain dependency may over-engineer existing LLM strategy.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "Extract the core dataflow pipeline concept for modular data processing, but implement a lightweight custom version instead of full integration to avoid bloat.",
       "risk": "Repo appears abandoned (last updated 2026, impossible date), high maintenance risk; integration would require significant refactoring without clear trading-specific optimizations.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "Study its modular strategy architecture and exchange integration patterns for design inspiration, but avoid direct code integration due to C# vs Python mismatch.",
       "risk": "High complexity from C#-Python language barrier; MIT license is acceptable but requires significant bridge development (e.g., Python.NET) with ongoing maintenance risk.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "No useful components; JavaScript crypto focus doesn't align with Python prediction market stack or strategy types.",
       "risk": "JavaScript vs Python mismatch requires heavy refactoring; crypto domain (not prediction markets) with suspicious future-dated last update; high maintenance risk.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "None; Gekko's Bitcoin-specific strategies and JavaScript architecture are incompatible with our Python prediction market stack.",
       "risk": "Domain mismatch (Bitcoin vs. prediction markets), language mismatch (JS vs. Python), future-dated last update (2026-03-29) indicates potential abandonment, and no prediction market integrations.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -280,7 +280,7 @@
       "what_to_take": "Core DRL agent architecture and training loop patterns for potential strategy development in RivalClaw, excluding market-specific stock code.",
       "risk": "Asset class mismatch (stocks vs prediction markets), notebook format requiring heavy refactoring, and suspicious future-dated last update (2026) indicating possible repo obsolescence.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -300,7 +300,7 @@
       "what_to_take": "None; design patterns for exchange connectivity could inform Python implementation but Java codebase is incompatible with Python stack.",
       "risk": "Java vs Python language mismatch requires major refactoring; repo is a full bot (not library) with no Python bindings; future-dated last update (2026) suggests data error; Apache 2.0 license is acceptable but integration complexity outweighs benefits.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -320,7 +320,7 @@
       "what_to_take": "Do not integrate; the repo is a curated resource list, not a codebase. Study the linked projects for potential inspiration but avoid direct integration.",
       "risk": "High effort for minimal value; linked projects may have incompatible licenses/maintenance; no reusable code for our stack.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -340,7 +340,7 @@
       "what_to_take": "Not applicable; this is a curated resource list (HTML), not executable code. No patterns or code to integrate.",
       "risk": "Repo is a static HTML list (not code), last updated in 2026 (future date), making it unreliable. No actual trading code to integrate. License unknown but irrelevant due to non-code nature.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
