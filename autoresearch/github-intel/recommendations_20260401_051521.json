@@ -20,7 +20,7 @@
       "what_to_take": "Extract the technical analysis module (indicators) and data providers for Polymarket/Kalshi/CoinGecko to replace custom implementations in Clawmpson/RivalClaw, avoiding full framework integration.",
       "risk": "Apache-2.0 license is acceptable, but ZVT's data model (time-series DB) conflicts with existing SQLite schemas requiring adapter layer; potential dependency bloat from unused ML modules.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -40,7 +40,7 @@
       "what_to_take": "Adopt the dataflow graph pattern for managing multi-feed data pipelines (e.g., feed-to-strategy routing) and the modular node-based processing structure, avoiding full framework adoption.",
       "risk": "Suspicious future last updated date (2026-03-30) suggests potential repo abandonment or data error; license not specified in description (check GitHub repo); integration requires refactoring existing data pipelines.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "Extract strategy framework and backtesting module for Clawmpson's graduation engine, ignoring crypto exchange integrations and focusing on strategy class structure and configuration patterns.",
       "risk": "GPLv3 license requires derivative works to be open-sourced under same license, conflicting with potential closed-source stack. Exchange connectors are crypto-specific (Binance/Hyperliquid) and irrelevant to prediction markets (Polymarket/Kalshi), requiring heavy adaptation.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "The columnar storage design for time-series data and JSON/SQL interface, but not the C implementation due to language mismatch and high integration cost.",
       "risk": "Unknown license (must verify), high complexity of C/Python integration, and potential for major refactoring of existing SQLite-based data layers without clear performance gains.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "Exchange abstraction patterns and order management framework (not strategy logic), but requires full Python reimplementation due to language mismatch.",
       "risk": "Java vs Python language barrier, crypto-specific domain (not prediction markets), and minimal relevance to our stack's Python/SQLite architecture. Apache 2.0 license is acceptable but not worth the effort.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "No usable patterns or code due to JavaScript/Python language mismatch, Bitcoin-only focus (not prediction markets), and irrelevant exchange integrations.",
       "risk": "MIT license is acceptable but high complexity from language/asset class mismatch; last update date (2026) appears erroneous suggesting potential abandonment; no prediction market support.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "Do not integrate; study the gym-based RL framework structure for potential inspiration on strategy simulation patterns only.",
       "risk": "Domain mismatch (crypto vs prediction markets), suspicious future-dated last update (2026), and high adaptation complexity with no direct relevance to current strategies.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -280,7 +280,7 @@
       "what_to_take": "This repo is a curated list of tools, not a codebase. No reusable code exists for direct integration; it only references external projects.",
       "risk": "License risks from external tools, high maintenance burden from researching/adopting listed projects, and no actual code to integrate. Future-proofing concerns due to repo's static nature.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -300,7 +300,7 @@
       "what_to_take": "None; the JavaScript charting library is incompatible with Python-based trading systems and lacks maintenance.",
       "risk": "Not maintained (major risk), JavaScript/Python language mismatch, potential license issues, and no relevance to core trading logic.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -320,7 +320,7 @@
       "what_to_take": "This repo is a curated list of resources, not executable code. No patterns or code can be integrated directly.",
       "risk": "Repo is an HTML-based list (not code), last updated in 2026 (future-dated), and contains no executable trading system code. Risk of misinterpreting it as a code repo.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
