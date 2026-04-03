@@ -747,3 +747,9 @@ Synthesis unavailable — Ollama not responding
 ### Intel Scan — 2026-04-03 07:03
 - Reports scanned: 0
 - No new scout reports found
+[2026-04-03 23:30] Idea engine ran — wrote /Users/nayslayer/openclaw/outputs/ideas-2026-04-03-08.md, ingested to Ideas Lab
+
+### Morning Brief — 2026-04-03 08:03
+- Completed overnight: 0
+- Pending queue: 3
+[2026-04-03 23:30] Idea engine ran — wrote /Users/nayslayer/openclaw/outputs/ideas-2026-04-03-08.md, ingested to Ideas Lab
