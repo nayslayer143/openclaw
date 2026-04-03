@@ -20,7 +20,7 @@
       "what_to_take": "Integrate ccxt as a dependency for standardized exchange connectivity, replacing custom API code with its unified interface for price feeds and order execution across all 100+ supported exchanges.",
       "risk": "MIT license is permissive and actively maintained; minimal risk but requires adapting existing exchange-specific code to ccxt's API structure.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -120,7 +120,7 @@
       "what_to_take": "Study strategy automation framework and exchange integration patterns for potential Python adaptation.",
       "risk": "Rust-to-Python integration requires significant effort; repo last updated in 2026 (likely typo) suggests possible outdated code; no license specified in provided info.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "No actionable code; tutorial uses generic ML models in Jupyter notebooks not suitable for production integration.",
       "risk": "License unknown (no license file visible), outdated code (last updated 2026), and Jupyter format requires major refactoring for production systems.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "No relevant patterns; repo focuses on stock market RL trading (not prediction markets) and lacks arbitrage/price-lag patterns needed for our stack.",
       "risk": "Domain mismatch (stocks vs prediction markets), potential license ambiguity, high integration complexity due to RL architecture not aligning with our SQLite/strategy engine stack.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "This repo is a curated list of external resources, not a codebase. No executable code or patterns can be directly integrated into any bot. It serves only as a reference for research, not for implementation.",
       "risk": "License compliance risks from linked projects; high maintenance burden to manually vet and integrate external code; no direct value for current stack due to lack of executable content.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "This repo is a curated resource list, not executable code. No direct integration possible; use it to identify specific repositories for further evaluation instead of integrating the list itself.",
       "risk": "Repo is a static list (not code), making integration impossible. Future-dated last update (2026-04-03) suggests metadata error. No license or maintenance concerns for the list, but it provides no actionable code for our stack.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
