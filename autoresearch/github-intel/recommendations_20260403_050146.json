@@ -20,7 +20,7 @@
       "what_to_take": "Integrate the ccxt library for standardized exchange connectivity across all bots, replacing custom exchange API implementations with its unified interface for data feeds and trading operations.",
       "risk": "MIT license is permissive; active maintenance (41k stars) mitigates long-term risk; minimal integration complexity due to well-documented API.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -120,7 +120,7 @@
       "what_to_take": "Feature engineering techniques for order book dynamics and ML model architecture for price prediction, adapted to non-SGX markets",
       "risk": "SGX-specific data pipeline (not applicable to Polymarket/Kalshi), Jupyter format requiring heavy refactoring, future-dated last update (2026) indicating possible repo issue, license not specified",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "None; JavaScript market-making logic is irrelevant to Python prediction market stack and lacks prediction market-specific patterns",
       "risk": "JavaScript vs Python mismatch, future-dated last update (2026) suggests potential repo inaccuracy, and crypto market-making patterns don't translate to prediction market strategies",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "Conceptual models for pairs trading and momentum strategies (e.g., cointegration tests, volatility-based entry/exit), not the notebook code. Reimplement core algorithms in Clawmpson's Python framework with production safeguards.",
       "risk": "Educational code lacks production safeguards (error handling, latency optimization), may contain inefficient implementations. License not specified in repo (MIT likely but requires verification). High maintenance burden to refactor.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "Nothing; models are for stock price prediction (not event-based prediction markets), and Jupyter format is incompatible with production systems.",
       "risk": "Domain mismatch (stocks vs prediction markets), Jupyter Notebook format requires major refactoring, suspicious future last update date (2026-04-02), and license confusion (MIT vs Apache in README).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
