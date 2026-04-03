@@ -60,7 +60,7 @@
       "what_to_take": "Extract the core backtesting engine module (without GUI) and adapt it to work with our SQLite data structures and strategy interfaces for strategy validation in Clawmpson and RivalClaw.",
       "risk": "License not explicitly confirmed (MIT likely but requires verification); requires adaptation for prediction market data structures; potential bloat if GUI dependencies aren't fully removed.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "Extract the backtesting module and strategy interface patterns to enhance Clawmpson's graduation engine for strategy validation and historical testing.",
       "risk": "License not specified in repo (must verify MIT/Apache 2.0), potential maintenance burden from adapting generic framework code to our SQLite/Python stack, and possible over-engineering for ArbClaw's lean requirements.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "Port core indicator algorithms (MACD, Bollinger Bands) to Python for Clawmpson/RivalClaw, avoiding Go dependency",
       "risk": "Go-to-Python integration requires significant porting effort; future-dated last update (2026) is suspicious; license not specified (must verify); redundant with existing Python indicator implementations",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "Study market making strategy patterns and modular architecture for potential Python adaptation, focusing on quote adjustment logic and strategy state management.",
       "risk": "Rust language mismatch requires complex integration (FFI or separate service); future last update date (2026) suggests maintenance risk; license not explicitly verified.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
