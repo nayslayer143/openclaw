@@ -140,7 +140,7 @@
       "what_to_take": "Study composable architecture patterns for real-time data pipelines and execution systems, but avoid direct code integration due to Elixir/Python mismatch.",
       "risk": "Elixir language mismatch requires significant rewrite; suspicious 2026 last update date suggests possible repo abandonment; license not verified (must check MIT/Apache).",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
