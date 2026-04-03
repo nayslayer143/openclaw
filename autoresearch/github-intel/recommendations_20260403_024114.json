@@ -60,7 +60,7 @@
       "what_to_take": "Extract the modular data fetching engine (especially for Polymarket/Kalshi/CoinGecko) and the backtesting framework for strategy validation, avoiding full framework integration.",
       "risk": "Suspicious future last-update date (2026-04-02) suggests potential repo inaccuracy; MIT license is acceptable but requires verification of actual maintenance status.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "Extract the data handling utilities (e.g., get_data, get_bars) for consistent market data fetching across multiple exchanges and feeds, avoiding broker-specific dependencies.",
       "risk": "MIT license is acceptable, but library has Interactive Brokers dependencies that could introduce bloat; requires careful extraction to avoid unnecessary imports. Last update date (2026-03-31) appears erroneous but may indicate stale maintenance.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "No actionable patterns; domain mismatch (crypto vs prediction markets) and JavaScript vs Python stack prevent meaningful integration.",
       "risk": "High complexity from language mismatch, domain irrelevance (crypto strategies don't apply to prediction markets), and potential maintenance burden from bridging JS/Python.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "No useful patterns for prediction markets; Gekko's Bitcoin-specific strategies and JavaScript architecture are incompatible with our Python-based stack and market focus.",
       "risk": "Language mismatch (JavaScript vs Python), market mismatch (Bitcoin vs prediction markets), and suspicious future-dated last update (2026-04-02) indicating potential repo issues.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
