@@ -60,7 +60,7 @@
       "what_to_take": "Extract momentum/price-lag ML model implementations and data preprocessing pipelines for Clawmpson; identify arbitrage detection patterns for ArbClaw",
       "risk": "License not explicitly confirmed (MIT likely but requires verification); last updated date 2026 is suspicious; requires adaptation to existing stack's SQLite/data flow",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -120,7 +120,7 @@
       "what_to_take": "Extract backtrader's strategy base and data handling components to build a dedicated backtesting module for RivalClaw's self-tuner and Clawmpson's graduation engine, enabling strategy validation without live trading impact.",
       "risk": "MIT license is safe, but integration requires refactoring existing strategy testing code; backtrader's full ecosystem isn't needed for live trading, so minimal maintenance overhead but moderate development effort for adapter layer.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "None; repo focuses on stock market RL trading, not prediction markets or arbitrage detection.",
       "risk": "Critical domain mismatch (stock vs prediction markets), high adaptation complexity, and future-dated last update (2026) suggests potential data error.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "This is a curated resource list (not executable code), so no patterns or code can be integrated. It points to external libraries but contains no actionable implementation.",
       "risk": "Repo is HTML-based (not code), last updated in 2026 (future date, indicating stale maintenance), and contains broken or outdated links. No license details visible. High risk of dead links.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
