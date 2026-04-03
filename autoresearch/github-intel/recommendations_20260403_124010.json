@@ -20,7 +20,7 @@
       "what_to_take": "Adopt the strategy class pattern and data handling interface for modular backtesting, and leverage the framework's performance metrics for strategy validation in Clawmpson and RivalClaw.",
       "risk": "MIT license is safe; minor adaptation needed for prediction market event-based outcomes vs. traditional markets, but framework is extensible.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -40,7 +40,7 @@
       "what_to_take": "Extract order book feature engineering techniques (e.g., imbalance metrics, depth features) and ML model selection pipeline for HFT, adapting to our exchange data formats.",
       "risk": "License not specified (must verify), future-dated last update (2026-04-02 is suspicious), and Jupyter Notebook format requires significant refactoring for production use.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "Study Hummingbot's modular strategy framework and order management patterns for architectural inspiration, but avoid direct code integration due to crypto-specific dependencies and prediction market API mismatch.",
       "risk": "Apache 2.0 license is acceptable, but high risk of wasted effort adapting crypto-focused exchange connectors to prediction markets (Polymarket/Kalshi APIs differ significantly), plus potential maintenance burden from unnecessary crypto logic.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "Study event-driven architecture patterns and backtesting engine for Clawmpson's graduation engine, avoiding full framework integration",
       "risk": "Apache 2.0 license acceptable but future-dated last update (2026-04-03) raises maintenance concerns; high complexity would require refactoring existing SQLite/strategy modules",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "The RSI and MACD indicator implementations for potential use in Clawmpson's momentum strategy as secondary confirmation metrics.",
       "risk": "Unknown license (requires verification); strategies are generic and may not optimize for prediction market volatility; potential over-engineering for existing Clawmpson momentum framework.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "None; fundamental mismatch between stock price prediction (traditional equities) and prediction market trading (event outcomes).",
       "risk": "License uncertainty, future-dated update (2026-03-18), and irrelevance to prediction markets (not stock markets).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
