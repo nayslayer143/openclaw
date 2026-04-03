@@ -1,9 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> Auto-generated 2026-04-02T17:07:00-07:00. Do not edit manually.
+> Auto-generated 2026-04-02T18:07:00-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-04-02T17:07:00-07:00
+Generated: 2026-04-02T18:07:00-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -207,7 +207,15 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/rivalclaw/data
 ~/rivalclaw/data/strategy-catalog.json
 ~/rivalclaw/docs
+~/rivalclaw/docs/architecture.md
+~/rivalclaw/docs/configuration.md
+~/rivalclaw/docs/database.md
+~/rivalclaw/docs/execution.md
+~/rivalclaw/docs/operations.md
+~/rivalclaw/docs/risk-management.md
+~/rivalclaw/docs/strategies.md
 ~/rivalclaw/docs/superpowers
+~/rivalclaw/docs/trading-pipeline.md
 ~/rivalclaw/event_logger.py
 ~/rivalclaw/execution_router.py
 ~/rivalclaw/experiments
@@ -1168,48 +1176,57 @@ See [the docs](https://docs.pytest.org/en/stable/how-to/cache.html) for more inf
 ```
 # RivalClaw
 
-Testing a hunch: does my main trading system's architecture actually slow down arbitrage execution?
+Mechanical arbitrage trading system that competes head-to-head against the
+OpenClaw (Clawmpson) trading stack.  Trades binary contracts on **Kalshi**
+across crypto, weather, commodities, and equity-index markets.
 
-[OpenClaw](https://gitlab.com/jordan291/openclaw) (Clawmpson) runs 5 strategies, LLM analysis, a graduation engine, and a bunch of other stuff on a 30-minute cycle. That's great for complex trades, but for cross-outcome arb where mispricing windows close in minutes — all that machinery might be costing me alpha.
+RivalClaw exists to answer one question:
 
-RivalClaw is the middle child in a three-way experiment:
+> Can a narrow, fast, mechanical system outperform a broader, integrated
+> architecture on real, execution-adjusted metrics?
 
-| System | What it is | Cycle | Question it answers |
-|--------|-----------|-------|-------------------|
-| **ArbClaw** | 4 files, zero overhead | 5 min | What's the speed ceiling? |
-| **RivalClaw** | Same architecture as Clawmpson, arb only | 5 min | Does the framework itself add lag? |
-| **Clawmpson** | Full system, 5 strategies | 30 min | Does strategy contention matter? |
+## Design principles
 
-## How it works
+- Mechanical over narrative.
+- Execution-first over theory-first.
+- Fast over exhaustive.
+- Skeptical over optimistic.
+- Minimal over feature-heavy.
 
-RivalClaw keeps Clawmpson's exact control flow but strips everything that isn't arb:
+---
+
+## Architecture overview
 
 ```
-fetch markets → analyze (arb only) → paper trade → check stops → maybe graduate
-```
-
-Same architecture shape. Same execution simulation (slippage, latency penalty, partial fills). Same graduation gates. Just fewer strategies competing for attention.
-
-## The arb math
-
-Identical to ArbClaw — same fee computation, same Kelly formula, same thresholds:
-- Fee: 2% of min(price, 1-price) per leg
-- Min edge: 0.5% after fees
-- Kelly cap: 10% of balance
-
-## What RivalClaw adds over ArbClaw
-
-This is the "architectural weight" being measured:
-- Execution simulation (50bps slippage, 0.2% latency penalty, 80-100% fill rate)
-- Full daily PnL accounting with ROI, Sharpe, max drawdown
-- Graduation gates (7-day window, same thresholds as Clawmpson)
-- Mark-to-market balance derivation
-- Integrity guards (stale timestamps, impossible prices, sum sanity checks)
-- Per-cycle timing instrumentation
-
-## Key metric
-
-`signal_to_trade_latency_ms` — how fast does each system go from seeing an opportunity to placing a trade? Tha
+                               +-------------------+
+                               |   Kalshi REST API  |
+                               | (RSA auth, prod)   |
+                               +--------+----------+
+                                        ^
+                                        | submit / poll / settle
+                                        v
++------------------+    +---------------+---------------+
+|  Market Feeds    |    |       Execution Router        |
+|                  |    |  10-pt pre-flight, kill switch |
+|  kalshi_feed     +--->|  anti-stack, rate limits       |
+|  spot_feed       |    +------+--------+---------------+
+|  index_feed      |           ^        |
+|  weather_feed    |           |        v
++--------+---------+    +------+--------+---------------+
+         |              |     Kalshi Executor            |
+         v              |  order build, submit, poll,    |
++--------+---------+    |  reconciliation, rate limiter  |
+| Market Classifier|    +-------------------------------+
+| speed + clarity  |           ^
++--------+---------+           |
+         |              +------+--------+
+         v              | Protocol      |
++--------+---------+    | Adapter       |
+| Trading Brain    |    | (openclaw-    |
+| 8 strategies     +--->|  protocol)    |
+| Kelly sizing     |    +---------------+
+| direction filter |           ^
++--------+-----
 ```
 
 ## Tech Stack Fingerprint
@@ -1425,7 +1442,7 @@ pytest-asyncio>=0.23
 ### openclaw
 ```
 Branch: main
-Last commit: dc9d028 auto: hourly sync 2026-04-02 23:47 UTC
+Last commit: dfd7f95 auto: hourly sync 2026-04-03 00:47 UTC
 Uncommitted files: 9
 Remote: 
 ```
@@ -1433,8 +1450,8 @@ Remote:
 ### rivalclaw
 ```
 Branch: feat/kalshi-live-bridge
-Last commit: 31d588e auto: hourly sync 2026-04-02 23:47 UTC
-Uncommitted files: 8
+Last commit: 7342f19 auto: hourly sync 2026-04-03 00:47 UTC
+Uncommitted files: 7
 Remote: 
 ```
 
@@ -1449,7 +1466,7 @@ Remote: https://oauth2:glpat-gpKuP2MCJ523PLVy2Rez7mM6MQpvOjEKdTpsMmJnZg8.01.170u
 ### quantumentalclaw
 ```
 Branch: main
-Last commit: 662d0e1 hourly: 2026-04-03 00:00 | $4,550 | 0W/0closed | $+0 | quiet
+Last commit: 9d9f3d1 hourly: 2026-04-03 01:00 | $4,769 | 0W/0closed | $+0 | quiet
 Uncommitted files: 0
 Remote: https://oauth2:glpat-gpKuP2MCJ523PLVy2Rez7mM6MQpvOjEKdTpsMmJnZg8.01.170uc249y@gitlab.com/jordan291/quantumentalclaw.git
 ```
@@ -1549,5 +1566,5 @@ Remote: https://github.com/nayslayer143/shiny-new.git
 ```
 
 ---
-End of context. Generated 2026-04-02T17:07:00-07:00.
+End of context. Generated 2026-04-02T18:07:00-07:00.
 For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw
