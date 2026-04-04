@@ -1,9 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> Auto-generated 2026-04-04T06:00:00-07:00. Do not edit manually.
+> Auto-generated 2026-04-04T06:07:00-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-04-04T06:00:00-07:00
+Generated: 2026-04-04T06:07:00-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -1296,3 +1296,283 @@ RivalClaw exists to answer one question:
 ```
 {"type": "commonjs"}
 ```
+
+### ~/openclaw/doctor-claw/package.json
+```
+{
+  "name": "doctor-claw",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "workers": "node workers/index.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
+    "@base-ui/react": "^1.3.0",
+    "@hookform/resolvers": "^5.2.2",
+    "@radix-ui/react-dialog": "^1.1.15",
+    "@radix-ui/react-label": "^2.1.8",
+    "@radix-ui/react-separator": "^1.1.8",
+    "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-tabs": "^1.1.13",
+    "@supabase/supabase-js": "^2.99.3",
+    "bullmq": "^5.71.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "dotenv": "^17.3.1",
+    "ioredis": "^5.10.1",
+    "lucide-react": "^0.577.0",
+    "next": "14.2.35",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-hook-form": "^7.71.2",
+    "shadcn": "^4.1.0",
+    "tailwind-merge": "^3.5.0",
+    "tw-animate-css": "^1.4.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@types/supertest": "^7.2.0",
+    "jest": "^30.3.0",
+    "postcss": "^8",
+    "supertest": "^7.2.2",
+    "tailwindcss": "^3.4.1",
+    "ts-jest": "^29.4.6",
+    "typescript": "^5"
+  }
+}
+
+```
+
+### ~/openclaw/punch-my-baby/.next/package.json
+```
+{"type": "commonjs"}
+```
+
+### ~/openclaw/punch-my-baby/package.json
+```
+{
+  "name": "punch-my-baby",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
+    "@base-ui/react": "^1.3.0",
+    "@hookform/resolvers": "^5.2.2",
+    "@supabase/supabase-js": "^2.99.3",
+    "adm-zip": "^0.5.16",
+    "cheerio": "^1.2.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "lucide-react": "^0.577.0",
+    "mammoth": "^1.12.0",
+    "next": "16.2.1",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "react-hook-form": "^7.71.2",
+    "shadcn": "^4.1.0",
+    "stripe": "^20.4.1",
+    "tailwind-merge": "^3.5.0",
+    "tw-animate-css": "^1.4.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/adm-zip": "^0.5.8",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
+
+```
+
+### ~/openclaw/requirements.txt
+```
+# Clawmson / OpenClaw dispatcher dependencies
+
+# Core (already in use)
+requests
+
+# HTML parsing for nitter tweet extraction
+beautifulsoup4
+
+# Link ingestion — extracts clean readable text from web pages
+trafilatura
+
+# PDF extraction
+pdfplumber
+
+# Excel/spreadsheet parsing
+openpyxl
+
+# Audio transcription (voice notes, audio files)
+# Only needed if Ollama does not have a whisper model loaded.
+# Install with: pip install openai-whisper
+# Requires ffmpeg: brew install ffmpeg
+openai-whisper
+
+```
+
+### ~/quantumentalclaw/requirements.txt
+```
+aiohttp>=3.9
+httpx>=0.27
+yfinance>=0.2.36
+feedparser>=6.0
+praw>=7.7
+python-dotenv>=1.0
+cryptography>=42.0
+pytest>=8.0
+pytest-asyncio>=0.23
+
+```
+
+## Git Status
+
+### openclaw
+```
+Branch: main
+Last commit: 2918975 auto: 2026-04-04 06:00 state snapshot
+Uncommitted files: 10
+Remote: 
+```
+
+### rivalclaw
+```
+Branch: feat/kalshi-live-bridge
+Last commit: bd5cd3d auto: hourly sync 2026-04-04 12:47 UTC
+Uncommitted files: 4
+Remote: 
+```
+
+### arbclaw
+```
+Branch: main
+Last commit: 394edd6 daily report 2026-04-04 — day 12 | bal=$ pnl=$ trades=0
+Uncommitted files: 3
+Remote: https://oauth2:glpat-gpKuP2MCJ523PLVy2Rez7mM6MQpvOjEKdTpsMmJnZg8.01.170uc249y@gitlab.com/jordan291/arbclaw.git
+```
+
+### quantumentalclaw
+```
+Branch: main
+Last commit: ec6e719 hourly: 2026-04-04 13:00 | $3,128 | 0W/0closed | $+0 | quiet
+Uncommitted files: 0
+Remote: https://oauth2:glpat-gpKuP2MCJ523PLVy2Rez7mM6MQpvOjEKdTpsMmJnZg8.01.170uc249y@gitlab.com/jordan291/quantumentalclaw.git
+```
+
+### doctor-claw
+```
+Branch: main
+Last commit: 0cdc5ed chore: suppress Supabase never-type build error in next.config.mjs
+Uncommitted files: 2
+Remote: https://github.com/nayslayer143/doctor-claw.git
+```
+
+### punch-my-baby
+```
+Branch: main
+Last commit: 954066f feat: file attachments, URL crawling, voice recording, mobile-first
+Uncommitted files: 0
+Remote: https://github.com/nayslayer143/punch-my-baby.git
+```
+
+### shiny-new
+```
+Branch: main
+Last commit: ac64d70 feat: SHINY.NEW v3 — LaChapelle flash, phosphor trail, full-bleed §7, oracle reveal, manifesto inversion, OMEGA easter egg
+Uncommitted files: 3
+Remote: https://github.com/nayslayer143/shiny-new.git
+```
+
+## Environment Files (names only, NO values)
+```
+~/openclaw/dashboard/.env
+~/openclaw/dashboard/.env.example
+~/openclaw/doctor-claw/.env.local
+~/openclaw/doctor-claw/.env.example
+~/openclaw/.env
+~/openclaw/punch-my-baby/.env.local
+~/openclaw/punch-my-baby/.env.example
+~/rivalclaw/.env.prev
+~/rivalclaw/.env
+~/quantumentalclaw/.env
+~/quantumentalclaw/.env.example
+~/openclaw/doctor-claw/.env.local
+~/openclaw/doctor-claw/.env.example
+~/openclaw/punch-my-baby/.env.local
+~/openclaw/punch-my-baby/.env.example
+```
+
+## Trading State (if available)
+
+### Clawmpson Trading Dashboard
+```json
+{
+  "portfolio": {
+    "open_positions": 1,
+    "total_invested": 0,
+    "total_current_value": 0,
+    "total_pnl": 0,
+    "total_pnl_pct": 0,
+    "positions": [
+      {
+        "id": "pos-20260323170243-9921",
+        "question": "Will the All India Anna Dravida Munnetra Kazhagam (ADMK) win the most seats in the 2026 Tamil Nadu Assembly Elections?",
+        "direction": "buy_yes",
+        "entry_price": 0.2155,
+        "estimated_true_prob": 0.4,
+        "edge": 0.1845,
+        "size_usd": 10,
+        "confidence": "medium",
+        "reasoning": "ADMK is a strong party but faces challenges, making it more likely than priced.",
+        "opened_at": "2026-03-23T17:02:43.403185",
+        "status": "open",
+        "pnl": 0,
+        "current_price": null,
+        "note": "Market not found \u2014 may have resolved"
+      }
+    ],
+    "as_of": "2026-03-23T17:02:44.495492"
+  },
+  "recent_signals": [
+    {
+      "question": "Will the All India Anna Dravida Munnetra Kazhagam (ADMK) win the most seats in the 2026 Tamil Nadu Assembly Elections?",
+      "current_yes_price": 0.2155,
+      "estimated_true_prob": 0.4,
+      "edge": 0.1845,
+      "direction": "buy_yes",
+      "confidence": "medium",
+      "reasoning": "ADMK is a strong party but faces challenges, making it more likely than priced.",
+      "suggested_size_usd": 10,
+      "scan_time": "2026-03-23T17:02:43.387870",
+      "status": "traded",
+      "id": "sig-20260323170243-9921"
+    }
+  ],
+  "history": [],
+  "updated_at": "2026-03-23T17:02:44.496312"
+}
+```
+
+---
+End of context. Generated 2026-04-04T06:07:00-07:00.
+For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw
