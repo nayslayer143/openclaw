@@ -20,7 +20,7 @@
       "what_to_take": "Adopt the core backtesting engine and strategy interface (Backtest class, on_tick method) to validate strategies without rewriting existing logic, using existing data feeds and SQLite storage.",
       "risk": "MIT license is safe; active maintenance; minor adaptation needed for strategy code to fit framework interface.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -40,7 +40,7 @@
       "what_to_take": "Extract queue position handling and latency modeling patterns for order book simulation, to be reimplemented in Python for realistic backtesting of arb/price-lag strategies",
       "risk": "Rust-to-Python porting complexity; crypto-specific examples may require adaptation for prediction markets; license must be verified (MIT likely but not confirmed in description)",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -100,7 +100,7 @@
       "what_to_take": "Backtesting engine and strategy component architecture for enhancing strategy testing and self-tuning in RivalClaw and Clawmpson.",
       "risk": "C++ core requires Python bindings; potential data structure mismatch for prediction markets; integration complexity 7/10.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -120,7 +120,7 @@
       "what_to_take": "Adopt Nautilus's event-driven architecture patterns and deterministic processing model for strategy execution and data feed handling, specifically for Clawmpson's graduation engine and RivalClaw's strategy comparison layer.",
       "risk": "Apache-2.0 license is acceptable, but Rust-to-Python integration requires significant effort (FFI, gRPC, or PyO3), increasing maintenance complexity. Risk of over-engineering if porting full system instead of patterns.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "Strategy pattern design and data feed handling patterns for inspiration, but not direct code integration due to C# vs Python mismatch.",
       "risk": "C# language barrier requires significant porting effort; no direct Python integration possible; StockSharp's focus on traditional markets (stocks/forex) less relevant to prediction markets (Polymarket/Kalshi).",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "Extract data preprocessing and model training patterns from the ML pipeline, but avoid direct code integration due to Jupyter format and lack of production context.",
       "risk": "Future-dated update (2026) suggests possible repo abandonment; Jupyter format requires significant refactoring; MIT license unclear in repo; tutorial code not production-tested.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "Generic LSTM/sequence models for time series forecasting, but requires complete domain adaptation from stock prices to prediction market event outcomes",
       "risk": "Domain mismatch (stock vs prediction markets), notebook format unsuitable for production, suspicious future last update date (2026), and no clear license in description. High risk of wasted effort due to fundamental misalignment with prediction market data structure.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -280,7 +280,7 @@
       "what_to_take": "None. Repo has spammy description, future last update date (2026), and generic CEX trading patterns not aligned with prediction markets or our strategy stack.",
       "risk": "High risk: fake future date (2026), spammy README, no license specified, likely low-quality code. Unlikely to provide useful patterns for our specialized prediction market stack.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -300,7 +300,7 @@
       "what_to_take": "The backtesting framework could be adapted for strategy validation, but stock-specific indicators (e.g., chip distribution) are irrelevant to prediction markets.",
       "risk": "Fundamental market mismatch (stocks vs prediction markets), high refactoring cost, license not specified in repo, and stock-specific concepts (e.g., 'chip distribution') won't apply.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -320,7 +320,7 @@
       "what_to_take": "None. Strategies are options-specific (not prediction markets) and would require fundamental rework for market structure differences.",
       "risk": "Domain mismatch (options vs prediction markets) creates high integration risk; no generic indicators applicable without major adaptation.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -340,7 +340,7 @@
       "what_to_take": "Repo is a curated list of resources, not executable code. No patterns or code to integrate. Use list for research only.",
       "risk": "No executable code to integrate; repo is purely a reference list. Wasted effort if mistaken for codebase. License unknown but irrelevant due to lack of code.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -360,7 +360,7 @@
       "what_to_take": "The repo is a curated list of resources, not executable code. No patterns or code should be integrated directly. It may serve as a reference to identify specific libraries for future research.",
       "risk": "No direct integration risk, but the list is static HTML with no code. Relying on it for code integration would require manual research into external libraries, introducing license/maintenance risks not inherent to this repo.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
