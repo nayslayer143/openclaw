@@ -60,7 +60,7 @@
       "what_to_take": "Extract momentum and price-lag strategy patterns from Python files for adaptation into Clawmpson's strategy framework, and look for simple arbitrage logic for ArbClaw's lean design (to be simplified to 3 files).",
       "risk": "License not specified in repo (must verify MIT/Apache 2.0), suspicious 2026-04-03 last update date (likely typo), and strategies may be platform-specific to FMZ (requiring refactoring for our SQLite/feeds architecture).",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "Extract the backtesting engine core and strategy validation module to integrate with Clawmpson's graduation engine and RivalClaw's self-tuner for strategy performance evaluation.",
       "risk": "License not specified in description (must verify MIT/Apache-2.0); future-dated last update (2026) suggests possible data error but repo appears active with 1859 stars.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "Design patterns for exchange connectivity and order management (not code) to inform Python implementation of trade execution layer.",
       "risk": "Java vs Python language mismatch requires full reimplementation; no direct code reuse possible. Ta4j technical analysis library is Java-specific and not portable.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "Extract strategy ensembling logic for RivalClaw's self-tuner; study LLM agent patterns for Clawmpson's LLM strategy (avoid LangChain dependency if possible).",
       "risk": "License unknown (must verify), LangChain dependency risk for Clawmpson integration, suspicious 2026 last update date (likely typo), and potential over-engineering for our lean systems.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "None; domain mismatch (stock prediction vs prediction markets) and Jupyter format unsuitable for production integration.",
       "risk": "Domain mismatch (stocks vs prediction markets), Jupyter notebooks require full refactoring, potential license ambiguity, and high effort for negligible value.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "Conceptual DRL framework structure only (not code), but irrelevant to prediction markets and stock-focused",
       "risk": "Domain mismatch (stocks vs prediction markets), notebook format unsuitable for production, suspicious 2026 last update date (likely abandoned), unknown license",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
