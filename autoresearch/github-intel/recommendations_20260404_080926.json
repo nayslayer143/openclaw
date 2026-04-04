@@ -20,7 +20,7 @@
       "what_to_take": "Extract the WebSocket stream management and data parsing logic for Binance, excluding the terminal UI (rich-tui) component, to replace or enhance Clawmpson's existing Binance feed implementation.",
       "risk": "Missing license information in repo (critical risk), future-dated last update (2026-03-23) suggests potential data error, and Binance-only focus limits cross-exchange arbitrage utility for ArbClaw.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -80,7 +80,7 @@
       "what_to_take": "Extract risk management patterns and AI-driven strategy evaluation modules for Clawmpson's graduation engine and RivalClaw's self-tuning component.",
       "risk": "License unknown (must verify MIT/Apache 2.0), potential dependency bloat from ML libraries, and moderate adaptation required for SQLite schema alignment.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -100,7 +100,7 @@
       "what_to_take": "Adopt the dataflow graph pattern for structuring data pipelines, especially for RivalClaw's multi-source data processing (Polymarket/Kalshi/CoinGecko) and strategy orchestration.",
       "risk": "Suspicious future-dated last update (2026), potential license incompatibility (MIT license not explicitly confirmed), and framework may introduce unnecessary abstraction for existing SQLite-based systems.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "Extract order book feature engineering patterns (e.g., spread depth, liquidity metrics) for potential adaptation to prediction market order books, avoiding SGX-specific data handling.",
       "risk": "SGX market focus mismatch with prediction markets (Polymarket/Kalshi), Jupyter notebook format requiring significant refactoring, and unknown license (must verify).",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "Modular strategy framework and self-tuning mechanism for adaptation to prediction market strategies, excluding exchange-specific crypto code.",
       "risk": "License not specified (potential compatibility risk), last update date appears to be a future date (2026-04-02) suggesting possible repo inactivity or error, and significant adaptation required for prediction market data structures.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "Study columnar storage design patterns for time-series data; avoid direct C integration due to Python stack mismatch.",
       "risk": "Unclear license, suspicious future-dated last update (2026), high maintenance burden from C dependency, and no Python bindings provided.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "None - C++ market making patterns are irrelevant to Python prediction market stack and domain mismatch (crypto exchanges vs prediction markets)",
       "risk": "License uncertainty (not specified in repo), high porting complexity from C++ to Python, and fundamental domain mismatch (crypto market making \u2260 prediction market arbitrage)",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -280,7 +280,7 @@
       "what_to_take": "Extract modular strategy plugin architecture pattern for inspiration, but avoid domain-specific crypto logic as prediction markets require different data models and arbitrage mechanics.",
       "risk": "MIT license is acceptable, but repo is inactive (last updated 2020, not 2026), language mismatch (JS vs Python), and crypto trading patterns are irrelevant to prediction market arbitrage (Polymarket/Kalshi).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -300,7 +300,7 @@
       "what_to_take": "No relevant patterns for prediction markets; repo focuses on stock market RL tape-reading with no adaptation path to prediction market dynamics or our strategies.",
       "risk": "Domain mismatch (stocks vs prediction markets), unverified license (not specified in repo), suspicious future last-update date (2026-04-03), and high adaptation complexity for no strategic value.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -320,7 +320,7 @@
       "what_to_take": "Focus on the time-series forecasting and arbitrage detection examples in the 'models' section, but only after evaluating specific linked repos for direct integration potential",
       "risk": "License compatibility risks with linked repos, high maintenance burden for third-party tools, and significant adaptation needed for our SQLite/strategy stack",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -340,7 +340,7 @@
       "what_to_take": "No actionable code to extract; charting library is JavaScript-based while stack is Python, and not maintained.",
       "risk": "Not maintained (last updated 2026-04-02), JavaScript/Python language mismatch, high integration complexity for potential frontend needs not aligned with current stack architecture.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -360,7 +360,7 @@
       "what_to_take": "Study composable architecture patterns for real-time market data pipelines, but port to Python as needed; avoid direct code reuse due to Elixir/Python mismatch.",
       "risk": "Language mismatch (Elixir vs Python) requires full porting effort; suspicious future-dated last update (2026) suggests possible repo abandonment; no clear license in description.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -380,7 +380,7 @@
       "what_to_take": "None; domain mismatch (crypto trading vs prediction markets) and JavaScript vs Python stack conflict prevent meaningful integration.",
       "risk": "Suspicious future-dated last update (2026), high complexity from language mismatch, and irrelevance to prediction market strategies.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -400,7 +400,7 @@
       "what_to_take": "None. Repo focuses on stock prediction (equities), not prediction markets. Jupyter notebooks are not production-ready and require heavy refactoring.",
       "risk": "Domain mismatch (stocks vs prediction markets), notebook format requiring major refactoring, potential license uncertainty (no license specified), and outdated 2026 update date suggesting possible data inaccuracies.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -420,7 +420,7 @@
       "what_to_take": "No relevant patterns for live trading stack; Zipline is exclusively a backtesting library with no live trading integration capabilities.",
       "risk": "Zipline is designed for backtesting, not live trading, making integration fundamentally misaligned with the stack's purpose. Apache 2.0 license is acceptable but irrelevant due to architectural mismatch.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -440,7 +440,7 @@
       "what_to_take": "No executable code to integrate; only a curated list of external resources requiring manual research.",
       "risk": "Links may be broken, resources require separate integration with unknown licenses/maintenance, and no direct code contribution.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -460,7 +460,7 @@
       "what_to_take": "Curated resource list, not code repository; no executable patterns or libraries to integrate directly.",
       "risk": "Repo is a static HTML list (not code), making integration impossible. Risk of misinterpreting it as a codebase. License not applicable as it's a list.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
