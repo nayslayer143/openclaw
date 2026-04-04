@@ -140,7 +140,7 @@
       "what_to_take": "Signal tracking pattern is abstract but market-specific (Binance futures vs prediction markets) and language mismatch (TypeScript) makes direct integration impractical; no code should be taken.",
       "risk": "License unknown (potential GPL/MIT incompatibility), language mismatch requiring full porting, and market context mismatch (Binance futures vs prediction markets) creates high integration risk.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "Exchange integration patterns (Binance/Coingecko APIs) and order management architecture, but not directly usable due to Java/Python mismatch.",
       "risk": "Java ecosystem mismatch requires heavy refactoring; Apache 2.0 license is acceptable but integration complexity outweighs benefits. No prediction market exchange support (Polymarket/Kalshi).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "No actionable code; research approach is for stock prediction (not prediction markets) and requires major refactoring",
       "risk": "License unspecified (legal risk), future-dated last update (2026) indicates potential inaccuracy/abandonment, fundamental market mismatch (stocks vs prediction markets)",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "None. The repo is a Bitcoin-focused Java bot with no prediction market relevance or Python compatibility.",
       "risk": "Java language mismatch (requires heavy refactoring), Bitcoin-only focus (not prediction markets), future-dated last update (2026-04-02 likely a typo), and minimal relevance to any stack component.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
