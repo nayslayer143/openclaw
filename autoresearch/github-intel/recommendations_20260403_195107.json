@@ -20,7 +20,7 @@
       "what_to_take": "Adopt the core backtesting engine and strategy API to standardize strategy validation across all bots, replacing custom backtesting logic with the framework's robust pipeline for historical data processing and performance metrics.",
       "risk": "MIT license is safe; minor adaptation needed for prediction market data structure (e.g., settlement events vs. standard OHLC), but framework's flexibility mitigates this; no significant maintenance concerns given active community.",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -120,7 +120,7 @@
       "what_to_take": "Study the strategy execution framework and order management patterns for architectural inspiration, but avoid direct integration due to crypto-specific dependencies.",
       "risk": "Apache 2.0 license is acceptable, but Hummingbot's crypto exchange connectors and market data pipelines are incompatible with prediction markets (Polymarket/Kalshi), requiring massive rework. Active maintenance is high but irrelevant to our domain.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "Extract reinforcement learning agent training framework for RivalClaw's self-tuning engine, but adapt for prediction market data instead of stock data.",
       "risk": "License unknown (potential issue), major data mismatch (stock vs prediction markets), and suspicious future last update date (2026-04-01) suggesting repo inaccuracy.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "This repo is a curated list of resources, not executable code. No patterns or code can be integrated into any bot system.",
       "risk": "Repo is a list of external resources (not code), future-dated last update (2026), and contains no executable code for integration. High risk of misleading metadata and zero actual code to leverage.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
