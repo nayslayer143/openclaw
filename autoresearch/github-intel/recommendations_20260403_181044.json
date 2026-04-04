@@ -60,7 +60,7 @@
       "what_to_take": "Extract feature engineering and ML signal generation modules for Clawmpson's LLM strategy and graduation engine, focusing on data preprocessing pipelines and model integration patterns.",
       "risk": "License not specified in repo (potential MIT but unconfirmed), requires adaptation to Clawmpson's SQLite/Python stack, and may introduce unnecessary ML complexity for lean ArbClaw.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -120,7 +120,7 @@
       "what_to_take": "Extract hyperparameter optimization framework and Rich terminal UI components for strategy testing, avoiding crypto exchange integrations to fit Clawmpson/RivalClaw's SQLite-based management.",
       "risk": "Suspicious future date (2026-03-29) suggests potential repo tampering; requires significant adaptation to remove crypto-specific code; MIT license requires verification.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "Extract crypto/derivatives data fetching patterns for potential adaptation to Python, but avoid UI components and terminal logic",
       "risk": "Future-dated last update (2026-04-02) indicates possible repo tampering; Go-to-Python integration would require significant refactoring; UI-focused code not suitable for core trading stack",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -160,7 +160,7 @@
       "what_to_take": "Extract unified API design patterns for exchange interaction (error handling, rate limiting, standardized responses) to replace Clawmpson's feed modules and simplify ArbClaw's exchange interface.",
       "risk": "JavaScript codebase incompatible with Python stack; future-dated last update (2026) suggests potential metadata error; license must be verified (likely MIT but requires check).",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "Extract composable architecture patterns for real-time data pipelines and trade execution, to inform Python implementation of feed handling and execution modules.",
       "risk": "Suspicious future last update date (2026), potential maintenance issues; high complexity due to Elixir/Python language barrier; no direct code reuse possible.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -220,7 +220,7 @@
       "what_to_take": "The backtesting module and strategy template structure for standardizing strategy development and backtesting, avoiding redundant implementation in Clawmpson's graduation engine.",
       "risk": "License not specified (potential risk), framework optimized for cryptocurrency not prediction markets (may require adaptation for Polymarket/Kalshi nuances), and future-dated last update (2026) suggests possible metadata error.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "No actionable patterns; domain mismatch (crypto trading vs prediction markets) and TypeScript language prevent integration. Core exchange logic (CCXT) is already covered in our stack.",
       "risk": "Future-dated last update (2026-04-02) indicates potential repo inaccuracy; TypeScript/Python language mismatch requires full rewrite; crypto trading strategies irrelevant to prediction market arbitrage.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -280,7 +280,7 @@
       "what_to_take": "Strategy development framework and backtesting infrastructure, but requires significant adaptation for prediction market data structures and trading rules.",
       "risk": "Domain mismatch (crypto vs prediction markets) requires high refactoring effort; exchange integration not applicable; MIT license acceptable but not worth effort.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -300,7 +300,7 @@
       "what_to_take": "Deep learning models for stock market prediction are irrelevant to prediction markets (Polymarket/Kalshi) and would require domain adaptation. No useful patterns for our stack.",
       "risk": "Domain mismatch (stock vs. prediction markets) creates high adaptation complexity. License not verified (potential legal risk). Last updated in 2026 (likely typo indicating abandonment).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -320,7 +320,7 @@
       "what_to_take": "None; repo is a curated list of resources, not executable code or patterns for integration.",
       "risk": "No code to integrate (just a list), so no license/maintenance risks for integration. Risk of misinterpreting as a codebase.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -340,7 +340,7 @@
       "what_to_take": "Repo is a static HTML list of trading resources, not executable code. No patterns or code to integrate.",
       "risk": "Repo is HTML (not code), last updated in 2026 (future date, indicating staleness), and contains no executable content. Links may be broken. License not specified for the list itself.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null

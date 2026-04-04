@@ -1,10 +1,30 @@
 {
   "crawl_date": "2026-04-03",
-  "analyzed_at": "2026-04-03T18:10:44.325940",
+  "analyzed_at": "2026-04-03T18:00:41.931744",
   "model": "qwen3:30b",
   "total_analyzed": 102,
   "total_library": 111,
   "recommendations": [
+    {
+      "id": "ff27d06f-f824-43a3-9a39-ece446d616fb",
+      "repo_name": "kernc/backtesting.py",
+      "repo_url": "https://github.com/kernc/backtesting.py",
+      "stars": 8150,
+      "language": "Python",
+      "signal_score": 1.1979,
+      "integration_value": 9,
+      "complexity": 4,
+      "clawmpson_relevance": 9,
+      "arbclaw_relevance": 8,
+      "rivalclaw_relevance": 7,
+      "what_to_take": "Adopt the core Backtest class and strategy execution framework for robust historical validation of all strategies, replacing Clawmpson's graduation engine's backtesting component and enabling ArbClaw's 5-min arb cycle validation.",
+      "risk": "MIT license is safe, but requires strategy code adaptation (moderate effort). No major maintenance concerns as repo is actively maintained with strong community support.",
+      "verdict": "INTEGRATE",
+      "status": "pending",
+      "approved_for": [],
+      "approved_at": null,
+      "task_id": null
+    },
     {
       "id": "eba4ca29-f706-4c05-be43-69b7b2ebeb18",
       "repo_name": "AmpyFin/ampyfin",
@@ -40,26 +60,6 @@
       "what_to_take": "Extract the event-driven backtesting engine and strategy evaluation tools to enhance Clawmpson's graduation engine and RivalClaw's self-tuner, adapting for prediction market data feeds.",
       "risk": "Future last update date (2026-03-25) is suspicious (likely typo) but indicates potential maintenance issues; prediction market support requires adaptation beyond crypto/stocks/futures; license must be verified (common permissive but not specified).",
       "verdict": "INTEGRATE",
-      "status": "pushed_to_repoman",
-      "approved_for": [],
-      "approved_at": null,
-      "task_id": null
-    },
-    {
-      "id": "181d2250-4bcb-4465-bbe9-4306fc5b51c0",
-      "repo_name": "asavinov/intelligent-trading-bot",
-      "repo_url": "https://github.com/asavinov/intelligent-trading-bot",
-      "stars": 1657,
-      "language": "Python",
-      "signal_score": 0.9061,
-      "integration_value": 7,
-      "complexity": 6,
-      "clawmpson_relevance": 7,
-      "arbclaw_relevance": 2,
-      "rivalclaw_relevance": 5,
-      "what_to_take": "Extract feature engineering and ML signal generation modules for Clawmpson's LLM strategy and graduation engine, focusing on data preprocessing pipelines and model integration patterns.",
-      "risk": "License not specified in repo (potential MIT but unconfirmed), requires adaptation to Clawmpson's SQLite/Python stack, and may introduce unnecessary ML complexity for lean ArbClaw.",
-      "verdict": "STUDY",
       "status": "pushed_to_repoman",
       "approved_for": [],
       "approved_at": null,
@@ -106,86 +106,6 @@
       "task_id": null
     },
     {
-      "id": "66d5344b-2151-43df-9b57-b3092cefe981",
-      "repo_name": "Kaleighc793/freqtrade-bot",
-      "repo_url": "https://github.com/Kaleighc793/freqtrade-bot",
-      "stars": 562,
-      "language": "Python",
-      "signal_score": 1.1768,
-      "integration_value": 6,
-      "complexity": 7,
-      "clawmpson_relevance": 7,
-      "arbclaw_relevance": 3,
-      "rivalclaw_relevance": 6,
-      "what_to_take": "Extract hyperparameter optimization framework and Rich terminal UI components for strategy testing, avoiding crypto exchange integrations to fit Clawmpson/RivalClaw's SQLite-based management.",
-      "risk": "Suspicious future date (2026-03-29) suggests potential repo tampering; requires significant adaptation to remove crypto-specific code; MIT license requires verification.",
-      "verdict": "STUDY",
-      "status": "pushed_to_repoman",
-      "approved_for": [],
-      "approved_at": null,
-      "task_id": null
-    },
-    {
-      "id": "d1c304f3-f16e-41a2-bdbf-8e6c748cf938",
-      "repo_name": "achannarasappa/ticker",
-      "repo_url": "https://github.com/achannarasappa/ticker",
-      "stars": 6020,
-      "language": "Go",
-      "signal_score": 0.9261,
-      "integration_value": 6,
-      "complexity": 8,
-      "clawmpson_relevance": 4,
-      "arbclaw_relevance": 3,
-      "rivalclaw_relevance": 5,
-      "what_to_take": "Extract crypto/derivatives data fetching patterns for potential adaptation to Python, but avoid UI components and terminal logic",
-      "risk": "Future-dated last update (2026-04-02) indicates possible repo tampering; Go-to-Python integration would require significant refactoring; UI-focused code not suitable for core trading stack",
-      "verdict": "STUDY",
-      "status": "pushed_to_repoman",
-      "approved_for": [],
-      "approved_at": null,
-      "task_id": null
-    },
-    {
-      "id": "5617d8ab-7c9c-4d08-a488-b695508f0833",
-      "repo_name": "ccxt-rest/ccxt-rest",
-      "repo_url": "https://github.com/ccxt-rest/ccxt-rest",
-      "stars": 484,
-      "language": "JavaScript",
-      "signal_score": 0.9112,
-      "integration_value": 6,
-      "complexity": 4,
-      "clawmpson_relevance": 7,
-      "arbclaw_relevance": 9,
-      "rivalclaw_relevance": 5,
-      "what_to_take": "Extract unified API design patterns for exchange interaction (error handling, rate limiting, standardized responses) to replace Clawmpson's feed modules and simplify ArbClaw's exchange interface.",
-      "risk": "JavaScript codebase incompatible with Python stack; future-dated last update (2026) suggests potential metadata error; license must be verified (likely MIT but requires check).",
-      "verdict": "STUDY",
-      "status": "pushed_to_repoman",
-      "approved_for": [],
-      "approved_at": null,
-      "task_id": null
-    },
-    {
-      "id": "9c8f28cc-e4c3-4061-b2e0-f2dca5cc0652",
-      "repo_name": "fremantle-industries/tai",
-      "repo_url": "https://github.com/fremantle-industries/tai",
-      "stars": 494,
-      "language": "Elixir",
-      "signal_score": 0.8517,
-      "integration_value": 6,
-      "complexity": 8,
-      "clawmpson_relevance": 5,
-      "arbclaw_relevance": 3,
-      "rivalclaw_relevance": 6,
-      "what_to_take": "Extract composable architecture patterns for real-time data pipelines and trade execution, to inform Python implementation of feed handling and execution modules.",
-      "risk": "Suspicious future last update date (2026), potential maintenance issues; high complexity due to Elixir/Python language barrier; no direct code reuse possible.",
-      "verdict": "STUDY",
-      "status": "pushed_to_repoman",
-      "approved_for": [],
-      "approved_at": null,
-      "task_id": null
-    },
-    {
       "id": "72231748-3a2a-46b2-a384-93ae80302101",
       "repo_name": "PyPortfolio/PyPortfolioOpt",
       "repo_url": "https://github.com/PyPortfolio/PyPortfolioOpt",
@@ -199,26 +119,6 @@
       "rivalclaw_relevance": 8,
       "what_to_take": "Extract the Hierarchical Risk Parity (HRP) implementation and covariance estimation methods for RivalClaw's self-tuning engine to optimize multi-strategy capital allocation across Polymarket/Kalshi assets.",
       "risk": "MIT license is acceptable, but Jupyter Notebook format requires significant refactoring. Algorithms assume traditional asset covariance; prediction markets require discrete outcome adaptation. Potential over-engineering for ArbClaw's lean design.",
-      "verdict": "STUDY",
-      "status": "pushed_to_repoman",
-      "approved_for": [],
-      "approved_at": null,
-      "task_id": null
-    },
-    {
-      "id": "9addfd4d-d258-4f61-9eb6-e2e6d330642a",
-      "repo_name": "coding-kitties/investing-algorithm-framework",
-      "repo_url": "https://github.com/coding-kitties/investing-algorithm-framework",
-      "stars": 713,
-      "language": "Python",
-      "signal_score": 1.0714,
-      "integration_value": 5,
-      "complexity": 7,
-      "clawmpson_relevance": 6,
-      "arbclaw_relevance": 3,
-      "rivalclaw_relevance": 5,
-      "what_to_take": "The backtesting module and strategy template structure for standardizing strategy development and backtesting, avoiding redundant implementation in Clawmpson's graduation engine.",
-      "risk": "License not specified (potential risk), framework optimized for cryptocurrency not prediction markets (may require adaptation for Polymarket/Kalshi nuances), and future-dated last update (2026) suggests possible metadata error.",
       "verdict": "STUDY",
       "status": "pushed_to_repoman",
       "approved_for": [],
@@ -246,110 +146,10 @@
       "task_id": null
     },
     {
-      "id": "ef03570c-f3d9-42b0-b92a-70964b006266",
-      "repo_name": "Haehnchen/crypto-trading-bot",
-      "repo_url": "https://github.com/Haehnchen/crypto-trading-bot",
-      "stars": 3451,
-      "language": "TypeScript",
-      "signal_score": 1.0238,
-      "integration_value": 3,
-      "complexity": 8,
-      "clawmpson_relevance": 2,
-      "arbclaw_relevance": 1,
-      "rivalclaw_relevance": 1,
-      "what_to_take": "No actionable patterns; domain mismatch (crypto trading vs prediction markets) and TypeScript language prevent integration. Core exchange logic (CCXT) is already covered in our stack.",
-      "risk": "Future-dated last update (2026-04-02) indicates potential repo inaccuracy; TypeScript/Python language mismatch requires full rewrite; crypto trading strategies irrelevant to prediction market arbitrage.",
-      "verdict": "SKIP",
-      "status": "pushed_to_repoman",
-      "approved_for": [],
-      "approved_at": null,
-      "task_id": null
-    },
-    {
-      "id": "6fcb7661-ceec-48b3-9284-b2122288995a",
-      "repo_name": "freqtrade/freqtrade",
-      "repo_url": "https://github.com/freqtrade/freqtrade",
-      "stars": 48286,
-      "language": "Python",
-      "signal_score": 1.0188,
-      "integration_value": 3,
-      "complexity": 8,
-      "clawmpson_relevance": 2,
-      "arbclaw_relevance": 2,
-      "rivalclaw_relevance": 3,
-      "what_to_take": "Strategy development framework and backtesting infrastructure, but requires significant adaptation for prediction market data structures and trading rules.",
-      "risk": "Domain mismatch (crypto vs prediction markets) requires high refactoring effort; exchange integration not applicable; MIT license acceptable but not worth effort.",
-      "verdict": "SKIP",
-      "status": "pushed_to_repoman",
-      "approved_for": [],
-      "approved_at": null,
-      "task_id": null
-    },
-    {
-      "id": "85a6066b-a2df-492b-b732-d79f6d5fdbe9",
-      "repo_name": "achillesrasquinha/bulbea",
-      "repo_url": "https://github.com/achillesrasquinha/bulbea",
-      "stars": 2270,
-      "language": "Python",
-      "signal_score": 1.0699,
-      "integration_value": 2,
-      "complexity": 8,
-      "clawmpson_relevance": 2,
-      "arbclaw_relevance": 1,
-      "rivalclaw_relevance": 2,
-      "what_to_take": "Deep learning models for stock market prediction are irrelevant to prediction markets (Polymarket/Kalshi) and would require domain adaptation. No useful patterns for our stack.",
-      "risk": "Domain mismatch (stock vs. prediction markets) creates high adaptation complexity. License not verified (potential legal risk). Last updated in 2026 (likely typo indicating abandonment).",
-      "verdict": "SKIP",
-      "status": "pushed_to_repoman",
-      "approved_for": [],
-      "approved_at": null,
-      "task_id": null
-    },
-    {
-      "id": "35280e49-908d-4d3a-a025-131db818a0e1",
-      "repo_name": "merovinh/best-of-algorithmic-trading",
-      "repo_url": "https://github.com/merovinh/best-of-algorithmic-trading",
-      "stars": 775,
-      "language": "Unknown",
-      "signal_score": 1.0285,
-      "integration_value": 1,
-      "complexity": 1,
-      "clawmpson_relevance": 2,
-      "arbclaw_relevance": 2,
-      "rivalclaw_relevance": 2,
-      "what_to_take": "None; repo is a curated list of resources, not executable code or patterns for integration.",
-      "risk": "No code to integrate (just a list), so no license/maintenance risks for integration. Risk of misinterpreting as a codebase.",
-      "verdict": "SKIP",
-      "status": "pushed_to_repoman",
-      "approved_for": [],
-      "approved_at": null,
-      "task_id": null
-    },
-    {
-      "id": "a8f7ebaf-43a2-4e8e-acbd-ba208579dbc5",
-      "repo_name": "wangzhe3224/awesome-systematic-trading",
-      "repo_url": "https://github.com/wangzhe3224/awesome-systematic-trading",
-      "stars": 3757,
-      "language": "HTML",
-      "signal_score": 0.9225,
-      "integration_value": 1,
-      "complexity": 10,
-      "clawmpson_relevance": 1,
-      "arbclaw_relevance": 1,
-      "rivalclaw_relevance": 1,
-      "what_to_take": "Repo is a static HTML list of trading resources, not executable code. No patterns or code to integrate.",
-      "risk": "Repo is HTML (not code), last updated in 2026 (future date, indicating staleness), and contains no executable content. Links may be broken. License not specified for the list itself.",
-      "verdict": "SKIP",
-      "status": "pushed_to_repoman",
-      "approved_for": [],
-      "approved_at": null,
-      "task_id": null
-    },
-    {
-      "id": "234ac166-e852-427a-902a-9cb3e4c9e1fc",
+      "id": "25668eee-1376-4dd9-8885-388ac2f95fe2",
       "repo_name": "Superalgos/Superalgos",
       "repo_url": "https://github.com/Superalgos/Superalgos",
-      "stars": 5387,
+      "stars": 5386,
       "language": "JavaScript",
       "signal_score": 1.3626,
       "integration_value": 0,
@@ -366,10 +166,10 @@
       "task_id": null
     },
     {
-      "id": "0fc1d836-df17-4044-bdd6-abdd3cf7ee9e",
+      "id": "f65a18c2-261f-465e-9fb3-0495d345faa4",
       "repo_name": "hummingbot/hummingbot",
       "repo_url": "https://github.com/hummingbot/hummingbot",
-      "stars": 17924,
+      "stars": 17923,
       "language": "Python",
       "signal_score": 1.2494,
       "integration_value": 0,
@@ -386,7 +186,7 @@
       "task_id": null
     },
     {
-      "id": "f8e6a2ce-b710-415d-b057-beba03262677",
+      "id": "26bcef7d-b0a6-4200-a725-9bf5e3ca507a",
       "repo_name": "ricequant/rqalpha",
       "repo_url": "https://github.com/ricequant/rqalpha",
       "stars": 6278,
@@ -406,10 +206,10 @@
       "task_id": null
     },
     {
-      "id": "85004863-d109-4877-90b7-03a3d554f910",
+      "id": "3f3b89bb-f910-43c5-961b-a60e4399d976",
       "repo_name": "je-suis-tm/quant-trading",
       "repo_url": "https://github.com/je-suis-tm/quant-trading",
-      "stars": 9588,
+      "stars": 9587,
       "language": "Python",
       "signal_score": 1.2093,
       "integration_value": 0,
@@ -426,12 +226,12 @@
       "task_id": null
     },
     {
-      "id": "be572c99-46b3-4ebc-a75f-d63fc70f5d61",
-      "repo_name": "kernc/backtesting.py",
-      "repo_url": "https://github.com/kernc/backtesting.py",
-      "stars": 8150,
+      "id": "f04a55a6-09f9-45e9-a992-4fffc60b808e",
+      "repo_name": "Kaleighc793/freqtrade-bot",
+      "repo_url": "https://github.com/Kaleighc793/freqtrade-bot",
+      "stars": 562,
       "language": "Python",
-      "signal_score": 1.1979,
+      "signal_score": 1.1768,
       "integration_value": 0,
       "complexity": 0,
       "clawmpson_relevance": 0,
@@ -446,7 +246,7 @@
       "task_id": null
     },
     {
-      "id": "18ccbb20-5754-4340-8bf4-063ea506ca0b",
+      "id": "598b770e-af1d-46ef-bd3b-0029c1ba1129",
       "repo_name": "ctubio/Krypto-trading-bot",
       "repo_url": "https://github.com/ctubio/Krypto-trading-bot",
       "stars": 3679,
@@ -466,7 +266,7 @@
       "task_id": null
     },
     {
-      "id": "cec71c9b-50fc-44cf-9841-cd39a99ba577",
+      "id": "713fb308-66c4-41fd-9e8c-1e78b31735b0",
       "repo_name": "rorysroes/SGX-Full-OrderBook-Tick-Data-Trading-Strategy",
       "repo_url": "https://github.com/rorysroes/SGX-Full-OrderBook-Tick-Data-Trading-Strategy",
       "stars": 2246,
@@ -486,7 +286,7 @@
       "task_id": null
     },
     {
-      "id": "2044539f-2c43-4bdf-bf36-83eb8d660603",
+      "id": "79896dbb-125b-43c4-8ec4-fa84adfad45b",
       "repo_name": "fasiondog/hikyuu",
       "repo_url": "https://github.com/fasiondog/hikyuu",
       "stars": 3069,
@@ -506,7 +306,7 @@
       "task_id": null
     },
     {
-      "id": "1fb82efa-1d44-4b80-bf94-c60f4caf3929",
+      "id": "240c2ff9-caeb-4137-850b-21d9d6755e1d",
       "repo_name": "nkaz001/hftbacktest",
       "repo_url": "https://github.com/nkaz001/hftbacktest",
       "stars": 3897,
@@ -526,7 +326,7 @@
       "task_id": null
     },
     {
-      "id": "bc3f6992-1d5f-4652-bab1-7da0bb4cb196",
+      "id": "cf1c2f63-c1ee-40b6-bd13-b331cb8e6fb9",
       "repo_name": "dcajasn/Riskfolio-Lib",
       "repo_url": "https://github.com/dcajasn/Riskfolio-Lib",
       "stars": 4018,
@@ -546,10 +346,10 @@
       "task_id": null
     },
     {
-      "id": "c828991d-5e00-4338-898d-8da7696dc5df",
+      "id": "b411f74a-73dd-427b-81fc-67f441d171a6",
       "repo_name": "huseinzol05/Stock-Prediction-Models",
       "repo_url": "https://github.com/huseinzol05/Stock-Prediction-Models",
-      "stars": 9281,
+      "stars": 9280,
       "language": "Jupyter Notebook",
       "signal_score": 1.1561,
       "integration_value": 0,
@@ -566,7 +366,7 @@
       "task_id": null
     },
     {
-      "id": "05bdd57e-abea-4652-a7b5-335f83c7f311",
+      "id": "99abb4bc-2912-4f35-9067-85c2e15889b1",
       "repo_name": "TradeMaster-NTU/TradeMaster",
       "repo_url": "https://github.com/TradeMaster-NTU/TradeMaster",
       "stars": 2551,
@@ -586,7 +386,7 @@
       "task_id": null
     },
     {
-      "id": "b818b938-efff-4000-8f12-756710d45234",
+      "id": "1524b733-98ed-4bd6-a252-a583dd3c5fed",
       "repo_name": "edtechre/pybroker",
       "repo_url": "https://github.com/edtechre/pybroker",
       "stars": 3252,
@@ -606,12 +406,12 @@
       "task_id": null
     },
     {
-      "id": "6b99a301-907f-491e-a46f-74e7ecbf921b",
+      "id": "636211e5-c5bb-4d60-a2cc-7ba301bd452b",
       "repo_name": "51bitquant/howtrader",
       "repo_url": "https://github.com/51bitquant/howtrader",
       "stars": 896,
       "language": "Python",
-      "signal_score": 1.1381,
+      "signal_score": 1.1386,
       "integration_value": 0,
       "complexity": 0,
       "clawmpson_relevance": 0,
@@ -626,7 +426,7 @@
       "task_id": null
     },
     {
-      "id": "9a99212d-fb5a-4d21-afff-9bc6844bae89",
+      "id": "8416071e-2965-4c6c-9c0b-77e53f2800ec",
       "repo_name": "51bitquant/bitquant",
       "repo_url": "https://github.com/51bitquant/bitquant",
       "stars": 1127,
@@ -646,7 +446,7 @@
       "task_id": null
     },
     {
-      "id": "e6699ea2-b66a-436d-b0f6-0e0947822c6a",
+      "id": "82fc9cb9-8bba-4dd5-af24-c82810b777b7",
       "repo_name": "blankly-finance/blankly",
       "repo_url": "https://github.com/blankly-finance/blankly",
       "stars": 2419,
@@ -666,12 +466,12 @@
       "task_id": null
     },
     {
-      "id": "06a70f15-65b0-4b9d-9f80-9f3ad2b847e8",
+      "id": "4677f3b2-98f8-488a-9dcd-cbf862e7ff32",
       "repo_name": "barter-rs/barter-rs",
       "repo_url": "https://github.com/barter-rs/barter-rs",
       "stars": 2048,
       "language": "Rust",
-      "signal_score": 1.1259,
+      "signal_score": 1.1258,
       "integration_value": 0,
       "complexity": 0,
       "clawmpson_relevance": 0,
@@ -686,7 +486,7 @@
       "task_id": null
     },
     {
-      "id": "0cdc2038-0254-4f91-aa82-f22317625ef6",
+      "id": "38f37e5a-9143-406b-a9bc-5ac637f6213a",
       "repo_name": "brokermr810/QuantDinger",
       "repo_url": "https://github.com/brokermr810/QuantDinger",
       "stars": 1082,
@@ -706,7 +506,7 @@
       "task_id": null
     },
     {
-      "id": "d5947d3d-48fd-40bc-b628-792750bfdc63",
+      "id": "678dcbe6-1966-41b2-8699-c41206260cd0",
       "repo_name": "PyPatel/Options-Trading-Strategies-in-Python",
       "repo_url": "https://github.com/PyPatel/Options-Trading-Strategies-in-Python",
       "stars": 979,
@@ -726,7 +526,7 @@
       "task_id": null
     },
     {
-      "id": "149815bc-d8d7-44e9-b82e-7af0b5ba43b0",
+      "id": "72ba27c0-81a8-49a4-80d3-4f368ecb32a4",
       "repo_name": "Adamant-im/adamant-tradebot",
       "repo_url": "https://github.com/Adamant-im/adamant-tradebot",
       "stars": 771,
@@ -746,7 +546,7 @@
       "task_id": null
     },
     {
-      "id": "eed01621-4bfe-4754-8272-f07a2780e5ab",
+      "id": "23524bfe-3ffe-4beb-8042-023f0413e10b",
       "repo_name": "LongOnly/Quantitative-Notebooks",
       "repo_url": "https://github.com/LongOnly/Quantitative-Notebooks",
       "stars": 1321,
@@ -766,12 +566,12 @@
       "task_id": null
     },
     {
-      "id": "91981c92-71cf-4115-a153-a0552a244ff0",
+      "id": "62d2a281-8ce9-4b3e-a2b2-29f6d1066ef8",
       "repo_name": "ivopetiz/algotrading",
       "repo_url": "https://github.com/ivopetiz/algotrading",
       "stars": 1526,
       "language": "Python",
-      "signal_score": 1.1115,
+      "signal_score": 1.112,
       "integration_value": 0,
       "complexity": 0,
       "clawmpson_relevance": 0,
@@ -786,10 +586,10 @@
       "task_id": null
     },
     {
-      "id": "f2702af1-f603-434f-8c64-142c76947f01",
+      "id": "61dd09cc-e1f3-4f12-9252-96a4f31411e8",
       "repo_name": "ccxt/ccxt",
       "repo_url": "https://github.com/ccxt/ccxt",
-      "stars": 41629,
+      "stars": 41628,
       "language": "Python",
       "signal_score": 1.1042,
       "integration_value": 0,
@@ -806,7 +606,7 @@
       "task_id": null
     },
     {
-      "id": "f2871a33-7e37-4f6a-acca-77f02ecc5c1f",
+      "id": "74fe47ed-484c-4043-ae8a-ab690b66cd50",
       "repo_name": "ryanfrigo/kalshi-ai-trading-bot",
       "repo_url": "https://github.com/ryanfrigo/kalshi-ai-trading-bot",
       "stars": 322,
@@ -826,7 +626,7 @@
       "task_id": null
     },
     {
-      "id": "0f2126c4-aaf7-4c1d-8684-16ceebc2bb4d",
+      "id": "2fe63ce6-38f3-47c2-aa1b-b7ca4593a953",
       "repo_name": "ZENALC/algobot",
       "repo_url": "https://github.com/ZENALC/algobot",
       "stars": 957,
@@ -846,7 +646,7 @@
       "task_id": null
     },
     {
-      "id": "8cb07c8c-9578-4215-891f-faf8404df7c8",
+      "id": "ca6ea700-65e6-495e-bd7a-2ca347090d62",
       "repo_name": "constverum/Quantdom",
       "repo_url": "https://github.com/constverum/Quantdom",
       "stars": 761,
@@ -866,12 +666,12 @@
       "task_id": null
     },
     {
-      "id": "b52ffbd0-76ae-44af-bc97-62345189e666",
+      "id": "119475f0-e86e-484e-9cd1-2a9840c3a025",
       "repo_name": "cinar/indicator",
       "repo_url": "https://github.com/cinar/indicator",
       "stars": 831,
       "language": "Go",
-      "signal_score": 1.0856,
+      "signal_score": 1.0861,
       "integration_value": 0,
       "complexity": 0,
       "clawmpson_relevance": 0,
@@ -886,7 +686,7 @@
       "task_id": null
     },
     {
-      "id": "738ec5a8-6905-497e-ac8a-51bd07cd82eb",
+      "id": "de81e1b0-a9ae-47e5-99a8-9692eef05419",
       "repo_name": "purefinance/mmb",
       "repo_url": "https://github.com/purefinance/mmb",
       "stars": 600,
@@ -906,12 +706,12 @@
       "task_id": null
     },
     {
-      "id": "f67a264d-d747-464f-8537-d4330f6ec347",
+      "id": "66ab2301-9468-493c-af27-2294eeb73481",
       "repo_name": "TheFourGreatErrors/alpha-rptr",
       "repo_url": "https://github.com/TheFourGreatErrors/alpha-rptr",
       "stars": 640,
       "language": "Python",
-      "signal_score": 1.073,
+      "signal_score": 1.0735,
       "integration_value": 0,
       "complexity": 0,
       "clawmpson_relevance": 0,
@@ -926,10 +726,50 @@
       "task_id": null
     },
     {
-      "id": "0ef2f077-5623-4920-b41c-66d1ea129cd6",
+      "id": "6ae8e88e-56eb-4cca-9cae-a387954c3409",
+      "repo_name": "coding-kitties/investing-algorithm-framework",
+      "repo_url": "https://github.com/coding-kitties/investing-algorithm-framework",
+      "stars": 713,
+      "language": "Python",
+      "signal_score": 1.0714,
+      "integration_value": 0,
+      "complexity": 0,
+      "clawmpson_relevance": 0,
+      "arbclaw_relevance": 0,
+      "rivalclaw_relevance": 0,
+      "what_to_take": "",
+      "risk": "analysis_failed",
+      "verdict": "SKIP",
+      "status": "analysis_failed",
+      "approved_for": [],
+      "approved_at": null,
+      "task_id": null
+    },
+    {
+      "id": "ec214dda-be72-47b9-9420-8ea52a4cd1ea",
+      "repo_name": "achillesrasquinha/bulbea",
+      "repo_url": "https://github.com/achillesrasquinha/bulbea",
+      "stars": 2270,
+      "language": "Python",
+      "signal_score": 1.0704,
+      "integration_value": 0,
+      "complexity": 0,
+      "clawmpson_relevance": 0,
+      "arbclaw_relevance": 0,
+      "rivalclaw_relevance": 0,
+      "what_to_take": "",
+      "risk": "analysis_failed",
+      "verdict": "SKIP",
+      "status": "analysis_failed",
+      "approved_for": [],
+      "approved_at": null,
+      "task_id": null
+    },
+    {
+      "id": "be16b70f-77e6-4f2c-8b2f-811b15771e93",
       "repo_name": "nautechsystems/nautilus_trader",
       "repo_url": "https://github.com/nautechsystems/nautilus_trader",
-      "stars": 21617,
+      "stars": 21615,
       "language": "Rust",
       "signal_score": 1.0673,
       "integration_value": 0,
@@ -946,12 +786,12 @@
       "task_id": null
     },
     {
-      "id": "45cb2c6d-83d0-49b0-adba-92a696d43e54",
+      "id": "a7ce5697-55cd-4934-a1a1-79951935be13",
       "repo_name": "tudorelu/pyjuque",
       "repo_url": "https://github.com/tudorelu/pyjuque",
       "stars": 457,
       "language": "Python",
-      "signal_score": 1.0667,
+      "signal_score": 1.0672,
       "integration_value": 0,
       "complexity": 0,
       "clawmpson_relevance": 0,
@@ -966,10 +806,10 @@
       "task_id": null
     },
     {
-      "id": "075053ca-b1f5-411e-92f3-9229bbbcc4d8",
+      "id": "410bb50f-da0d-4c43-b21c-21ed7a63bcbd",
       "repo_name": "fmzquant/strategies",
       "repo_url": "https://github.com/fmzquant/strategies",
-      "stars": 5136,
+      "stars": 5135,
       "language": "Unknown",
       "signal_score": 1.0631,
       "integration_value": 0,
@@ -986,12 +826,12 @@
       "task_id": null
     },
     {
-      "id": "02111bb8-ecf8-40fa-b6ff-9aac1b13861f",
+      "id": "c5f4f218-5072-40c3-a46e-62f8acfeaef2",
       "repo_name": "Yvictor/TradingGym",
       "repo_url": "https://github.com/Yvictor/TradingGym",
       "stars": 1859,
       "language": "Python",
-      "signal_score": 1.0605,
+      "signal_score": 1.0609,
       "integration_value": 0,
       "complexity": 0,
       "clawmpson_relevance": 0,
@@ -1006,7 +846,7 @@
       "task_id": null
     },
     {
-      "id": "5ebea7cf-aad1-4d52-a02c-c6d122d0c193",
+      "id": "978225ca-1863-4119-a806-97fd24d1fcc9",
       "repo_name": "LastAncientOne/Deep_Learning_Machine_Learning_Stock",
       "repo_url": "https://github.com/LastAncientOne/Deep_Learning_Machine_Learning_Stock",
       "stars": 1731,
@@ -1026,7 +866,7 @@
       "task_id": null
     },
     {
-      "id": "e3d9eb26-01a9-44c5-92a0-65abf39cbf2b",
+      "id": "03330d55-1a9d-481f-94e8-cb2fb525db7f",
       "repo_name": "0xemmkty/QuantMuse",
       "repo_url": "https://github.com/0xemmkty/QuantMuse",
       "stars": 2144,
@@ -1046,7 +886,7 @@
       "task_id": null
     },
     {
-      "id": "9e952887-bcb9-41ce-a532-4971995722a6",
+      "id": "bdbb64e6-911d-47b9-9293-9224ca119a8f",
       "repo_name": "Rajat-dhyani/Stock-Price-Predictor",
       "repo_url": "https://github.com/Rajat-dhyani/Stock-Price-Predictor",
       "stars": 316,
@@ -1066,7 +906,7 @@
       "task_id": null
     },
     {
-      "id": "6c537eec-9e63-469c-a84a-eda96a077707",
+      "id": "50b33c60-091a-4e42-9e1f-12ed8b99ab8c",
       "repo_name": "sadighian/crypto-rl",
       "repo_url": "https://github.com/sadighian/crypto-rl",
       "stars": 945,
@@ -1086,7 +926,7 @@
       "task_id": null
     },
     {
-      "id": "65980e53-1de0-48fb-84e0-8bd6827adc2f",
+      "id": "662a6e7e-709a-4baf-87b8-f1c6be8d7491",
       "repo_name": "gbeced/basana",
       "repo_url": "https://github.com/gbeced/basana",
       "stars": 822,
@@ -1106,7 +946,7 @@
       "task_id": null
     },
     {
-      "id": "9bc04850-abe5-45e8-88fe-acb64799f89a",
+      "id": "1d730fe7-7261-471f-b54d-afe3207aa461",
       "repo_name": "yeahrb/CEX-Option-Futures-Crypto-Quant-Algorithm-Trading-Bot",
       "repo_url": "https://github.com/yeahrb/CEX-Option-Futures-Crypto-Quant-Algorithm-Trading-Bot",
       "stars": 476,
@@ -1126,7 +966,7 @@
       "task_id": null
     },
     {
-      "id": "6e2995bd-e864-4ccf-ac09-c339e041ee99",
+      "id": "3b2b0291-f8f0-428f-8506-31971a050f25",
       "repo_name": "Ceruleanacg/Personae",
       "repo_url": "https://github.com/Ceruleanacg/Personae",
       "stars": 1400,
@@ -1146,7 +986,67 @@
       "task_id": null
     },
     {
-      "id": "1bc52063-a2cd-41f8-a87a-b947deb60ce9",
+      "id": "a2a6436f-1dcd-4c08-aa86-0834685709a1",
+      "repo_name": "merovinh/best-of-algorithmic-trading",
+      "repo_url": "https://github.com/merovinh/best-of-algorithmic-trading",
+      "stars": 773,
+      "language": "Unknown",
+      "signal_score": 1.0285,
+      "integration_value": 0,
+      "complexity": 0,
+      "clawmpson_relevance": 0,
+      "arbclaw_relevance": 0,
+      "rivalclaw_relevance": 0,
+      "what_to_take": "",
+      "risk": "analysis_failed",
+      "verdict": "SKIP",
+      "status": "analysis_failed",
+      "approved_for": [],
+      "approved_at": null,
+      "task_id": null
+    },
+    {
+      "id": "ab3b25ef-3dd0-4976-b18c-0a8f4a077b0b",
+      "repo_name": "Haehnchen/crypto-trading-bot",
+      "repo_url": "https://github.com/Haehnchen/crypto-trading-bot",
+      "stars": 3451,
+      "language": "TypeScript",
+      "signal_score": 1.0238,
+      "integration_value": 0,
+      "complexity": 0,
+      "clawmpson_relevance": 0,
+      "arbclaw_relevance": 0,
+      "rivalclaw_relevance": 0,
+      "what_to_take": "",
+      "risk": "analysis_failed",
+      "verdict": "SKIP",
+      "status": "analysis_failed",
+      "approved_for": [],
+      "approved_at": null,
+      "task_id": null
+    },
+    {
+      "id": "0410fc3a-e8b4-47c3-ab23-c31de5315ce7",
+      "repo_name": "freqtrade/freqtrade",
+      "repo_url": "https://github.com/freqtrade/freqtrade",
+      "stars": 48283,
+      "language": "Python",
+      "signal_score": 1.0188,
+      "integration_value": 0,
+      "complexity": 0,
+      "clawmpson_relevance": 0,
+      "arbclaw_relevance": 0,
+      "rivalclaw_relevance": 0,
+      "what_to_take": "",
+      "risk": "analysis_failed",
+      "verdict": "SKIP",
+      "status": "analysis_failed",
+      "approved_for": [],
+      "approved_at": null,
+      "task_id": null
+    },
+    {
+      "id": "4973ded6-d4b3-4592-a175-95bb8e0ff9b2",
       "repo_name": "jamesmawm/High-Frequency-Trading-Model-with-IB",
       "repo_url": "https://github.com/jamesmawm/High-Frequency-Trading-Model-with-IB",
       "stars": 2896,
@@ -1166,7 +1066,7 @@
       "task_id": null
     },
     {
-      "id": "b3968bc6-d66b-49a0-9184-2e482a3a5c47",
+      "id": "675b1daa-d64c-4e8f-af1d-3eb9f13ed7d4",
       "repo_name": "JordiCorbilla/stock-prediction-deep-neural-learning",
       "repo_url": "https://github.com/JordiCorbilla/stock-prediction-deep-neural-learning",
       "stars": 672,
@@ -1186,10 +1086,10 @@
       "task_id": null
     },
     {
-      "id": "d7097dee-3faf-43b4-90cb-f184d43639e8",
+      "id": "dd4cc129-d02c-4d8c-91f9-5f90ee31f8f1",
       "repo_name": "microsoft/qlib",
       "repo_url": "https://github.com/microsoft/qlib",
-      "stars": 40104,
+      "stars": 40094,
       "language": "Python",
       "signal_score": 1.0131,
       "integration_value": 0,
@@ -1206,7 +1106,7 @@
       "task_id": null
     },
     {
-      "id": "438485ce-d2c5-4773-9db1-db1a89c9292f",
+      "id": "9483b6dc-bd85-4cf8-9d64-86ee3508ee7b",
       "repo_name": "bbfamily/abu",
       "repo_url": "https://github.com/bbfamily/abu",
       "stars": 16707,
@@ -1226,7 +1126,7 @@
       "task_id": null
     },
     {
-      "id": "78da8032-32d0-4e77-abbe-ca9a930a4956",
+      "id": "a9858695-7267-4908-8271-a797bc7fefc1",
       "repo_name": "samre12/deep-trading-agent",
       "repo_url": "https://github.com/samre12/deep-trading-agent",
       "stars": 793,
@@ -1246,10 +1146,10 @@
       "task_id": null
     },
     {
-      "id": "2392db38-984e-4208-a5b4-28e4ade2f131",
+      "id": "1a225579-9f40-4ca6-a82a-5f36f9be73e4",
       "repo_name": "QuantConnect/Lean",
       "repo_url": "https://github.com/QuantConnect/Lean",
-      "stars": 18217,
+      "stars": 18216,
       "language": "C#",
       "signal_score": 1.0013,
       "integration_value": 0,
@@ -1266,7 +1166,7 @@
       "task_id": null
     },
     {
-      "id": "19c44f28-7f2e-4a2b-9062-2d6e4892284b",
+      "id": "4d8c7bc7-7f7e-4a2e-a459-83dbc1278961",
       "repo_name": "warproxxx/poly-maker",
       "repo_url": "https://github.com/warproxxx/poly-maker",
       "stars": 1000,
@@ -1286,7 +1186,7 @@
       "task_id": null
     },
     {
-      "id": "0434b2b0-97ed-4bbe-adda-db212ec996d9",
+      "id": "31ed63ad-ad26-48e8-9d31-9f312b877d6d",
       "repo_name": "ryantcullen/stock-bot",
       "repo_url": "https://github.com/ryantcullen/stock-bot",
       "stars": 304,
@@ -1306,10 +1206,10 @@
       "task_id": null
     },
     {
-      "id": "26a3706d-2f61-4f0c-ab2b-eae312959de7",
+      "id": "4c3d273f-c314-43d4-ae3a-5fedfe6de58a",
       "repo_name": "wilsonfreitas/awesome-quant",
       "repo_url": "https://github.com/wilsonfreitas/awesome-quant",
-      "stars": 25306,
+      "stars": 25304,
       "language": "HTML",
       "signal_score": 0.9935,
       "integration_value": 0,
@@ -1326,10 +1226,10 @@
       "task_id": null
     },
     {
-      "id": "7ef2232b-365c-47d8-aece-46b4e11248fd",
+      "id": "6c427abd-b297-4ec6-8630-8424185d2a46",
       "repo_name": "AI4Finance-Foundation/FinRL",
       "repo_url": "https://github.com/AI4Finance-Foundation/FinRL",
-      "stars": 14648,
+      "stars": 14647,
       "language": "Jupyter Notebook",
       "signal_score": 0.9862,
       "integration_value": 0,
@@ -1346,7 +1246,7 @@
       "task_id": null
     },
     {
-      "id": "c28497f9-3989-4159-97ae-1853deaa2fd1",
+      "id": "4aaf1ca0-cb9c-417d-b4f6-556dfa6d852d",
       "repo_name": "myhhub/stock",
       "repo_url": "https://github.com/myhhub/stock",
       "stars": 12132,
@@ -1366,10 +1266,10 @@
       "task_id": null
     },
     {
-      "id": "2afe0595-5e0c-4d4a-a51a-1ed5eca51b66",
+      "id": "3a660d4d-5197-4554-a42d-504e72dbfd0e",
       "repo_name": "StockSharp/StockSharp",
       "repo_url": "https://github.com/StockSharp/StockSharp",
-      "stars": 9551,
+      "stars": 9550,
       "language": "C#",
       "signal_score": 0.9736,
       "integration_value": 0,
@@ -1386,10 +1286,10 @@
       "task_id": null
     },
     {
-      "id": "8bdbe093-a5cc-4ef0-a9bb-3239aa6cf0ed",
+      "id": "4fa7e175-7667-48f3-8d7a-902f4eb72edf",
       "repo_name": "tensortrade-org/tensortrade",
       "repo_url": "https://github.com/tensortrade-org/tensortrade",
-      "stars": 6119,
+      "stars": 6118,
       "language": "Python",
       "signal_score": 0.9715,
       "integration_value": 0,
@@ -1406,7 +1306,7 @@
       "task_id": null
     },
     {
-      "id": "1fce50db-a21d-4031-a902-03b942cb3cdb",
+      "id": "ae971776-6953-463c-8e81-234a5f64a171",
       "repo_name": "nuglifeleoji/Factor-Research",
       "repo_url": "https://github.com/nuglifeleoji/Factor-Research",
       "stars": 392,
@@ -1426,7 +1326,7 @@
       "task_id": null
     },
     {
-      "id": "f2d5d6b5-f92d-45a7-b7ce-256119811f27",
+      "id": "986e7932-0e21-4356-8d14-00ad06d4ac54",
       "repo_name": "richmanbtc/mlbot_tutorial",
       "repo_url": "https://github.com/richmanbtc/mlbot_tutorial",
       "stars": 514,
@@ -1446,12 +1346,12 @@
       "task_id": null
     },
     {
-      "id": "d7709f40-667a-4494-8309-e09fe3de148e",
+      "id": "0afc7913-653a-49fb-bd04-ffcf28683839",
       "repo_name": "CryptoSignal/Crypto-Signal",
       "repo_url": "https://github.com/CryptoSignal/Crypto-Signal",
       "stars": 5517,
       "language": "Python",
-      "signal_score": 0.9558,
+      "signal_score": 0.9562,
       "integration_value": 0,
       "complexity": 0,
       "clawmpson_relevance": 0,
@@ -1466,7 +1366,7 @@
       "task_id": null
     },
     {
-      "id": "ea58d991-e6dd-4e80-8321-9374ce0d2e00",
+      "id": "80ee7652-ebab-493b-8ae0-3cb353ed3868",
       "repo_name": "PacktPublishing/Machine-Learning-for-Algorithmic-Trading-Bots-with-Python",
       "repo_url": "https://github.com/PacktPublishing/Machine-Learning-for-Algorithmic-Trading-Bots-with-Python",
       "stars": 402,
@@ -1486,7 +1386,7 @@
       "task_id": null
     },
     {
-      "id": "b7994051-10e7-4fc8-b809-b7b0d8198a7f",
+      "id": "e4b2c003-1c6b-452b-9449-37c81fc4f625",
       "repo_name": "ranaroussi/quantstats",
       "repo_url": "https://github.com/ranaroussi/quantstats",
       "stars": 6921,
@@ -1506,7 +1406,7 @@
       "task_id": null
     },
     {
-      "id": "56a21a76-6d45-46b0-a240-34342e664b45",
+      "id": "aa0257b5-1ef1-4015-9961-be5b9c634c6d",
       "repo_name": "jesse-ai/jesse",
       "repo_url": "https://github.com/jesse-ai/jesse",
       "stars": 7634,
@@ -1526,10 +1426,10 @@
       "task_id": null
     },
     {
-      "id": "56fdeeb9-fd1a-4942-8ddd-d0a37309a132",
+      "id": "5e7b57ad-2e02-4725-bda4-2924538720cb",
       "repo_name": "paperswithbacktest/awesome-systematic-trading",
       "repo_url": "https://github.com/paperswithbacktest/awesome-systematic-trading",
-      "stars": 7658,
+      "stars": 7655,
       "language": "Python",
       "signal_score": 0.9514,
       "integration_value": 0,
@@ -1546,7 +1446,7 @@
       "task_id": null
     },
     {
-      "id": "4bc9b8c0-5fd0-4ad3-b7b6-949bfbbe1a8c",
+      "id": "61fec1b1-1708-43c9-b32b-143090d387ac",
       "repo_name": "Drakkar-Software/OctoBot",
       "repo_url": "https://github.com/Drakkar-Software/OctoBot",
       "stars": 5551,
@@ -1566,7 +1466,7 @@
       "task_id": null
     },
     {
-      "id": "e0a1f508-7e9f-4e00-a89a-efbd22e8ce32",
+      "id": "eda39431-18bf-4c33-8ac5-a1543f86e33a",
       "repo_name": "zvtvz/zvt",
       "repo_url": "https://github.com/zvtvz/zvt",
       "stars": 4051,
@@ -1586,7 +1486,7 @@
       "task_id": null
     },
     {
-      "id": "919766a5-85ff-4572-965a-702b02263559",
+      "id": "2e6c0768-04fc-4f9c-ba91-0418fca2b225",
       "repo_name": "askmike/gekko",
       "repo_url": "https://github.com/askmike/gekko",
       "stars": 10169,
@@ -1606,10 +1506,10 @@
       "task_id": null
     },
     {
-      "id": "62b30e4c-b847-42ee-9bcc-02e262c41d83",
+      "id": "8acfffa2-33ea-44ce-8e89-393e7e3d66fb",
       "repo_name": "polakowo/vectorbt",
       "repo_url": "https://github.com/polakowo/vectorbt",
-      "stars": 7064,
+      "stars": 7065,
       "language": "Python",
       "signal_score": 0.943,
       "integration_value": 0,
@@ -1626,7 +1526,7 @@
       "task_id": null
     },
     {
-      "id": "8fec41ad-8354-4969-89b9-2491162be9da",
+      "id": "e576ca77-85b0-464b-b448-1401911885c2",
       "repo_name": "gesine1541ro7/UNICORN-Binance-WebSocket-API",
       "repo_url": "https://github.com/gesine1541ro7/UNICORN-Binance-WebSocket-API",
       "stars": 816,
@@ -1646,7 +1546,7 @@
       "task_id": null
     },
     {
-      "id": "a99461ec-86a1-42aa-a3d7-86ba616f965a",
+      "id": "cabefeef-7cb9-431f-8c93-a6faf1611087",
       "repo_name": "kkyon/botflow",
       "repo_url": "https://github.com/kkyon/botflow",
       "stars": 1196,
@@ -1666,7 +1566,7 @@
       "task_id": null
     },
     {
-      "id": "0f179e61-6e74-4397-8ed6-60bd6f4b4f1e",
+      "id": "0b4eead7-1801-40fb-a065-547550365afe",
       "repo_name": "deependersingla/deep_trader",
       "repo_url": "https://github.com/deependersingla/deep_trader",
       "stars": 1492,
@@ -1686,7 +1586,7 @@
       "task_id": null
     },
     {
-      "id": "ee3e1c95-ca8e-4a30-a822-309a20eb2e08",
+      "id": "1587b97b-977e-49f0-b8a9-59dfcd883997",
       "repo_name": "notadamking/RLTrader",
       "repo_url": "https://github.com/notadamking/RLTrader",
       "stars": 1849,
@@ -1706,7 +1606,7 @@
       "task_id": null
     },
     {
-      "id": "694f7c92-7564-43a4-9729-5edf1974359a",
+      "id": "c865bafc-66e4-4889-a7a0-6bf19e2d20a9",
       "repo_name": "firmai/financial-machine-learning",
       "repo_url": "https://github.com/firmai/financial-machine-learning",
       "stars": 8471,
@@ -1726,10 +1626,10 @@
       "task_id": null
     },
     {
-      "id": "b9397b7a-09f7-42fb-939c-b72284081849",
+      "id": "601a2982-5f96-4bf7-bdfe-a4dfa6a87e2a",
       "repo_name": "mementum/backtrader",
       "repo_url": "https://github.com/mementum/backtrader",
-      "stars": 21018,
+      "stars": 21017,
       "language": "Python",
       "signal_score": 0.9334,
       "integration_value": 0,
@@ -1746,7 +1646,7 @@
       "task_id": null
     },
     {
-      "id": "2e1820fc-a492-41c8-bc27-3bd1696d5eb9",
+      "id": "a5bd884d-6210-454f-8f5b-a74df9b07b19",
       "repo_name": "quantopian/zipline",
       "repo_url": "https://github.com/quantopian/zipline",
       "stars": 19597,
@@ -1766,7 +1666,7 @@
       "task_id": null
     },
     {
-      "id": "0ea6adbf-d523-4130-a1bd-2ac9b729cf65",
+      "id": "e27f5548-e181-4f24-b6cd-1eabfe3a24c6",
       "repo_name": "tvjsx/trading-vue-js",
       "repo_url": "https://github.com/tvjsx/trading-vue-js",
       "stars": 2278,
@@ -1786,7 +1686,47 @@
       "task_id": null
     },
     {
-      "id": "4250d920-9114-4bac-964b-288fd1181483",
+      "id": "dea21c19-7518-4b0a-8d37-128b4b04a913",
+      "repo_name": "achannarasappa/ticker",
+      "repo_url": "https://github.com/achannarasappa/ticker",
+      "stars": 6020,
+      "language": "Go",
+      "signal_score": 0.9261,
+      "integration_value": 0,
+      "complexity": 0,
+      "clawmpson_relevance": 0,
+      "arbclaw_relevance": 0,
+      "rivalclaw_relevance": 0,
+      "what_to_take": "",
+      "risk": "analysis_failed",
+      "verdict": "SKIP",
+      "status": "analysis_failed",
+      "approved_for": [],
+      "approved_at": null,
+      "task_id": null
+    },
+    {
+      "id": "e84d9d47-50eb-4169-bffe-04d313a6e884",
+      "repo_name": "wangzhe3224/awesome-systematic-trading",
+      "repo_url": "https://github.com/wangzhe3224/awesome-systematic-trading",
+      "stars": 3757,
+      "language": "HTML",
+      "signal_score": 0.9225,
+      "integration_value": 0,
+      "complexity": 0,
+      "clawmpson_relevance": 0,
+      "arbclaw_relevance": 0,
+      "rivalclaw_relevance": 0,
+      "what_to_take": "",
+      "risk": "analysis_failed",
+      "verdict": "SKIP",
+      "status": "analysis_failed",
+      "approved_for": [],
+      "approved_at": null,
+      "task_id": null
+    },
+    {
+      "id": "18e004de-02e6-4ea8-8309-96f7e8c4baa3",
       "repo_name": "alpacahq/alpaca-trade-api-python",
       "repo_url": "https://github.com/alpacahq/alpaca-trade-api-python",
       "stars": 1864,
@@ -1806,12 +1746,12 @@
       "task_id": null
     },
     {
-      "id": "d557fed2-7752-4458-9db9-863754b8200c",
+      "id": "8c88a68c-8b53-472a-b9d9-6b0e373a4c97",
       "repo_name": "suenot/profitmaker",
       "repo_url": "https://github.com/suenot/profitmaker",
       "stars": 347,
       "language": "TypeScript",
-      "signal_score": 0.9139,
+      "signal_score": 0.9144,
       "integration_value": 0,
       "complexity": 0,
       "clawmpson_relevance": 0,
@@ -1826,12 +1766,52 @@
       "task_id": null
     },
     {
-      "id": "c5c61d23-23a8-45bf-9831-591a01625c30",
+      "id": "ac0a746e-8e89-40ac-978f-f6b39ddbdcc9",
+      "repo_name": "ccxt-rest/ccxt-rest",
+      "repo_url": "https://github.com/ccxt-rest/ccxt-rest",
+      "stars": 484,
+      "language": "JavaScript",
+      "signal_score": 0.9117,
+      "integration_value": 0,
+      "complexity": 0,
+      "clawmpson_relevance": 0,
+      "arbclaw_relevance": 0,
+      "rivalclaw_relevance": 0,
+      "what_to_take": "",
+      "risk": "analysis_failed",
+      "verdict": "SKIP",
+      "status": "analysis_failed",
+      "approved_for": [],
+      "approved_at": null,
+      "task_id": null
+    },
+    {
+      "id": "3b73b439-6ac3-4457-92fb-3884dae3c258",
+      "repo_name": "asavinov/intelligent-trading-bot",
+      "repo_url": "https://github.com/asavinov/intelligent-trading-bot",
+      "stars": 1657,
+      "language": "Python",
+      "signal_score": 0.9065,
+      "integration_value": 0,
+      "complexity": 0,
+      "clawmpson_relevance": 0,
+      "arbclaw_relevance": 0,
+      "rivalclaw_relevance": 0,
+      "what_to_take": "",
+      "risk": "analysis_failed",
+      "verdict": "SKIP",
+      "status": "analysis_failed",
+      "approved_for": [],
+      "approved_at": null,
+      "task_id": null
+    },
+    {
+      "id": "b81a3bc7-79dd-4aa1-adf6-c432ea3f4774",
       "repo_name": "terryso/nof1-tracker",
       "repo_url": "https://github.com/terryso/nof1-tracker",
       "stars": 747,
       "language": "TypeScript",
-      "signal_score": 0.9052,
+      "signal_score": 0.9056,
       "integration_value": 0,
       "complexity": 0,
       "clawmpson_relevance": 0,
@@ -1846,12 +1826,12 @@
       "task_id": null
     },
     {
-      "id": "a4909581-d895-4021-bc76-ca4263e135d1",
+      "id": "59e2edab-9b6c-46f8-9d8a-78a45577a67c",
       "repo_name": "gazbert/bxbot",
       "repo_url": "https://github.com/gazbert/bxbot",
       "stars": 866,
       "language": "Java",
-      "signal_score": 0.9045,
+      "signal_score": 0.905,
       "integration_value": 0,
       "complexity": 0,
       "clawmpson_relevance": 0,
@@ -1866,12 +1846,12 @@
       "task_id": null
     },
     {
-      "id": "39d1f5f9-1cb8-4f92-a207-a6168e9dca49",
+      "id": "041b8208-4a37-4f85-ab92-3b39ac825ec4",
       "repo_name": "51bitquant/binance_grid_trader",
       "repo_url": "https://github.com/51bitquant/binance_grid_trader",
       "stars": 950,
       "language": "Python",
-      "signal_score": 0.9033,
+      "signal_score": 0.9038,
       "integration_value": 0,
       "complexity": 0,
       "clawmpson_relevance": 0,
@@ -1886,7 +1866,7 @@
       "task_id": null
     },
     {
-      "id": "da192b6c-1622-4a9b-b32a-b9c8d1ca5dff",
+      "id": "fa3bd1b9-911a-45ac-86b1-b729ac440dd6",
       "repo_name": "TreborNamor/TradingView-Machine-Learning-GUI",
       "repo_url": "https://github.com/TreborNamor/TradingView-Machine-Learning-GUI",
       "stars": 925,
@@ -1906,12 +1886,12 @@
       "task_id": null
     },
     {
-      "id": "e829d2fb-b615-43f2-aace-be2f1f12a36c",
+      "id": "66a2a179-111f-4feb-b30b-d3835ee5007e",
       "repo_name": "kieran-mackle/AutoTrader",
       "repo_url": "https://github.com/kieran-mackle/AutoTrader",
       "stars": 1238,
       "language": "Python",
-      "signal_score": 0.8966,
+      "signal_score": 0.897,
       "integration_value": 0,
       "complexity": 0,
       "clawmpson_relevance": 0,
@@ -1926,12 +1906,12 @@
       "task_id": null
     },
     {
-      "id": "e7bd7262-0feb-4c79-9c66-509fdf7a9ef7",
+      "id": "82420413-cad5-4575-96b5-0c9d5e8ef0bc",
       "repo_name": "hackthemarket/gym-trading",
       "repo_url": "https://github.com/hackthemarket/gym-trading",
       "stars": 712,
       "language": "Jupyter Notebook",
-      "signal_score": 0.8901,
+      "signal_score": 0.8905,
       "integration_value": 0,
       "complexity": 0,
       "clawmpson_relevance": 0,
@@ -1946,7 +1926,7 @@
       "task_id": null
     },
     {
-      "id": "e5133746-69ec-422e-8c22-9cfc2db7b2d0",
+      "id": "70ffe4ed-d5fb-4e4c-967f-d40227d6af48",
       "repo_name": "timestocome/Test-stock-prediction-algorithms",
       "repo_url": "https://github.com/timestocome/Test-stock-prediction-algorithms",
       "stars": 435,
@@ -1966,12 +1946,12 @@
       "task_id": null
     },
     {
-      "id": "aee1476b-6a07-43a5-be7f-78d0c5ac5b13",
+      "id": "67903e1d-620b-4e8d-aaab-9fc4f41891c9",
       "repo_name": "cassandre-tech/cassandre-trading-bot",
       "repo_url": "https://github.com/cassandre-tech/cassandre-trading-bot",
       "stars": 652,
       "language": "Java",
-      "signal_score": 0.8832,
+      "signal_score": 0.8836,
       "integration_value": 0,
       "complexity": 0,
       "clawmpson_relevance": 0,
@@ -1986,7 +1966,7 @@
       "task_id": null
     },
     {
-      "id": "a16a45ee-a906-41a3-b8ac-d89ad42e1510",
+      "id": "7a9951af-5157-4b0f-8550-2f0796d184df",
       "repo_name": "Albert-Z-Guo/Deep-Reinforcement-Stock-Trading",
       "repo_url": "https://github.com/Albert-Z-Guo/Deep-Reinforcement-Stock-Trading",
       "stars": 693,
@@ -2006,7 +1986,7 @@
       "task_id": null
     },
     {
-      "id": "1da49ce1-6b3f-4e29-aa6a-42762882278f",
+      "id": "b276943b-3641-4513-949f-1863f9884a92",
       "repo_name": "ranaroussi/qtpylib",
       "repo_url": "https://github.com/ranaroussi/qtpylib",
       "stars": 2258,
@@ -2026,7 +2006,7 @@
       "task_id": null
     },
     {
-      "id": "bb30759f-f841-4c99-9398-e1afb5ad1d00",
+      "id": "6f60a8a8-5d23-4858-a465-a38484285854",
       "repo_name": "6551Team/opennews-mcp",
       "repo_url": "https://github.com/6551Team/opennews-mcp",
       "stars": 725,
@@ -2046,7 +2026,7 @@
       "task_id": null
     },
     {
-      "id": "8508fbdf-e9c2-4eef-9723-98fe03a7e9ca",
+      "id": "07c91506-f9cc-48e2-aa96-8d39b36dc87a",
       "repo_name": "51bitquant/ai-hedge-fund-crypto",
       "repo_url": "https://github.com/51bitquant/ai-hedge-fund-crypto",
       "stars": 549,
@@ -2066,7 +2046,7 @@
       "task_id": null
     },
     {
-      "id": "6611f92d-35b5-4e43-b608-c172b38cd8c1",
+      "id": "c9a08c0e-8ce2-4983-9962-079c5579fd51",
       "repo_name": "josephchenhk/qtrader",
       "repo_url": "https://github.com/josephchenhk/qtrader",
       "stars": 548,
@@ -2086,7 +2066,27 @@
       "task_id": null
     },
     {
-      "id": "c7098486-8905-44fa-8e87-3e5cfb202f7b",
+      "id": "77485374-4fb5-40f6-ae08-75ff2de96048",
+      "repo_name": "fremantle-industries/tai",
+      "repo_url": "https://github.com/fremantle-industries/tai",
+      "stars": 494,
+      "language": "Elixir",
+      "signal_score": 0.8522,
+      "integration_value": 0,
+      "complexity": 0,
+      "clawmpson_relevance": 0,
+      "arbclaw_relevance": 0,
+      "rivalclaw_relevance": 0,
+      "what_to_take": "",
+      "risk": "analysis_failed",
+      "verdict": "SKIP",
+      "status": "analysis_failed",
+      "approved_for": [],
+      "approved_at": null,
+      "task_id": null
+    },
+    {
+      "id": "9f092b36-d7c7-44ef-bb21-5b83d9189c35",
       "repo_name": "alltick/alltick-realtime-forex-crypto-stock-tick-finance-websocket-api",
       "repo_url": "https://github.com/alltick/alltick-realtime-forex-crypto-stock-tick-finance-websocket-api",
       "stars": 541,
@@ -2106,12 +2106,12 @@
       "task_id": null
     },
     {
-      "id": "1cea2142-c705-41af-9256-6d28862dbaf8",
+      "id": "cef5c585-cd5c-4600-a2ae-7f56b3566f2a",
       "repo_name": "tardis-dev/tardis-node",
       "repo_url": "https://github.com/tardis-dev/tardis-node",
       "stars": 349,
       "language": "TypeScript",
-      "signal_score": 0.8503,
+      "signal_score": 0.8507,
       "integration_value": 0,
       "complexity": 0,
       "clawmpson_relevance": 0,
@@ -2126,7 +2126,7 @@
       "task_id": null
     },
     {
-      "id": "c62b0662-d376-478c-afe6-b814a9c6e688",
+      "id": "365edefa-cdf5-46c8-a1bf-00febbc7fdff",
       "repo_name": "zszszszsz/.config",
       "repo_url": "https://github.com/zszszszsz/.config",
       "stars": 320,
@@ -2146,7 +2146,7 @@
       "task_id": null
     },
     {
-      "id": "a0f182a6-a3d5-4c56-aeba-1bed3177a465",
+      "id": "fcabada2-4e21-4dcd-bfb4-82263bd9f20f",
       "repo_name": "kevinlawler/kerf1",
       "repo_url": "https://github.com/kevinlawler/kerf1",
       "stars": 546,
