@@ -44,8 +44,8 @@ BRAIN_LOG          = HOME / "openclaw" / "memory" / "brain-log.md"
 TURBOQUANT_BASE = os.environ.get("TURBOQUANT_BASE_URL", "http://localhost:8090")
 OLLAMA_BASE     = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
 LOOKBACK_HOURS  = int(os.environ.get("BRAIN_LOOKBACK_HOURS", "24"))
-MAX_TRADES      = int(os.environ.get("BRAIN_MAX_TRADES", "50"))
-MAX_DECISIONS   = int(os.environ.get("BRAIN_MAX_DECISIONS", "50"))
+MAX_TRADES      = int(os.environ.get("BRAIN_MAX_TRADES", "20"))
+MAX_DECISIONS   = int(os.environ.get("BRAIN_MAX_DECISIONS", "20"))
 
 
 def _ts_cutoff() -> str:
@@ -287,24 +287,37 @@ def _trim_for_context(data: dict) -> dict:
     """Trim data to fit within context window. Remove verbose fields."""
     trimmed = json.loads(json.dumps(data, default=str))
 
-    # Trim trade reasoning to 200 chars each
+    # Aggressively trim trades — keep only decision-relevant fields
     for t in trimmed.get("rivalclaw", {}).get("trades", []):
-        if t.get("reasoning") and len(t["reasoning"]) > 200:
-            t["reasoning"] = t["reasoning"][:200] + "..."
+        if t.get("reasoning") and len(t["reasoning"]) > 100:
+            t["reasoning"] = t["reasoning"][:100] + "..."
         # Drop verbose fields
-        t.pop("market_id", None)
-        t.pop("question", None)
+        for k in ("market_id", "question", "binary_outcome",
+                  "signal_to_trade_latency_ms", "expected_edge"):
+            t.pop(k, None)
 
-    # Trim decision reasoning and signal snapshots
+    # Aggressively trim decisions
     for d in trimmed.get("quantumentalclaw", {}).get("decisions", []):
-        if d.get("reasoning") and len(d["reasoning"]) > 200:
-            d["reasoning"] = d["reasoning"][:200] + "..."
-        # Flatten signal_snapshot to just scores
+        # Drop reasoning entirely — signal_snapshot has the data
+        d.pop("reasoning", None)
+        # Flatten signal_snapshot to just module scores
         ss = d.get("signal_snapshot")
         if isinstance(ss, dict):
             d["signal_snapshot"] = {k: round(v, 3) if isinstance(v, float) else v
                                     for k, v in ss.items()
                                     if k.endswith("_score") or k == "final"}
+        elif isinstance(ss, str):
+            try:
+                parsed = json.loads(ss)
+                d["signal_snapshot"] = {k: round(v, 3) if isinstance(v, float) else v
+                                        for k, v in parsed.items()
+                                        if k.endswith("_score") or k == "final"}
+            except Exception:
+                d["signal_snapshot"] = "parse_error"
+
+    # Drop module accuracy metadata field (JSON blob)
+    for m in trimmed.get("quantumentalclaw", {}).get("module_accuracy", []):
+        m.pop("metadata", None)
 
     # Trim strategy registry to just id + status
     reg = trimmed.get("rivalclaw", {}).get("strategy_registry", {})
@@ -350,7 +363,7 @@ def digest(data: dict) -> dict | None:
                 "max_tokens": 2048,
                 "temperature": 0.2,
             },
-            timeout=300,
+            timeout=600,
         )
         if resp.status_code != 200:
             print(f"[brain] LLM error: {resp.status_code}")
