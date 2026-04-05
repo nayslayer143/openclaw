@@ -2827,6 +2827,79 @@ async def orchestrator_embed(request: Request):
     })
 
 
+# ── CodeMonkeyClaw Work Orders ────────────────────────────────────────────────
+_CMC_DB = Path.home() / "codemonkeyclaw" / "codemonkeyclaw.db"
+
+def _cmc_orders(status: str = None):
+    """Read work orders from CodeMonkeyClaw SQLite DB."""
+    import sqlite3
+    if not _CMC_DB.exists():
+        return []
+    try:
+        con = sqlite3.connect(str(_CMC_DB))
+        con.row_factory = sqlite3.Row
+        cur = con.cursor()
+        if status:
+            cur.execute("SELECT * FROM work_orders WHERE status=? ORDER BY created_at DESC LIMIT 100", (status,))
+        else:
+            cur.execute("SELECT * FROM work_orders ORDER BY created_at DESC LIMIT 100")
+        rows = [dict(r) for r in cur.fetchall()]
+        con.close()
+        return rows
+    except Exception as e:
+        return []
+
+@app.get("/api/codemonkey/orders")
+async def cmc_list_orders(status: str = None, user: str = Depends(get_current_user)):
+    """List CodeMonkeyClaw work orders, optionally filtered by status."""
+    return _cmc_orders(status)
+
+@app.post("/api/codemonkey/orders")
+async def cmc_submit_order(request: Request, user: str = Depends(get_current_user)):
+    """Submit a new CodeMonkeyClaw work order via the CLI."""
+    data = await request.json()
+    required = {"description", "target_repo", "type"}
+    if not required.issubset(data):
+        raise HTTPException(400, f"Missing fields: {required - set(data)}")
+    import subprocess, sys
+    cmd = [
+        sys.executable,
+        str(Path.home() / "codemonkeyclaw" / "run.py"),
+        "submit",
+        "--source", "dashboard",
+        "--type", data["type"],
+        "--target", data["target_repo"],
+        "--path", data.get("target_path", ""),
+        "--description", data["description"],
+        "--priority", str(data.get("priority", "medium")),
+    ]
+    if data.get("context"):
+        cmd += ["--context-refs", data["context"]]
+    try:
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+        wo_id = result.stdout.strip().split()[-1] if result.returncode == 0 else None
+        return {"ok": result.returncode == 0, "wo_id": wo_id, "error": result.stderr[:200] if result.returncode != 0 else None}
+    except subprocess.TimeoutExpired:
+        raise HTTPException(504, "CodeMonkeyClaw submit timed out")
+
+@app.get("/api/codemonkey/orders/{wo_id}")
+async def cmc_get_order(wo_id: str, user: str = Depends(get_current_user)):
+    """Get a single work order by ID."""
+    orders = _cmc_orders()
+    for o in orders:
+        if o.get("id") == wo_id:
+            return o
+    raise HTTPException(404, f"Work order {wo_id} not found")
+
+@app.get("/api/codemonkey/stats")
+async def cmc_stats(user: str = Depends(get_current_user)):
+    """Summary stats for the CodeMonkeyClaw work queue."""
+    orders = _cmc_orders()
+    from collections import Counter
+    counts = Counter(o.get("status", "UNKNOWN") for o in orders)
+    return {"total": len(orders), "by_status": dict(counts)}
+
+
 @app.get("/{path:path}")
 async def spa(path: str, request: Request):
     # Let API and WebSocket routes through
