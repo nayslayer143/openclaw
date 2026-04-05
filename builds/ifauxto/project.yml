@@ -67,6 +67,8 @@ targets:
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
         UILaunchScreen: {}
+    dependencies:
+      - sdk: libsqlite3.tbd
     entitlements:
       path: iFauxto/iFauxto.entitlements
       properties:

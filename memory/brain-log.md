@@ -33,3 +33,20 @@
 - ... and 2 more
 
 ---
+
+## 2026-04-05 08:03
+
+**Regime:** trending (confidence: 80%)
+
+**Alerts:**
+- CRITICAL: QuantumentalClaw module weights are completely static. Immediate intervention required to prevent model decay.
+
+**Lessons extracted:** 6
+- [rivalclaw] The 'fair_value_directional' strategy shows high win rates on successful trades (e.g., 26.3378 pnl) but also incurred losses on high-confidence, short-term trades (e.g., -3.06 pnl).
+- [rivalclaw] The 'fair_value_directional' strategy is highly profitable when the edge is high (e.g., 0.845, 0.899) and the bracket size is large (bkt=0.7x).
+- [quantclaw] The 'quant' module's accuracy (0.4212) is slightly higher than 'asymmetry' (0.4024) on the most recent evaluation, suggesting marginal module stability.
+- [quantclaw] Module weights are showing extreme stability, with all weights remaining fixed at the last recorded values across multiple time intervals.
+- [cross-system] RivalClaw's successful trades occurred across a wide range of timeframes (14m to 55m), while QuantumentalClaw's high-confidence signals were exclusively for 'sprint' time horizons.
+- ... and 1 more
+
+---
