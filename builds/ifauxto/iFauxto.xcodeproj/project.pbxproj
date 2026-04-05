@@ -22,6 +22,7 @@
 		87020180D373F43B388B6C66 /* PhotoReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B59C50C8B9DC6F9843D3F4 /* PhotoReferenceTests.swift */; };
 		A53A611D5D8A77C3C1691CBC /* FolderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C58BC719D64219558E6C51 /* FolderTests.swift */; };
 		A7678EC57B62624613697C1B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FFBED5883116DC1BECF899 /* ContentView.swift */; };
+		AB7D6EF0687B612572470322 /* FolderSortModeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A62F2FD7E67B676F4D3C1BA /* FolderSortModeTests.swift */; };
 		B2ACB1273BBFF9DADBD58CA0 /* PhotoReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AE52712A6A5FB1976B6E3D7 /* PhotoReference.swift */; };
 		B2AE7E0C0B34B5BF8F57B1B4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 103DCEC79A2F9FFA35D66E1C /* Assets.xcassets */; };
 		B8E98E521415AA20F4CFA7A0 /* ImportProgressView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA875DA9DD3412F08C515026 /* ImportProgressView.swift */; };
@@ -46,6 +47,7 @@
 /* Begin PBXFileReference section */
 		01ED550A03711B56F8827E42 /* CloudKitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudKitService.swift; sourceTree = "<group>"; };
 		08D9C03D9F30F008BB5DAB70 /* SyncManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncManager.swift; sourceTree = "<group>"; };
+		0A62F2FD7E67B676F4D3C1BA /* FolderSortModeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderSortModeTests.swift; sourceTree = "<group>"; };
 		0AD328EE97D38C9FECD54FC6 /* iFauxtoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iFauxtoApp.swift; sourceTree = "<group>"; };
 		0AE52712A6A5FB1976B6E3D7 /* PhotoReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoReference.swift; sourceTree = "<group>"; };
 		103DCEC79A2F9FFA35D66E1C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -88,6 +90,7 @@
 			isa = PBXGroup;
 			children = (
 				16890220CE61B79CCA0222D1 /* DataManagerTests.swift */,
+				0A62F2FD7E67B676F4D3C1BA /* FolderSortModeTests.swift */,
 				69C58BC719D64219558E6C51 /* FolderTests.swift */,
 				6E37E26D083740E160EDE6DB /* iFauxtoTests.swift */,
 				F0B59C50C8B9DC6F9843D3F4 /* PhotoReferenceTests.swift */,
@@ -275,6 +278,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				52C763E43309395A860C4039 /* DataManagerTests.swift in Sources */,
+				AB7D6EF0687B612572470322 /* FolderSortModeTests.swift in Sources */,
 				A53A611D5D8A77C3C1691CBC /* FolderTests.swift in Sources */,
 				87020180D373F43B388B6C66 /* PhotoReferenceTests.swift in Sources */,
 				F8BDC931956D6ED6ABED3483 /* iFauxtoTests.swift in Sources */,

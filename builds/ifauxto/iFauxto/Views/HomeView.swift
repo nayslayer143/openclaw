@@ -8,6 +8,21 @@ struct HomeView: View {
     @State private var showingCreateFolder = false
     @State private var showingImport = false
     @State private var editMode: EditMode = .inactive
+    @State private var folderSortMode: String = "custom"
+    @State private var showingSettings = false
+
+    private var displayFolders: [Folder] {
+        switch folderSortMode {
+        case "alpha":
+            return folders.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+        case "date":
+            return folders.sorted { $0.createdAt < $1.createdAt }
+        case "recent":
+            return folders.sorted { $0.createdAt > $1.createdAt }
+        default:
+            return folders
+        }
+    }
 
     var body: some View {
         NavigationStack {
@@ -21,7 +36,14 @@ struct HomeView: View {
             .navigationTitle("iFauxto")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    EditButton()
+                    HStack {
+                        EditButton()
+                        Button {
+                            showingSettings = true
+                        } label: {
+                            Image(systemName: "gearshape")
+                        }
+                    }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
@@ -39,6 +61,29 @@ struct HomeView: View {
                                 systemImage: "square.and.arrow.down.on.square"
                             )
                         }
+                        Divider()
+                        Menu("Sort By") {
+                            Button {
+                                folderSortMode = "custom"
+                            } label: {
+                                Label("Manual Order", systemImage: folderSortMode == "custom" ? "checkmark" : "")
+                            }
+                            Button {
+                                folderSortMode = "alpha"
+                            } label: {
+                                Label("Alphabetical", systemImage: folderSortMode == "alpha" ? "checkmark" : "")
+                            }
+                            Button {
+                                folderSortMode = "date"
+                            } label: {
+                                Label("Date Created", systemImage: folderSortMode == "date" ? "checkmark" : "")
+                            }
+                            Button {
+                                folderSortMode = "recent"
+                            } label: {
+                                Label("Most Recent", systemImage: folderSortMode == "recent" ? "checkmark" : "")
+                            }
+                        }
                     } label: {
                         Image(systemName: "ellipsis.circle")
                     }
@@ -47,6 +92,9 @@ struct HomeView: View {
             .environment(\.editMode, $editMode)
             .sheet(isPresented: $showingCreateFolder, onDismiss: loadFolders) {
                 FolderCreationSheet(parentId: nil)
+            }
+            .sheet(isPresented: $showingSettings) {
+                SettingsView()
             }
             .sheet(isPresented: $showingImport, onDismiss: loadFolders) {
                 ImportProgressView(importService: importService) {
@@ -70,7 +118,7 @@ struct HomeView: View {
 
     private var folderList: some View {
         List {
-            ForEach(folders) { folder in
+            ForEach(displayFolders) { folder in
                 NavigationLink {
                     FolderView(folder: folder)
                 } label: {
@@ -78,6 +126,7 @@ struct HomeView: View {
                 }
             }
             .onMove { source, destination in
+                guard folderSortMode == "custom" else { return }
                 folders.move(fromOffsets: source, toOffset: destination)
                 dataManager.updateFolderOrder(folders)
             }

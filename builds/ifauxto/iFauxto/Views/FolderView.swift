@@ -14,6 +14,18 @@ struct FolderView: View {
     @State private var showingPhotoPicker = false
     @State private var showingMoveSheet = false
     @State private var showingSubfolderCreation = false
+    @State private var photoSortMode: String = "custom"
+
+    private var displayPhotos: [PhotoReference] {
+        switch photoSortMode {
+        case "alpha":
+            return photos.sorted { $0.id.localizedCaseInsensitiveCompare($1.id) == .orderedAscending }
+        case "recent":
+            return photos.sorted { $0.orderIndex > $1.orderIndex }
+        default:
+            return photos
+        }
+    }
 
     private let columns = [GridItem(.adaptive(minimum: 110), spacing: 2)]
 
@@ -27,7 +39,7 @@ struct FolderView: View {
                 // Photos grid
                 if !photos.isEmpty {
                     LazyVGrid(columns: columns, spacing: 2) {
-                        ForEach(photos) { photo in
+                        ForEach(displayPhotos) { photo in
                             PhotoThumbnailView(
                                 photo: photo,
                                 isSelected: selectedPhotoIds.contains(photo.id),
@@ -43,6 +55,7 @@ struct FolderView: View {
                                 .opacity(0.9)
                             }
                             .dropDestination(for: String.self) { items, _ in
+                                guard photoSortMode == "custom" else { return false }
                                 guard let sourceId = items.first, sourceId != photo.id else { return false }
                                 withAnimation(.easeInOut(duration: 0.2)) {
                                     photos = DragDropManager.reorder(photos, draggedId: sourceId, targetId: photo.id)
@@ -191,6 +204,24 @@ struct FolderView: View {
                         isEditMode = true
                     } label: {
                         Label("Select Photos", systemImage: "checkmark.circle")
+                    }
+                    Divider()
+                    Menu("Sort Photos") {
+                        Button {
+                            photoSortMode = "custom"
+                        } label: {
+                            Label("Manual Order", systemImage: photoSortMode == "custom" ? "checkmark" : "")
+                        }
+                        Button {
+                            photoSortMode = "alpha"
+                        } label: {
+                            Label("By Name", systemImage: photoSortMode == "alpha" ? "checkmark" : "")
+                        }
+                        Button {
+                            photoSortMode = "recent"
+                        } label: {
+                            Label("Newest First", systemImage: photoSortMode == "recent" ? "checkmark" : "")
+                        }
                     }
                 } label: {
                     Image(systemName: "ellipsis.circle")

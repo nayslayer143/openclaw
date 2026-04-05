@@ -13,7 +13,7 @@ final class DataManager: ObservableObject {
     let isCloudKitEnabled: Bool = false
 
     init(inMemory: Bool = false) throws {
-        let schema = Schema([Folder.self, PhotoReference.self])
+        let schema = Schema([Folder.self, PhotoReference.self, AppSettings.self])
         // cloudKitDatabase: .none prevents SwiftData from auto-enabling CloudKit via entitlements,
         // which would fail model validation (non-optional to-many relationship).
         let config = ModelConfiguration(
@@ -132,5 +132,18 @@ final class DataManager: ObservableObject {
             destination.photoReferences = (destination.photoReferences ?? []) + [photo]
         }
         try? modelContext.save()
+    }
+
+    // MARK: Settings
+
+    func getOrCreateSettings() -> AppSettings {
+        let descriptor = FetchDescriptor<AppSettings>()
+        if let existing = try? modelContext.fetch(descriptor).first {
+            return existing
+        }
+        let settings = AppSettings()
+        modelContext.insert(settings)
+        try? modelContext.save()
+        return settings
     }
 }

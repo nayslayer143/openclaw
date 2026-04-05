@@ -9,6 +9,7 @@ final class Folder {
     var parentId: String?
     var createdAt: Date = Date()
     var order: Int = 0
+    var sortMode: String = "custom"  // "custom" | "alpha" | "date" | "recent"
 
     @Relationship(deleteRule: .cascade, inverse: \PhotoReference.folder)
     var photoReferences: [PhotoReference]? = []
