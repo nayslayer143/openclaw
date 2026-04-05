@@ -336,18 +336,10 @@ def digest(data: dict) -> dict | None:
     trimmed = _trim_for_context(data)
     payload = json.dumps(trimmed, indent=1, default=str)
 
-    # Check TurboQuant health, fall back to Ollama 31B
-    base_url = TURBOQUANT_BASE
-    model = "gemma4-31b-turboquant"
-    try:
-        health = requests.get(f"{TURBOQUANT_BASE}/health", timeout=2)
-        if health.status_code != 200:
-            raise ConnectionError
-        endpoint = f"{TURBOQUANT_BASE}/v1/chat/completions"
-    except Exception:
-        print("[brain] TurboQuant unavailable, falling back to Ollama gemma4:31b")
-        endpoint = f"{OLLAMA_BASE}/v1/chat/completions"
-        model = "gemma4:31b"
+    # Use Ollama for digest (faster prefill than TurboQuant fork).
+    # TurboQuant is for live long-context conversations, not batch jobs.
+    endpoint = f"{OLLAMA_BASE}/v1/chat/completions"
+    model = "gemma4:31b"
 
     print(f"[brain] Sending {len(payload)} chars to {model}")
 
