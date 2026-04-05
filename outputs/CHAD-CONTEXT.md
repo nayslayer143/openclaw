@@ -1,9 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> Auto-generated 2026-04-05T01:07:00-07:00. Do not edit manually.
+> Auto-generated 2026-04-05T02:07:01-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-04-05T01:07:00-07:00
+Generated: 2026-04-05T02:07:01-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -32,6 +32,7 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/openclaw/.git
 ~/openclaw/.pytest_cache
 ~/openclaw/.queue-locks
+~/openclaw/.repowise
 ~/openclaw/.skills
 ~/openclaw/.skills/superpowers
 ~/openclaw/.superpowers
@@ -330,12 +331,17 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ### quantumentalclaw (/Users/nayslayer/quantumentalclaw)
 ```
 ~/quantumentalclaw
+~/quantumentalclaw/.claude
 ~/quantumentalclaw/.codemonkey
 ~/quantumentalclaw/.codemonkey/wo-2026-03-27-007
 ~/quantumentalclaw/.codemonkey/wo-2026-03-27-008
 ~/quantumentalclaw/.git
 ~/quantumentalclaw/.gitignore
+~/quantumentalclaw/.mcp.json
 ~/quantumentalclaw/.pytest_cache
+~/quantumentalclaw/.repowise
+~/quantumentalclaw/.repowise/mcp.json
+~/quantumentalclaw/.repowise/wiki.db
 ~/quantumentalclaw/CHANGELOG.md
 ~/quantumentalclaw/CLAUDE.md
 ~/quantumentalclaw/README.md
@@ -1514,16 +1520,16 @@ pytest-asyncio>=0.23
 ### openclaw
 ```
 Branch: main
-Last commit: 40c85ea auto: 2026-04-05 01:00 state snapshot
-Uncommitted files: 12
+Last commit: 0230d6e auto: 2026-04-05 02:00 state snapshot
+Uncommitted files: 9
 Remote: https://github.com/nayslayer143/openclaw.git
 ```
 
 ### rivalclaw
 ```
 Branch: feat/kalshi-live-bridge
-Last commit: 94bec55 auto: hourly sync 2026-04-05 07:47 UTC
-Uncommitted files: 8
+Last commit: 6e9a27a auto: hourly sync 2026-04-05 08:47 UTC
+Uncommitted files: 5
 Remote: https://github.com/nayslayer143/rivalclaw.git
 ```
 
@@ -1538,8 +1544,8 @@ Remote: https://github.com/nayslayer143/arbclaw.git
 ### quantumentalclaw
 ```
 Branch: main
-Last commit: 299800f hourly: 2026-04-05 08:00 | $3,517 | 0W/0closed | $+0 | quiet
-Uncommitted files: 1
+Last commit: 421b86e hourly: 2026-04-05 09:00 | $3,668 | 0W/0closed | $+0 | quiet
+Uncommitted files: 4
 Remote: https://github.com/nayslayer143/quantumentalclaw.git
 ```
 
@@ -1638,5 +1644,5 @@ Remote: https://github.com/nayslayer143/shiny-new.git
 ```
 
 ---
-End of context. Generated 2026-04-05T01:07:00-07:00.
+End of context. Generated 2026-04-05T02:07:01-07:00.
 For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw

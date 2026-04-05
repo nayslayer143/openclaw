@@ -50,3 +50,21 @@
 - ... and 1 more
 
 ---
+
+## 2026-04-05 09:05
+
+**Regime:** trending (confidence: 80%)
+
+**Alerts:**
+- RivalClaw: The 'fair_value_directional' strategy is flagged as 'degraded' despite recent high profitability; manual review of its underlying assumptions is required immediately.
+- QuantumentalClaw: The weight convergence is too stable; consider injecting noise or forcing a weight adjustment based on external market regime indicators to prevent stagnation.
+
+**Lessons extracted:** 6
+- [rivalclaw] The 'fair_value_directional' strategy shows high success on closed trades (PNL > 0) when the edge is high (e.g., 0.874, 0.845), suggesting it works best when the market price is significantly misaligned from the calculated fair value.
+- [rivalclaw] The strategy's status is 'degraded' despite recent profitable trades, indicating the underlying model or parameters need immediate review.
+- [quantclaw] The weight convergence across all modules is stable and consistent, suggesting the learning process has reached a temporary equilibrium.
+- [quantclaw] The system shows a strong tendency to generate high-confidence signals (1.0) for the 'sprint' horizon, suggesting this time frame is currently over-represented in the signal generation.
+- [cross-system] Both systems are operating under conditions that favor high-frequency, short-term directional plays, indicated by QuantumentalClaw's focus on 'sprint' signals and RivalClaw's successful bracket trades.
+- ... and 1 more
+
+---
