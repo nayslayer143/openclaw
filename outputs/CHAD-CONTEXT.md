@@ -1,9 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> Auto-generated 2026-04-04T22:07:00-07:00. Do not edit manually.
+> Auto-generated 2026-04-04T23:07:00-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-04-04T22:07:00-07:00
+Generated: 2026-04-04T23:07:00-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -388,6 +388,7 @@ OpenClaw is the operator shell for Jordan's web-based businesses. Claude Code is
 ~/quantumentalclaw/learning/__init__.py
 ~/quantumentalclaw/learning/analyzer.py
 ~/quantumentalclaw/learning/evolver.py
+~/quantumentalclaw/learning/insights.json
 ~/quantumentalclaw/learning/memory.py
 ~/quantumentalclaw/learning/trade_logger.py
 ~/quantumentalclaw/learning/tuner.py
@@ -1507,16 +1508,16 @@ pytest-asyncio>=0.23
 ### openclaw
 ```
 Branch: main
-Last commit: 893b504 auto: 2026-04-04 22:00 state snapshot
-Uncommitted files: 7
+Last commit: ba2dfb6 auto: 2026-04-04 23:00 state snapshot
+Uncommitted files: 10
 Remote: https://github.com/nayslayer143/openclaw.git
 ```
 
 ### rivalclaw
 ```
 Branch: feat/kalshi-live-bridge
-Last commit: d889d83 auto: hourly sync 2026-04-05 04:47 UTC
-Uncommitted files: 7
+Last commit: 64b89dc auto: hourly sync 2026-04-05 05:47 UTC
+Uncommitted files: 5
 Remote: https://github.com/nayslayer143/rivalclaw.git
 ```
 
@@ -1531,7 +1532,7 @@ Remote: https://github.com/nayslayer143/arbclaw.git
 ### quantumentalclaw
 ```
 Branch: main
-Last commit: 4237d78 hourly: 2026-04-05 05:00 | $3,207 | 0W/0closed | $+0 | quiet
+Last commit: bb7c4ae hourly: 2026-04-05 06:00 | $3,150 | 0W/0closed | $+0 | quiet
 Uncommitted files: 0
 Remote: https://github.com/nayslayer143/quantumentalclaw.git
 ```
@@ -1631,5 +1632,5 @@ Remote: https://github.com/nayslayer143/shiny-new.git
 ```
 
 ---
-End of context. Generated 2026-04-04T22:07:00-07:00.
+End of context. Generated 2026-04-04T23:07:00-07:00.
 For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw

@@ -844,3 +844,11 @@ Synthesis unavailable — Ollama not responding
 - Nightly consolidation: scheduled for 23:03
 [2026-04-04 21:00] Bounty scan complete — 0
 0 actionable
+[2026-04-04 23:30] Idea engine ran — wrote /Users/nayslayer/openclaw/outputs/ideas-2026-04-04-23.md, ingested to Ideas Lab
+
+### Nightly Consolidation — 2026-04-04 23:03
+Tasks: 0
+0 complete, 0
+0 blocked, 0
+0 errors
+Consolidation unavailable — Ollama not responding
