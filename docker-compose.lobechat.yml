@@ -1,0 +1,43 @@
+version: "3.8"
+
+# Lobe Chat — multi-agent web UI for OpenClaw ecosystem
+# Usage: docker compose -f docker-compose.lobechat.yml up -d
+# Open:  http://localhost:3210
+
+services:
+  lobe-chat:
+    image: lobehub/lobe-chat:latest
+    container_name: lobechat
+    restart: unless-stopped
+    ports:
+      - "3210:3210"
+    environment:
+      # ── Model APIs ──────────────────────────────────────────────────────────
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+
+      # ── Ollama (local models) ────────────────────────────────────────────────
+      # Ollama runs on host — use host.docker.internal on macOS
+      OLLAMA_PROXY_URL: http://host.docker.internal:11434
+
+      # ── Enabled model providers ─────────────────────────────────────────────
+      NEXT_PUBLIC_ENABLED_PROVIDERS: anthropic,openai,ollama
+
+      # ── Lobe Chat config ─────────────────────────────────────────────────────
+      # Set a password to protect the instance (optional on localhost)
+      # ACCESS_CODE: your_password_here
+
+      # Feature flags
+      FEATURE_FLAGS: "-feedback,+webrtc_sync"
+
+      # ── OpenClaw plugin ──────────────────────────────────────────────────────
+      # The dashboard API is exposed at localhost:7080 — accessible from container
+      # as host.docker.internal:7080
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+    volumes:
+      - lobechat_data:/app/.data
+
+volumes:
+  lobechat_data:
