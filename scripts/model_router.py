@@ -26,32 +26,44 @@ _PS_CACHE_TTL    = 10.0   # seconds
 # ── Model sizes (GB, from bakeoff 2026-03-19) ────────────────────────────────
 
 MODEL_SIZES_GB: dict[str, float] = {
+    # Tier 1: fast (reflex)
+    "gemma4:e4b":           5.0,
+    "llama3.2:3b":          2.0,
+    # Tier 2: mid (reasoning)
+    "gemma4:31b":          19.0,
     "qwen3:32b":           20.0,
     "qwen3:30b":           18.0,
     "qwen3-coder-next":    51.0,
     "devstral-small-2":    15.0,
-    "deepseek-coder:33b":  18.0,
-    "deepseek-coder:6.7b":  3.8,
-    "llama3.1:70b":        42.0,
-    "llama3.3:70b":        42.0,
-    "qwen2.5:14b":          9.0,
-    "qwen2.5:32b":         19.0,
     "qwen2.5:7b":           4.7,
-    "llama3.2:3b":          2.0,
+    "qwen2.5:14b":          9.0,
+    # Tier 3: deep (TurboQuant — not managed by Ollama)
+    # gemma4-31b-turboquant @ localhost:8090
+    # Multimodal
     "qwen3-vl:32b":        20.0,
+    # Utility
     "nomic-embed-text":     0.3,
+    # Legacy (still installed)
+    "llama3.3:70b":        42.0,
 }
 
 # ── Fallback chains per task type ────────────────────────────────────────────
 
 FALLBACK_CHAINS: dict[str, list[str]] = {
-    "chat":      ["qwen2.5:7b", "qwen2.5:14b", "qwen2.5:32b"],
-    "code":      ["qwen3-coder-next", "devstral-small-2", "deepseek-coder:6.7b"],
-    "research":  ["qwen3:30b", "qwen3:32b", "qwen2.5:32b"],
-    "routing":   ["qwen2.5:7b", "llama3.2:3b"],
+    "chat":      ["gemma4:e4b", "qwen2.5:7b", "llama3.2:3b"],
+    "code":      ["qwen3-coder-next", "devstral-small-2", "gemma4:31b"],
+    "research":  ["gemma4:31b", "qwen3:32b", "qwen3:30b"],
+    "routing":   ["gemma4:e4b", "llama3.2:3b"],
     "vision":    ["qwen3-vl:32b"],
     "embedding": ["nomic-embed-text"],
 }
+
+# TurboQuant server for long-context / memory tasks (not in Ollama)
+TURBOQUANT_BASE_URL = os.environ.get("TURBOQUANT_BASE_URL", "http://localhost:8090")
+TURBOQUANT_MODEL    = os.environ.get("TURBOQUANT_MODEL", "gemma4-31b-turboquant")
+
+# Task types that should route to TurboQuant when available
+TURBOQUANT_TASKS = {"memory", "strategy", "digest"}
 
 # ── Intent → task_type lookup ────────────────────────────────────────────────
 
@@ -203,12 +215,12 @@ Return ONLY the single word."""
 
 
 def _classify_prompt(prompt: str) -> str:
-    """Use qwen2.5:7b to classify prompt → task_type. Never calls route()."""
+    """Use gemma4:e4b to classify prompt → task_type. Never calls route()."""
     try:
         resp = requests.post(
             f"{OLLAMA_BASE_URL}/api/chat",
             json={
-                "model": "qwen2.5:7b",  # hardcoded — must not recurse via route()
+                "model": "gemma4:e4b",  # hardcoded — must not recurse via route()
                 "messages": [
                     {"role": "system", "content": _CLASSIFY_PROMPT},
                     {"role": "user", "content": prompt[:500]},
@@ -262,6 +274,16 @@ def route(
         override = os.environ.get(env_key)
         if override:
             return override
+
+    # TurboQuant tasks route to the long-context server when available
+    if task_type in TURBOQUANT_TASKS:
+        try:
+            health = requests.get(f"{TURBOQUANT_BASE_URL}/health", timeout=2)
+            if health.status_code == 200:
+                _log_routing(task_type, TURBOQUANT_MODEL, intent, 0.0)
+                return TURBOQUANT_MODEL
+        except Exception:
+            pass  # TurboQuant down — fall through to Ollama chain
 
     # Get VRAM state and pick from chain
     vram_used = _get_vram_used_gb()
