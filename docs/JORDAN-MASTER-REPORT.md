@@ -276,4 +276,60 @@ In priority order:
 
 ---
 
-*Everything built tonight is in the repos and committed. Run `git pushall` from each project dir to sync.*
+---
+
+## 9. Additional Overnight Builds (after initial report)
+
+### New CodeMonkeyClaw Skills
+| Skill | What it does |
+|-------|-------------|
+| `greenfield-build` | Build new modules from spec — write in dep order, verify, test |
+| `write-tests` | Write comprehensive tests for existing code |
+| `dependency-upgrade` | Safe one-at-a-time package upgrades with regression validation |
+
+### Auto-Dispatch Poller
+`~/codemonkeyclaw/scripts/poll-and-dispatch.sh` — cron runs every 5min:
+- Picks highest-priority QUEUED work order
+- Dispatches to correct skill based on order type
+- Marks DELIVERED or FAILED automatically
+
+Install: already in crontab (`*/5 * * * *`)
+
+### Homework Validator
+`~/codemonkeyclaw/scripts/validate-homework.py`
+```bash
+python3 scripts/validate-homework.py --all          # run all 4 homework checks
+python3 scripts/validate-homework.py --doc surgical-patch  # run one
+```
+Requires Ollama + qwen3-coder-next running.
+
+### QuantumentalClaw → RivalClaw Signal Bridge
+`~/quantumentalclaw/execution/rivalclaw_bridge.py`
+
+Enable: add to `~/quantumentalclaw/.env`:
+```
+QUANTCLAW_FORWARD_TO_RIVALCLAW=1
+QUANTCLAW_SIGNAL_QUEUE_DB=~/rivalclaw/quantclaw_signals.db
+```
+QuantumentalClaw will write approved signals to a shared SQLite queue. RivalClaw picks them up (poller still needs to be built on the RivalClaw side).
+
+### Learning Loop Fixed
+`~/quantumentalclaw/daily-update.sh` now runs `python3 run.py --learn` before the snapshot. Signal weights evolve every night at 11:45pm based on yesterday's closed trades.
+
+### Shell Aliases
+Added to `~/.zshrc` — take effect in next terminal:
+```bash
+morning          # morning briefing across all systems
+cmc-list         # list all work orders
+cmc-queued       # queued only
+cmc-done         # delivered
+gpa              # git pushall
+summarize        # session-summarize.sh
+gpx              # openai-continue.sh
+oc/qc/rc/cmcd   # quick nav to each claw
+```
+
+### Web UI
+Lobe Chat: `cd ~/openclaw && ./start-lobechat.sh` → http://localhost:3210
+
+*Everything committed and pushed to GitHub. `git pushall` from each project dir to sync mirrors.*
