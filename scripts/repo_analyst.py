@@ -8,7 +8,7 @@ Usage:
     python repo_analyst.py                          # analyze latest crawl
     python repo_analyst.py --crawl-file path.json   # analyze specific crawl
     python repo_analyst.py --top 20                 # only top N repos (default 40)
-    python repo_analyst.py --model qwen3:30b        # specify model (default qwen3:30b)
+    python repo_analyst.py --model gemma4:31b        # specify model (default gemma4:31b)
 
 Dependencies: NONE beyond stdlib. Ollama called via urllib (localhost:11434).
 """
@@ -30,7 +30,7 @@ DATASET_DIR = OPENCLAW_ROOT / "autoresearch" / "outputs" / "datasets"
 INTEL_DIR = OPENCLAW_ROOT / "autoresearch" / "github-intel"
 RECS_FILE = INTEL_DIR / "recommendations.json"
 OLLAMA_URL = "http://localhost:11434/api/generate"
-DEFAULT_MODEL = "qwen3:30b"
+DEFAULT_MODEL = "gemma4:31b"
 DEFAULT_TOP_N = 40
 MAX_RETRIES = 1
 REQUEST_DELAY = 1.0  # seconds between Ollama calls
@@ -347,7 +347,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="GitHub Repo Analyst — Ollama LLM scoring")
     parser.add_argument("--crawl-file", type=str, help="Path to crawl JSON file")
     parser.add_argument("--top", type=int, default=DEFAULT_TOP_N, help="Analyze top N repos (default 40)")
-    parser.add_argument("--model", type=str, default=DEFAULT_MODEL, help="Ollama model (default qwen3:30b)")
+    parser.add_argument("--model", type=str, default=DEFAULT_MODEL, help="Ollama model (default gemma4:31b)")
     args = parser.parse_args()
 
     if args.crawl_file:

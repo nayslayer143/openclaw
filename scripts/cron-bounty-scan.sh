@@ -42,7 +42,7 @@ Output format per gig:
 
 List up to 10 real-feeling opportunities. If nothing strong, list the top 5 weakest and flag as low-quality."
 
-BOUNTIES=$(echo "$PROMPT" | ollama run qwen3:30b 2>/dev/null || echo "LLM unavailable")
+BOUNTIES=$(echo "$PROMPT" | ollama run gemma4:e4b 2>/dev/null || echo "LLM unavailable")
 
 cat > "$OUTPUT" << EOF
 # Bounty & Gig Scan — ${TODAY}

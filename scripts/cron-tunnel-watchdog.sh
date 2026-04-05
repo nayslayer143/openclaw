@@ -32,7 +32,7 @@ else
   # launchd plist not loaded — fall back to manual start
   if ! pgrep -f "telegram-dispatcher" > /dev/null; then
     cd "$HOME/openclaw/scripts"
-    OLLAMA_CHAT_MODEL=qwen3:32b OLLAMA_CLASSIFY_MODEL=qwen2.5:7b PYTHONUNBUFFERED=1 \
+    OLLAMA_CHAT_MODEL=gemma4:e4b OLLAMA_CLASSIFY_MODEL=qwen2.5:7b PYTHONUNBUFFERED=1 \
       nohup python3 telegram-dispatcher.py >> "$HOME/openclaw/logs/dispatcher.log" 2>&1 &
     echo "[$(date)] Dispatcher started (launchd not loaded, PID $!)" >> "$HOME/openclaw/logs/watchdog.log"
   fi

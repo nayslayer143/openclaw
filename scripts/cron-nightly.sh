@@ -41,9 +41,9 @@ Write a 5-10 line structured summary covering:
 
 Format as plain text. No markdown headers. Be factual."
 
-# Short nightly summary (<4K tokens) — qwen3:32b is 2.6x faster than llama3.3:70b per bakeoff
-# llama3.3:70b is reserved for long-context work (self-improvement, autoresearch papers)
-SUMMARY=$(echo "$PROMPT" | ollama run qwen3:32b 2>/dev/null || echo "Consolidation unavailable — Ollama not responding")
+# Short nightly summary (<4K tokens) — gemma4:e4b is fast for summary tasks
+# gemma4:31b is reserved for long-context work (self-improvement, autoresearch papers)
+SUMMARY=$(echo "$PROMPT" | ollama run gemma4:e4b 2>/dev/null || echo "Consolidation unavailable — Ollama not responding")
 
 # --- Append to MEMORY.md ---
 cat >> "${OPENCLAW_ROOT}/memory/IDLE_LOG.md" << LOGENTRY

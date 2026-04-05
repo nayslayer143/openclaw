@@ -53,7 +53,7 @@ fi
 
 # Fallback to local LLM
 if [[ -z "$GIGS" ]]; then
-  GIGS=$(echo "$PROMPT" | ollama run qwen3:30b 2>/dev/null || echo "LLM unavailable — run manually")
+  GIGS=$(echo "$PROMPT" | ollama run gemma4:e4b 2>/dev/null || echo "LLM unavailable — run manually")
 fi
 
 # Write output

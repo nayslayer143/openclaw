@@ -49,7 +49,7 @@ if [[ "$TASK_COUNT" -eq 0 && "$ERROR_COUNT" -eq 0 ]]; then
   exit 0
 fi
 
-# --- Synthesize with qwen3:32b (fast, <4K context) ---
+# --- Synthesize with gemma4:e4b (fast, <4K context) ---
 PROMPT="Summarize the last 6 hours of OpenClaw activity. Be brief — 3-5 lines max.
 
 Tasks completed: ${TASK_COUNT}
@@ -61,7 +61,7 @@ ${LOG_CONTENT}
 
 Output format: plain text, factual, no markdown. Cover: what ran, any errors, anything worth flagging."
 
-SUMMARY=$(echo "$PROMPT" | timeout 120 ollama run qwen3:32b 2>/dev/null \
+SUMMARY=$(echo "$PROMPT" | timeout 120 ollama run gemma4:e4b 2>/dev/null \
   || echo "Synthesis unavailable — Ollama not responding")
 
 # --- Append to IDLE_LOG ---

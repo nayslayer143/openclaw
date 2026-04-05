@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from typing import Any
 
 OLLAMA_BASE_URL   = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
-MIROFISH_MODEL    = os.environ.get("MIROFISH_MODEL", "qwen3:30b")
+MIROFISH_MODEL    = os.environ.get("MIROFISH_MODEL", "gemma4:31b")
 OLLAMA_TIMEOUT    = int(os.environ.get("MIROFISH_OLLAMA_TIMEOUT", "180"))
 MAX_POSITION_PCT = float(os.environ.get("MIROFISH_MAX_POSITION_PCT", "0.10"))
 MERGED_SIGNAL_LIMIT = int(os.environ.get("MERGED_SIGNAL_LIMIT", "30"))

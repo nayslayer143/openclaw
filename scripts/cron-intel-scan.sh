@@ -41,7 +41,7 @@ For each item:
 
 No simulation. No speculation. Signal only. If nothing is high-signal, say so."
 
-INTEL=$(echo "$PROMPT" | ollama run qwen3:30b 2>/dev/null || echo "Intel scan unavailable — Ollama not responding")
+INTEL=$(echo "$PROMPT" | ollama run gemma4:e4b 2>/dev/null || echo "Intel scan unavailable — Ollama not responding")
 
 # --- Send ---
 MESSAGE="Morning Intel Brief — ${TODAY}

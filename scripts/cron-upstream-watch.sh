@@ -38,7 +38,7 @@ fi
 NOTES_TRIMMED=$(echo "$RELEASE_NOTES" | head -c 4000)
 
 # Our system context
-OUR_STACK="Our OpenClaw system uses: Telegram bot (clawmson_chat.py, qwen3:32b), 7 AI agents (AXIS/SCOUT/FORGE/VIGIL/WAVE/SHORE/VAULT), GonzoClaw dashboard (FastAPI+vanilla JS on port 7080), Cloudflare tunnel, 19 crons, Ollama local models (14 models ~264GB), MiroFish simulation, AutoResearch pipeline, trading bot (Polymarket), project-launch automation, Ralph build loop. We run on M2 Max 96GB with no cloud API dependency for core ops."
+OUR_STACK="Our OpenClaw system uses: Telegram bot (clawmson_chat.py, gemma4:e4b), 7 AI agents (AXIS/SCOUT/FORGE/VIGIL/WAVE/SHORE/VAULT), GonzoClaw dashboard (FastAPI+vanilla JS on port 7080), Cloudflare tunnel, 19 crons, Ollama local models (14 models ~264GB), MiroFish simulation, AutoResearch pipeline, trading bot (Polymarket), project-launch automation, Ralph build loop. We run on M2 Max 96GB with no cloud API dependency for core ops."
 
 # Analyze with Ollama
 ANALYSIS=$(echo "You are Clawmpson analyzing an upstream OpenClaw release for upgrade opportunities.
@@ -58,7 +58,7 @@ Analyze this release and produce a brief with:
 4. SKIP (items irrelevant to our stack)
 5. RECOMMENDATION: upgrade now / wait / cherry-pick specific items
 
-Be specific. Reference our actual components." | ollama run qwen3:30b 2>/dev/null)
+Be specific. Reference our actual components." | ollama run gemma4:31b 2>/dev/null)
 
 if [[ -z "$ANALYSIS" || "$ANALYSIS" == *"error"* ]]; then
   ANALYSIS="LLM unavailable — raw release notes saved. Review manually."

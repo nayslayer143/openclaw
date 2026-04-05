@@ -1,9 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> Auto-generated 2026-04-04T21:07:00-07:00. Do not edit manually.
+> Auto-generated 2026-04-04T22:07:00-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-04-04T21:07:00-07:00
+Generated: 2026-04-04T22:07:00-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -646,52 +646,58 @@ Combine 5 independent signal types to find trades where the upside massively out
 
 ### ~/arbclaw/README.md
 ```
+---
+project: arbclaw
+type: trading-agent
+stack: [python, sqlite]
+status: active
+github: https://github.com/nayslayer143/arbclaw
+gitlab: https://gitlab.com/jordan291/arbclaw
+instance: ArbClaw
+parent: openclaw
+children: []
+---
+
 # ArbClaw
 
-The simplest possible Polymarket arb bot. 441 lines of Python. No AI, no agents, no dashboard. Just math.
+Minimal arbitrage bot — the speed and execution baseline for the OpenClaw ecosystem.
 
-I built this as a speed baseline for an experiment: my main system ([OpenClaw](https://gitlab.com/jordan291/openclaw)) has a lot of moving parts, and I wanted to know if all that architecture was actually slowing down arb execution. ArbClaw is the control group — what happens when you strip everything away and just run the arb logic?
+## What This Is
 
-## How it works
+ArbClaw is a stripped-down arb execution agent. It exists to establish a performance baseline that RivalClaw and other trading agents are compared against. The simplest possible Polymarket arb bot — no AI, no agents, no dashboard. Just math. The control group for whether OpenClaw's architecture actually helps or hurts arb execution speed.
 
-Every 5 minutes:
-1. Fetch all active Polymarket markets
-2. Check if YES + NO prices sum to less than 1.0 (after 2% taker fees per leg)
-3. Size with Kelly criterion
-4. Paper trade the underpriced side
+## Architecture
 
-That's it. Four files, one strategy, zero overhead.
+- **Minimal surface area** — smallest possible codebase for arb detection and execution
+- **Metrics-compatible** — exports daily JSON matching the OpenClaw comparison contract
+- **Sub-agent of Clawmpson** — runs within the OpenClaw orchestration layer
 
-| File | What it does | Lines |
-|------|-------------|-------|
-| `feed.py` | Polymarket API fetch + SQLite cache | 112 |
-| `arb_strategy.py` | Cross-outcome arb detection + Kelly sizing | 77 |
-| `wallet.py` | Paper wallet with latency tracking | 192 |
-| `run.py` | Entry point | 60 |
+## Key Files
 
-## The experiment
+| File/Dir | Purpose |
+|----------|---------|
+| `CLAUDE.md` | Agent instructions (if exists) |
+| `src/` | Core arbitrage logic |
 
-Three systems running the same arb logic on the same machine:
+## Quick Start
 
-| System | Complexity | Cycle |
-|--------|-----------|-------|
-| **ArbClaw** (this) | 4 files, 441 lines | 5 min |
-| **RivalClaw** | Full architecture, arb only | 5 min |
-| **Clawmpson** | Full system, 5 strategies | 30 min |
+```bash
+git clone https://github.com/nayslayer143/arbclaw.git
+cd arbclaw
+cat CLAUDE.md  # Architecture and constraints
+```
 
-Key metric: `signal_to_trade_latency_ms` — how long from spotting an opportunity to placing the trade?
+## Related Projects
 
-## Outcome logic
+| Project | Relationship | Repo |
+|---------|-------------|------|
+| OpenClaw | Parent — orchestrator | [GitHub](https://github.com/nayslayer143/openclaw) |
+| RivalClaw | Sibling — arb architecture comparison | [GitHub](https://github.com/nayslayer143/rivalclaw) |
+| QuantumentalClaw | Sibling — signal fusion | [GitHub](https://github.com/nayslayer143/quantumentalclaw) |
 
-- If ArbClaw captures more edge → build a fast-path mode into Clawmpson
-- If Clawmpson wins anyway → architecture validated, ArbClaw gets retired
-- Either way, I learn something
+## License
 
-## Status
-
-Paper trading experiment running March 24 – April 7, 2026. Daily reports auto-generated in `daily/`.
-
-Part of the [OpenClaw](https://gitlab.com/jordan291/openclaw) ecosystem.
+Private project.
 
 ```
 
@@ -710,39 +716,60 @@ See [the docs](https://docs.pytest.org/en/stable/how-to/cache.html) for more inf
 
 ### ~/openclaw/README.md
 ```
+---
+project: openclaw
+type: trading-agent
+stack: [python, sqlite, bash, yaml]
+status: active
+github: https://github.com/nayslayer143/openclaw
+gitlab: https://gitlab.com/jordan291/openclaw
+instance: Clawmpson
+parent: none
+children: [arbclaw, rivalclaw, quantumentalclaw]
+---
+
 # OpenClaw
 
-My personal AI operating system. Started as a trading bot, turned into something way bigger.
+AI operating system for web-based businesses — agent orchestration, trading, research, content, and automation on a single M2 Max.
 
-OpenClaw is the central nervous system that runs my fleet of AI agents — trading, research, content, automation, all of it. Think of it like a business OS where Claude-powered agents handle the heavy lifting and I steer from the top.
+## What This Is
 
-## What's in here
+OpenClaw is the central nervous system that runs a fleet of AI agents. Trading bots, research engines, content pipelines, and build systems all route through here. Claude Code is the build plane, local Ollama models handle inference at zero API cost, and deterministic Lobster workflows handle scheduling and approval gates.
 
-- **Agent orchestration** — multiple specialized agents (ArbClaw, PhantomClaw, etc.) that each own a domain
-- **Trading stack** — paper trading across Polymarket and equities with multiple strategies running in parallel
-- **Research engine** — automated multi-domain research (market intel, content ideas, academic papers, competitive analysis)
-- **Lobster workflows** — deterministic YAML-based pipelines for anything that needs to run on a schedule or with approval gates
-- **Build system** — agents can pick up tasks, write code, run tests, and submit results for review
-- **Memory layer** — the system learns from past runs and surfaces patterns over time
+## Architecture
 
-## The ecosystem
+- **Agent orchestration** — 13+ specialized agents each own a domain
+- **Trading stack** — paper trading across Polymarket and equities with multiple parallel strategies
+- **Research engine** — automated multi-domain research (market intel, content, academic, competitive)
+- **Lobster workflows** — YAML-based deterministic pipelines with schedule and approval gates
+- **Memory layer** — learns from past runs, surfaces patterns over time
 
-OpenClaw doesn't run alone. It's the hub for a few other projects:
+## Key Files
 
-| Project | What it does |
-|---------|-------------|
-| [Mission Control](https://gitlab.com/jordan291/openclaw-mission-control) | Next.js dashboard — monitor agents, chat with them, track costs |
-| [QuantumentalClaw](https://gitlab.com/jordan291/quantumentalclaw) | Signal fusion engine for asymmetric trading |
-| [RivalClaw](https://gitlab.com/jordan291/rivalclaw) | Architecture comparison experiment for arb execution |
-| [ArbClaw](https://gitlab.com/jordan291/arbclaw) | Minimal arb bot — the speed baseline |
+| File/Dir | Purpose |
+|----------|---------|
+| `CLAUDE.md` | Agent instructions and workspace map |
+| `CONTEXT.md` | Task router — start here |
+| `CONSTRAINTS.md` | Non-negotiable rules |
+| `openclaw-v4.1-strategy.md` | Full strategy document |
+| `agents/configs/` | 13 agent configuration files |
+| `scripts/mirofish/` | Advanced trading brain (10 modules) |
+| `dashboard/` | Next.js monitoring dashboard |
 
-## Status
+## Quick Start
 
-Active development. This is my daily driver — constantly evolving as I figure out what works and what doesn't. Paper trading only for now.
+```bash
+git clone https://github.com/nayslayer143/openclaw.git
+cd openclaw
+cat CONTEXT.md  # Route to the right workspace
+```
 
-## Setup
+## Related Projects
 
-This isn't really designed for others to run (yet). It's deeply tied to my local environment, API keys, and workflow. But if you're curious about any of the architecture, the `CONTEXT.md` files are
+| Project | Relationship | Repo |
+|---------|-------------|------|
+| ArbClaw | Child — minimal arb bot | [GitHub](https://github.com/nayslayer143/arbclaw) |
+| RivalClaw | Child 
 ```
 
 ### ~/openclaw/chatgpt-mcp/README.md
@@ -1135,37 +1162,64 @@ See [the docs](https://docs.pytest.org/en/stable/how-to/cache.html) for more inf
 
 ### ~/quantumentalclaw/README.md
 ```
+---
+project: quantumentalclaw
+type: signal-engine
+stack: [python, sqlite]
+status: active
+github: https://github.com/nayslayer143/quantumentalclaw
+gitlab: https://gitlab.com/jordan291/quantumentalclaw
+instance: QuantumentalClaw
+parent: openclaw
+children: []
+---
+
 # QuantumentalClaw
 
-Signal fusion engine for finding asymmetric trades across equities and prediction markets.
+Signal fusion engine that detects asymmetric opportunities across equities and prediction markets.
 
-The name is a mashup of "quantitative" and "fundamental" — the idea is to combine hard data signals with softer contextual ones and let them reinforce each other. When multiple independent signals point the same direction, that's when things get interesting.
+## What This Is
 
-## What it does
+Combines five independent signal types to find trades where upside massively outweighs downside. Not a generic trading bot — executes selectively, learns continuously, compounds edge over time. Runs alongside RivalClaw as a parallel strategy in the OpenClaw ecosystem.
 
-7 data feeds flow into 5 signal modules, get fused together, filtered, sized, risk-checked, and executed. The system learns from every trade to recalibrate signal weights over time.
+## Architecture
 
-```
-Feeds (7) → Signals (5) → Fusion → Filter → Size → Risk → Execute → Learn
-```
+Five signal types fused into a single scoring framework:
 
-Everything runs async in a single process. No microservices, no message queues — just clean Python.
+1. **Quant** — price inefficiencies, cross-venue spreads, mean reversion
+2. **Narrative** — keyword velocity, sentiment shifts, attention spikes
+3. **Event** — earnings, FOMC, CPI — scheduled catalysts with uncertainty
+4. **EDGAR** — SEC filings, insider buying clusters, material events
+5. **Cross-venue** — prediction market vs equity price divergences
 
-## Quick start
+## Key Files
+
+| File/Dir | Purpose |
+|----------|---------|
+| `CLAUDE.md` | Agent instructions and signal architecture |
+| `simulator.py` | Async orchestrator — the main loop |
+| `run.py` | CLI entry point |
+| `feeds/` | Data ingestion (7 feeds) |
+| `signals/` | Signal modules (5 modules) |
+| `engine/` | Fusion, filtering, sizing, risk |
+
+## Quick Start
 
 ```bash
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env  # add your API keys
-python run.py --migrate
-python run.py --run
+git clone https://github.com/nayslayer143/quantumentalclaw.git
+cd quantumentalclaw
+cat CLAUDE.md  # Architecture and signal specs
 ```
 
-## Status
+## Related Projects
 
-V1 build, paper trading only. Part of the [OpenClaw](https://gitlab.com/jordan291/openclaw) ecosystem.
+| Project | Relationship | Repo |
+|---------|-------------|------|
+| OpenClaw | Parent — orchestrator | [GitHub](https://github.com/nayslayer143/openclaw) |
+| RivalClaw | Sibling — arb execution | [GitHub](https://github.com/nayslayer143/rivalclaw) |
+| ArbClaw | Sibling — minimal arb baseline | [GitHub](https://github.com/nayslayer143/arbclaw) |
 
+## Licen
 ```
 
 ### ~/rivalclaw/.pytest_cache/README.md
@@ -1183,59 +1237,61 @@ See [the docs](https://docs.pytest.org/en/stable/how-to/cache.html) for more inf
 
 ### ~/rivalclaw/README.md
 ```
-# RivalClaw
-
-Mechanical arbitrage trading system that competes head-to-head against the
-OpenClaw (Clawmpson) trading stack.  Trades binary contracts on **Kalshi**
-across crypto, weather, commodities, and equity-index markets.
-
-RivalClaw exists to answer one question:
-
-> Can a narrow, fast, mechanical system outperform a broader, integrated
-> architecture on real, execution-adjusted metrics?
-
-## Design principles
-
-- Mechanical over narrative.
-- Execution-first over theory-first.
-- Fast over exhaustive.
-- Skeptical over optimistic.
-- Minimal over feature-heavy.
-
+---
+project: rivalclaw
+type: trading-agent
+stack: [python, sqlite]
+status: active
+github: https://github.com/nayslayer143/rivalclaw
+gitlab: https://gitlab.com/jordan291/rivalclaw
+instance: RivalClaw
+parent: openclaw
+children: []
 ---
 
-## Architecture overview
+# RivalClaw
 
+Lightweight, laser-focused arbitrage trading agent. Speed and execution reliability over complexity.
+
+## What This Is
+
+RivalClaw is a standalone arbitrage execution engine within the OpenClaw ecosystem. It runs independently but exports daily metrics compatible with OpenClaw's comparison framework. Optimizes for reliable, repeatable, execution-realistic arbitrage — not narrative intelligence or complex reasoning.
+
+## Architecture
+
+- **Cycle-based execution** — runs every 10-15 minutes scanning for arb opportunities
+- **Single-strategy focus** — pure arbitrage, no multi-strategy complexity
+- **Metrics export** — daily JSON contract compatible with OpenClaw and ArbClaw comparison
+- **Risk management** — built-in drawdown limits, slippage tracking, false positive monitoring
+
+## Key Files
+
+| File/Dir | Purpose |
+|----------|---------|
+| `CLAUDE.md` | Agent instructions and architecture rules |
+| `src/` | Core trading logic |
+| `daily-update.sh` | Daily report generation + git push |
+
+## Quick Start
+
+```bash
+git clone https://github.com/nayslayer143/rivalclaw.git
+cd rivalclaw
+cat CLAUDE.md  # Full architecture and rules
 ```
-                               +-------------------+
-                               |   Kalshi REST API  |
-                               | (RSA auth, prod)   |
-                               +--------+----------+
-                                        ^
-                                        | submit / poll / settle
-                                        v
-+------------------+    +---------------+---------------+
-|  Market Feeds    |    |       Execution Router        |
-|                  |    |  10-pt pre-flight, kill switch |
-|  kalshi_feed     +--->|  anti-stack, rate limits       |
-|  spot_feed       |    +------+--------+---------------+
-|  index_feed      |           ^        |
-|  weather_feed    |           |        v
-+--------+---------+    +------+--------+---------------+
-         |              |     Kalshi Executor            |
-         v              |  order build, submit, poll,    |
-+--------+---------+    |  reconciliation, rate limiter  |
-| Market Classifier|    +-------------------------------+
-| speed + clarity  |           ^
-+--------+---------+           |
-         |              +------+--------+
-         v              | Protocol      |
-+--------+---------+    | Adapter       |
-| Trading Brain    |    | (openclaw-    |
-| 8 strategies     +--->|  protocol)    |
-| Kelly sizing     |    +---------------+
-| direction filter |           ^
-+--------+-----
+
+## Related Projects
+
+| Project | Relationship | Repo |
+|---------|-------------|------|
+| OpenClaw | Parent — orchestrator | [GitHub](https://github.com/nayslayer143/openclaw) |
+| ArbClaw | Sibling — minimal arb baseline | [GitHub](https://github.com/nayslayer143/arbclaw) |
+| QuantumentalClaw | Sibling — signal fusion | [GitHub](https://github.com/nayslayer143/quantumentalclaw) |
+
+## License
+
+Private project.
+
 ```
 
 ## Tech Stack Fingerprint
@@ -1451,23 +1507,23 @@ pytest-asyncio>=0.23
 ### openclaw
 ```
 Branch: main
-Last commit: 8075fe3 auto: 2026-04-04 21:00 state snapshot
-Uncommitted files: 10
+Last commit: 893b504 auto: 2026-04-04 22:00 state snapshot
+Uncommitted files: 7
 Remote: https://github.com/nayslayer143/openclaw.git
 ```
 
 ### rivalclaw
 ```
 Branch: feat/kalshi-live-bridge
-Last commit: c43f1dc auto: hourly sync 2026-04-05 03:47 UTC
-Uncommitted files: 9
+Last commit: d889d83 auto: hourly sync 2026-04-05 04:47 UTC
+Uncommitted files: 7
 Remote: https://github.com/nayslayer143/rivalclaw.git
 ```
 
 ### arbclaw
 ```
 Branch: main
-Last commit: 394edd6 daily report 2026-04-04 — day 12 | bal=$ pnl=$ trades=0
+Last commit: 1e54790 docs: GitHub-primary setup — structured README with YAML frontmatter
 Uncommitted files: 3
 Remote: https://github.com/nayslayer143/arbclaw.git
 ```
@@ -1475,7 +1531,7 @@ Remote: https://github.com/nayslayer143/arbclaw.git
 ### quantumentalclaw
 ```
 Branch: main
-Last commit: 487957b hourly: 2026-04-05 04:00 | $3,114 | 0W/0closed | $+0 | quiet
+Last commit: 4237d78 hourly: 2026-04-05 05:00 | $3,207 | 0W/0closed | $+0 | quiet
 Uncommitted files: 0
 Remote: https://github.com/nayslayer143/quantumentalclaw.git
 ```
@@ -1575,5 +1631,5 @@ Remote: https://github.com/nayslayer143/shiny-new.git
 ```
 
 ---
-End of context. Generated 2026-04-04T21:07:00-07:00.
+End of context. Generated 2026-04-04T22:07:00-07:00.
 For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw

@@ -41,7 +41,7 @@ fi
 ask_llm() {
   local prompt="$1"
   local result
-  result=$(echo "$prompt" | ollama run qwen3:30b 2>/dev/null | sed '/^<think>/,/<\/think>/d')
+  result=$(echo "$prompt" | ollama run gemma4:e4b 2>/dev/null | sed '/^<think>/,/<\/think>/d')
   echo "$result"
 }
 

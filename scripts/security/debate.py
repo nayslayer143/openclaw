@@ -2,7 +2,7 @@
 """
 3-agent inline Ollama debate for REVIEW-range skills.
 Runs: defender → attacker → judge.
-All calls use qwen3:30b with 120s timeout. Fallback: qwen3:32b.
+All calls use gemma4:31b with 120s timeout. Fallback: gemma4:e4b.
 """
 from __future__ import annotations
 import json
@@ -10,8 +10,8 @@ import re
 import requests
 
 OLLAMA_BASE    = "http://localhost:11434"
-PRIMARY_MODEL  = "qwen3:30b"
-FALLBACK_MODEL = "qwen3:32b"
+PRIMARY_MODEL  = "gemma4:31b"
+FALLBACK_MODEL = "gemma4:e4b"
 TIMEOUT_S      = 120
 
 

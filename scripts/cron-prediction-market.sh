@@ -64,7 +64,7 @@ Output ONLY valid JSON matching this schema:
   \"meta\": {\"total_scanned\": 20, \"high_confidence\": 0, \"mode\": \"paper_trading\"}
 }"
 
-RESULT=$(echo "$PROMPT" | timeout 180 ollama run qwen3:32b 2>/dev/null | python3 -c "
+RESULT=$(echo "$PROMPT" | timeout 180 ollama run gemma4:31b 2>/dev/null | python3 -c "
 import sys, json, re
 txt = sys.stdin.read()
 m = re.search(r'\{.*\}', txt, re.DOTALL)

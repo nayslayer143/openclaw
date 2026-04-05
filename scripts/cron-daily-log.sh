@@ -18,7 +18,7 @@ PENDING_QUEUE=$(find "${OPENCLAW_ROOT}/repo-queue" -name "task-*.json" 2>/dev/nu
 PENDING_IDEAS=$(find "${OPENCLAW_ROOT}/ideas" -name "idea-*.json" -exec grep -l '"status": "pending"' {} \; 2>/dev/null | wc -l | tr -d ' ')
 
 # ── Synthesize with LLM ───────────────────────────────────────────────────────
-SUMMARY=$(ollama run qwen3:32b "You are Clawmpson writing your daily work log for Jordan.
+SUMMARY=$(ollama run gemma4:e4b "You are Clawmpson writing your daily work log for Jordan.
 
 Today's activity log:
 ${IDLE_LOG_ENTRIES}

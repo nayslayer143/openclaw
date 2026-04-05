@@ -20,8 +20,8 @@ from clawteam.registry import get_agent
 BUILD_RESULTS_DIR = Path(os.environ.get("OPENCLAW_BUILD_RESULTS",
                          Path.home() / "openclaw" / "build-results"))
 
-_SYNTH_PRIMARY  = "qwen3:32b"
-_SYNTH_FALLBACK = "qwen3:30b"
+_SYNTH_PRIMARY  = "gemma4:31b"
+_SYNTH_FALLBACK = "gemma4:e4b"
 
 
 def _make_swarm_id(task: str) -> str:
@@ -31,7 +31,7 @@ def _make_swarm_id(task: str) -> str:
 
 
 def _synthesize(subtask_results: list) -> str:
-    """Call SYNTHESIZER (qwen3:32b, fallback qwen3:30b) to merge completed results."""
+    """Call SYNTHESIZER (gemma4:31b, fallback gemma4:e4b) to merge completed results."""
     completed = [r for r in subtask_results if r.get("status") == "complete"]
     if not completed:
         return ""

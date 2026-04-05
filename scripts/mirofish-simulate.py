@@ -23,7 +23,7 @@ from pathlib import Path
 OPENCLAW = Path.home() / "openclaw"
 REPORTS_DIR = OPENCLAW / "mirofish" / "reports"
 OLLAMA_URL = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
-MODEL = os.environ.get("MIROFISH_MODEL", "qwen3:30b")
+MODEL = os.environ.get("MIROFISH_MODEL", "gemma4:31b")
 
 
 def llm(prompt, system="", timeout=300):

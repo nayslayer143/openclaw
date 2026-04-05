@@ -3,7 +3,7 @@ Inspector Gadget — Logic Analyzer (Task 7).
 
 Two-stage analysis of trading bot source code:
   1. Deterministic checks: fast AST/regex scan without LLM
-  2. LLM analysis: send source to qwen3:30b at localhost:11434 for logic review
+  2. LLM analysis: send source to gemma4:31b at localhost:11434 for logic review
 
 Source is truncated to 8000 chars for LLM calls (documented limitation).
 """
@@ -43,7 +43,7 @@ _TEST_LEAK_RE = re.compile(
 )
 
 _OLLAMA_URL = "http://localhost:11434/api/chat"
-_OLLAMA_MODEL = "qwen3:30b"
+_OLLAMA_MODEL = "gemma4:31b"
 _OLLAMA_TIMEOUT = 180
 _SOURCE_TRUNCATE = 8000
 
@@ -144,7 +144,7 @@ class LogicAnalyzer:
 
     def _llm_analysis(self, filepath: str, source: str) -> List[dict]:
         """
-        Send source (truncated to 8000 chars) to qwen3:30b for logic review.
+        Send source (truncated to 8000 chars) to gemma4:31b for logic review.
 
         Returns a list of finding dicts, or a single analysis_error finding
         if Ollama is unavailable or returns an unparseable response.

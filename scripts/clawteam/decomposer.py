@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 ClawTeam task decomposer.
-Calls qwen3:32b (fallback: qwen3:30b) to break a task into subtasks.
+Calls gemma4:31b (fallback: gemma4:e4b) to break a task into subtasks.
 Returns: {"pattern": str, "subtasks": [{"agent": str, "model": str, "prompt": str, "depends_on": str|None}]}
 """
 from __future__ import annotations
@@ -9,8 +9,8 @@ import json
 from clawteam.runner import run_agent
 from clawteam.registry import get_agent
 
-_PRIMARY_MODEL  = "qwen3:32b"
-_FALLBACK_MODEL = "qwen3:30b"
+_PRIMARY_MODEL  = "gemma4:31b"
+_FALLBACK_MODEL = "gemma4:e4b"
 
 _DECOMPOSE_PROMPT = """\
 You are a task decomposer for a local AI system. The following is a task description \
@@ -81,7 +81,7 @@ def _parse_response(raw: str, task: str) -> dict:
 
 def decompose(task: str) -> dict:
     """
-    Decompose task into subtasks using qwen3:32b (fallback: qwen3:30b).
+    Decompose task into subtasks using gemma4:31b (fallback: gemma4:e4b).
     Returns {"pattern": str, "subtasks": list[dict]}.
     """
     prompt = _DECOMPOSE_PROMPT + task

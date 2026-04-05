@@ -7,7 +7,7 @@ Part of OpenClaw's research pipeline.
 Layers:
   1. DB helpers      — save/retrieve papers and digests from clawmson.db
   2. Discovery       — search HF, embed + rank by relevance
-  3. Digestion       — fetch paper markdown, extract insights via qwen3:30b
+  3. Digestion       — fetch paper markdown, extract insights via gemma4:31b
   4. Action routing  — write improvements, bakeoff flags, build notes
   5. Auto mode       — overnight cron entry point
   6. ClawTeam shim   — get_paper_for_debate()
@@ -36,7 +36,7 @@ import clawmson_db as db
 # ── Constants ─────────────────────────────────────────────────────────────────
 
 OLLAMA_BASE_URL       = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
-DIGEST_MODEL          = os.environ.get("SCHOLAR_DIGEST_MODEL", "qwen3:30b")
+DIGEST_MODEL          = os.environ.get("SCHOLAR_DIGEST_MODEL", "gemma4:31b")
 EMBED_MODEL           = os.environ.get("SCHOLAR_EMBED_MODEL", "nomic-embed-text")
 RELEVANCE_THRESHOLD   = float(os.environ.get("SCHOLAR_RELEVANCE_THRESHOLD", "0.75"))
 HF_REQUEST_TIMEOUT    = 30  # seconds for all HuggingFace HTTP calls
@@ -462,7 +462,7 @@ def digest_paper(paper_id: str) -> dict:
     prompt_content = content[:8000] if len(content) > 8000 else content
     prompt = f"{_DIGEST_PROMPT}\n\n---\n\n{prompt_content}"
 
-    # Call qwen3:30b
+    # Call gemma4:31b
     try:
         resp = requests.post(
             f"{OLLAMA_BASE_URL}/api/chat",

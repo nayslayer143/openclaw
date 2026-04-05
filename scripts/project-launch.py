@@ -45,7 +45,7 @@ def _load_env():
 _load_env()
 
 OLLAMA_URL   = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
-CHAT_MODEL   = os.environ.get("OLLAMA_CHAT_MODEL", "qwen3:32b")
+CHAT_MODEL   = os.environ.get("OLLAMA_CHAT_MODEL", "gemma4:e4b")
 SERPER_KEY   = os.environ.get("SERPER_API_KEY", "")
 BOT_TOKEN    = os.environ.get("TELEGRAM_BOT_TOKEN", "")
 CHAT_ID      = os.environ.get("TELEGRAM_ALLOWED_USERS", "").strip().strip('"[]').split(",")[0].strip()
