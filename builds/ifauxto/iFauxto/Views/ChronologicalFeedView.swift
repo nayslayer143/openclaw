@@ -5,7 +5,10 @@ struct ChronologicalFeedView: View {
     @EnvironmentObject var photoKitService: PhotoKitService
 
     @State private var assetIdentifiers: [String] = []
+    @State private var allIdentifiers: [String] = []
     @State private var isLoading = true
+    @State private var loadedCount = 0
+    private let pageSize = 100
 
     private let columns = [GridItem(.adaptive(minimum: 110), spacing: 2)]
 
@@ -31,16 +34,29 @@ struct ChronologicalFeedView: View {
                         ForEach(assetIdentifiers, id: \.self) { identifier in
                             FeedThumbnailView(identifier: identifier)
                         }
+
+                        if loadedCount < allIdentifiers.count {
+                            Color.clear
+                                .frame(height: 1)
+                                .onAppear { loadNextPage() }
+                        }
                     }
                     .padding(2)
                 }
             }
             .navigationTitle("All Photos")
             .task {
-                assetIdentifiers = photoKitService.fetchAllAssetIdentifiers()
+                allIdentifiers = photoKitService.fetchAllAssetIdentifiers()
+                loadNextPage()
                 isLoading = false
             }
         }
+    }
+
+    private func loadNextPage() {
+        let nextBatch = Array(allIdentifiers.dropFirst(loadedCount).prefix(pageSize))
+        assetIdentifiers.append(contentsOf: nextBatch)
+        loadedCount = assetIdentifiers.count
     }
 }
 

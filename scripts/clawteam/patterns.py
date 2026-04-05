@@ -190,7 +190,9 @@ def run_hierarchy(swarm_id: str, task: str, bus, runner: Callable = run_agent) -
         "You are the MANAGER agent. Decompose the following task into worker subtasks. "
         "Return ONLY a JSON array of objects with keys: agent (string), prompt (string), "
         "depends_on (array of subtask indices, 0-based, or empty array if none). "
-        f"Task: {task}"
+        f"Task: {task}\n\n"
+        "REMINDER: Your output MUST be a JSON array of objects. Each object MUST have keys: "
+        "agent (string), prompt (string), depends_on (array of 0-based indices or empty array)."
     )
     manager_result = runner("MANAGER", get_agent("AXIS").primary_model, manager_prompt)
 

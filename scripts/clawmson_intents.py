@@ -66,6 +66,8 @@ Examples:
 - "check this out https://example.com" → REFERENCE_INGEST
 - "check disk space" → DIRECT_COMMAND
 
+CRITICAL REMINDER: Return a JSON object with "intent" set to exactly one of: BUILD_TASK, REFERENCE_INGEST, STATUS_QUERY, DIRECT_COMMAND, CONVERSATION, BROWSER_TASK, or UNCLEAR. When in doubt, default to CONVERSATION. Most messages are CONVERSATION.
+
 Return ONLY valid JSON. No markdown, no explanation."""
 
 # ── URL helpers ──────────────────────────────────────────────────────────────

@@ -24,10 +24,16 @@ final class PhotoKitService: ObservableObject {
         return result.firstObject
     }
 
-    /// Returns a UIImage thumbnail for a given PHAsset identifier.
+    /// Returns a UIImage thumbnail for a given PHAsset identifier, with caching.
     func loadThumbnail(for identifier: String, targetSize: CGSize = CGSize(width: 200, height: 200)) async -> UIImage? {
+        let cacheKey = "\(identifier)_\(Int(targetSize.width))x\(Int(targetSize.height))"
+
+        if let cached = ThumbnailCache.shared.get(key: cacheKey) {
+            return cached
+        }
+
         guard let asset = fetchAsset(withIdentifier: identifier) else { return nil }
-        return await withCheckedContinuation { continuation in
+        let image = await withCheckedContinuation { continuation in
             let options = PHImageRequestOptions()
             options.deliveryMode = .highQualityFormat
             options.resizeMode = .fast
@@ -42,6 +48,12 @@ final class PhotoKitService: ObservableObject {
                 continuation.resume(returning: image)
             }
         }
+
+        if let image {
+            ThumbnailCache.shared.set(key: cacheKey, image: image)
+        }
+
+        return image
     }
 
     /// Returns a full-resolution UIImage for a given PHAsset identifier.

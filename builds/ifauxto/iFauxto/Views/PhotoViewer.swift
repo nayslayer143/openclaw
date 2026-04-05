@@ -7,6 +7,7 @@ struct PhotoViewer: View {
     @EnvironmentObject var photoKitService: PhotoKitService
     @Environment(\.dismiss) var dismiss
     @State private var currentIndex: Int
+    @State private var showingEditor = false
 
     init(photos: [PhotoReference], startIndex: Int) {
         self.photos = photos
@@ -34,6 +35,19 @@ struct PhotoViewer: View {
                     .foregroundStyle(.white, .black.opacity(0.5))
                     .padding(16)
             }
+        }
+        .overlay(alignment: .topTrailing) {
+            Button {
+                showingEditor = true
+            } label: {
+                Image(systemName: "slider.horizontal.3")
+                    .font(.title2)
+                    .foregroundStyle(.white, .black.opacity(0.5))
+                    .padding(16)
+            }
+        }
+        .sheet(isPresented: $showingEditor) {
+            PhotoEditorView(photoIdentifier: photos[currentIndex].id)
         }
         .overlay(alignment: .bottom) {
             Text("\(currentIndex + 1) / \(photos.count)")

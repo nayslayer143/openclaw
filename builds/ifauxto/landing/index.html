@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iFauxto — Your photos. Your order.</title>
+    <link rel="stylesheet" href="./src/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Hero Section -->
+    <header class="hero-section">
+        <div class="hero-content">
+            <h1>Your photos.<br>Your order.</h1>
+            <p class="subtitle">Apple decides what you see. We think that is your job.</p>
+            <a href="#demo" class="cta-button primary-cta">Try the Demo</a>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <h2>Control Your Memories</h2>
+        <div class="feature-grid">
+            <!-- Feature 1: Folders that stay put -->
+            <div class="feature-card">
+                <span class="icon">📌</span>
+                <h2>Folders that stay put</h2>
+                <p>Drag once. Done forever. No reshuffling.</p>
+            </div>
+            <!-- Feature 2: Find anything -->
+            <div class="feature-card">
+                <span class="icon">🔍</span>
+                <h2>Find anything. Instantly.</h2>
+                <p>Every photo tagged automatically on your device.</p>
+            </div>
+            <!-- Feature 3: Edit your way -->
+            <div class="feature-card">
+                <span class="icon">🎨</span>
+                <h2>Edit your way</h2>
+                <p>VSCO-quality sliders. Non-destructive.</p>
+            </div>
+            <!-- Feature 4: Your app, your entry -->
+            <div class="feature-card">
+                <span class="icon">🏠</span>
+                <h2>Your app, your entry</h2>
+                <p>Choose what you see when you open the app.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Demo Section -->
+    <section id="demo" class="demo-section">
+        <h2>Try it yourself</h2>
+        <p class="subtitle">Experience folder structure and granular control.</p>
+        
+        <!-- Phone Frame Container -->
+        <div class="phone-frame">
+            <div class="demo-app">
+                <header class="demo-header">
+                    <h3>iFauxto</h3>
+                    <div class="search-bar">
+                        🔍 Search photos...
+                    </div>
+                </header>
+                
+                <!-- Folder List Placeholder -->
+                <div class="folder-list">
+                    <!-- Folders loaded here by JS -->
+                </div>
+
+                <!-- Photo Grid Placeholder -->
+                <div class="photo-grid">
+                    <!-- Photos loaded here by JS -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <h2>Ready to take control?</h2>
+        <p>No surprises. Just your system.</p>
+        <div class="store-links">
+            <button class="cta-button secondary-cta" id="app-store-button">Download on App Store</button>
+            <a href="#" class="waitlist-link">Join Waitlist</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 iFauxto — Finally, your photos behave.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="./src/data.js"></script>
+    <script src="./src/demo.js"></script>
+    <script src="./src/tooltips.js"></script>
+</body>
+</html>

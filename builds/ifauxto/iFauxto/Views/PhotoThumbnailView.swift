@@ -6,6 +6,7 @@ struct PhotoThumbnailView: View {
     let isEditMode: Bool
 
     @EnvironmentObject var photoKitService: PhotoKitService
+    @EnvironmentObject var dataManager: DataManager
     @State private var thumbnail: UIImage?
 
     private let size: CGFloat = 120
@@ -19,6 +20,15 @@ struct PhotoThumbnailView: View {
 
             if isEditMode {
                 selectionIndicator
+                    .padding(4)
+            }
+
+            if !isEditMode && dataManager.hasEdits(photoId: photo.id) {
+                Image(systemName: "slider.horizontal.3")
+                    .font(.caption2)
+                    .padding(4)
+                    .background(.ultraThinMaterial, in: Circle())
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
                     .padding(4)
             }
         }

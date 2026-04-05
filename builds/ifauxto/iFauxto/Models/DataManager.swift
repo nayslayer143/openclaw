@@ -134,6 +134,19 @@ final class DataManager: ObservableObject {
         try? modelContext.save()
     }
 
+    // MARK: Settings
+
+    func getOrCreateSettings() -> AppSettings {
+        let descriptor = FetchDescriptor<AppSettings>()
+        if let existing = try? modelContext.fetch(descriptor).first {
+            return existing
+        }
+        let settings = AppSettings()
+        modelContext.insert(settings)
+        try? modelContext.save()
+        return settings
+    }
+
     // MARK: Edit State CRUD
 
     /// Checks if any edit state exists for a given photo ID.

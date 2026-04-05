@@ -28,6 +28,13 @@ Also select the best execution pattern:
 - debate: adversarial review — exactly 2 positions + 1 judge
 - hierarchy: complex multi-domain, MANAGER decomposes further at runtime
 
+REMINDER: You MUST decompose into 2-5 subtasks. Each subtask MUST be assigned to one of these agents:
+- SCOUT: research, intel, analysis, competitive research
+- FORGE: code, build, debug, technical implementation
+- AXIS: orchestration, synthesis, planning, general
+- VIGIL: ops, monitoring, system health
+Do not invent other agent names. Every subtask must have an "agent" from this list.
+
 Return ONLY valid JSON, no explanation:
 {
   "pattern": "parallel",
