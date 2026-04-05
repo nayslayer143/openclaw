@@ -196,5 +196,14 @@ Build systems, not scripts · Extend existing modules, don't replace · Prefer e
 
 ---
 
+## Version Control
+
+- **Primary:** GitHub — `nayslayer143/openclaw`
+- **Mirrors:** GitLab (`jordan291/openclaw`), Gitea (local)
+- **Push:** Always use `git pushall` — see `~/.claude/CLAUDE.md` for full details
+- **Pull:** `git pull` pulls from GitHub (origin)
+
+---
+
 *This file is auto-loaded by Claude Code. Keep it under 200 lines. Map only.*
 *For phase steps, workflows, revenue streams, and full agent configs: read `openclaw-v4.1-strategy.md`*
