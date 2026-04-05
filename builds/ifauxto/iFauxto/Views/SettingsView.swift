@@ -1,35 +1,28 @@
 import SwiftUI
 
+private struct ModeOption: Identifiable {
+    let id: String
+    let label: String
+}
+
 struct SettingsView: View {
     @EnvironmentObject var dataManager: DataManager
     @Environment(\.dismiss) var dismiss
 
     @State private var homeMode: String = "folder_list"
 
-    private let modes: [(id: String, label: String)] = [
-        ("folder_list", "Folders"),
-        ("chronological_feed", "Photo Feed"),
-        ("last_opened", "Last Opened"),
+    private let modes: [ModeOption] = [
+        ModeOption(id: "folder_list", label: "Folders"),
+        ModeOption(id: "chronological_feed", label: "Photo Feed"),
+        ModeOption(id: "last_opened", label: "Last Opened"),
     ]
 
     var body: some View {
         NavigationStack {
             List {
                 Section("Home Screen") {
-                    ForEach(modes, id: \.id) { mode in
-                        Button {
-                            homeMode = mode.id
-                        } label: {
-                            HStack {
-                                Text(mode.label)
-                                    .foregroundStyle(.primary)
-                                Spacer()
-                                if homeMode == mode.id {
-                                    Image(systemName: "checkmark")
-                                        .foregroundStyle(.accentColor)
-                                }
-                            }
-                        }
+                    ForEach(modes) { mode in
+                        modeRow(mode)
                     }
                 }
             }
@@ -47,6 +40,22 @@ struct SettingsView: View {
             }
             .onAppear {
                 homeMode = dataManager.getOrCreateSettings().homeViewMode
+            }
+        }
+    }
+
+    private func modeRow(_ mode: ModeOption) -> some View {
+        Button {
+            homeMode = mode.id
+        } label: {
+            HStack {
+                Text(mode.label)
+                    .foregroundStyle(.primary)
+                Spacer()
+                if homeMode == mode.id {
+                    Image(systemName: "checkmark")
+                        .foregroundColor(.accentColor)
+                }
             }
         }
     }
