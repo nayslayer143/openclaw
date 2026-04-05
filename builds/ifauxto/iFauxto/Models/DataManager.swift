@@ -13,7 +13,7 @@ final class DataManager: ObservableObject {
     let isCloudKitEnabled: Bool = false
 
     init(inMemory: Bool = false) throws {
-        let schema = Schema([Folder.self, PhotoReference.self, AppSettings.self])
+        let schema = Schema([Folder.self, PhotoReference.self, AppSettings.self, EditState.self])
         // cloudKitDatabase: .none prevents SwiftData from auto-enabling CloudKit via entitlements,
         // which would fail model validation (non-optional to-many relationship).
         let config = ModelConfiguration(
@@ -134,16 +134,49 @@ final class DataManager: ObservableObject {
         try? modelContext.save()
     }
 
-    // MARK: Settings
+    // MARK: Edit State CRUD
 
-    func getOrCreateSettings() -> AppSettings {
-        let descriptor = FetchDescriptor<AppSettings>()
-        if let existing = try? modelContext.fetch(descriptor).first {
-            return existing
+    /// Checks if any edit state exists for a given photo ID.
+    func hasEdits(photoId: String) -> Bool {
+        let descriptor = FetchDescriptor<EditState>(
+            predicate: #Predicate { $0.photoId == photoId }
+        )
+        return (try? modelContext.fetch(descriptor))?.isEmpty == false
+    }
+
+    /// Fetches the current edit state for a photo ID.
+    func fetchEditState(photoId: String) -> EditState? {
+        let descriptor = FetchDescriptor<EditState>(
+            predicate: #Predicate { $0.photoId == photoId }
+        )
+        return try? modelContext.fetch(descriptor).first
+    }
+
+    /// Saves or updates the edit state for a photo.
+    func saveEditState(photoId: String, adjustments: EditAdjustments) {
+        if let existingState = fetchEditState(photoId: photoId) {
+            // Update existing record
+            existingState.adjustments = adjustments
+        } else {
+            // Create new record
+            let newState = EditState(photoId: photoId, adjustments: adjustments)
+            modelContext.insert(newState)
         }
-        let settings = AppSettings()
-        modelContext.insert(settings)
-        try? modelContext.save()
-        return settings
+        do {
+            try modelContext.save()
+        } catch {
+            print("Failed to save edit state: \(error)")
+        }
+    }
+
+    /// Deletes the edit state for a photo ID.
+    func deleteEditState(photoId: String) {
+        let descriptor = FetchDescriptor<EditState>(
+            predicate: #Predicate { $0.photoId == photoId }
+        )
+        if let stateToDelete = try? modelContext.fetch(descriptor).first {
+            modelContext.delete(stateToDelete)
+            try? modelContext.save()
+        }
     }
 }

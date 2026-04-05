@@ -84,10 +84,11 @@ struct OnboardingView: View {
 
     private var getStartedButton: some View {
         Button {
-            let settings = dataManager.getOrCreateSettings()
+            let dm: DataManager = dataManager
+            let settings = dm.getOrCreateSettings()
             settings.homeViewMode = selectedMode
             settings.hasCompletedOnboarding = true
-            try? dataManager.modelContext.save()
+            try? dm.modelContext.save()
             onComplete()
         } label: {
             Text("Get Started")

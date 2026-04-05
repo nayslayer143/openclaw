@@ -1,204 +1,137 @@
 import Photos
 import UIKit
-import Combine
-
-// Assume TagStore, TagRecord, and VisionTaggingService are defined and accessible in scope.
 
 @MainActor
 final class IndexingManager: ObservableObject {
-    
-    // MARK: - Published Properties
-    @Published private(set) var isIndexing: Bool = false
-    @Published private(set) var indexedCount: Int = 0
-    @Published private(set) var totalCount: Int = 0
-    
-    // MARK: - Private State
+    @Published var isIndexing = false
+    @Published var indexedCount = 0
+    @Published var totalCount = 0
+
     private let tagStore: TagStore
-    private let taggingService: VisionTaggingService
+    private let taggingService = VisionTaggingService()
     private var indexingTask: Task<Void, Never>?
-    
-    /// Computed property for tracking progress.
-    var progress: Double {
-        guard totalCount > 0 else { return 0.0 }
-        return Double(indexedCount) / Double(totalCount)
-    }
-    
-    // MARK: - Initialization
+
     init(tagStore: TagStore) {
         self.tagStore = tagStore
-        // Initialize VisionTaggingService as per requirements
-        self.taggingService = VisionTaggingService()
     }
-    
-    // MARK: - Public API
-    
-    /// Starts the background photo indexing process if not already running.
+
+    var progress: Double {
+        guard totalCount > 0 else { return 0 }
+        return Double(indexedCount) / Double(totalCount)
+    }
+
     func startBackgroundIndexing() {
-        guard indexingTask == nil else {
-            print("Indexing is already running.")
-            return
-        }
-        
-        print("Starting background photo indexing...")
-        // Use Task.detached to run in the background with utility priority
+        guard indexingTask == nil else { return }
         indexingTask = Task.detached(priority: .utility) { [weak self] in
             await self?.runIndexing()
         }
     }
-    
-    /// Cancels the ongoing indexing task.
+
     func stopIndexing() {
         indexingTask?.cancel()
         indexingTask = nil
-        print("Indexing process cancelled.")
     }
-    
-    // MARK: - Core Logic
-    
+
     private func runIndexing() async {
-        // 1. Set isIndexing = true on MainActor
-        await MainActor.run {
-            self.isIndexing = true
-            self.indexedCount = 0
-            self.totalCount = 0
-        }
-        
-        // 2. Fetch all PHAssets
+        await MainActor.run { isIndexing = true }
+
         let fetchOptions = PHFetchOptions()
-        // Sort by creationDate descending
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-        
         let assets = PHAsset.fetchAssets(with: .image, options: fetchOptions)
-        guard let firstAsset = assets.allObjects.first else {
-            print("No assets found to index.")
-            await MainActor.run {
-                self.isIndexing = false
-            }
-            return
-        }
-        
-        let allAssets = assets.allObjects
-        
-        // 3. Set totalCount on MainActor
-        await MainActor.run {
-            self.totalCount = allAssets.count
-        }
-        
-        // 4. Loop through assets
-        for (index, asset) in allAssets.enumerated() {
-            // Check for cancellation before processing
-            guard !Task.isCancelled else {
-                print("Indexing task was cancelled.")
-                break
-            }
-            
-            // Skip if already tagged
-            guard !tagStore.isIndexed(asset: asset) else {
+
+        await MainActor.run { totalCount = assets.count }
+
+        let batchSize = 20
+        var processed = 0
+
+        for i in 0..<assets.count {
+            guard !Task.isCancelled else { break }
+
+            let asset = assets.object(at: i)
+            let assetId = asset.localIdentifier
+
+            if (try? tagStore.isIndexed(assetId: assetId)) == true {
+                processed += 1
+                await MainActor.run { indexedCount = processed }
                 continue
             }
-            
-            do {
-                // Load image and tag
-                guard let cgImage = await loadImageForAnalysis(asset: asset) else {
-                    print("Skipping asset \(index) due to image loading failure.")
-                    continue
-                }
-                
-                // Tag photo
-                let tags = await taggingService.tagPhoto(cgImage: cgImage)
-                
-                // Metadata tags
-                var metadata: [TagRecord] = [
-                    .location(string: ""),
-                    .timeOfDay(string: "")
-                ]
-                
-                // Add metadata tags
-                metadata.append(contentsOf: metadataTags(for: asset))
-                
-                // Store tags
-                try tagStore.insertTags(asset: asset, tags: metadata)
-                
-                // Update count on MainActor
-                await MainActor.run {
-                    self.indexedCount += 1
-                }
-            } catch {
-                print("Error processing asset \(index): \(error.localizedDescription)")
+
+            guard let image = await loadImageForAnalysis(asset: asset) else {
+                processed += 1
+                await MainActor.run { indexedCount = processed }
+                continue
             }
-            
-            // 5. Every 20 photos: sleep
-            if (index + 1) % 20 == 0 {
-                do {
-                    try await Task.sleep(nanoseconds: 50_000_000)
-                } catch {
-                    // Task cancelled during sleep
-                    break
+
+            let photoTags = await taggingService.tagPhoto(image: image, assetId: assetId)
+
+            var allTags = photoTags.tags
+            allTags.append(contentsOf: metadataTags(for: asset))
+
+            try? tagStore.insertTags(assetId: assetId, tags: allTags)
+
+            processed += 1
+            await MainActor.run { indexedCount = processed }
+
+            if processed % batchSize == 0 {
+                if ProcessInfo.processInfo.isLowPowerModeEnabled {
+                    try? await Task.sleep(nanoseconds: 500_000_000)
+                } else {
+                    try? await Task.sleep(nanoseconds: 50_000_000)
                 }
             }
         }
-        
-        // 7. Set isIndexing = false on MainActor when done
+
         await MainActor.run {
-            self.isIndexing = false
-            print("Background photo indexing finished.")
+            isIndexing = false
+            indexingTask = nil
         }
     }
-    
-    // MARK: - Helpers
-    
-    /// Loads a CGImage representation of the asset thumbnail.
+
     private func loadImageForAnalysis(asset: PHAsset) async -> CGImage? {
-        return await withCheckedContinuation { continuation in
+        await withCheckedContinuation { continuation in
+            let options = PHImageRequestOptions()
+            options.deliveryMode = .fastFormat
+            options.resizeMode = .fast
+            options.isSynchronous = false
+            options.isNetworkAccessAllowed = false
             PHImageManager.default().requestImage(
                 for: asset,
                 targetSize: CGSize(width: 640, height: 640),
-                contentMode: .aspectFill,
-                options: [PHImageOptionsKey.deliveryMode: .fastFormat,
-                          PHImageOptionsKey.isNetworkAccessAllowed: false]
-            ) { (image, _, error) in
-                if let image = image {
-                    let cgImage = image.cgImage
-                    continuation.resume(returning: cgImage)
-                } else {
-                    continuation.resume(returning: nil)
-                }
+                contentMode: .aspectFit,
+                options: options
+            ) { image, _ in
+                continuation.resume(returning: image?.cgImage)
             }
         }
     }
-    
-    /// Generates tags based on time, location, and screenshot detection.
+
     private func metadataTags(for asset: PHAsset) -> [TagRecord] {
-        let creationDate = asset.creationDate?
-        var records: [TagRecord] = []
-        
-        // 1. Time of day detection
-        var timeOfDayString = "Night"
-        if let date = creationDate {
-            let calendar = Calendar.current
-            let hour = calendar.component(.hour, from: date)
-            
-            if (5...11).contains(hour) { // 5 AM to 11:59 AM
-                timeOfDayString = "Morning"
-            } else if (12...16).contains(hour) { // 12 PM to 4:59 PM
-                timeOfDayString = "Afternoon"
-            } else if (17...20).contains(hour) { // 5 PM to 8:59 PM
-                timeOfDayString = "Evening"
+        var tags: [TagRecord] = []
+
+        if let date = asset.creationDate {
+            let hour = Calendar.current.component(.hour, from: date)
+            let timeOfDay: String
+            switch hour {
+            case 5..<12: timeOfDay = "morning"
+            case 12..<17: timeOfDay = "afternoon"
+            case 17..<21: timeOfDay = "evening"
+            default: timeOfDay = "night"
             }
+            tags.append(TagRecord(tagType: "time", tagValue: timeOfDay, confidence: 1.0))
         }
-        records.append(.timeOfDay(string: timeOfDayString))
-        
-        // 2. Location
-        let location = asset.location
-        if let lat = location.latitude, let lon = location.longitude {
-            records.append(.location(string: "\(lat), \(lon)"))
+
+        if let location = asset.location {
+            tags.append(TagRecord(
+                tagType: "location",
+                tagValue: "lat:\(location.coordinate.latitude) lon:\(location.coordinate.longitude)",
+                confidence: 1.0
+            ))
         }
-        
-        // 3. Screenshot detection
+
         if asset.mediaSubtypes.contains(.photoScreenshot) {
-            records.append(.screenshot(string: "Detected"))
+            tags.append(TagRecord(tagType: "object", tagValue: "screenshot", confidence: 1.0))
         }
-        
-        return records
+
+        return tags
     }
 }

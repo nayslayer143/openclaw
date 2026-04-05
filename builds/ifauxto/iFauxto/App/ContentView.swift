@@ -33,11 +33,10 @@ struct ContentView: View {
 
     @ViewBuilder
     private var mainView: some View {
-        let settings = dataManager.getOrCreateSettings()
-        switch settings.homeViewMode {
-        case "chronological_feed":
+        let dm: DataManager = dataManager
+        if dm.getOrCreateSettings().homeViewMode == "chronological_feed" {
             ChronologicalFeedView()
-        default:
+        } else {
             HomeView()
         }
     }
@@ -47,8 +46,8 @@ struct ContentView: View {
             await photoKitService.requestAuthorization()
         }
         hasCheckedAuth = true
-        let settings = dataManager.getOrCreateSettings()
-        if !settings.hasCompletedOnboarding {
+        let dm: DataManager = dataManager
+        if !dm.getOrCreateSettings().hasCompletedOnboarding {
             showOnboarding = true
         }
     }

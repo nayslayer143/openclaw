@@ -10,6 +10,8 @@ struct HomeView: View {
     @State private var editMode: EditMode = .inactive
     @State private var folderSortMode: String = "custom"
     @State private var showingSettings = false
+    @State private var showingSearch = false
+    @Environment(\.searchService) var searchService
 
     private var displayFolders: [Folder] {
         switch folderSortMode {
@@ -51,6 +53,11 @@ struct HomeView: View {
                             showingCreateFolder = true
                         } label: {
                             Label("New Folder", systemImage: "folder.badge.plus")
+                        }
+                        Button {
+                            showingSearch = true
+                        } label: {
+                            Label("Search", systemImage: "magnifyingglass")
                         }
                         Divider()
                         Button {
@@ -95,6 +102,11 @@ struct HomeView: View {
             }
             .sheet(isPresented: $showingSettings) {
                 SettingsView()
+            }
+            .sheet(isPresented: $showingSearch) {
+                if let service = searchService {
+                    SearchView(searchService: service)
+                }
             }
             .sheet(isPresented: $showingImport, onDismiss: loadFolders) {
                 ImportProgressView(importService: importService) {

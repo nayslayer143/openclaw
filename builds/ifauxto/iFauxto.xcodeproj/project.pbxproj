@@ -14,6 +14,7 @@
 		094E27A1098F5E9EF9D9DB66 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD38D022FE4A582684EA0039 /* Extensions.swift */; };
 		100F405A571736B4946179FB /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D64040B42537E9E93C089351 /* libsqlite3.tbd */; };
 		19DC61DE427733174D5244C2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2114EB78270B8BB2409C3163 /* SettingsView.swift */; };
+		2CC7D911B76212DBC768C41F /* IndexingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FC9AF40754C1E1DAF5E2F4E /* IndexingManager.swift */; };
 		2FE2D73080D7DD985B7B6FDD /* PhotoThumbnailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5939D45474DB18D9722F985 /* PhotoThumbnailView.swift */; };
 		3BEE3255A6884AB725D44FBE /* DataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3238C58B68DF509753AFA7FB /* DataManager.swift */; };
 		438AB899ACAA984393E046DB /* CloudKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01ED550A03711B56F8827E42 /* CloudKitService.swift */; };
@@ -23,11 +24,13 @@
 		6437DB4787E0137B2B5A8D6A /* FolderCreationSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 428977AEEFA854F10C33353D /* FolderCreationSheet.swift */; };
 		69139E9C44A69D4C1B3B1DB4 /* PhotoPickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 502473E19CF7167CA16D954E /* PhotoPickerView.swift */; };
 		6DBA6D468B6FA471CA557678 /* VisionTaggingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD114C9039B50D03F0628EB6 /* VisionTaggingService.swift */; };
+		731EB91950DFF1B3B87B778B /* SearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ADF5C2FAC3EB0FFF00D02E2 /* SearchView.swift */; };
 		7F88F49A9FD589DE5A853A92 /* Folder.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE72F53C6904D4686288D4BE /* Folder.swift */; };
 		847F2E2624BB5B12FBCD494A /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0DD47588EE7EC7E12D262DF /* HomeView.swift */; };
 		87020180D373F43B388B6C66 /* PhotoReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B59C50C8B9DC6F9843D3F4 /* PhotoReferenceTests.swift */; };
 		A53A611D5D8A77C3C1691CBC /* FolderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69C58BC719D64219558E6C51 /* FolderTests.swift */; };
 		A7678EC57B62624613697C1B /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4FFBED5883116DC1BECF899 /* ContentView.swift */; };
+		A937B8FBD193F48AA5FAE61A /* EditStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 37C873DFCE2C434EFC036F00 /* EditStateTests.swift */; };
 		AB7D6EF0687B612572470322 /* FolderSortModeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A62F2FD7E67B676F4D3C1BA /* FolderSortModeTests.swift */; };
 		B2ACB1273BBFF9DADBD58CA0 /* PhotoReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AE52712A6A5FB1976B6E3D7 /* PhotoReference.swift */; };
 		B2AE7E0C0B34B5BF8F57B1B4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 103DCEC79A2F9FFA35D66E1C /* Assets.xcassets */; };
@@ -36,11 +39,14 @@
 		BE0D1606F267CCC9D4629A30 /* ChronologicalFeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1184F971869A26CF07B6A0F3 /* ChronologicalFeedView.swift */; };
 		C7D7D71A798E1AD7420E2E31 /* TagStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CFBD37FDF056876440DC5F1 /* TagStore.swift */; };
 		C8913675E02E0F3C8E6F321B /* DragDropManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 251CD3FA94D23C242095B0C4 /* DragDropManager.swift */; };
+		D3350E9A29F8427D95963CD3 /* EditState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 835020AA28B85DD9AEB9F5D7 /* EditState.swift */; };
 		E049B910842EA8EA97201869 /* iFauxtoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AD328EE97D38C9FECD54FC6 /* iFauxtoApp.swift */; };
 		EC4A1F9036F66F4750194FBE /* SyncManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08D9C03D9F30F008BB5DAB70 /* SyncManager.swift */; };
+		EE5038637C26E80444106A7E /* SearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = DC124BD7F85FEBACC73E00CE /* SearchService.swift */; };
 		F40D48F3F141304CB5D68660 /* PhotoKitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE83CD674D2197CFE37A7099 /* PhotoKitService.swift */; };
 		F6739A570740C0745CE8B880 /* LibraryImportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71023995B7DB672B2865A799 /* LibraryImportService.swift */; };
 		F8BDC931956D6ED6ABED3483 /* iFauxtoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E37E26D083740E160EDE6DB /* iFauxtoTests.swift */; };
+		FD0AE9CC674550522A527F3B /* EditService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64BB2C611F152A155801D7B4 /* EditService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,21 +68,26 @@
 		103DCEC79A2F9FFA35D66E1C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1184F971869A26CF07B6A0F3 /* ChronologicalFeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChronologicalFeedView.swift; sourceTree = "<group>"; };
 		16890220CE61B79CCA0222D1 /* DataManagerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManagerTests.swift; sourceTree = "<group>"; };
+		1FC9AF40754C1E1DAF5E2F4E /* IndexingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexingManager.swift; sourceTree = "<group>"; };
 		2114EB78270B8BB2409C3163 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		251CD3FA94D23C242095B0C4 /* DragDropManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DragDropManager.swift; sourceTree = "<group>"; };
 		27E72FCC622DB23B083C78E2 /* AppSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsTests.swift; sourceTree = "<group>"; };
 		3238C58B68DF509753AFA7FB /* DataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataManager.swift; sourceTree = "<group>"; };
 		356237A440ABC8C20C944DA8 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		37C873DFCE2C434EFC036F00 /* EditStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditStateTests.swift; sourceTree = "<group>"; };
 		428977AEEFA854F10C33353D /* FolderCreationSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderCreationSheet.swift; sourceTree = "<group>"; };
 		45E807B7B21B862F5B5014B8 /* iFauxtoTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = iFauxtoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		502473E19CF7167CA16D954E /* PhotoPickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoPickerView.swift; sourceTree = "<group>"; };
 		55A5A8C7AC0FEE0A01CAA079 /* iFauxto.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = iFauxto.entitlements; sourceTree = "<group>"; };
+		5ADF5C2FAC3EB0FFF00D02E2 /* SearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchView.swift; sourceTree = "<group>"; };
+		64BB2C611F152A155801D7B4 /* EditService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditService.swift; sourceTree = "<group>"; };
 		69C58BC719D64219558E6C51 /* FolderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderTests.swift; sourceTree = "<group>"; };
 		6E37E26D083740E160EDE6DB /* iFauxtoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iFauxtoTests.swift; sourceTree = "<group>"; };
 		6ECDE847A4204338D50CAD3D /* iFauxto.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = iFauxto.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		71023995B7DB672B2865A799 /* LibraryImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryImportService.swift; sourceTree = "<group>"; };
 		72BFD302313DA02BDFEF8540 /* FolderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderView.swift; sourceTree = "<group>"; };
 		7CFBD37FDF056876440DC5F1 /* TagStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagStore.swift; sourceTree = "<group>"; };
+		835020AA28B85DD9AEB9F5D7 /* EditState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditState.swift; sourceTree = "<group>"; };
 		966484D5F5ED98072014BADD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		BA7CA76C1A82EEE03FE49904 /* PhotoViewer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoViewer.swift; sourceTree = "<group>"; };
 		BE72F53C6904D4686288D4BE /* Folder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Folder.swift; sourceTree = "<group>"; };
@@ -87,6 +98,7 @@
 		D29C4B5DA289D398AA0765C9 /* EditModeToolbar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditModeToolbar.swift; sourceTree = "<group>"; };
 		D4FFBED5883116DC1BECF899 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		D64040B42537E9E93C089351 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
+		DC124BD7F85FEBACC73E00CE /* SearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchService.swift; sourceTree = "<group>"; };
 		DCDC19B9241BA5A25C9765EC /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		E5939D45474DB18D9722F985 /* PhotoThumbnailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoThumbnailView.swift; sourceTree = "<group>"; };
 		F0B59C50C8B9DC6F9843D3F4 /* PhotoReferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoReferenceTests.swift; sourceTree = "<group>"; };
@@ -121,6 +133,7 @@
 			children = (
 				27E72FCC622DB23B083C78E2 /* AppSettingsTests.swift */,
 				16890220CE61B79CCA0222D1 /* DataManagerTests.swift */,
+				37C873DFCE2C434EFC036F00 /* EditStateTests.swift */,
 				0A62F2FD7E67B676F4D3C1BA /* FolderSortModeTests.swift */,
 				69C58BC719D64219558E6C51 /* FolderTests.swift */,
 				6E37E26D083740E160EDE6DB /* iFauxtoTests.swift */,
@@ -144,6 +157,7 @@
 			children = (
 				DCDC19B9241BA5A25C9765EC /* AppSettings.swift */,
 				3238C58B68DF509753AFA7FB /* DataManager.swift */,
+				835020AA28B85DD9AEB9F5D7 /* EditState.swift */,
 				BE72F53C6904D4686288D4BE /* Folder.swift */,
 				0AE52712A6A5FB1976B6E3D7 /* PhotoReference.swift */,
 			);
@@ -154,8 +168,11 @@
 			isa = PBXGroup;
 			children = (
 				01ED550A03711B56F8827E42 /* CloudKitService.swift */,
+				64BB2C611F152A155801D7B4 /* EditService.swift */,
+				1FC9AF40754C1E1DAF5E2F4E /* IndexingManager.swift */,
 				71023995B7DB672B2865A799 /* LibraryImportService.swift */,
 				BE83CD674D2197CFE37A7099 /* PhotoKitService.swift */,
+				DC124BD7F85FEBACC73E00CE /* SearchService.swift */,
 				08D9C03D9F30F008BB5DAB70 /* SyncManager.swift */,
 				7CFBD37FDF056876440DC5F1 /* TagStore.swift */,
 				FD114C9039B50D03F0628EB6 /* VisionTaggingService.swift */,
@@ -199,6 +216,7 @@
 				502473E19CF7167CA16D954E /* PhotoPickerView.swift */,
 				E5939D45474DB18D9722F985 /* PhotoThumbnailView.swift */,
 				BA7CA76C1A82EEE03FE49904 /* PhotoViewer.swift */,
+				5ADF5C2FAC3EB0FFF00D02E2 /* SearchView.swift */,
 				2114EB78270B8BB2409C3163 /* SettingsView.swift */,
 			);
 			path = Views;
@@ -326,6 +344,7 @@
 			files = (
 				085157E7B2DE03FBA64EAE6E /* AppSettingsTests.swift in Sources */,
 				52C763E43309395A860C4039 /* DataManagerTests.swift in Sources */,
+				A937B8FBD193F48AA5FAE61A /* EditStateTests.swift in Sources */,
 				AB7D6EF0687B612572470322 /* FolderSortModeTests.swift in Sources */,
 				A53A611D5D8A77C3C1691CBC /* FolderTests.swift in Sources */,
 				87020180D373F43B388B6C66 /* PhotoReferenceTests.swift in Sources */,
@@ -345,12 +364,15 @@
 				3BEE3255A6884AB725D44FBE /* DataManager.swift in Sources */,
 				C8913675E02E0F3C8E6F321B /* DragDropManager.swift in Sources */,
 				0435630BF033D88ADBD676C5 /* EditModeToolbar.swift in Sources */,
+				FD0AE9CC674550522A527F3B /* EditService.swift in Sources */,
+				D3350E9A29F8427D95963CD3 /* EditState.swift in Sources */,
 				094E27A1098F5E9EF9D9DB66 /* Extensions.swift in Sources */,
 				7F88F49A9FD589DE5A853A92 /* Folder.swift in Sources */,
 				6437DB4787E0137B2B5A8D6A /* FolderCreationSheet.swift in Sources */,
 				476EDB4A5106172AE4D6E8FE /* FolderView.swift in Sources */,
 				847F2E2624BB5B12FBCD494A /* HomeView.swift in Sources */,
 				B8E98E521415AA20F4CFA7A0 /* ImportProgressView.swift in Sources */,
+				2CC7D911B76212DBC768C41F /* IndexingManager.swift in Sources */,
 				F6739A570740C0745CE8B880 /* LibraryImportService.swift in Sources */,
 				076631A14EAB03521745FEEE /* OnboardingView.swift in Sources */,
 				F40D48F3F141304CB5D68660 /* PhotoKitService.swift in Sources */,
@@ -358,6 +380,8 @@
 				B2ACB1273BBFF9DADBD58CA0 /* PhotoReference.swift in Sources */,
 				2FE2D73080D7DD985B7B6FDD /* PhotoThumbnailView.swift in Sources */,
 				60ECDF32E6573B0E2314BD7A /* PhotoViewer.swift in Sources */,
+				EE5038637C26E80444106A7E /* SearchService.swift in Sources */,
+				731EB91950DFF1B3B87B778B /* SearchView.swift in Sources */,
 				19DC61DE427733174D5244C2 /* SettingsView.swift in Sources */,
 				EC4A1F9036F66F4750194FBE /* SyncManager.swift in Sources */,
 				C7D7D71A798E1AD7420E2E31 /* TagStore.swift in Sources */,
