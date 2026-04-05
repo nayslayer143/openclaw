@@ -100,7 +100,7 @@
       "what_to_take": "Extract the backtesting engine and strategy abstraction layer for multi-strategy testing, focusing on the data feed integration patterns and strategy execution framework.",
       "risk": "License not specified in repo (must verify MIT/Apache), future-dated last update (2026-04-04) suggests possible data error or abandonment, and integration would require adapting to our SQLite schema and existing strategy modules.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -120,7 +120,7 @@
       "what_to_take": "Extract the backtesting framework and strategy validation module to enhance Clawmpson's graduation engine for strategy testing, avoiding RL-specific components.",
       "risk": "License not verified (MIT assumed but requires check), potential misalignment with existing data pipelines, and unnecessary complexity for ArbClaw's lean design.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -140,7 +140,7 @@
       "what_to_take": "Strategy framework and backtesting module for multi-strategy architecture, but avoid crypto-specific components and license issues.",
       "risk": "GPLv3 license requires open-sourcing entire project, conflicting with proprietary trading bot stack. Crypto focus misaligned with prediction markets.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -180,7 +180,7 @@
       "what_to_take": "Extract generic time-series preprocessing and model architecture patterns (e.g., LSTM/Transformer building blocks) for potential adaptation to prediction market data, avoiding direct stock-specific implementations.",
       "risk": "License unknown (must verify), suspicious future-dated last update (2026-04-01), significant domain mismatch (stock vs. prediction markets), and high adaptation complexity required for integration.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -200,7 +200,7 @@
       "what_to_take": "Extract data feed management patterns and event-driven architecture concepts for potential Python adaptation, focusing on multi-source data handling and time-series event processing.",
       "risk": "C# to Python translation complexity, potential misalignment with prediction market data characteristics, and high maintenance effort for extracted patterns; MIT license is acceptable but not worth the effort.",
       "verdict": "STUDY",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -240,7 +240,7 @@
       "what_to_take": "Adapt the DQN state representation and reward function patterns for RivalClaw's self-tuning component, but only after significant domain adaptation for prediction markets (not Bitcoin).",
       "risk": "Domain mismatch (Bitcoin vs prediction markets), high complexity for adaptation, and unknown license (repo lacks explicit license in description).",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -260,7 +260,7 @@
       "what_to_take": "Nothing - domain mismatch (stocks vs prediction markets) and Jupyter format incompatible with production stack",
       "risk": "MIT license but domain mismatch (stocks vs prediction markets), Jupyter notebooks unsuitable for production integration, and last updated date (2026) suggests abandonment",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -280,7 +280,7 @@
       "what_to_take": "No actionable code. The repo focuses on stock market prediction (not prediction markets), requiring domain-specific retraining for event-based markets like Polymarket/Kalshi. No relevant patterns for arbitrage or strategy comparison.",
       "risk": "Domain mismatch (stock vs prediction markets), suspicious future last-update date (2026), unknown license, and high adaptation effort. Models would need retraining on event data with different features.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -300,7 +300,7 @@
       "what_to_take": "None. The repo focuses on stock prediction (not prediction markets), uses stock-specific features/data, and is in Jupyter Notebooks (not production-ready).",
       "risk": "Domain mismatch (stock vs prediction markets), Jupyter Notebook format requiring heavy refactoring, suspicious future last updated date (2026), and no license specified in description.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -320,7 +320,7 @@
       "what_to_take": "Do not extract; repo appears to be a static HTML project with no usable code (language: HTML, future last updated date 2026-03-18).",
       "risk": "Suspicious future date (2026), HTML language (not code), unstructured Jupyter notebooks, no production-ready code, high risk of being a placeholder or fake repo.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -340,7 +340,7 @@
       "what_to_take": "None. The repo is a Java-based Bitcoin spot trading bot with no relevance to prediction markets, multi-strategy systems, or our Python stack. Its exchange integrations (Bitfinex, Coinbase) are unrelated to Polymarket/Kalshi.",
       "risk": "Java language mismatch requires heavy refactoring, domain mismatch (spot crypto vs prediction markets), suspicious future last update date (2026-04-03), and no applicable patterns for our strategy engines or feeds.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null
@@ -360,7 +360,7 @@
       "what_to_take": "Repo is a curated list of resources, not executable code. No patterns or code to integrate. Use list to research other repos for actual code integration.",
       "risk": "Repo is a static list (not codebase), making integration impossible. Future last update date (2026-04-04) indicates potential maintenance issues. License unknown. High risk of wasted effort.",
       "verdict": "SKIP",
-      "status": "pushed_to_repoman",
+      "status": "pending",
       "approved_for": [],
       "approved_at": null,
       "task_id": null

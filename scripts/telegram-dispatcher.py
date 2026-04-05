@@ -3,7 +3,7 @@ from __future__ import annotations
 """
 OpenClaw Telegram Dispatcher — Clawmson Edition
 Full conversational AI assistant + build pipeline in one bot.
-NLU-powered intent classification via local qwen2.5:7b.
+NLU-powered intent classification via local gemma4:e4b.
 
 Run with: python3 ~/openclaw/scripts/telegram-dispatcher.py
 Keep alive: launchd plist or startup.sh
@@ -488,7 +488,7 @@ def _load_claw_daily_context(claw_name: str) -> str:
 
 
 def _ollama_chat_direct(history: list, user_message: str,
-                        system_prompt: str, model: str = "qwen2.5:7b") -> str:
+                        system_prompt: str, model: str = "gemma4:e4b") -> str:
     """Call Ollama with an explicit system prompt — bypasses clawmson_chat defaults."""
     messages = [{"role": "system", "content": system_prompt}]
     for entry in history:
@@ -545,7 +545,7 @@ def _sub_claw_response_thread(chat_id: str, text: str,
         if daily_ctx:
             system_prompt = f"{system_prompt}\n\n{daily_ctx}"
         history = _get_claw_history(claw_name, chat_id)
-        reply   = _ollama_chat_direct(history, text, system_prompt, model="qwen2.5:7b")
+        reply   = _ollama_chat_direct(history, text, system_prompt, model="gemma4:e4b")
         _save_claw_history(claw_name, chat_id, "user",      text)
         _save_claw_history(claw_name, chat_id, "assistant", reply)
         send_fn(chat_id, reply)
@@ -609,7 +609,7 @@ def build_task_packet(goal: str, classification=None,
         "priority": "normal",
         "time_budget_minutes": 30,
         "risk_level": "low",
-        "model": "qwen2.5:7b",
+        "model": "gemma4:e4b",
         "timestamp": datetime.datetime.now().isoformat(),
         "output_location": str(BUILD_RESULTS / task_id)
     }
