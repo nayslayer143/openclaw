@@ -336,34 +336,32 @@ def digest(data: dict) -> dict | None:
     trimmed = _trim_for_context(data)
     payload = json.dumps(trimmed, indent=1, default=str)
 
-    # Use Ollama for digest (faster prefill than TurboQuant fork).
-    # TurboQuant is for live long-context conversations, not batch jobs.
-    endpoint = f"{OLLAMA_BASE}/v1/chat/completions"
-    model = "gemma4:31b"
+    # Use Ollama native /api/chat (more reliable for large payloads).
+    digest_model = os.environ.get("BRAIN_DIGEST_MODEL", "gemma4:e4b")
+    endpoint = f"{OLLAMA_BASE}/api/chat"
 
-    print(f"[brain] Sending {len(payload)} chars to {model}")
+    print(f"[brain] Sending {len(payload)} chars to {digest_model}")
 
     try:
         resp = requests.post(
             endpoint,
             json={
-                "model": model,
+                "model": digest_model,
                 "messages": [
                     {"role": "system", "content": DIGEST_PROMPT},
                     {"role": "user", "content": f"Here is the last {LOOKBACK_HOURS}h of data:\n\n{payload}"},
                 ],
-                "max_tokens": 2048,
-                "temperature": 0.2,
+                "stream": False,
+                "options": {"temperature": 0.2, "num_predict": 2048},
             },
-            timeout=600,
+            timeout=1800,  # 30 min — large prompt prefill is slow
         )
         if resp.status_code != 200:
             print(f"[brain] LLM error: {resp.status_code}")
             return None
 
         result = resp.json()
-        msg = result.get("choices", [{}])[0].get("message", {})
-        content = msg.get("content", "") or msg.get("reasoning_content", "")
+        content = result.get("message", {}).get("content", "")
 
         # Parse JSON from response
         # Strip markdown fencing if present
