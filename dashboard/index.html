@@ -2387,6 +2387,18 @@ body {
 
     </div>
 
+    <!-- CodeMonkeyClaw Work Queue -->
+    <div class="t-section" style="margin-bottom:14px;border-color:rgba(255,160,0,0.25);background:linear-gradient(135deg,rgba(15,8,0,0.95),rgba(8,4,0,0.98))">
+      <div class="t-section-title" style="color:rgba(255,160,0,0.9);border-bottom-color:rgba(255,160,0,0.2);display:flex;align-items:center;justify-content:space-between;font-size:0.56rem">
+        <span>CODEMONKEYCLAW <span style="background:rgba(255,160,0,0.9);box-shadow:0 0 6px rgba(255,160,0,0.5);width:6px;height:6px;border-radius:50%;display:inline-block;vertical-align:middle;margin-left:4px"></span></span>
+        <span style="font-size:0.38rem;color:rgba(255,160,0,0.4);letter-spacing:1px">ENGINEERING DISPATCH · OPEN MODELS</span>
+      </div>
+      <div id="cmcStats" style="margin-bottom:8px;min-height:18px">
+        <span style="font-size:0.6rem;color:var(--grey2)">loading queue...</span>
+      </div>
+      <div id="cmcOrdersList"></div>
+    </div>
+
     <!-- Unified Trade Feed -->
     <div class="t-section" style="margin-bottom:14px">
       <div class="t-section-title" style="display:flex;align-items:center;justify-content:space-between">
@@ -3157,6 +3169,8 @@ function showPage(page, pushState) {
     page = 'dashboard'
     document.getElementById('pageDashboard').classList.add('active')
     document.getElementById('tabDashboard').classList.add('active')
+    loadCMCStats()
+    loadCMCOrders()
   }
 
   // Update URL (unless called from popstate or initial load)
@@ -3359,6 +3373,58 @@ function renderAgents() {
       </div>
     </div>`
   }).join('')
+}
+
+// ══════════════════════════════════════════════════════════════════
+// CODEMONKEY WORK QUEUE
+// ══════════════════════════════════════════════════════════════════
+let cmcInterval = null
+
+async function loadCMCStats() {
+  try {
+    const r = await fetch('/api/codemonkey/stats')
+    if (!r.ok) return
+    const data = await r.json()
+    const el = document.getElementById('cmcStats')
+    if (!el) return
+    const byStatus = data.by_status || {}
+    const queued   = byStatus['QUEUED'] || 0
+    const inProg   = byStatus['IN_PROGRESS'] || 0
+    const done     = byStatus['DELIVERED'] || 0
+    const failed   = byStatus['FAILED'] || 0
+    el.innerHTML = `
+      <div style="display:flex;gap:1.2rem;flex-wrap:wrap;font-size:0.68rem;font-family:var(--mono)">
+        <span style="color:var(--neon-yellow)">◈ QUEUED <strong>${queued}</strong></span>
+        <span style="color:var(--neon-blue)">▶ IN PROGRESS <strong>${inProg}</strong></span>
+        <span style="color:var(--neon-green)">✓ DELIVERED <strong>${done}</strong></span>
+        ${failed > 0 ? `<span style="color:var(--neon-red)">✗ FAILED <strong>${failed}</strong></span>` : ''}
+        <span style="color:var(--grey2)">TOTAL ${data.total}</span>
+      </div>`
+    if (!cmcInterval) cmcInterval = setInterval(loadCMCStats, 15000)
+  } catch(e) {}
+}
+
+async function loadCMCOrders() {
+  try {
+    const r = await fetch('/api/codemonkey/orders?status=QUEUED')
+    if (!r.ok) return
+    const orders = await r.json()
+    const el = document.getElementById('cmcOrdersList')
+    if (!el) return
+    if (!orders.length) {
+      el.innerHTML = `<div class="empty" style="font-size:0.65rem;padding:0.6rem 0">queue empty</div>`
+      return
+    }
+    el.innerHTML = orders.slice(0, 5).map(o => `
+      <div class="queue-row" style="padding:0.45rem 0.5rem">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <code style="font-size:0.55rem;color:var(--grey2)">${o.id}</code>
+          <span style="font-size:0.55rem;padding:0.1rem 0.4rem;border-radius:3px;background:rgba(255,200,0,0.12);color:var(--neon-yellow)">${o.status}</span>
+        </div>
+        <div style="font-size:0.65rem;color:var(--offwhite);margin-top:0.2rem;line-height:1.4">${(o.description||'').slice(0,80)}${(o.description||'').length>80?'…':''}</div>
+        <div style="font-size:0.55rem;color:var(--grey2);margin-top:0.15rem">${o.target_repo||''} · ${o.priority||'medium'}</div>
+      </div>`).join('')
+  } catch(e) {}
 }
 
 // ── Auth ───────────────────────────────────────────────────────────────────
