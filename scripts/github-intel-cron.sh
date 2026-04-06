@@ -27,7 +27,9 @@ if [ -z "$LATEST_JSON" ]; then
 fi
 
 if [ -n "$LATEST_JSON" ]; then
-  python3 scripts/repo_analyst.py --crawl-file "$LATEST_JSON" --top 150 >> "$LOG" 2>&1
+  # Use small fast model for background analysis — keeps big models free for
+  # foreground work like PSE vision digest and on-demand Claw tasks.
+  python3 scripts/repo_analyst.py --crawl-file "$LATEST_JSON" --top 150 --model gemma4:e4b >> "$LOG" 2>&1
   echo "[$(date -Iseconds)] Analysis complete" >> "$LOG"
 else
   echo "[$(date -Iseconds)] No crawl output found" >> "$LOG"
