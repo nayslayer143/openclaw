@@ -925,3 +925,7 @@ Tasks: 0
 0
 Synthesis unavailable — Ollama not responding
 [2026-04-06] Skill upgrade brief generated → /Users/nayslayer/openclaw/improvements/skill-upgrade-2026-04-06.md
+
+### Market Intel Skip — 2026-04-06 06:30
+- No scout reports found for today
+- Skipped market intel run
