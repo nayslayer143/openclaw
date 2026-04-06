@@ -36,7 +36,14 @@ TOOLS = [
 
 
 def chat(model, messages, tools=None, timeout=TIMEOUT):
-    payload = {"model": model, "messages": messages, "stream": False, "think": False}
+    import os as _os
+    payload = {
+        "model": model,
+        "messages": messages,
+        "stream": False,
+        "think": False,
+        "options": {"num_ctx": int(_os.environ.get("OPENCLAW_NUM_CTX", "16384"))},
+    }
     if tools:
         payload["tools"] = tools
     data = json.dumps(payload).encode()

@@ -11,6 +11,7 @@ Source is truncated to 8000 chars for LLM calls (documented limitation).
 from __future__ import annotations
 
 import json
+import os
 import re
 from datetime import datetime, timezone
 from pathlib import Path

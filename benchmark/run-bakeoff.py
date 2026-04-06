@@ -23,7 +23,14 @@ OUTPUT = sys.argv[2] if len(sys.argv) > 2 else f"benchmark/bakeoff-{DATE}.md"
 
 
 def chat(messages, tools=None, timeout=180):
-    payload = {"model": MODEL, "messages": messages, "stream": False, "think": False}
+    import os as _os  # benchmark script — local alias avoids top-level import
+    payload = {
+        "model": MODEL,
+        "messages": messages,
+        "stream": False,
+        "think": False,
+        "options": {"num_ctx": int(_os.environ.get("OPENCLAW_NUM_CTX", "16384"))},
+    }
     if tools:
         payload["tools"] = tools
     data = json.dumps(payload).encode()

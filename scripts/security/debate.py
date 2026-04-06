@@ -6,6 +6,7 @@ All calls use gemma4:26b-A4B (MoE) with 120s timeout. Fallback: gemma4:e4b.
 """
 from __future__ import annotations
 import json
+import os
 import re
 import requests
 
