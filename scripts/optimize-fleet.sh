@@ -88,17 +88,19 @@ ENV
 chown nayslayer:staff "${ENV_FILE}"
 chmod 644 "${ENV_FILE}"
 
-# launchctl setenv — takes effect only for *future* Ollama.app launches.
-# (Running process keeps its original env; restart Ollama to pick up.)
-launchctl setenv OLLAMA_FLASH_ATTENTION 1
-launchctl setenv OLLAMA_KV_CACHE_TYPE q8_0
-launchctl setenv OLLAMA_KEEP_ALIVE 30m
-launchctl setenv OLLAMA_MAX_LOADED_MODELS 2
-launchctl setenv OLLAMA_NUM_PARALLEL 2
-launchctl setenv OLLAMA_LOAD_TIMEOUT 600
-
+# NOTE: launchctl setenv must be run as the LOGIN USER, not root — SIP blocks
+# `sudo launchctl setenv` with "Operation not permitted while System Integrity
+# Protection is engaged". We write the env file here and print the user
+# commands to run in their own shell after this script exits.
 echo "    wrote ${ENV_FILE}"
-echo "    applied to launchctl (takes effect on next Ollama.app restart)"
+echo ""
+echo "    ⚠️  Run these as YOUR user (NOT sudo) to apply to Ollama.app:"
+echo "        launchctl setenv OLLAMA_FLASH_ATTENTION 1"
+echo "        launchctl setenv OLLAMA_KV_CACHE_TYPE q8_0"
+echo "        launchctl setenv OLLAMA_KEEP_ALIVE 30m"
+echo "        launchctl setenv OLLAMA_MAX_LOADED_MODELS 2"
+echo "        launchctl setenv OLLAMA_NUM_PARALLEL 2"
+echo "        launchctl setenv OLLAMA_LOAD_TIMEOUT 600"
 echo ""
 echo "==> DONE"
 echo ""

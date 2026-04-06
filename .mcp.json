@@ -9,6 +9,19 @@
         "stdio"
       ],
       "description": "repowise: codebase intelligence \u2014 docs, graph, git signals, dead code, decisions"
+    },
+    "pinterest-style-engine": {
+      "command": "/Users/nayslayer/pinterest-style-engine/.venv/bin/python",
+      "args": [
+        "-m",
+        "src.mcp_server.server"
+      ],
+      "cwd": "/Users/nayslayer/pinterest-style-engine",
+      "env": {
+        "PSE_DB_PATH": "/Users/nayslayer/pinterest-style-engine/data/style_engine.db",
+        "PSE_DATA_DIR": "/Users/nayslayer/pinterest-style-engine/data"
+      },
+      "description": "pinterest-style-engine: visual style index \u2014 search scraped Pinterest references, fetch recreation prompts, build design briefs"
     }
   }
 }
