@@ -2,6 +2,31 @@
 ## v4 Operating System + Jake Layer Context Routing
 > Synthesized from 5 strategy iterations + Jake's context routing patch + rigorous debate
 > March 18, 2026 · Jordan · M2 Max 96GB · Zero API Cost
+
+---
+
+## v4.5 Update — 2026-04-06
+
+**Platform:** Upgraded to openclaw 2026.4.5 (from 2026.3.24)
+
+**Migration complete:** All 4 claw instances now running as proper openclaw agent workspaces.
+Python Telegram dispatchers retired. openclaw gateway handles all 4 bots natively.
+
+**Agent registry:**
+- `main` (Clawmpson) → `~/.openclaw/workspace/` — Telegram: clawmpson bot
+- `rivalclaw` → `~/.openclaw/workspace-rivalclaw/` — Telegram: rivalclaw bot
+- `quantumentalclaw` → `~/.openclaw/workspace-quantumentalclaw/` — Telegram: quantclaw bot
+- `codemonkeyclaw` → `~/.openclaw/workspace-codemonkeyclaw/` — Telegram: codemonkey bot
+
+**New capabilities in 2026.4.5:**
+- `video_generate` + `music_generate` built-in tools
+- New providers: Qwen, Fireworks AI, StepFun, MiniMax TTS, Ollama Web Search, Amazon Bedrock Mantle
+- Dreaming system: weighted recall, configurable aging, Dream Diary UI
+- Prompt caching: normalized system prompts, deterministic tool ordering
+- Matrix exec approvals + iOS APNs push notifications
+- TurboQuant (gemma4-26b, 65k ctx) wired as custom provider
+
+---
 >
 > **How to use in any new Claude Code session:**
 > `"Read ~/openclaw/openclaw-v4.1-strategy.md. I am on Phase [N], Step [X]. My current status: [what's done/not done]. Execute the next unchecked step."`
