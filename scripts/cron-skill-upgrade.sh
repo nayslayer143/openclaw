@@ -69,7 +69,7 @@ if [[ -n "${OPENAI_API_KEY:-}" ]]; then
 fi
 
 if [[ -z "$UPGRADES" ]]; then
-  UPGRADES=$(echo "$PROMPT" | ollama run gemma4:31b 2>/dev/null || echo "LLM unavailable")
+  UPGRADES=$(echo "$PROMPT" | ollama run gemma4:26b 2>/dev/null || echo "LLM unavailable")
 fi
 
 cat > "$OUTPUT" << EOF

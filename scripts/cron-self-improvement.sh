@@ -47,7 +47,7 @@ LOGENTRY
 fi
 
 # =============================================================================
-# Step 2: Pattern extraction via gemma4:31b (with fallback)
+# Step 2: Pattern extraction via gemma4:26b-A4B (MoE) (with fallback)
 # =============================================================================
 ANALYSIS_PROMPT="You are the Memory Librarian for an AI operating system called OpenClaw.
 
@@ -79,12 +79,12 @@ RISK: low | medium | high
 If fewer than 3 qualifying patterns exist, output only what you found.
 If no qualifying patterns exist, output: NO_PATTERNS_FOUND"
 
-echo "[$(date)] Running pattern analysis via gemma4:31b..." >> "$LOG_FILE"
+echo "[$(date)] Running pattern analysis via gemma4:26b-A4B (MoE)..." >> "$LOG_FILE"
 
-ANALYSIS=$(echo "$ANALYSIS_PROMPT" | ollama run gemma4:31b 2>/dev/null)
+ANALYSIS=$(echo "$ANALYSIS_PROMPT" | ollama run gemma4:26b 2>/dev/null)
 if [[ -z "$ANALYSIS" || "$ANALYSIS" == *"Error"* ]]; then
-  echo "[$(date)] gemma4:31b unavailable, falling back to gemma4:31b" >> "$LOG_FILE"
-  ANALYSIS=$(echo "$ANALYSIS_PROMPT" | ollama run gemma4:31b 2>/dev/null || echo "NO_PATTERNS_FOUND")
+  echo "[$(date)] gemma4:26b unavailable, falling back to gemma4:26b" >> "$LOG_FILE"
+  ANALYSIS=$(echo "$ANALYSIS_PROMPT" | ollama run gemma4:26b 2>/dev/null || echo "NO_PATTERNS_FOUND")
 fi
 
 if [[ "$ANALYSIS" == *"NO_PATTERNS_FOUND"* ]] || [[ -z "$ANALYSIS" ]]; then

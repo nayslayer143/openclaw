@@ -13,7 +13,7 @@
   },
   "ollama": {
     "base_url": "http://localhost:11434",
-    "model": "gemma4:31b",
+    "model": "gemma4:26b",
     "timeout": 180
   },
   "thresholds": {

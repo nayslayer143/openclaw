@@ -50,7 +50,7 @@ for x in results[:5]:
     print(x.get('title','') + ': ' + x.get('snippet',''))
 " 2>/dev/null || echo "Search unavailable")
 
-  ANALYSIS=$(ollama run gemma4:31b "You are Clawmpson monitoring competitive intelligence for '${PROJECT_NAME}'.
+  ANALYSIS=$(ollama run gemma4:26b "You are Clawmpson monitoring competitive intelligence for '${PROJECT_NAME}'.
 
 Recent search results:
 ${SEARCH_RESULTS}

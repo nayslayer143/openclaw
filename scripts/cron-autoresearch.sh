@@ -113,11 +113,11 @@ Be direct. No filler. Signal over length. State confidence levels explicitly."
 
   local OUTPUT
   # 5 min timeout per experiment
-  OUTPUT=$(timeout 300 bash -c "echo \"\$PROMPT\" | ollama run gemma4:31b" 2>/dev/null)
+  OUTPUT=$(timeout 300 bash -c "echo \"\$PROMPT\" | ollama run gemma4:26b" 2>/dev/null)
 
   if [[ -z "$OUTPUT" ]]; then
-    OUTPUT=$(timeout 300 bash -c "echo \"\$PROMPT\" | ollama run gemma4:31b" 2>/dev/null || echo "Experiment failed — model unavailable")
-    echo "[$(date)] Fallback to gemma4:31b for ${SLUG}" >> "$LOG_FILE"
+    OUTPUT=$(timeout 300 bash -c "echo \"\$PROMPT\" | ollama run gemma4:26b" 2>/dev/null || echo "Experiment failed — model unavailable")
+    echo "[$(date)] Fallback to gemma4:26b for ${SLUG}" >> "$LOG_FILE"
   fi
 
   # Write output

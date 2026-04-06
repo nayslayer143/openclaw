@@ -75,12 +75,12 @@ Do NOT repeat ideas from: ${PAST_IDEAS}
 
 Be ruthless. Be specific. No vague nonsense. Think like a broke genius with infinite compute and zero patience."
 
-IDEAS=$(echo "$PROMPT" | ollama run gemma4:31b 2>/dev/null || echo "$PROMPT" | ollama run gemma4:31b 2>/dev/null)
+IDEAS=$(echo "$PROMPT" | ollama run gemma4:26b 2>/dev/null || echo "$PROMPT" | ollama run gemma4:26b 2>/dev/null)
 if [[ -z "$IDEAS" || "$IDEAS" == *"error"* ]]; then
   # Ollama down — attempt restart and retry
   ollama serve &>/dev/null &
   sleep 5
-  IDEAS=$(echo "$PROMPT" | ollama run gemma4:31b 2>/dev/null || echo "$PROMPT" | ollama run gemma4:31b 2>/dev/null)
+  IDEAS=$(echo "$PROMPT" | ollama run gemma4:26b 2>/dev/null || echo "$PROMPT" | ollama run gemma4:26b 2>/dev/null)
   if [[ -z "$IDEAS" || "$IDEAS" == *"error"* ]]; then
     IDEAS="LLM unavailable — Ollama not responding (restart attempted, still down)"
     ESCALATION="🚨 CRITICAL: Ollama is DOWN — idea engine failed.

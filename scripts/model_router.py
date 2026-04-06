@@ -30,7 +30,7 @@ MODEL_SIZES_GB: dict[str, float] = {
     "gemma4:e4b":           5.0,
     "llama3.2:3b":          2.0,
     # Tier 2: mid (reasoning)
-    "gemma4:31b":          19.0,
+    "gemma4:26b":          19.0,
     "qwen3:32b":           20.0,
     "qwen3:30b":           18.0,
     "qwen3-coder-next":    51.0,
@@ -51,8 +51,8 @@ MODEL_SIZES_GB: dict[str, float] = {
 
 FALLBACK_CHAINS: dict[str, list[str]] = {
     "chat":      ["gemma4:e4b", "qwen2.5:7b", "llama3.2:3b"],
-    "code":      ["qwen3-coder-next", "devstral-small-2", "gemma4:31b"],
-    "research":  ["gemma4:31b", "qwen3:32b", "qwen3:30b"],
+    "code":      ["qwen3-coder-next", "devstral-small-2", "gemma4:26b"],
+    "research":  ["gemma4:26b", "qwen3:32b", "qwen3:30b"],
     "routing":   ["gemma4:e4b", "llama3.2:3b"],
     "vision":    ["qwen3-vl:32b"],
     "embedding": ["nomic-embed-text"],

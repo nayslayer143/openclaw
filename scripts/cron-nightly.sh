@@ -42,7 +42,7 @@ Write a 5-10 line structured summary covering:
 Format as plain text. No markdown headers. Be factual."
 
 # Short nightly summary (<4K tokens) — gemma4:e4b is fast for summary tasks
-# gemma4:31b is reserved for long-context work (self-improvement, autoresearch papers)
+# gemma4:26b-A4B (MoE) is reserved for long-context work (self-improvement, autoresearch papers)
 SUMMARY=$(echo "$PROMPT" | ollama run gemma4:e4b 2>/dev/null || echo "Consolidation unavailable — Ollama not responding")
 
 # --- Append to MEMORY.md ---

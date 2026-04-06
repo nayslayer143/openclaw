@@ -2,7 +2,7 @@
 """
 3-agent inline Ollama debate for REVIEW-range skills.
 Runs: defender → attacker → judge.
-All calls use gemma4:31b with 120s timeout. Fallback: gemma4:e4b.
+All calls use gemma4:26b-A4B (MoE) with 120s timeout. Fallback: gemma4:e4b.
 """
 from __future__ import annotations
 import json
@@ -10,7 +10,7 @@ import re
 import requests
 
 OLLAMA_BASE    = "http://localhost:11434"
-PRIMARY_MODEL  = "gemma4:31b"
+PRIMARY_MODEL  = "gemma4:26b"
 FALLBACK_MODEL = "gemma4:e4b"
 TIMEOUT_S      = 120
 

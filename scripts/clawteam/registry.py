@@ -21,14 +21,14 @@ AGENTS: dict = {
     "AXIS": AgentDef(
         codename="AXIS",
         role="Chief orchestrator — coordination, synthesis, planning",
-        primary_model="gemma4:31b",
+        primary_model="gemma4:26b",
         fast_model="qwen2.5:7b",
         capabilities=["orchestration", "synthesis", "planning"],
     ),
     "SCOUT": AgentDef(
         codename="SCOUT",
         role="Research agent — intel, analysis, competitive research",
-        primary_model="gemma4:31b",
+        primary_model="gemma4:26b",
         fast_model="qwen2.5:7b",
         capabilities=["research", "intel", "analysis"],
     ),

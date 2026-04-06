@@ -58,7 +58,7 @@ Analyze this release and produce a brief with:
 4. SKIP (items irrelevant to our stack)
 5. RECOMMENDATION: upgrade now / wait / cherry-pick specific items
 
-Be specific. Reference our actual components." | ollama run gemma4:31b 2>/dev/null)
+Be specific. Reference our actual components." | ollama run gemma4:26b 2>/dev/null)
 
 if [[ -z "$ANALYSIS" || "$ANALYSIS" == *"error"* ]]; then
   ANALYSIS="LLM unavailable — raw release notes saved. Review manually."
