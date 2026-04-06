@@ -470,6 +470,7 @@ def digest_paper(paper_id: str) -> dict:
                 "model": DIGEST_MODEL,
                 "messages": [{"role": "user", "content": prompt}],
                 "stream": False,
+                "options": {"num_ctx": int(os.environ.get("OPENCLAW_NUM_CTX", "16384"))},
             },
             timeout=120,
         )

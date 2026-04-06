@@ -226,6 +226,7 @@ def _classify_prompt(prompt: str) -> str:
                     {"role": "user", "content": prompt[:500]},
                 ],
                 "stream": False,
+                "options": {"num_ctx": int(os.environ.get("OPENCLAW_NUM_CTX", "16384"))},
             },
             timeout=15,
         )

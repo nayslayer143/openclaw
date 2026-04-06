@@ -61,7 +61,8 @@ def chat(history: list, user_message: str, has_image: bool = False,
     try:
         response = requests.post(
             f"{OLLAMA_BASE_URL}/api/chat",
-            json={"model": model, "messages": messages, "stream": True},
+            json={"model": model, "messages": messages, "stream": True,
+                  "options": {"num_ctx": int(os.environ.get("OPENCLAW_NUM_CTX", "16384"))}},
             stream=True,
             timeout=300
         )

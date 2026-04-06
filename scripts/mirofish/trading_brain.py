@@ -414,6 +414,7 @@ def _call_ollama(prompt: str) -> str:
                 "model": MIROFISH_MODEL,
                 "messages": [{"role": "user", "content": prompt}],
                 "stream": False,
+                "options": {"num_ctx": int(os.environ.get("OPENCLAW_NUM_CTX", "16384"))},
             },
             timeout=OLLAMA_TIMEOUT,
         )

@@ -352,7 +352,11 @@ def digest(data: dict) -> dict | None:
                     {"role": "user", "content": f"Here is the last {LOOKBACK_HOURS}h of data:\n\n{payload}"},
                 ],
                 "stream": False,
-                "options": {"temperature": 0.2, "num_predict": 2048},
+                "options": {
+                    "temperature": 0.2,
+                    "num_predict": 2048,
+                    "num_ctx": int(os.environ.get("OPENCLAW_NUM_CTX", "32768")),
+                },
             },
             timeout=1800,  # 30 min — large prompt prefill is slow
         )

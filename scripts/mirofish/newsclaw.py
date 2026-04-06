@@ -201,7 +201,8 @@ Return ONLY a JSON array. If no matches, return [].
     try:
         resp = requests.post(
             f"{OLLAMA_URL}/api/chat",
-            json={"model": NEWSCLAW_MODEL, "messages": [{"role": "user", "content": prompt}], "stream": False},
+            json={"model": NEWSCLAW_MODEL, "messages": [{"role": "user", "content": prompt}], "stream": False,
+                  "options": {"num_ctx": int(os.environ.get("OPENCLAW_NUM_CTX", "16384"))}},
             timeout=180,
         )
         resp.raise_for_status()

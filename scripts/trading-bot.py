@@ -59,7 +59,12 @@ def llm(prompt, system="", timeout=180):
     if system:
         messages.append({"role": "system", "content": system})
     messages.append({"role": "user", "content": prompt})
-    data = json.dumps({"model": MODEL, "messages": messages, "stream": False}).encode()
+    data = json.dumps({
+        "model": MODEL,
+        "messages": messages,
+        "stream": False,
+        "options": {"num_ctx": int(os.environ.get("OPENCLAW_NUM_CTX", "16384"))},
+    }).encode()
     req = urllib.request.Request(
         f"{OLLAMA_URL}/api/chat", data=data,
         headers={"Content-Type": "application/json"}

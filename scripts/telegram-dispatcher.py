@@ -501,7 +501,8 @@ def _ollama_chat_direct(history: list, user_message: str,
     base_url = os.environ.get("OLLAMA_BASE_URL", "http://localhost:11434")
     response = requests.post(
         f"{base_url}/api/chat",
-        json={"model": model, "messages": messages, "stream": True},
+        json={"model": model, "messages": messages, "stream": True,
+              "options": {"num_ctx": int(os.environ.get("OPENCLAW_NUM_CTX", "16384"))}},
         stream=True,
         timeout=300,
     )

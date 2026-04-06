@@ -241,6 +241,7 @@ def categorize_tweet(tweet_text: str, linked_urls: list) -> dict:
                 ],
                 "stream": False,
                 "format": "json",
+                "options": {"num_ctx": int(os.environ.get("OPENCLAW_NUM_CTX", "16384"))},
             },
             timeout=60,
         )

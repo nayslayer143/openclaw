@@ -162,6 +162,7 @@ class LogicAnalyzer:
                         "content": _LLM_PROMPT + truncated,
                     }
                 ],
+                "options": {"num_ctx": int(os.environ.get("OPENCLAW_NUM_CTX", "16384"))},
             }
             resp = httpx.post(_OLLAMA_URL, json=payload, timeout=_OLLAMA_TIMEOUT)
             resp.raise_for_status()

@@ -54,7 +54,11 @@ def call_ollama(prompt: str, model: str) -> str:
         "model": model,
         "prompt": prompt,
         "stream": False,
-        "options": {"temperature": 0.3, "num_predict": 4096},
+        "options": {
+            "temperature": 0.3,
+            "num_predict": 4096,
+            "num_ctx": int(os.environ.get("OPENCLAW_NUM_CTX", "16384")),
+        },
     }).encode("utf-8")
     req = urllib.request.Request(
         OLLAMA_URL,

@@ -103,7 +103,8 @@ def classify_intent_llm(text: str, history=None) -> dict:
     resp = requests.post(
         f"{OLLAMA_BASE_URL}/api/chat",
         json={"model": CLASSIFY_MODEL, "messages": messages, "stream": False,
-              "format": "json"},
+              "format": "json",
+              "options": {"num_ctx": int(os.environ.get("OPENCLAW_NUM_CTX", "16384"))}},
         timeout=30
     )
     resp.raise_for_status()

@@ -100,7 +100,10 @@ def _llm_compose(prompt: str, manifest: list) -> dict:
             "prompt": user_msg,
             "system": _SYSTEM_PROMPT,
             "stream": False,
-            "options": {"temperature": 0.7},
+            "options": {
+                "temperature": 0.7,
+                "num_ctx": int(os.environ.get("OPENCLAW_NUM_CTX", "16384")),
+            },
         },
         timeout=120,
     )

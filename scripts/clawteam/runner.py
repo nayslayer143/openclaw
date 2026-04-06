@@ -40,7 +40,8 @@ def run_agent(codename: str, model: str, prompt: str) -> str:
     try:
         resp = requests.post(
             f"{OLLAMA_BASE_URL}/api/chat",
-            json={"model": model, "messages": messages, "stream": True},
+            json={"model": model, "messages": messages, "stream": True,
+                  "options": {"num_ctx": int(os.environ.get("OPENCLAW_NUM_CTX", "16384"))}},
             stream=True,
             timeout=300,
         )

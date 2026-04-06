@@ -24,6 +24,7 @@ def _call_ollama(prompt: str, model: str = PRIMARY_MODEL) -> str:
                 "model":    model,
                 "messages": [{"role": "user", "content": prompt}],
                 "stream":   False,
+                "options":  {"num_ctx": int(os.environ.get("OPENCLAW_NUM_CTX", "16384"))},
             },
             timeout=TIMEOUT_S,
         )
@@ -40,6 +41,7 @@ def _call_ollama(prompt: str, model: str = PRIMARY_MODEL) -> str:
                     "model":    FALLBACK_MODEL,
                     "messages": [{"role": "user", "content": prompt}],
                     "stream":   False,
+                    "options":  {"num_ctx": int(os.environ.get("OPENCLAW_NUM_CTX", "16384"))},
                 },
                 timeout=TIMEOUT_S,
             )

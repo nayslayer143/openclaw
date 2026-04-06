@@ -92,7 +92,8 @@ def _llm_json(prompt: str, system: str = "") -> dict:
         resp = requests.post(
             f"{OLLAMA_BASE_URL}/api/chat",
             json={"model": MEMORY_MODEL, "messages": messages,
-                  "stream": False, "format": "json"},
+                  "stream": False, "format": "json",
+                  "options": {"num_ctx": int(os.environ.get("OPENCLAW_NUM_CTX", "16384"))}},
             timeout=60
         )
         resp.raise_for_status()
@@ -110,7 +111,8 @@ def _llm_text(prompt: str) -> str:
             f"{OLLAMA_BASE_URL}/api/chat",
             json={"model": MEMORY_MODEL,
                   "messages": [{"role": "user", "content": prompt}],
-                  "stream": False},
+                  "stream": False,
+                  "options": {"num_ctx": int(os.environ.get("OPENCLAW_NUM_CTX", "16384"))}},
             timeout=60
         )
         resp.raise_for_status()

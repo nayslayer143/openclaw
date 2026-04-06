@@ -75,7 +75,8 @@ def llm(prompt: str, system: str = "") -> str:
     messages.append({"role": "user", "content": prompt})
     try:
         r = requests.post(f"{OLLAMA_URL}/api/chat",
-            json={"model": CHAT_MODEL, "messages": messages, "stream": False},
+            json={"model": CHAT_MODEL, "messages": messages, "stream": False,
+                  "options": {"num_ctx": int(os.environ.get("OPENCLAW_NUM_CTX", "16384"))}},
             timeout=300)
         r.raise_for_status()
         return r.json().get("message", {}).get("content", "").strip()
