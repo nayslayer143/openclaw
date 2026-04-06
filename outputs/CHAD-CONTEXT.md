@@ -1,9 +1,9 @@
 # OpenClaw Ecosystem — Master Context for ChatGPT
 
-> Auto-generated 2026-04-06T15:07:01-07:00. Do not edit manually.
+> Auto-generated 2026-04-06T16:07:00-07:00. Do not edit manually.
 > For live code, use the GitHub MCP connector to read repos directly.
 
-Generated: 2026-04-06T15:07:01-07:00
+Generated: 2026-04-06T16:07:00-07:00
 Machine: Jordan's MacBook Pro M2 Max (96GB)
 User: nayslayer
 
@@ -485,8 +485,9 @@ Lobster runs deterministic workflows. Agents route tasks. Jordan approves via Te
 **Verticals:** Trading & arbitrage · Software/app development · Agentic business ops · Marketing & growth · Content & research pipelines. Optimize across the system, not locally within one vertical.
 
 **Strategy doc:** `~/openclaw/openclaw-v4.1-strategy.md`
-**Current phase:** Phase 5 COMPLETE (2026-03-23) — full trading intelligence stack
-**Last updated:** 2026-03-23
+**Current phase:** Phase 5 COMPLETE (2026-03-23) → v4.5 Migration COMPLETE (2026-04-06)
+**Platform:** openclaw 2026.4.5 — all 4 claws running as proper openclaw agent workspaces
+**Last updated:** 2026-04-06
 
 ---
 
@@ -508,8 +509,7 @@ Lobster runs deterministic workflows. Agents route tasks. Jordan approves via Te
 │       ├── trading_brain.py     ← 4 strategies: arb, price-lag, momentum, LLM
 │       ├── paper_wallet.py      ← SQLite-backed wallet w/ stop-loss & take-profit
 │       ├── polymarket_feed.py   ← gamma API + SQLite cache
-│       ├── unusual_whales_feed.py ← options flow, dark pool, congressional, institutional
-│       ├── crucix_feed.py   
+│       ├── unusual_whales_feed.p
 ```
 
 ### ~/rivalclaw/CLAUDE.md
@@ -1530,7 +1530,7 @@ pytest-asyncio>=0.23
 ### openclaw
 ```
 Branch: main
-Last commit: fd7390c auto: hourly sync 2026-04-06 21:47 UTC
+Last commit: 656dc55 auto: hourly sync 2026-04-06 22:47 UTC
 Uncommitted files: 7
 Remote: https://github.com/nayslayer143/openclaw.git
 ```
@@ -1538,8 +1538,8 @@ Remote: https://github.com/nayslayer143/openclaw.git
 ### rivalclaw
 ```
 Branch: feat/kalshi-live-bridge
-Last commit: 3502120 auto: hourly sync 2026-04-06 21:47 UTC
-Uncommitted files: 7
+Last commit: 2d839b5 auto: hourly sync 2026-04-06 22:47 UTC
+Uncommitted files: 6
 Remote: https://github.com/nayslayer143/rivalclaw.git
 ```
 
@@ -1554,7 +1554,7 @@ Remote: https://github.com/nayslayer143/arbclaw.git
 ### quantumentalclaw
 ```
 Branch: main
-Last commit: ea50ea3 hourly: 2026-04-06 22:00 | $4,578 | 0W/0closed | $+0 | quiet
+Last commit: 34f4dc8 hourly: 2026-04-06 23:00 | $5,011 | 0W/0closed | $+0 | quiet
 Uncommitted files: 0
 Remote: https://github.com/nayslayer143/quantumentalclaw.git
 ```
@@ -1654,5 +1654,5 @@ Remote: https://github.com/nayslayer143/shiny-new.git
 ```
 
 ---
-End of context. Generated 2026-04-06T15:07:01-07:00.
+End of context. Generated 2026-04-06T16:07:00-07:00.
 For live code, use GitHub MCP connector -> github.com/nayslayer143/openclaw
