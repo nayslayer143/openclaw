@@ -7,8 +7,9 @@ Lobster runs deterministic workflows. Agents route tasks. Jordan approves via Te
 **Verticals:** Trading & arbitrage · Software/app development · Agentic business ops · Marketing & growth · Content & research pipelines. Optimize across the system, not locally within one vertical.
 
 **Strategy doc:** `~/openclaw/openclaw-v4.1-strategy.md`
-**Current phase:** Phase 5 COMPLETE (2026-03-23) — full trading intelligence stack
-**Last updated:** 2026-03-23
+**Current phase:** Phase 5 COMPLETE (2026-03-23) → v4.5 Migration COMPLETE (2026-04-06)
+**Platform:** openclaw 2026.4.5 — all 4 claws running as proper openclaw agent workspaces
+**Last updated:** 2026-04-06
 
 ---
 
