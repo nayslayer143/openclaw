@@ -68,3 +68,21 @@
 - ... and 1 more
 
 ---
+
+## 2026-04-06 04:57
+
+**Regime:** volatile (confidence: 75%)
+
+**Alerts:**
+- RivalClaw: The 'fair_value_directional' strategy is showing signs of degradation despite high confidence signals; immediate risk mitigation (edge/volatility filtering) is required.
+- QuantumentalClaw: While signal generation is strong, the weight convergence suggests the model might be over-optimizing on recent data; monitor for overfitting.
+
+**Lessons extracted:** 7
+- [rivalclaw] The 'fair_value_directional' strategy shows inconsistent performance, with high confidence trades (0.9+) yielding large wins but also significant losses (-2.499, -2.652), suggesting over-reliance on high confidence signals.
+- [rivalclaw] The 'fair_value_directional' strategy's performance is highly dependent on the specific contract/bracket, as evidenced by the wide range of PnL outcomes.
+- [quantclaw] The weight convergence across all modules (asymmetry, narrative, event, edgar, quant) is stable and highly uniform, suggesting the model is in a steady state of learning.
+- [quantclaw] The 'quant' module shows a clear upward trend in accuracy when looking at the most recent data points (0.4725 -> 0.5102 -> 0.5315), suggesting recent signal generation is improving.
+- [quantclaw] The 'sprint' time horizon consistently generates signals with the highest frequency and the most recent decision points, indicating it is the most active signal source.
+- ... and 2 more
+
+---
