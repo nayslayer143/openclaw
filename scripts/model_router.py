@@ -38,7 +38,7 @@ MODEL_SIZES_GB: dict[str, float] = {
     "qwen2.5:7b":           4.7,
     "qwen2.5:14b":          9.0,
     # Tier 3: deep (TurboQuant — not managed by Ollama)
-    # gemma4-31b-turboquant @ localhost:8090
+    # gemma4-26b-turboquant @ localhost:8090
     # Multimodal
     "qwen3-vl:32b":        20.0,
     # Utility
@@ -60,7 +60,7 @@ FALLBACK_CHAINS: dict[str, list[str]] = {
 
 # TurboQuant server for long-context / memory tasks (not in Ollama)
 TURBOQUANT_BASE_URL = os.environ.get("TURBOQUANT_BASE_URL", "http://localhost:8090")
-TURBOQUANT_MODEL    = os.environ.get("TURBOQUANT_MODEL", "gemma4-31b-turboquant")
+TURBOQUANT_MODEL    = os.environ.get("TURBOQUANT_MODEL", "gemma4-26b-turboquant")
 
 # Task types that should route to TurboQuant when available
 TURBOQUANT_TASKS = {"memory", "strategy", "digest"}
