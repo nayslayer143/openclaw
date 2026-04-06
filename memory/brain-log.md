@@ -86,3 +86,20 @@
 - ... and 2 more
 
 ---
+
+## 2026-04-06 09:09
+
+**Regime:** volatile (confidence: 80%)
+
+**Alerts:**
+- CRITICAL: QuantumentalClaw weight renormalization appears broken; weights are not updating despite performance metrics being calculated.
+
+**Lessons extracted:** 7
+- [rivalclaw] The 'fair_value_directional' strategy shows consistent profitability when trades are closed, suggesting the underlying edge calculation remains valid in the current market structure.
+- [rivalclaw] The strategy registry indicates multiple core arbitrage/mean-reversion strategies are marked 'degraded', suggesting systemic performance decay across multiple models.
+- [rivalclaw] High confidence (0.9) trades are not guaranteeing wins, as evidenced by the mix of large wins and small losses across the day's activity.
+- [quantclaw] The 'quant' module shows a slight upward trend in accuracy (0.4225 -> 0.4405), while 'asymmetry' is slightly declining (0.3989 -> 0.4148, but the trend is noisy).
+- [quantclaw] The weight convergence is highly stable, with all weights remaining constant across all logged adjustments.
+- ... and 2 more
+
+---
