@@ -2074,6 +2074,7 @@ body {
   <div class="nav-brand" onclick="showPage('dashboard')" style="cursor:pointer">GONZOCLAW</div>
   <div class="nav-tabs">
     <button class="nav-tab active" id="tabDashboard" onclick="showPage('dashboard')">◈ OPS</button>
+    <button class="nav-tab" id="tabChat" onclick="showPage('chat')">◬ CHAT</button>
     <!-- DEACTIVATED 2026-04-07 — pages preserved in DOM, only nav buttons hidden. To re-enable, uncomment.
     <button class="nav-tab" id="tabJordan" onclick="showPage('jordan')">⚡ JORDAN</button>
     -->
@@ -2756,6 +2757,11 @@ body {
     <iframe id="orchestratorFrame" style="flex:1;border:none;width:100%;height:100%;" src="about:blank"></iframe>
   </div><!-- /pageOrchestrator -->
 
+  <!-- Gonzoclaw chat dashboard (built React SPA, served at /chat-app) -->
+  <div class="page" id="pageChat">
+    <iframe id="chatFrame" style="flex:1;border:none;width:100%;height:100%;background:var(--bg);" src="about:blank"></iframe>
+  </div><!-- /pageChat -->
+
   <!-- Intel Approve Modal -->
   <div class="modal-overlay" id="intelApproveModal" onclick="if(event.target===this)this.classList.remove('active')">
     <div class="modal-box" style="max-width:420px;">
@@ -3163,6 +3169,14 @@ function showPage(page, pushState) {
     document.getElementById('pageOrchestrator').classList.add('active')
     document.getElementById('tabOrchestrator').classList.add('active')
     document.getElementById('orchestratorFrame').src = '/orchestrator-embed'
+  } else if (page === 'chat') {
+    document.getElementById('pageChat').classList.add('active')
+    document.getElementById('tabChat').classList.add('active')
+    // Lazy-load the iframe so the React SPA only mounts when the tab is opened
+    const f = document.getElementById('chatFrame')
+    if (!f.src || f.src === 'about:blank' || !f.src.includes('/chat-app')) {
+      f.src = '/chat-app'
+    }
   } else {
     page = 'dashboard'
     document.getElementById('pageDashboard').classList.add('active')

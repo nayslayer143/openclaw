@@ -2827,6 +2827,44 @@ async def orchestrator_embed(request: Request):
     })
 
 
+# ── Gonzoclaw chat dashboard (SPA) ────────────────────────────────────────────
+# Built React app from ~/gonzoclaw/frontend/dist. Vite is configured with
+# base="/chat-app/" so asset URLs resolve under that prefix. The SPA's API
+# calls go to a separate cloudflared ingress (gonzoclaw-api.asdfghjk.lol)
+# that points at the gonzoclaw FastAPI backend on localhost:18790.
+GONZOCLAW_DIST = Path.home() / "gonzoclaw" / "frontend" / "dist"
+GONZOCLAW_ASSETS = GONZOCLAW_DIST / "assets"
+
+
+@app.get("/chat-app")
+@app.get("/chat-app/")
+async def chat_app_index(request: Request):
+    """Serve the gonzoclaw chat SPA index.html with auth gate."""
+    token = request.cookies.get("oc_token")
+    if not token or not verify_token(token):
+        if not is_localhost(request):
+            return RedirectResponse(url="/login")
+    index = GONZOCLAW_DIST / "index.html"
+    if not index.exists():
+        return HTMLResponse(
+            content="<h1>chat-app build missing</h1><p>run: cd ~/gonzoclaw/frontend && VITE_BASE_PATH=/chat-app/ VITE_API_BASE=https://gonzoclaw-api.asdfghjk.lol npm run build</p>",
+            status_code=503,
+        )
+    return HTMLResponse(
+        content=index.read_text(),
+        headers={"Cache-Control": "no-cache, no-store, must-revalidate"},
+    )
+
+
+# Static asset bundle (JS/CSS hashed by Vite — safe to cache)
+if GONZOCLAW_ASSETS.exists():
+    app.mount(
+        "/chat-app/assets",
+        StaticFiles(directory=str(GONZOCLAW_ASSETS)),
+        name="chat_app_assets",
+    )
+
+
 # ── CodeMonkeyClaw Work Orders ────────────────────────────────────────────────
 _CMC_DB = Path.home() / "codemonkeyclaw" / "codemonkeyclaw.db"
 
