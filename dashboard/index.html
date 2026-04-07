@@ -2074,10 +2074,14 @@ body {
   <div class="nav-brand" onclick="showPage('dashboard')" style="cursor:pointer">GONZOCLAW</div>
   <div class="nav-tabs">
     <button class="nav-tab active" id="tabDashboard" onclick="showPage('dashboard')">◈ OPS</button>
+    <!-- DEACTIVATED 2026-04-07 — pages preserved in DOM, only nav buttons hidden. To re-enable, uncomment.
     <button class="nav-tab" id="tabJordan" onclick="showPage('jordan')">⚡ JORDAN</button>
+    -->
     <button class="nav-tab" id="tabIdeas" onclick="showPage('ideas')">◉ IDEAS LAB</button>
+    <!-- DEACTIVATED 2026-04-07
     <button class="nav-tab" id="tabProjects" onclick="showPage('projects')">◎ PROJECTS</button>
     <button class="nav-tab" id="tabTrading" onclick="showPage('trading')">$ TRADING</button>
+    -->
     <button class="nav-tab" id="tabTerminal" onclick="showPage('terminal')">⊡ TERMINAL</button>
     <button class="nav-tab" id="tabIntel" onclick="showPage('intel')">⌬ INTEL</button>
     <button class="nav-tab" id="tabResearch" onclick="showPage('research')">◎ RESEARCH<span id="researchBadge" style="display:none;margin-left:5px;background:#ff4444;color:#fff;border-radius:8px;padding:1px 6px;font-size:0.45rem;vertical-align:middle;">0</span></button>
@@ -3118,23 +3122,17 @@ function showPage(page, pushState) {
 
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'))
   document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'))
+  // DEACTIVATED 2026-04-07 — jordan/projects/trading pages are hidden but
+  // data is preserved on disk. Calls to showPage('jordan'|'projects'|'trading')
+  // silently redirect to the dashboard. To re-enable: restore the original
+  // branches below and uncomment the nav buttons in the navbar.
+  if (page === 'jordan' || page === 'projects' || page === 'trading') {
+    page = 'dashboard'
+  }
   if (page === 'ideas') {
     document.getElementById('pageIdeas').classList.add('active')
     document.getElementById('tabIdeas').classList.add('active')
     loadIdeas()
-  } else if (page === 'jordan') {
-    document.getElementById('pageJordan').classList.add('active')
-    document.getElementById('tabJordan').classList.add('active')
-    loadJordanTasks()
-  } else if (page === 'projects') {
-    document.getElementById('pageProjects').classList.add('active')
-    document.getElementById('tabProjects').classList.add('active')
-    loadProjects()
-  } else if (page === 'trading') {
-    document.getElementById('pageTrading').classList.add('active')
-    document.getElementById('tabTrading').classList.add('active')
-    loadTrading()
-    loadExperiment()
   } else if (page === 'terminal') {
     document.getElementById('pageTerminal').classList.add('active')
     document.getElementById('tabTerminal').classList.add('active')
