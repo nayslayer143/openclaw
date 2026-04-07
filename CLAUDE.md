@@ -167,6 +167,20 @@ If you need upstream context, load only the specific artifact referenced in the 
 
 > **14 models total · ~264 GB local storage**
 
+### Codex escalation (paid escape hatch)
+
+OpenAI Codex is available via the `codex@openai-codex` Claude Code plugin (installed at user scope, so Clawmpson has it automatically). Use **only** as a second opinion or to break out of a loop — not as a primary model. Local Ollama models still handle all default inference; the "zero API cost" rule above still governs day-to-day work.
+
+| When to reach for Codex | Slash command |
+|-------------------------|---------------|
+| Hostile second-opinion review on a hard PR | `/codex:adversarial-review` |
+| Standard diff/file review | `/codex:review` |
+| Stuck in a loop, hand off the task | `/codex:rescue` (or `codex:codex-rescue` subagent) |
+| Check / fetch / cancel an async Codex job | `/codex:status` `/codex:result` `/codex:cancel` |
+| Verify install + auth | `/codex:setup` |
+
+Full details: `~/.claude/CLAUDE.md` → "Codex Plugin (OpenAI) — Cross-Model Delegation".
+
 ---
 
 ## Hard Constraints (details in CONSTRAINTS.md)
