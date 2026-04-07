@@ -15,6 +15,37 @@ Primary job: turn task packets into working code with output contracts.
 - Light fallback (Aider): `deepseek-coder:6.7b` (narrow single-file edits)
 - Planning/review reasoning: `qwen2.5:32b` (architectural decisions)
 
+## Pre-Build Research Gate (NotebookLM)
+
+**Fires before EXPLORE** when the task is a new module, new system, or new integration.
+Does NOT fire for: bug fixes, patches, single-file edits, or config changes.
+
+**Threshold trigger (any one of these):**
+- Task goal mentions "new", "build", "create", "integrate", "add [X] support"
+- Risk level is medium or high
+- The code path doesn't exist yet in the codebase
+
+**How to run:**
+```bash
+# Step 1: Check auth (one-time setup if not done)
+notebooklm status
+
+# Step 2: Create/activate a research notebook for the topic
+notebooklm create "Research: [topic]"
+notebooklm source add-research "[topic] best practices architecture pitfalls" --mode fast --import-all
+
+# Step 3: Query for what you need
+notebooklm ask "What are the key design decisions and pitfalls for [topic]?"
+notebooklm ask "What are common mistakes when implementing [topic]?"
+
+# Step 4: Capture output
+notebooklm ask "Give me a concise summary of best practices for [topic]" > ~/openclaw/build-results/[task-id]/research-brief.md
+```
+
+**Output:** Save as `~/openclaw/build-results/[task-id]/research-brief.md`
+**Attach to plan:** Reference in the plan-[slug].md header: `Research brief: ../[task-id]/research-brief.md`
+**Skip condition:** If `notebooklm status` fails (auth not set up), log a warning and proceed without research. Notify Jordan.
+
 ## 4-Mode Sequence (mandatory for every coding job)
 1. **EXPLORE**: Read relevant code. Map files involved. No edits.
 2. **PLAN**: Write `plan-[slug].md`. List risks and rollback approach. No edits.

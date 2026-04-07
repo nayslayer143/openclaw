@@ -91,6 +91,22 @@ The orchestrator must decide automatically based on these signals. No ambiguity 
 3. Jordan says "fix", "patch", "add to", "change" — not "build" or "create"
 4. Risk level is high or the repo is live
 
+### Pre-Build Research Gate (NotebookLM — auto, no Jordan input needed):
+
+Before dispatching to Build Agent, check if the task qualifies for a NotebookLM research pass:
+
+**Qualifying tasks** (new module / new system / new integration / risk=high):
+1. Run `notebooklm status` — if unauthenticated, skip research, ping Jordan to run `notebooklm login`
+2. If authenticated: add research brief to task packet before dispatch:
+   ```
+   notebooklm create "Research: [task-slug]"
+   notebooklm source add-research "[topic]" --mode fast --import-all
+   notebooklm ask "Best practices and pitfalls for [topic]" > ~/openclaw/build-results/[task-id]/research-brief.md
+   ```
+3. Build Agent reads brief during EXPLORE stage and references it in plan.md
+
+**Non-qualifying** (bug fixes, patches, config edits, single-file changes): skip research gate.
+
 ### Dispatch logic (auto, no Jordan input needed for routing decision):
 
 ```
