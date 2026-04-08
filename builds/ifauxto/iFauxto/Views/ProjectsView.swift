@@ -59,7 +59,7 @@ struct ProjectsView: View {
             LazyVGrid(columns: columns, spacing: 14) {
                 ForEach(projects) { project in
                     NavigationLink {
-                        CollageEditorView(project: project)
+                        editor(for: project)
                     } label: {
                         ProjectCard(project: project)
                     }
@@ -70,6 +70,16 @@ struct ProjectsView: View {
             .padding(.horizontal, 16)
             .padding(.top, 12)
             .padding(.bottom, 40)
+        }
+    }
+
+    @ViewBuilder
+    private func editor(for project: PhotoProject) -> some View {
+        switch project.type {
+        case .collage:  CollageEditorView(project: project)
+        case .book:     BookEditorView(project: project)
+        case .calendar: CalendarEditorView(project: project)
+        case .card:     CardEditorView(project: project)
         }
     }
 

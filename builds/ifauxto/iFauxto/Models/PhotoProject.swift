@@ -12,8 +12,47 @@ final class PhotoProject {
     var typeRaw: String = "collage"
     var theme: String = "Default"
     var photoIdsCSV: String = ""
+    /// Type-specific page data. Book = [BookPage], Calendar = [CalendarPage],
+    /// Card = CardContent, Collage = nil (uses photoIds directly).
+    var pagesData: Data = Data()
     var createdAt: Date = Date()
     var updatedAt: Date = Date()
+
+    // MARK: - Book pages
+
+    var bookPages: [BookPage] {
+        get {
+            (try? JSONDecoder().decode([BookPage].self, from: pagesData)) ?? []
+        }
+        set {
+            pagesData = (try? JSONEncoder().encode(newValue)) ?? Data()
+            updatedAt = Date()
+        }
+    }
+
+    // MARK: - Calendar pages
+
+    var calendarPages: [CalendarPage] {
+        get {
+            (try? JSONDecoder().decode([CalendarPage].self, from: pagesData)) ?? []
+        }
+        set {
+            pagesData = (try? JSONEncoder().encode(newValue)) ?? Data()
+            updatedAt = Date()
+        }
+    }
+
+    // MARK: - Card
+
+    var cardContent: CardContent {
+        get {
+            (try? JSONDecoder().decode(CardContent.self, from: pagesData)) ?? CardContent()
+        }
+        set {
+            pagesData = (try? JSONEncoder().encode(newValue)) ?? Data()
+            updatedAt = Date()
+        }
+    }
 
     var type: ProjectType {
         get { ProjectType(rawValue: typeRaw) ?? .collage }

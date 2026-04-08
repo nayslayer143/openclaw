@@ -111,6 +111,14 @@ struct FolderView: View {
         .fullScreenCover(isPresented: $showingSlideshow) {
             SlideshowView(photoIds: photos.map(\.id))
         }
+        .dropDestination(for: URL.self) { urls, _ in
+            let ids = FilesImportService.importFiles(urls)
+            guard !ids.isEmpty else { return false }
+            dataManager.addPhotos(assetIdentifiers: ids, to: folder)
+            Haptics.success()
+            loadContent()
+            return true
+        }
         .sheet(isPresented: $showingFilesImport) {
             FilesImporterView { urls in
                 let identifiers = FilesImportService.importFiles(urls)

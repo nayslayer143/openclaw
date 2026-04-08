@@ -191,6 +191,14 @@ struct HomeView: View {
                         }
                         .buttonStyle(PressableButtonStyle(scale: 0.985))
                         .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
+                        .dropDestination(for: URL.self) { urls, _ in
+                            let ids = FilesImportService.importFiles(urls)
+                            guard !ids.isEmpty else { return false }
+                            dataManager.addPhotos(assetIdentifiers: ids, to: folder)
+                            Haptics.success()
+                            loadFolders()
+                            return true
+                        }
                         .opacity(listAppeared ? 1 : 0)
                         .offset(y: listAppeared ? 0 : 12)
                         .animation(

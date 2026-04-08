@@ -30,6 +30,10 @@ struct iFauxtoApp: App {
     }
 
     var body: some Scene {
+        mainScene
+    }
+
+    private var mainScene: some Scene {
         WindowGroup {
             ContentView()
                 .environmentObject(dataManager)
@@ -47,6 +51,7 @@ struct iFauxtoApp: App {
                     indexingManager.startBackgroundIndexing()
                 }
         }
+        .commands { AppCommands() }
     }
 }
 

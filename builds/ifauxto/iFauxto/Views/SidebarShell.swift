@@ -8,6 +8,7 @@ struct SidebarShell: View {
     @EnvironmentObject var navCoordinator: NavCoordinator
     @Environment(\.horizontalSizeClass) private var sizeClass
 
+    @AppStorage("iFauxto.sidebarSelection") private var persistedSelection: String = "folders"
     @State private var selection: SidebarItem? = .folders
     @State private var folders: [Folder] = []
     @State private var smartAlbums: [SmartAlbum] = []
@@ -52,7 +53,51 @@ struct SidebarShell: View {
                         }
                 }
             }
-            .onAppear { reload() }
+            .onAppear {
+                reload()
+                selection = decodeSelection(persistedSelection)
+            }
+            .onChange(of: selection) { _, newValue in
+                if let newValue {
+                    persistedSelection = encodeSelection(newValue)
+                }
+            }
+        }
+    }
+
+    private func encodeSelection(_ item: SidebarItem) -> String {
+        switch item {
+        case .folders:   return "folders"
+        case .feed:      return "feed"
+        case .events:    return "events"
+        case .places:    return "places"
+        case .faces:     return "faces"
+        case .favorites: return "favorites"
+        case .hidden:    return "hidden"
+        case .trash:     return "trash"
+        case .folder(let id):      return "folder:\(id)"
+        case .smartAlbum(let id):  return "smart:\(id)"
+        }
+    }
+
+    private func decodeSelection(_ raw: String) -> SidebarItem {
+        switch raw {
+        case "folders":   return .folders
+        case "feed":      return .feed
+        case "events":    return .events
+        case "places":    return .places
+        case "faces":     return .faces
+        case "favorites": return .favorites
+        case "hidden":    return .hidden
+        case "trash":     return .trash
+        default:
+            if raw.hasPrefix("folder:") {
+                return .folder(String(raw.dropFirst("folder:".count)))
+            }
+            if raw.hasPrefix("smart:") {
+                return .smartAlbum(String(raw.dropFirst("smart:".count)))
+            }
+            return .folders
         }
     }
 
