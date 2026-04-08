@@ -6,6 +6,8 @@ struct FolderView: View {
 
     @EnvironmentObject var dataManager: DataManager
     @EnvironmentObject var photoKitService: PhotoKitService
+    @EnvironmentObject var navCoordinator: NavCoordinator
+    @Environment(\.dismiss) private var dismiss
 
     @State private var subfolders: [Folder] = []
     @State private var photos: [PhotoReference] = []
@@ -30,15 +32,20 @@ struct FolderView: View {
     private let columns = [GridItem(.adaptive(minimum: 110), spacing: 2)]
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                // Subfolders section
-                if !subfolders.isEmpty {
-                    subfolderSection
-                }
-                // Photos grid
-                if !photos.isEmpty {
-                    LazyVGrid(columns: columns, spacing: 2) {
+        ZStack(alignment: .top) {
+            Theme.Palette.bg.ignoresSafeArea()
+
+            ScrollView {
+                Spacer().frame(height: 72) // room for sticky top bar
+
+                VStack(alignment: .leading, spacing: 0) {
+                    // Subfolders section
+                    if !subfolders.isEmpty {
+                        subfolderSection
+                    }
+                    // Photos grid
+                    if !photos.isEmpty {
+                        LazyVGrid(columns: columns, spacing: 2) {
                         ForEach(displayPhotos) { photo in
                             PhotoThumbnailView(
                                 photo: photo,
@@ -85,11 +92,21 @@ struct FolderView: View {
                 if subfolders.isEmpty && photos.isEmpty {
                     emptyState
                 }
+                }
+                .padding(.bottom, 60)
+            }
+            .scrollIndicators(.hidden)
+
+            BrandTopBar(
+                title: folder.name,
+                subtitle: "\(photos.count) \(photos.count == 1 ? "photo" : "photos")",
+                onBack: { dismiss() },
+                onHome: { navCoordinator.popToRoot() }
+            ) {
+                folderMenuButton
             }
         }
-        .navigationTitle(folder.name)
-        .navigationBarTitleDisplayMode(.large)
-        .toolbar { toolbarItems }
+        .navigationBarHidden(true)
         .safeAreaInset(edge: .bottom) {
             if isEditMode && !selectedPhotoIds.isEmpty {
                 EditModeToolbar(
@@ -176,57 +193,64 @@ struct FolderView: View {
         .padding(.top, 80)
     }
 
-    // MARK: Toolbar
+    // MARK: Brand menu
 
-    @ToolbarContentBuilder
-    private var toolbarItems: some ToolbarContent {
-        ToolbarItem(placement: .navigationBarTrailing) {
-            if isEditMode {
-                Button("Done") {
-                    isEditMode = false
-                    selectedPhotoIds.removeAll()
-                }
-                .fontWeight(.semibold)
-            } else {
-                Menu {
-                    Button {
-                        showingPhotoPicker = true
-                    } label: {
-                        Label("Add Photos", systemImage: "photo.badge.plus")
-                    }
-                    Button {
-                        showingSubfolderCreation = true
-                    } label: {
-                        Label("New Subfolder", systemImage: "folder.badge.plus")
-                    }
-                    Divider()
-                    Button {
-                        isEditMode = true
-                    } label: {
-                        Label("Select Photos", systemImage: "checkmark.circle")
-                    }
-                    Divider()
-                    Menu("Sort Photos") {
-                        Button {
-                            photoSortMode = "custom"
-                        } label: {
-                            Label("Manual Order", systemImage: photoSortMode == "custom" ? "checkmark" : "")
-                        }
-                        Button {
-                            photoSortMode = "alpha"
-                        } label: {
-                            Label("By Name", systemImage: photoSortMode == "alpha" ? "checkmark" : "")
-                        }
-                        Button {
-                            photoSortMode = "recent"
-                        } label: {
-                            Label("Newest First", systemImage: photoSortMode == "recent" ? "checkmark" : "")
-                        }
-                    }
-                } label: {
-                    Image(systemName: "ellipsis.circle")
-                }
+    @ViewBuilder
+    private var folderMenuButton: some View {
+        if isEditMode {
+            Button {
+                Haptics.tap()
+                isEditMode = false
+                selectedPhotoIds.removeAll()
+            } label: {
+                Text("Done")
+                    .font(Theme.Font.body(14, weight: .bold))
+                    .foregroundStyle(Theme.Palette.accent)
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 9)
+                    .background(
+                        Capsule().fill(.ultraThinMaterial)
+                    )
+                    .overlay(
+                        Capsule().strokeBorder(Theme.Palette.accent.opacity(0.5), lineWidth: 1)
+                    )
             }
+            .buttonStyle(.plain)
+        } else {
+            Menu {
+                Button { showingPhotoPicker = true } label: {
+                    Label("Add Photos", systemImage: "photo.badge.plus")
+                }
+                Button { showingSubfolderCreation = true } label: {
+                    Label("New Subfolder", systemImage: "folder.badge.plus")
+                }
+                Divider()
+                Button {
+                    isEditMode = true
+                } label: {
+                    Label("Select Photos", systemImage: "checkmark.circle")
+                }
+                Divider()
+                Menu("Sort Photos") {
+                    Button { photoSortMode = "custom" } label: {
+                        Label("Manual Order", systemImage: photoSortMode == "custom" ? "checkmark" : "hand.point.up.left")
+                    }
+                    Button { photoSortMode = "alpha" } label: {
+                        Label("By Name", systemImage: photoSortMode == "alpha" ? "checkmark" : "textformat")
+                    }
+                    Button { photoSortMode = "recent" } label: {
+                        Label("Newest First", systemImage: photoSortMode == "recent" ? "checkmark" : "clock")
+                    }
+                }
+            } label: {
+                Image(systemName: "ellipsis")
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(Theme.Palette.text)
+                    .frame(width: 38, height: 38)
+                    .background(Circle().fill(.ultraThinMaterial))
+                    .overlay(Circle().strokeBorder(Theme.Palette.stroke, lineWidth: 1))
+            }
+            .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
         }
     }
 

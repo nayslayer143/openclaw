@@ -147,6 +147,11 @@ final class DataManager: ObservableObject {
         return settings
     }
 
+    /// Persist any in-place mutations to AppSettings.
+    func saveSettings() {
+        try? modelContext.save()
+    }
+
     // MARK: Edit State CRUD
 
     /// Checks if any edit state exists for a given photo ID.
