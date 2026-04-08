@@ -5,5 +5,6 @@ enum SmartAlbumRoute: Hashable {
     case events
     case places
     case faces
+    case projects
     case smartList(id: String, title: String)
 }

@@ -42,9 +42,10 @@ struct SidebarShell: View {
                         }
                         .navigationDestination(for: SmartAlbumRoute.self) { r in
                             switch r {
-                            case .events: EventsView()
-                            case .places: PlacesView()
-                            case .faces:  FacesView()
+                            case .events:   EventsView()
+                            case .places:   PlacesView()
+                            case .faces:    FacesView()
+                            case .projects: ProjectsView()
                             case .smartList(let id, let title):
                                 SmartListView(id: id, title: title)
                             }

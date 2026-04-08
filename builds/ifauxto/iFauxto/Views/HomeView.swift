@@ -85,9 +85,10 @@ struct HomeView: View {
             }
             .navigationDestination(for: SmartAlbumRoute.self) { route in
                 switch route {
-                case .events: EventsView()
-                case .places: PlacesView()
-                case .faces:  FacesView()
+                case .events:   EventsView()
+                case .places:   PlacesView()
+                case .faces:    FacesView()
+                case .projects: ProjectsView()
                 case .smartList(let id, let title):
                     SmartListView(id: id, title: title)
                 }
@@ -320,6 +321,13 @@ struct HomeView: View {
                     route: .faces
                 )
                 divider
+                smartAlbumNavRow(
+                    title: "Projects",
+                    icon: "square.grid.3x3.square",
+                    tint: Color(red: 0.30, green: 0.70, blue: 0.55),
+                    route: .projects
+                )
+                divider
                 smartAlbumRow(
                     title: "Favorites",
                     icon: "heart.fill",
@@ -531,9 +539,10 @@ struct HomeView: View {
             let target = args[idx + 1]
             let route: SmartAlbumRoute? = {
                 switch target {
-                case "events": return .events
-                case "places": return .places
-                case "faces":  return .faces
+                case "events":   return .events
+                case "places":   return .places
+                case "faces":    return .faces
+                case "projects": return .projects
                 default: return nil
                 }
             }()
