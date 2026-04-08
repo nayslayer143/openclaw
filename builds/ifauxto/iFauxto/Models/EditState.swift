@@ -11,7 +11,8 @@ struct EditAdjustments: Codable, Equatable {
     var shadows: Float = 0.0
     var grain: Float = 0.0
     var vignette: Float = 0.0
-
+    /// Quarter-turn rotations clockwise (0-3). Persists across sessions.
+    var rotationQuarterTurns: Int = 0
 }
 
 /// SwiftData model representing non-destructive photo editing state.

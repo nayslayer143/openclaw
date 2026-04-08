@@ -13,7 +13,7 @@ final class DataManager: ObservableObject {
     let isCloudKitEnabled: Bool = false
 
     init(inMemory: Bool = false) throws {
-        let schema = Schema([Folder.self, PhotoReference.self, AppSettings.self, EditState.self])
+        let schema = Schema([Folder.self, PhotoReference.self, AppSettings.self, EditState.self, PhotoMeta.self])
         // cloudKitDatabase: .none prevents SwiftData from auto-enabling CloudKit via entitlements,
         // which would fail model validation (non-optional to-many relationship).
         let config = ModelConfiguration(
@@ -150,6 +150,50 @@ final class DataManager: ObservableObject {
     /// Persist any in-place mutations to AppSettings.
     func saveSettings() {
         try? modelContext.save()
+    }
+
+    // MARK: - PhotoMeta (favorites, ratings, hidden, title, caption)
+
+    func getOrCreateMeta(for assetId: String) -> PhotoMeta {
+        let descriptor = FetchDescriptor<PhotoMeta>(
+            predicate: #Predicate { $0.assetIdentifier == assetId }
+        )
+        if let existing = try? modelContext.fetch(descriptor).first {
+            return existing
+        }
+        let meta = PhotoMeta(assetIdentifier: assetId)
+        modelContext.insert(meta)
+        try? modelContext.save()
+        return meta
+    }
+
+    func metaIfExists(for assetId: String) -> PhotoMeta? {
+        let descriptor = FetchDescriptor<PhotoMeta>(
+            predicate: #Predicate { $0.assetIdentifier == assetId }
+        )
+        return try? modelContext.fetch(descriptor).first
+    }
+
+    func toggleFavorite(for assetId: String) -> Bool {
+        let meta = getOrCreateMeta(for: assetId)
+        meta.isFavorite.toggle()
+        meta.updatedAt = Date()
+        try? modelContext.save()
+        return meta.isFavorite
+    }
+
+    func setRating(_ rating: Int, for assetId: String) {
+        let meta = getOrCreateMeta(for: assetId)
+        meta.rating = max(0, min(5, rating))
+        meta.updatedAt = Date()
+        try? modelContext.save()
+    }
+
+    func favoriteAssetIds() -> [String] {
+        let descriptor = FetchDescriptor<PhotoMeta>(
+            predicate: #Predicate { $0.isFavorite == true }
+        )
+        return ((try? modelContext.fetch(descriptor)) ?? []).map(\.assetIdentifier)
     }
 
     // MARK: Edit State CRUD

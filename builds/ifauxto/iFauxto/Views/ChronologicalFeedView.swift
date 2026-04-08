@@ -4,6 +4,7 @@ import Photos
 struct ChronologicalFeedView: View {
     @EnvironmentObject var photoKitService: PhotoKitService
     @EnvironmentObject var dataManager: DataManager
+    @EnvironmentObject var navCoordinator: NavCoordinator
     @Environment(\.searchService) var searchService
 
     @State private var assetIdentifiers: [String] = []
@@ -26,7 +27,7 @@ struct ChronologicalFeedView: View {
     ]
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $navCoordinator.path) {
             ZStack(alignment: .top) {
                 Theme.Palette.bg.ignoresSafeArea()
 
@@ -94,6 +95,12 @@ struct ChronologicalFeedView: View {
             }
             .animation(Theme.Motion.snappy, value: isSelectMode)
             .navigationBarHidden(true)
+            .navigationDestination(for: PhotoViewerRoute.self) { route in
+                PhotoViewer(photoIds: route.photoIds, startIndex: route.startIndex)
+            }
+            .navigationDestination(for: Folder.self) { folder in
+                FolderView(folder: folder)
+            }
             .sheet(isPresented: $showingSettings) {
                 SettingsView()
             }
@@ -119,6 +126,15 @@ struct ChronologicalFeedView: View {
                 withAnimation(Theme.Motion.soft) {
                     isLoading = false
                 }
+                #if DEBUG
+                if ProcessInfo.processInfo.arguments.contains("-autoOpenPhoto") {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                        navCoordinator.path.append(
+                            PhotoViewerRoute(photoIds: assetIdentifiers, startIndex: 3)
+                        )
+                    }
+                }
+                #endif
             }
         }
     }
@@ -137,20 +153,35 @@ struct ChronologicalFeedView: View {
 
     private var grid: some View {
         LazyVGrid(columns: columns, spacing: 3) {
-            ForEach(assetIdentifiers, id: \.self) { identifier in
-                FeedThumbnailView(
-                    identifier: identifier,
-                    isSelected: selectedIds.contains(identifier),
-                    isSelectMode: isSelectMode
-                )
-                .onTapGesture {
+            ForEach(Array(assetIdentifiers.enumerated()), id: \.element) { index, identifier in
+                Group {
                     if isSelectMode {
-                        Haptics.select()
-                        if selectedIds.contains(identifier) {
-                            selectedIds.remove(identifier)
-                        } else {
-                            selectedIds.insert(identifier)
+                        FeedThumbnailView(
+                            identifier: identifier,
+                            isSelected: selectedIds.contains(identifier),
+                            isSelectMode: true
+                        )
+                        .onTapGesture {
+                            Haptics.select()
+                            if selectedIds.contains(identifier) {
+                                selectedIds.remove(identifier)
+                            } else {
+                                selectedIds.insert(identifier)
+                            }
                         }
+                    } else {
+                        NavigationLink(value: PhotoViewerRoute(
+                            photoIds: assetIdentifiers,
+                            startIndex: index
+                        )) {
+                            FeedThumbnailView(
+                                identifier: identifier,
+                                isSelected: false,
+                                isSelectMode: false
+                            )
+                        }
+                        .buttonStyle(PressableButtonStyle(scale: 0.97))
+                        .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
                     }
                 }
             }

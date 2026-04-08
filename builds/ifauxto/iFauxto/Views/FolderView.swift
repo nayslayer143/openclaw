@@ -53,49 +53,12 @@ struct FolderView: View {
                     // Photos grid
                     if !photos.isEmpty {
                         LazyVGrid(columns: columns, spacing: 2) {
-                        ForEach(displayPhotos) { photo in
-                            PhotoThumbnailView(
-                                photo: photo,
-                                isSelected: selectedPhotoIds.contains(photo.id),
-                                isEditMode: isEditMode
-                            )
-                            .draggable(photo.id) {
-                                PhotoThumbnailView(
-                                    photo: photo,
-                                    isSelected: false,
-                                    isEditMode: false
-                                )
-                                .frame(width: 80, height: 80)
-                                .opacity(0.9)
-                            }
-                            .dropDestination(for: String.self) { items, _ in
-                                guard photoSortMode == "custom" else { return false }
-                                guard let sourceId = items.first, sourceId != photo.id else { return false }
-                                withAnimation(.easeInOut(duration: 0.2)) {
-                                    photos = DragDropManager.reorder(photos, draggedId: sourceId, targetId: photo.id)
-                                }
-                                dataManager.updatePhotoOrder(photos)
-                                return true
-                            }
-                            .onTapGesture {
-                                if isEditMode { toggleSelection(photo.id) }
-                            }
-                            .overlay {
-                                if !isEditMode {
-                                    NavigationLink {
-                                        PhotoViewer(
-                                            photos: photos,
-                                            startIndex: photos.firstIndex(where: { $0.id == photo.id }) ?? 0
-                                        )
-                                    } label: {
-                                        Color.clear
-                                    }
-                                }
+                            ForEach(displayPhotos) { photo in
+                                photoCell(photo)
                             }
                         }
+                        .padding(2)
                     }
-                    .padding(2)
-                }
                 if subfolders.isEmpty && photos.isEmpty {
                     emptyState
                 }
@@ -150,6 +113,45 @@ struct FolderView: View {
             let s = dataManager.getOrCreateSettings()
             s.lastOpenedViewId = folder.id
             dataManager.saveSettings()
+        }
+    }
+
+    // MARK: Photo cell
+
+    @ViewBuilder
+    private func photoCell(_ photo: PhotoReference) -> some View {
+        let thumb = PhotoThumbnailView(
+            photo: photo,
+            isSelected: selectedPhotoIds.contains(photo.id),
+            isEditMode: isEditMode
+        )
+        .draggable(photo.id) {
+            PhotoThumbnailView(photo: photo, isSelected: false, isEditMode: false)
+                .frame(width: 80, height: 80)
+                .opacity(0.9)
+        }
+        .dropDestination(for: String.self) { items, _ in
+            guard photoSortMode == "custom" else { return false }
+            guard let sourceId = items.first, sourceId != photo.id else { return false }
+            withAnimation(.easeInOut(duration: 0.2)) {
+                photos = DragDropManager.reorder(photos, draggedId: sourceId, targetId: photo.id)
+            }
+            dataManager.updatePhotoOrder(photos)
+            return true
+        }
+
+        if isEditMode {
+            thumb
+                .onTapGesture { toggleSelection(photo.id) }
+        } else {
+            NavigationLink(value: PhotoViewerRoute(
+                photoIds: photos.map(\.id),
+                startIndex: photos.firstIndex(where: { $0.id == photo.id }) ?? 0
+            )) {
+                thumb
+            }
+            .buttonStyle(PressableButtonStyle(scale: 0.97))
+            .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
         }
     }
 

@@ -79,6 +79,9 @@ struct HomeView: View {
             .navigationDestination(for: Folder.self) { folder in
                 FolderView(folder: folder)
             }
+            .navigationDestination(for: PhotoViewerRoute.self) { route in
+                PhotoViewer(photoIds: route.photoIds, startIndex: route.startIndex)
+            }
             .environment(\.editMode, $editMode)
             .sheet(isPresented: $showingCreateFolder, onDismiss: loadFolders) {
                 FolderCreationSheet(parentId: nil)
