@@ -115,13 +115,16 @@ struct ChronologicalFeedView: View {
                 }
             }
             .task {
+                let raw: [String]
                 if DemoLibrary.isEnabled {
-                    allIdentifiers = DemoLibrary.identifiers
+                    raw = DemoLibrary.identifiers
                 } else if ProcessInfo.processInfo.arguments.contains("-demoPhotos") {
-                    allIdentifiers = (0..<48).map { "demo:\($0)" }
+                    raw = (0..<48).map { "demo:\($0)" }
                 } else {
-                    allIdentifiers = photoKitService.fetchAllAssetIdentifiers()
+                    raw = photoKitService.fetchAllAssetIdentifiers()
                 }
+                let excluded = dataManager.excludedAssetIdSet()
+                allIdentifiers = raw.filter { !excluded.contains($0) }
                 loadNextPage()
                 withAnimation(Theme.Motion.soft) {
                     isLoading = false
@@ -152,37 +155,18 @@ struct ChronologicalFeedView: View {
     // MARK: - Grid
 
     private var grid: some View {
-        LazyVGrid(columns: columns, spacing: 3) {
-            ForEach(Array(assetIdentifiers.enumerated()), id: \.element) { index, identifier in
-                Group {
-                    if isSelectMode {
-                        FeedThumbnailView(
-                            identifier: identifier,
-                            isSelected: selectedIds.contains(identifier),
-                            isSelectMode: true
-                        )
-                        .onTapGesture {
-                            Haptics.select()
-                            if selectedIds.contains(identifier) {
-                                selectedIds.remove(identifier)
-                            } else {
-                                selectedIds.insert(identifier)
-                            }
+        let groups = PhotoDateGrouper.group(assetIdentifiers)
+        return LazyVStack(spacing: 18, pinnedViews: [.sectionHeaders]) {
+            ForEach(groups) { group in
+                Section {
+                    LazyVGrid(columns: columns, spacing: 3) {
+                        ForEach(group.identifiers, id: \.self) { identifier in
+                            cell(for: identifier)
                         }
-                    } else {
-                        NavigationLink(value: PhotoViewerRoute(
-                            photoIds: assetIdentifiers,
-                            startIndex: index
-                        )) {
-                            FeedThumbnailView(
-                                identifier: identifier,
-                                isSelected: false,
-                                isSelectMode: false
-                            )
-                        }
-                        .buttonStyle(PressableButtonStyle(scale: 0.97))
-                        .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
                     }
+                    .padding(.horizontal, 12)
+                } header: {
+                    eventHeader(group)
                 }
             }
             if loadedCount < allIdentifiers.count {
@@ -191,8 +175,93 @@ struct ChronologicalFeedView: View {
                     .onAppear { loadNextPage() }
             }
         }
-        .padding(.horizontal, 12)
         .padding(.top, 4)
+    }
+
+    private func eventHeader(_ group: PhotoDateGroup) -> some View {
+        HStack {
+            Text(group.title)
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(Theme.Palette.text)
+            Spacer()
+            Text("\(group.identifiers.count)")
+                .font(.system(size: 13, weight: .medium).monospacedDigit())
+                .foregroundStyle(Theme.Palette.textMuted)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .background(Theme.Palette.bg.opacity(0.94))
+        .overlay(
+            Rectangle()
+                .fill(Theme.Palette.divider)
+                .frame(height: 0.5),
+            alignment: .bottom
+        )
+    }
+
+    @ViewBuilder
+    private func cell(for identifier: String) -> some View {
+        if isSelectMode {
+            FeedThumbnailView(
+                identifier: identifier,
+                isSelected: selectedIds.contains(identifier),
+                isSelectMode: true
+            )
+            .onTapGesture {
+                Haptics.select()
+                if selectedIds.contains(identifier) {
+                    selectedIds.remove(identifier)
+                } else {
+                    selectedIds.insert(identifier)
+                }
+            }
+        } else {
+            let startIdx = assetIdentifiers.firstIndex(of: identifier) ?? 0
+            NavigationLink(value: PhotoViewerRoute(
+                photoIds: assetIdentifiers,
+                startIndex: startIdx
+            )) {
+                FeedThumbnailView(
+                    identifier: identifier,
+                    isSelected: false,
+                    isSelectMode: false
+                )
+            }
+            .buttonStyle(PressableButtonStyle(scale: 0.97))
+            .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
+            .contextMenu {
+                photoContextMenu(for: identifier)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func photoContextMenu(for identifier: String) -> some View {
+        let meta = dataManager.metaIfExists(for: identifier)
+        Button {
+            _ = dataManager.toggleFavorite(for: identifier)
+            Haptics.success()
+        } label: {
+            Label(meta?.isFavorite == true ? "Unfavorite" : "Favorite",
+                  systemImage: meta?.isFavorite == true ? "heart.slash" : "heart")
+        }
+        Button {
+            _ = dataManager.toggleHidden(for: identifier)
+            allIdentifiers.removeAll { $0 == identifier }
+            assetIdentifiers.removeAll { $0 == identifier }
+            Haptics.medium()
+        } label: {
+            Label("Hide", systemImage: "eye.slash")
+        }
+        Divider()
+        Button(role: .destructive) {
+            dataManager.moveToTrash(identifier)
+            allIdentifiers.removeAll { $0 == identifier }
+            assetIdentifiers.removeAll { $0 == identifier }
+            Haptics.warning()
+        } label: {
+            Label("Delete", systemImage: "trash")
+        }
     }
 
     // MARK: - Select action bar

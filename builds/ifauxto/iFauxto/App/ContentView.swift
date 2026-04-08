@@ -75,6 +75,19 @@ struct ContentView: View {
         // We do NOT seed folders — they should start empty so the user
         // can build albums by selecting from the photo feed.
         // The flag here just ensures the library is enabled.
+
+        if args.contains("-seedFavorites") {
+            // Pre-favorite a handful of demo photos so the Favorites
+            // smart album has content for screenshot/preview.
+            let toFavorite = (0..<8).map { "demo:travel:\($0 * 5)" }
+            for id in toFavorite {
+                let meta = dm.getOrCreateMeta(for: id)
+                if !meta.isFavorite {
+                    meta.isFavorite = true
+                }
+            }
+            dm.saveSettings()
+        }
         let s = dm.getOrCreateSettings()
         if args.contains("-showOnboarding") {
             // Force the onboarding flow for screenshots.

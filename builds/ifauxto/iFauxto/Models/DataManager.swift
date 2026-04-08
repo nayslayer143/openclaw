@@ -13,7 +13,7 @@ final class DataManager: ObservableObject {
     let isCloudKitEnabled: Bool = false
 
     init(inMemory: Bool = false) throws {
-        let schema = Schema([Folder.self, PhotoReference.self, AppSettings.self, EditState.self, PhotoMeta.self])
+        let schema = Schema([Folder.self, PhotoReference.self, AppSettings.self, EditState.self, PhotoMeta.self, SmartAlbum.self])
         // cloudKitDatabase: .none prevents SwiftData from auto-enabling CloudKit via entitlements,
         // which would fail model validation (non-optional to-many relationship).
         let config = ModelConfiguration(
@@ -191,9 +191,124 @@ final class DataManager: ObservableObject {
 
     func favoriteAssetIds() -> [String] {
         let descriptor = FetchDescriptor<PhotoMeta>(
-            predicate: #Predicate { $0.isFavorite == true }
+            predicate: #Predicate { $0.isFavorite == true && $0.trashedAt == nil }
         )
         return ((try? modelContext.fetch(descriptor)) ?? []).map(\.assetIdentifier)
+    }
+
+    func hiddenAssetIds() -> [String] {
+        let descriptor = FetchDescriptor<PhotoMeta>(
+            predicate: #Predicate { $0.isHidden == true && $0.trashedAt == nil }
+        )
+        return ((try? modelContext.fetch(descriptor)) ?? []).map(\.assetIdentifier)
+    }
+
+    func trashedAssetIds() -> [String] {
+        let descriptor = FetchDescriptor<PhotoMeta>(
+            predicate: #Predicate { $0.trashedAt != nil }
+        )
+        return ((try? modelContext.fetch(descriptor)) ?? []).map(\.assetIdentifier)
+    }
+
+    /// Returns the union of asset IDs that should be filtered out of the
+    /// chronological feed and album grids (hidden + trashed).
+    func excludedAssetIdSet() -> Set<String> {
+        let descriptor = FetchDescriptor<PhotoMeta>(
+            predicate: #Predicate { $0.isHidden == true || $0.trashedAt != nil }
+        )
+        let metas = (try? modelContext.fetch(descriptor)) ?? []
+        return Set(metas.map(\.assetIdentifier))
+    }
+
+    func toggleHidden(for assetId: String) -> Bool {
+        let meta = getOrCreateMeta(for: assetId)
+        meta.isHidden.toggle()
+        meta.updatedAt = Date()
+        try? modelContext.save()
+        return meta.isHidden
+    }
+
+    func moveToTrash(_ assetId: String) {
+        let meta = getOrCreateMeta(for: assetId)
+        meta.trashedAt = Date()
+        meta.updatedAt = Date()
+        try? modelContext.save()
+    }
+
+    func restoreFromTrash(_ assetId: String) {
+        let meta = getOrCreateMeta(for: assetId)
+        meta.trashedAt = nil
+        meta.updatedAt = Date()
+        try? modelContext.save()
+    }
+
+    // MARK: - Smart Albums
+
+    func fetchSmartAlbums() -> [SmartAlbum] {
+        let descriptor = FetchDescriptor<SmartAlbum>(
+            sortBy: [SortDescriptor(\.createdAt, order: .reverse)]
+        )
+        return (try? modelContext.fetch(descriptor)) ?? []
+    }
+
+    @discardableResult
+    func createSmartAlbum(name: String, rules: [SmartRule]) -> SmartAlbum {
+        let album = SmartAlbum(name: name, rules: rules)
+        modelContext.insert(album)
+        try? modelContext.save()
+        return album
+    }
+
+    func deleteSmartAlbum(_ album: SmartAlbum) {
+        modelContext.delete(album)
+        try? modelContext.save()
+    }
+
+    /// Evaluates a smart album's rules against all PhotoMeta + the
+    /// candidate identifier list, returning matching identifiers.
+    func evaluateSmartAlbum(_ album: SmartAlbum, candidates: [String]) -> [String] {
+        guard !album.rules.isEmpty else { return candidates }
+        let metas = Dictionary(
+            uniqueKeysWithValues: candidates.map { ($0, metaIfExists(for: $0)) }
+        )
+        return candidates.filter { id in
+            let meta = metas[id] ?? nil
+            return album.rules.allSatisfy { evaluate(rule: $0, identifier: id, meta: meta) }
+        }
+    }
+
+    private func evaluate(rule: SmartRule, identifier: String, meta: PhotoMeta?) -> Bool {
+        switch rule.field {
+        case .favorite:
+            let v = meta?.isFavorite ?? false
+            return rule.op == .isTrue ? v : !v
+        case .hidden:
+            let v = meta?.isHidden ?? false
+            return rule.op == .isTrue ? v : !v
+        case .rating:
+            let r = meta?.rating ?? 0
+            let target = Int(rule.value) ?? 0
+            switch rule.op {
+            case .equals:  return r == target
+            case .atLeast: return r >= target
+            default:       return false
+            }
+        case .eventBucket:
+            // Match against the synthesized bucket title for the photo.
+            let title = PhotoDateGrouper.group([identifier]).first?.title ?? ""
+            return title.localizedCaseInsensitiveContains(rule.value)
+        }
+    }
+
+    /// Hard-deletes any PhotoMeta whose trashedAt is older than 30 days.
+    func purgeExpiredTrash() {
+        let cutoff = Date().addingTimeInterval(-30 * 24 * 3600)
+        let descriptor = FetchDescriptor<PhotoMeta>(
+            predicate: #Predicate { $0.trashedAt != nil && ($0.trashedAt ?? Date()) < cutoff }
+        )
+        let expired = (try? modelContext.fetch(descriptor)) ?? []
+        for meta in expired { modelContext.delete(meta) }
+        try? modelContext.save()
     }
 
     // MARK: Edit State CRUD

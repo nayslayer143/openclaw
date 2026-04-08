@@ -10,6 +10,7 @@ struct HomeView: View {
     @State private var showingImport = false
     @State private var showingSettings = false
     @State private var showingSearch = false
+    @State private var showingCreateSmartAlbum = false
     @State private var editMode: EditMode = .inactive
     @State private var listAppeared = false
     @Environment(\.searchService) var searchService
@@ -81,6 +82,15 @@ struct HomeView: View {
             }
             .navigationDestination(for: PhotoViewerRoute.self) { route in
                 PhotoViewer(photoIds: route.photoIds, startIndex: route.startIndex)
+            }
+            .navigationDestination(for: SmartAlbumRoute.self) { route in
+                switch route {
+                case .events: EventsView()
+                case .places: PlacesView()
+                case .faces:  FacesView()
+                case .smartList(let id, let title):
+                    SmartListView(id: id, title: title)
+                }
             }
             .environment(\.editMode, $editMode)
             .sheet(isPresented: $showingCreateFolder, onDismiss: loadFolders) {
@@ -161,13 +171,14 @@ struct HomeView: View {
 
     private var folderList: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading, spacing: 18) {
+                smartAlbums
+
                 Text("ALBUMS")
                     .font(.system(size: 12, weight: .regular))
                     .foregroundStyle(Theme.Palette.textMuted)
                     .tracking(0.4)
                     .padding(.horizontal, 32)
-                    .padding(.top, 4)
 
                 VStack(spacing: 0) {
                     ForEach(Array(displayFolders.enumerated()), id: \.element.id) { index, folder in
@@ -268,6 +279,157 @@ struct HomeView: View {
         withAnimation(Theme.Motion.soft) {
             folders = dataManager.fetchFolders(parentId: nil)
         }
+    }
+
+    // MARK: - Smart albums
+
+    private var smartAlbums: some View {
+        let favorites = dataManager.favoriteAssetIds()
+        let hidden = dataManager.hiddenAssetIds()
+        let trashed = dataManager.trashedAssetIds()
+        return VStack(alignment: .leading, spacing: 6) {
+            Text("SMART ALBUMS")
+                .font(.system(size: 12))
+                .foregroundStyle(Theme.Palette.textMuted)
+                .tracking(0.4)
+                .padding(.horizontal, 32)
+                .padding(.top, 4)
+
+            VStack(spacing: 0) {
+                smartAlbumNavRow(
+                    title: "Events",
+                    icon: "calendar",
+                    tint: Color(red: 0.95, green: 0.55, blue: 0.10),
+                    route: .events
+                )
+                divider
+                smartAlbumNavRow(
+                    title: "Places",
+                    icon: "mappin.and.ellipse",
+                    tint: Color(red: 0.20, green: 0.55, blue: 0.95),
+                    route: .places
+                )
+                divider
+                smartAlbumNavRow(
+                    title: "Faces",
+                    icon: "person.crop.square",
+                    tint: Color(red: 0.55, green: 0.40, blue: 0.95),
+                    route: .faces
+                )
+                divider
+                smartAlbumRow(
+                    title: "Favorites",
+                    icon: "heart.fill",
+                    tint: Color(red: 1.0, green: 0.30, blue: 0.30),
+                    ids: favorites
+                )
+                divider
+                smartAlbumRow(
+                    title: "Hidden",
+                    icon: "eye.slash.fill",
+                    tint: Color(red: 0.5, green: 0.5, blue: 0.55),
+                    ids: hidden
+                )
+                divider
+                smartAlbumRow(
+                    title: "Recently Deleted",
+                    icon: "trash.fill",
+                    tint: Color(red: 0.95, green: 0.55, blue: 0.10),
+                    ids: trashed,
+                    subtitle: trashed.isEmpty ? nil : "Auto-purged after 30 days"
+                )
+            }
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Theme.Palette.bgElevated)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(Theme.Palette.stroke, lineWidth: 0.5)
+            )
+            .padding(.horizontal, 16)
+        }
+    }
+
+    private var divider: some View {
+        Rectangle()
+            .fill(Theme.Palette.divider)
+            .frame(height: 0.5)
+            .padding(.leading, 64)
+    }
+
+    /// Row that pushes a SmartAlbumRoute (Events, Places, Faces, etc).
+    private func smartAlbumNavRow(
+        title: String,
+        icon: String,
+        tint: Color,
+        route: SmartAlbumRoute
+    ) -> some View {
+        NavigationLink(value: route) {
+            HStack(spacing: 14) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .fill(tint.opacity(0.15))
+                        .frame(width: 38, height: 38)
+                    Image(systemName: icon)
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(tint)
+                }
+                Text(title)
+                    .font(.system(size: 17))
+                    .foregroundStyle(Theme.Palette.text)
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Theme.Palette.textDim)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(PressableButtonStyle(scale: 0.985))
+        .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
+    }
+
+    private func smartAlbumRow(
+        title: String,
+        icon: String,
+        tint: Color,
+        ids: [String],
+        subtitle: String? = nil
+    ) -> some View {
+        let isEmpty = ids.isEmpty
+        return NavigationLink(value: PhotoViewerRoute(photoIds: ids, startIndex: 0)) {
+            HStack(spacing: 14) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .fill(tint.opacity(0.15))
+                        .frame(width: 38, height: 38)
+                    Image(systemName: icon)
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(tint)
+                }
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(title)
+                        .font(.system(size: 17))
+                        .foregroundStyle(Theme.Palette.text)
+                    Text(subtitle ?? "\(ids.count) \(ids.count == 1 ? "photo" : "photos")")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Theme.Palette.textMuted)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Theme.Palette.textDim)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(PressableButtonStyle(scale: 0.985))
+        .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
+        .disabled(isEmpty)
+        .opacity(isEmpty ? 0.55 : 1)
     }
 
     private func switchToFeed() {

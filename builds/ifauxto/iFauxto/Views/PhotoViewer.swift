@@ -117,10 +117,17 @@ struct PhotoViewer: View {
                 systemName: isFavorite ? "heart.fill" : "heart",
                 tint: isFavorite ? Color(red: 1.0, green: 0.30, blue: 0.30) : .white
             ) { toggleFavorite() }
-            PhotoOverlayButton(systemName: "trash") { /* delete, future */ }
+            PhotoOverlayButton(systemName: "trash") { trashCurrent() }
             Spacer()
         }
         .padding(.bottom, 36)
+    }
+
+    private func trashCurrent() {
+        Haptics.warning()
+        dataManager.moveToTrash(currentId)
+        // Pop back so we don't strand the user on a deleted photo.
+        dismiss()
     }
 }
 

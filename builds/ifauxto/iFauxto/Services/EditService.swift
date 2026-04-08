@@ -8,6 +8,18 @@ final class EditService {
     func applyAdjustments(_ adj: EditAdjustments, to inputImage: CIImage) -> CIImage {
         var image = inputImage
 
+        // Geometry first so subsequent filters operate on the rotated image.
+        let turns = ((adj.rotationQuarterTurns % 4) + 4) % 4
+        if turns > 0 {
+            // Each clockwise turn is -π/2 radians.
+            let radians = -CGFloat(turns) * .pi / 2
+            let transform = CGAffineTransform(rotationAngle: radians)
+            image = image.transformed(by: transform)
+            // Re-anchor to origin so downstream extents are positive.
+            let translate = CGAffineTransform(translationX: -image.extent.origin.x, y: -image.extent.origin.y)
+            image = image.transformed(by: translate)
+        }
+
         if adj.exposure != 0 {
             let filter = CIFilter.exposureAdjust()
             filter.inputImage = image

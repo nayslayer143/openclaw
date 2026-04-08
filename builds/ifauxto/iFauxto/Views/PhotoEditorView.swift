@@ -99,6 +99,7 @@ struct PhotoEditorView: View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(spacing: 14) {
+                    geometrySection
                     sliderRow("Exposure", value: $adjustments.exposure, range: -1...1)
                     sliderRow("Contrast", value: $adjustments.contrast, range: -1...1)
                     sliderRow("Saturation", value: $adjustments.saturation, range: -1...1)
@@ -131,6 +132,40 @@ struct PhotoEditorView: View {
         }
         .frame(height: 320)
         .background(Theme.Palette.bgElevated)
+    }
+
+    private var geometrySection: some View {
+        HStack(spacing: 16) {
+            Text("Geometry")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(Theme.Palette.text)
+            Spacer()
+            Button {
+                Haptics.tap()
+                adjustments.rotationQuarterTurns = ((adjustments.rotationQuarterTurns - 1) % 4 + 4) % 4
+            } label: {
+                Image(systemName: "rotate.left")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(Theme.Palette.accent)
+                    .frame(width: 38, height: 38)
+                    .background(Circle().fill(Theme.Palette.bg))
+                    .overlay(Circle().strokeBorder(Theme.Palette.stroke, lineWidth: 0.5))
+            }
+            .buttonStyle(.plain)
+            Button {
+                Haptics.tap()
+                adjustments.rotationQuarterTurns = (adjustments.rotationQuarterTurns + 1) % 4
+            } label: {
+                Image(systemName: "rotate.right")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(Theme.Palette.accent)
+                    .frame(width: 38, height: 38)
+                    .background(Circle().fill(Theme.Palette.bg))
+                    .overlay(Circle().strokeBorder(Theme.Palette.stroke, lineWidth: 0.5))
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(.bottom, 4)
     }
 
     private func sliderRow(_ label: String, value: Binding<Float>, range: ClosedRange<Float>) -> some View {

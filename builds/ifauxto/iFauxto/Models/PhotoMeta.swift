@@ -11,10 +11,14 @@ final class PhotoMeta {
     var isFavorite: Bool = false
     var rating: Int = 0          // 0..5
     var isHidden: Bool = false
+    /// Soft-delete timestamp. Photos are auto-purged 30 days after this.
+    var trashedAt: Date?
     var title: String = ""
     var caption: String = ""
     var createdAt: Date = Date()
     var updatedAt: Date = Date()
+
+    var isTrashed: Bool { trashedAt != nil }
 
     init(assetIdentifier: String) {
         self.assetIdentifier = assetIdentifier
