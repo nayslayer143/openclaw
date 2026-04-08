@@ -15,43 +15,61 @@ struct PhotoEditorView: View {
     private let editService = EditService()
 
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 0) {
-                previewSection
-                sliderSection
-            }
-            .navigationTitle("Edit")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Save") {
+        VStack(spacing: 0) {
+            // Top bar — same iPhoto chrome as the rest of the app.
+            ZStack {
+                Text("Edit")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(Theme.Palette.text)
+
+                HStack {
+                    Button {
+                        Haptics.tap()
+                        dismiss()
+                    } label: {
+                        Text("Cancel")
+                            .font(.system(size: 17))
+                            .foregroundStyle(Theme.Palette.accent)
+                    }
+                    .buttonStyle(.plain)
+                    Spacer()
+                    Button {
+                        Haptics.success()
                         let dm: DataManager = dataManager
                         dm.saveEditState(photoId: photoIdentifier, adjustments: adjustments)
                         dismiss()
+                    } label: {
+                        Text("Save")
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundStyle(Theme.Palette.accent)
                     }
-                    .fontWeight(.semibold)
+                    .buttonStyle(.plain)
                 }
-                ToolbarItem(placement: .bottomBar) {
-                    Button("Reset") {
-                        adjustments = EditAdjustments()
-                    }
-                    .foregroundColor(.red)
-                }
+                .padding(.horizontal, 16)
             }
-            .task {
-                await loadOriginalImage()
-                let dm: DataManager = dataManager
-                if let existing = dm.fetchEditState(photoId: photoIdentifier) {
-                    adjustments = existing.adjustments
-                }
-                updatePreview()
+            .frame(height: 44)
+            .padding(.top, 8)
+            .padding(.bottom, 6)
+            .background(Theme.Palette.bg)
+            .overlay(
+                Rectangle().fill(Theme.Palette.divider).frame(height: 0.5),
+                alignment: .bottom
+            )
+
+            previewSection
+            sliderSection
+        }
+        .background(Theme.Palette.bg)
+        .task {
+            await loadOriginalImage()
+            let dm: DataManager = dataManager
+            if let existing = dm.fetchEditState(photoId: photoIdentifier) {
+                adjustments = existing.adjustments
             }
-            .onChange(of: adjustments) { _, _ in
-                updatePreview()
-            }
+            updatePreview()
+        }
+        .onChange(of: adjustments) { _, _ in
+            updatePreview()
         }
     }
 
@@ -78,35 +96,57 @@ struct PhotoEditorView: View {
     }
 
     private var sliderSection: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                sliderRow("Exposure", value: $adjustments.exposure, range: -1...1)
-                sliderRow("Contrast", value: $adjustments.contrast, range: -1...1)
-                sliderRow("Saturation", value: $adjustments.saturation, range: -1...1)
-                sliderRow("Temperature", value: $adjustments.temperature, range: -1...1)
-                sliderRow("Highlights", value: $adjustments.highlights, range: -1...1)
-                sliderRow("Shadows", value: $adjustments.shadows, range: -1...1)
-                sliderRow("Grain", value: $adjustments.grain, range: 0...1)
-                sliderRow("Vignette", value: $adjustments.vignette, range: 0...1)
+        VStack(spacing: 0) {
+            ScrollView {
+                VStack(spacing: 14) {
+                    sliderRow("Exposure", value: $adjustments.exposure, range: -1...1)
+                    sliderRow("Contrast", value: $adjustments.contrast, range: -1...1)
+                    sliderRow("Saturation", value: $adjustments.saturation, range: -1...1)
+                    sliderRow("Temperature", value: $adjustments.temperature, range: -1...1)
+                    sliderRow("Highlights", value: $adjustments.highlights, range: -1...1)
+                    sliderRow("Shadows", value: $adjustments.shadows, range: -1...1)
+                    sliderRow("Grain", value: $adjustments.grain, range: 0...1)
+                    sliderRow("Vignette", value: $adjustments.vignette, range: 0...1)
+                }
+                .padding(16)
             }
-            .padding(16)
+            Divider()
+            HStack {
+                Spacer()
+                Button {
+                    Haptics.tap()
+                    withAnimation(Theme.Motion.snappy) {
+                        adjustments = EditAdjustments()
+                    }
+                } label: {
+                    Text("Reset")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(.red)
+                }
+                .buttonStyle(.plain)
+                Spacer()
+            }
+            .padding(.vertical, 12)
+            .background(Theme.Palette.bgElevated)
         }
-        .frame(height: 280)
-        .background(Color(.systemBackground))
+        .frame(height: 320)
+        .background(Theme.Palette.bgElevated)
     }
 
     private func sliderRow(_ label: String, value: Binding<Float>, range: ClosedRange<Float>) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Text(label)
-                    .font(.caption.weight(.medium))
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(Theme.Palette.text)
                 Spacer()
                 Text(String(format: "%.2f", value.wrappedValue))
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: 12))
+                    .foregroundStyle(Theme.Palette.textMuted)
                     .monospacedDigit()
             }
             Slider(value: value, in: range)
+                .tint(Theme.Palette.accent)
         }
     }
 

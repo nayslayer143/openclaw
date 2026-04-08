@@ -269,6 +269,11 @@ struct HomeView: View {
                 showingSettings = true
             }
         }
+        if args.contains("-autoShowSearch") {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                showingSearch = true
+            }
+        }
     }
     #endif
 }

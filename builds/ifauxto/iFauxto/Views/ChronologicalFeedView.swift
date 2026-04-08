@@ -217,7 +217,7 @@ private struct FeedThumbnailView: View {
                         .clipped()
                 } else {
                     Rectangle()
-                        .fill(Theme.Palette.bgCard)
+                        .fill(Color(red: 0.918, green: 0.918, blue: 0.937))
                         .overlay(
                             ProgressView()
                                 .controlSize(.small)
@@ -226,7 +226,7 @@ private struct FeedThumbnailView: View {
                         .frame(width: geo.size.width, height: geo.size.width)
                 }
             }
-            .clipShape(RoundedRectangle(cornerRadius: 4, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 2, style: .continuous))
         }
         .aspectRatio(1, contentMode: .fit)
         .task(id: identifier) {
