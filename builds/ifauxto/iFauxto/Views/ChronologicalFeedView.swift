@@ -21,11 +21,16 @@ struct ChronologicalFeedView: View {
     @State private var showingAlbumPicker = false
 
     private let pageSize = 100
-    private let columns = [
-        GridItem(.flexible(), spacing: 3),
-        GridItem(.flexible(), spacing: 3),
-        GridItem(.flexible(), spacing: 3)
-    ]
+
+    /// How many columns the grid shows. Controlled by pinch — inward
+    /// pinch reduces the count (bigger thumbs), outward pinch increases
+    /// (more thumbs visible). Matches the Photos.app behavior.
+    @AppStorage("iFauxto.feedColumns") private var columnCount: Int = 3
+    @State private var pinchBase: CGFloat = 0
+
+    private var columns: [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: 3), count: max(2, min(8, columnCount)))
+    }
 
     var body: some View {
         NavigationStack(path: $navCoordinator.path) {
@@ -89,6 +94,7 @@ struct ChronologicalFeedView: View {
                     .padding(.bottom, isSelectMode ? 96 : 40)
                 }
                 .scrollIndicators(.hidden)
+                .gesture(pinchGesture)
 
                 // Bottom action bar in select mode
                 if isSelectMode {
@@ -365,6 +371,35 @@ struct ChronologicalFeedView: View {
         let settings = dataManager.getOrCreateSettings()
         settings.homeViewMode = mode
         dataManager.saveSettings()
+    }
+
+    /// Pinch to change column count. Pinching out (scale > 1) spreads
+    /// the grid into more, smaller columns. Pinching in (scale < 1)
+    /// collapses into fewer, bigger columns. Matches Photos.app.
+    private var pinchGesture: some Gesture {
+        MagnificationGesture()
+            .onChanged { value in
+                if pinchBase == 0 { pinchBase = value }
+                let delta = value / max(pinchBase, 0.01)
+                if delta > 1.25 {
+                    // Pinch out — more columns
+                    if columnCount < 8 {
+                        columnCount += 1
+                        Haptics.tap()
+                    }
+                    pinchBase = value
+                } else if delta < 0.8 {
+                    // Pinch in — fewer columns
+                    if columnCount > 2 {
+                        columnCount -= 1
+                        Haptics.tap()
+                    }
+                    pinchBase = value
+                }
+            }
+            .onEnded { _ in
+                pinchBase = 0
+            }
     }
 
     private func loadNextPage() {

@@ -49,9 +49,24 @@ struct iFauxtoApp: App {
                 .onAppear {
                     userSession.bootstrap(dataManager: dataManager)
                     indexingManager.startBackgroundIndexing()
+                    drainShareInboxIfNeeded()
                 }
         }
         .commands { AppCommands() }
+    }
+
+    /// Looks at the shared App Group inbox where the Share Extension drops
+    /// incoming photos, moves them into Documents/Imports/, and stashes the
+    /// resulting identifiers into a "Recents → Shared" folder so the user
+    /// sees them on next launch.
+    private func drainShareInboxIfNeeded() {
+        let incoming = ShareInboxService.drainInbox()
+        guard !incoming.isEmpty else { return }
+        let name = "Shared with iFauxto"
+        let siblings = dataManager.fetchFolders(parentId: nil)
+        let target = siblings.first(where: { $0.name == name })
+            ?? dataManager.createFolder(name: name)
+        dataManager.addPhotos(assetIdentifiers: incoming, to: target)
     }
 }
 

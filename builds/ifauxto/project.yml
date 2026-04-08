@@ -74,6 +74,9 @@ targets:
           UIColorName: LaunchBackground
     dependencies:
       - sdk: libsqlite3.tbd
+      - target: ShareExtension
+        embed: true
+        codeSign: true
     entitlements:
       path: iFauxto/iFauxto.entitlements
       properties:
@@ -84,6 +87,27 @@ targets:
           - iCloud.com.ifauxto.app
         com.apple.developer.applesignin:
           - Default
+        com.apple.security.application-groups:
+          - group.com.ifauxto.shared
+
+  ShareExtension:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: ShareExtension
+        excludes:
+          - "**/.DS_Store"
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.ifauxto.app.ShareExtension
+      DEVELOPMENT_TEAM: ""
+      CODE_SIGN_STYLE: Automatic
+      INFOPLIST_FILE: ShareExtension/Info.plist
+      SKIP_INSTALL: YES
+    entitlements:
+      path: ShareExtension/ShareExtension.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.ifauxto.shared
 
   iFauxtoTests:
     type: bundle.unit-test
