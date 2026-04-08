@@ -171,7 +171,7 @@ struct HomeView: View {
                         NavigationLink(value: folder) {
                             FolderRow(folder: folder)
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(PressableButtonStyle(scale: 0.985))
                         .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
                         .opacity(listAppeared ? 1 : 0)
                         .offset(y: listAppeared ? 0 : 12)

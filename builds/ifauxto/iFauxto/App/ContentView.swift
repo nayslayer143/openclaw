@@ -71,67 +71,10 @@ struct ContentView: View {
                 }
             }
         }
-        // Synthetic photos for visual preview without real PhotoKit access.
-        // Identifiers prefixed with "demo:" render as colored placeholders.
-        // Total: 100 photos at the album level + 44 in nested subalbums.
-        if args.contains("-seedDemoPhotos") {
-            let folders = dm.fetchFolders(parentId: nil)
-
-            // Travel — 30 photos in root + 4 subalbums (Japan/Iceland/Coast/City)
-            if let target = folders.first(where: { $0.name == "Travel" }) ?? folders.first {
-                if dm.fetchPhotos(in: target).isEmpty {
-                    let identifiers = (0..<30).map { "demo:travel:\($0)" }
-                    dm.addPhotos(assetIdentifiers: identifiers, to: target)
-                }
-                let existingSubs = dm.fetchFolders(parentId: target.id)
-                if existingSubs.isEmpty {
-                    let subSpec: [(String, Int)] = [
-                        ("Japan 2026", 8),
-                        ("Iceland", 10),
-                        ("Coast Roadtrip", 12),
-                        ("City Breaks", 14)
-                    ]
-                    for (name, count) in subSpec {
-                        let sub = dm.createFolder(name: name, parentId: target.id)
-                        let ids = (0..<count).map { "demo:sub:\(name):\($0)" }
-                        dm.addPhotos(assetIdentifiers: ids, to: sub)
-                    }
-                }
-            }
-
-            // Family — 18 photos
-            if let family = folders.first(where: { $0.name == "Family" }) {
-                if dm.fetchPhotos(in: family).isEmpty {
-                    let identifiers = (0..<18).map { "demo:family:\($0)" }
-                    dm.addPhotos(assetIdentifiers: identifiers, to: family)
-                }
-            }
-
-            // Screenshots — 16 photos
-            if let screenshots = folders.first(where: { $0.name == "Screenshots" }) {
-                if dm.fetchPhotos(in: screenshots).isEmpty {
-                    let identifiers = (0..<16).map { "demo:screens:\($0)" }
-                    dm.addPhotos(assetIdentifiers: identifiers, to: screenshots)
-                }
-            }
-
-            // Food — 14 photos
-            if let food = folders.first(where: { $0.name == "Food" }) {
-                if dm.fetchPhotos(in: food).isEmpty {
-                    let identifiers = (0..<14).map { "demo:food:\($0)" }
-                    dm.addPhotos(assetIdentifiers: identifiers, to: food)
-                }
-            }
-
-            // Everything Else — 22 photos (the messy bucket to sort)
-            if let misc = folders.first(where: { $0.name == "Everything Else" }) {
-                if dm.fetchPhotos(in: misc).isEmpty {
-                    let identifiers = (0..<22).map { "demo:misc:\($0)" }
-                    dm.addPhotos(assetIdentifiers: identifiers, to: misc)
-                }
-            }
-            // Grand total at root: 30 + 18 + 16 + 14 + 22 = 100. Plus 44 in subalbums.
-        }
+        // The synthetic library lives in DemoLibrary (100 photos).
+        // We do NOT seed folders — they should start empty so the user
+        // can build albums by selecting from the photo feed.
+        // The flag here just ensures the library is enabled.
         let s = dm.getOrCreateSettings()
         if args.contains("-showOnboarding") {
             // Force the onboarding flow for screenshots.

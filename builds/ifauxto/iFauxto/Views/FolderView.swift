@@ -183,8 +183,7 @@ struct FolderView: View {
                             .padding(8)
                             .contentShape(Rectangle())
                         }
-                        .buttonStyle(.plain)
-                        .pressScale()
+                        .buttonStyle(PressableButtonStyle())
                         .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
                     }
                 }

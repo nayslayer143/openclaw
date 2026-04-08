@@ -172,8 +172,7 @@ struct FolderPickerSheet: View {
                             .padding(.vertical, 10)
                             .contentShape(Rectangle())
                         }
-                        .buttonStyle(.plain)
-                        .pressScale(0.985)
+                        .buttonStyle(PressableButtonStyle(scale: 0.985))
 
                         if index < displayFolders.count - 1 {
                             Rectangle()

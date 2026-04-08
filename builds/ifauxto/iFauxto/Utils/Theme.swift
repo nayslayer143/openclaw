@@ -72,28 +72,23 @@ enum Theme {
 
 // MARK: - Interaction modifiers
 
-/// Adds a brief inward scale on press — gives any view a "pressable" feel
-/// without wrapping it in a Button. Use on rows, cells, cards.
-struct PressScale: ViewModifier {
+/// Press-feedback ButtonStyle — scales on `isPressed` without consuming
+/// taps the way `.onLongPressGesture` would. Use on NavigationLink and
+/// Button by passing it to `.buttonStyle(...)`.
+struct PressableButtonStyle: ButtonStyle {
     var scale: CGFloat = 0.97
-    @State private var pressed = false
-    func body(content: Content) -> some View {
-        content
-            .scaleEffect(pressed ? scale : 1)
-            .animation(Theme.Motion.instant, value: pressed)
-            .onLongPressGesture(
-                minimumDuration: 0,
-                maximumDistance: .infinity,
-                pressing: { pressed = $0 },
-                perform: {}
-            )
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? scale : 1)
+            .animation(Theme.Motion.instant, value: configuration.isPressed)
     }
 }
 
 extension View {
-    func pressScale(_ scale: CGFloat = 0.97) -> some View {
-        modifier(PressScale(scale: scale))
-    }
+    /// Legacy alias kept so existing call sites still compile.
+    /// On non-Button content this is a no-op — wrap with a Button or
+    /// NavigationLink + `.buttonStyle(PressableButtonStyle())` instead.
+    func pressScale(_ scale: CGFloat = 0.97) -> some View { self }
 
     func brandBackground() -> some View {
         self.background(Theme.Palette.bg.ignoresSafeArea())
