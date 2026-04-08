@@ -9,6 +9,22 @@ struct PhotoThumbnailView: View {
     @EnvironmentObject var dataManager: DataManager
     @State private var thumbnail: UIImage?
 
+    private var isDemo: Bool { photo.id.hasPrefix("demo:") }
+
+    private var demoColor: Color {
+        let palette: [Color] = [
+            Color(red: 0.84, green: 0.86, blue: 0.91),
+            Color(red: 0.95, green: 0.85, blue: 0.71),
+            Color(red: 0.74, green: 0.86, blue: 0.78),
+            Color(red: 0.92, green: 0.79, blue: 0.84),
+            Color(red: 0.78, green: 0.83, blue: 0.92),
+            Color(red: 0.89, green: 0.91, blue: 0.74),
+            Color(red: 0.95, green: 0.81, blue: 0.67),
+            Color(red: 0.81, green: 0.78, blue: 0.92)
+        ]
+        return palette[abs(photo.id.hashValue) % palette.count]
+    }
+
     var body: some View {
         GeometryReader { geo in
             ZStack(alignment: .topTrailing) {
@@ -34,6 +50,7 @@ struct PhotoThumbnailView: View {
         .aspectRatio(1, contentMode: .fit)
         .animation(.easeInOut(duration: 0.15), value: isSelected)
         .task(id: photo.id) {
+            guard !isDemo else { return }
             thumbnail = await photoKitService.loadThumbnail(
                 for: photo.id,
                 targetSize: CGSize(width: 300, height: 300)
@@ -43,7 +60,28 @@ struct PhotoThumbnailView: View {
 
     @ViewBuilder
     private var thumbnailImage: some View {
-        if let img = thumbnail {
+        if isDemo {
+            ZStack {
+                LinearGradient(
+                    colors: [demoColor, demoColor.opacity(0.7)],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                Image(systemName: "photo")
+                    .font(.system(size: 22, weight: .light))
+                    .foregroundStyle(.white.opacity(0.65))
+            }
+            .overlay(
+                isSelected ? Color.black.opacity(0.28) : Color.clear
+            )
+            .overlay(
+                Rectangle()
+                    .strokeBorder(
+                        isSelected ? Theme.Palette.accent : Color.clear,
+                        lineWidth: 3
+                    )
+            )
+        } else if let img = thumbnail {
             Image(uiImage: img)
                 .resizable()
                 .scaledToFill()

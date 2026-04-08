@@ -8,6 +8,8 @@ final class AppSettings {
     var lastOpenedViewId: String?
     var pinnedViewId: String?
     var hasCompletedOnboarding: Bool = false
+    /// Sort mode for the root folder list. "custom" | "alpha" | "date" | "recent"
+    var rootFolderSortMode: String = "custom"
 
     init() {
         self.id = "singleton"

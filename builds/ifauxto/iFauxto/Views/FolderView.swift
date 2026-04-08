@@ -16,7 +16,14 @@ struct FolderView: View {
     @State private var showingPhotoPicker = false
     @State private var showingMoveSheet = false
     @State private var showingSubfolderCreation = false
-    @State private var photoSortMode: String = "custom"
+
+    /// Bound to the Folder model so the sort survives launches.
+    private var photoSortMode: String { folder.sortMode }
+    private func setPhotoSortMode(_ mode: String) {
+        Haptics.select()
+        folder.sortMode = mode
+        try? dataManager.modelContext.save()
+    }
 
     private var displayPhotos: [PhotoReference] {
         switch photoSortMode {
@@ -136,7 +143,14 @@ struct FolderView: View {
         .sheet(isPresented: $showingSubfolderCreation, onDismiss: loadContent) {
             FolderCreationSheet(parentId: folder.id)
         }
-        .onAppear(perform: loadContent)
+        .onAppear {
+            loadContent()
+            // Track this folder as the most recently opened — the
+            // "Last Opened" home mode reads this on next launch.
+            let s = dataManager.getOrCreateSettings()
+            s.lastOpenedViewId = folder.id
+            dataManager.saveSettings()
+        }
     }
 
     // MARK: Subfolders section
@@ -246,13 +260,13 @@ struct FolderView: View {
                 }
                 Divider()
                 Menu("Sort Photos") {
-                    Button { photoSortMode = "custom" } label: {
+                    Button { setPhotoSortMode("custom") } label: {
                         Label("Manual Order", systemImage: photoSortMode == "custom" ? "checkmark" : "hand.point.up.left")
                     }
-                    Button { photoSortMode = "alpha" } label: {
+                    Button { setPhotoSortMode("alpha") } label: {
                         Label("By Name", systemImage: photoSortMode == "alpha" ? "checkmark" : "textformat")
                     }
-                    Button { photoSortMode = "recent" } label: {
+                    Button { setPhotoSortMode("recent") } label: {
                         Label("Newest First", systemImage: photoSortMode == "recent" ? "checkmark" : "clock")
                     }
                 }

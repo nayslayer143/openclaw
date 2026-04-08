@@ -10,10 +10,22 @@ struct HomeView: View {
     @State private var showingImport = false
     @State private var showingSettings = false
     @State private var showingSearch = false
-    @State private var folderSortMode: String = "custom"
     @State private var editMode: EditMode = .inactive
     @State private var listAppeared = false
     @Environment(\.searchService) var searchService
+
+    /// Sort mode is stored on AppSettings so it survives launches.
+    private var folderSortMode: String {
+        dataManager.getOrCreateSettings().rootFolderSortMode
+    }
+
+    private func setFolderSortMode(_ mode: String) {
+        Haptics.select()
+        let s = dataManager.getOrCreateSettings()
+        s.rootFolderSortMode = mode
+        dataManager.saveSettings()
+        loadFolders()
+    }
 
     private var displayFolders: [Folder] {
         switch folderSortMode {
@@ -105,16 +117,16 @@ struct HomeView: View {
 
     private var sortMenu: some View {
         Menu {
-            Button { folderSortMode = "custom" } label: {
+            Button { setFolderSortMode("custom") } label: {
                 Label("Manual Order", systemImage: folderSortMode == "custom" ? "checkmark" : "hand.point.up.left")
             }
-            Button { folderSortMode = "alpha" } label: {
+            Button { setFolderSortMode("alpha") } label: {
                 Label("Alphabetical", systemImage: folderSortMode == "alpha" ? "checkmark" : "textformat")
             }
-            Button { folderSortMode = "date" } label: {
+            Button { setFolderSortMode("date") } label: {
                 Label("Date Created", systemImage: folderSortMode == "date" ? "checkmark" : "calendar")
             }
-            Button { folderSortMode = "recent" } label: {
+            Button { setFolderSortMode("recent") } label: {
                 Label("Most Recent", systemImage: folderSortMode == "recent" ? "checkmark" : "clock")
             }
             Divider()
