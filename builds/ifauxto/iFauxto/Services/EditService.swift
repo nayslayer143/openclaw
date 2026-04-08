@@ -20,6 +20,21 @@ final class EditService {
             image = image.transformed(by: translate)
         }
 
+        // Crop after rotation so the normalized rect maps onto the
+        // rotated image extents.
+        if adj.hasCustomCrop {
+            let extent = image.extent
+            let cropRect = CGRect(
+                x: extent.origin.x + extent.width * adj.cropOriginX,
+                y: extent.origin.y + extent.height * (1 - adj.cropOriginY - adj.cropHeight),
+                width: extent.width * adj.cropWidth,
+                height: extent.height * adj.cropHeight
+            )
+            image = image.cropped(to: cropRect)
+            let reset = CGAffineTransform(translationX: -image.extent.origin.x, y: -image.extent.origin.y)
+            image = image.transformed(by: reset)
+        }
+
         if adj.exposure != 0 {
             let filter = CIFilter.exposureAdjust()
             filter.inputImage = image

@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import Photos
+import UIKit
 
 struct ContentView: View {
     @EnvironmentObject var dataManager: DataManager
@@ -114,15 +115,21 @@ struct ContentView: View {
 
     @ViewBuilder
     private var mainView: some View {
-        switch settings.homeViewMode {
-        case "chronological_feed":
-            ChronologicalFeedView()
-        case "last_opened":
-            LastOpenedRouter(modeKey: "last_opened")
-        case "custom_view":
-            LastOpenedRouter(modeKey: "custom_view")
-        default:
-            HomeView()
+        // On iPad / Mac the sidebar shell takes over and ignores the
+        // chosen home mode (sidebar is always the entry surface).
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            SidebarShell()
+        } else {
+            switch settings.homeViewMode {
+            case "chronological_feed":
+                ChronologicalFeedView()
+            case "last_opened":
+                LastOpenedRouter(modeKey: "last_opened")
+            case "custom_view":
+                LastOpenedRouter(modeKey: "custom_view")
+            default:
+                HomeView()
+            }
         }
     }
 }

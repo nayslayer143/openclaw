@@ -13,6 +13,7 @@ struct ChronologicalFeedView: View {
     @State private var loadedCount = 0
     @State private var showingSettings = false
     @State private var showingSearch = false
+    @State private var showingSlideshow = false
 
     // Selection mode — pick photos from the feed and add them to an album.
     @State private var isSelectMode = false
@@ -53,6 +54,9 @@ struct ChronologicalFeedView: View {
                                 } else {
                                     GlassIconButton(systemName: "gearshape") {
                                         showingSettings = true
+                                    }
+                                    GlassIconButton(systemName: "play.rectangle") {
+                                        showingSlideshow = true
                                     }
                                     GlassIconButton(systemName: "checkmark.circle") {
                                         Haptics.tap()
@@ -113,6 +117,9 @@ struct ChronologicalFeedView: View {
                 AlbumPickerSheet { folder in
                     addSelectedToFolder(folder)
                 }
+            }
+            .fullScreenCover(isPresented: $showingSlideshow) {
+                SlideshowView(photoIds: assetIdentifiers)
             }
             .task {
                 let raw: [String]

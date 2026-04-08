@@ -8,18 +8,21 @@ final class DataManager: ObservableObject {
 
     // MARK: Init
 
-    // CloudKit sync disabled pending entitlements setup.
-    // Model is CloudKit-compatible: all relationships optional ([PhotoReference]?).
-    let isCloudKitEnabled: Bool = false
+    /// CloudKit sync is enabled when the build has the
+    /// `com.apple.developer.icloud-services` entitlement and a valid
+    /// container identifier. The Info.plist key `iFauxtoCloudKitEnabled`
+    /// flips it on. Defaults off so unsigned dev builds don't crash.
+    let isCloudKitEnabled: Bool
 
     init(inMemory: Bool = false) throws {
-        let schema = Schema([Folder.self, PhotoReference.self, AppSettings.self, EditState.self, PhotoMeta.self, SmartAlbum.self])
-        // cloudKitDatabase: .none prevents SwiftData from auto-enabling CloudKit via entitlements,
-        // which would fail model validation (non-optional to-many relationship).
+        let cloudEnabled = (Bundle.main.object(forInfoDictionaryKey: "iFauxtoCloudKitEnabled") as? Bool) ?? false
+        self.isCloudKitEnabled = cloudEnabled
+
+        let schema = Schema([Folder.self, PhotoReference.self, AppSettings.self, EditState.self, PhotoMeta.self, SmartAlbum.self, PhotoProject.self])
         let config = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: inMemory,
-            cloudKitDatabase: .none
+            cloudKitDatabase: cloudEnabled ? .automatic : .none
         )
         modelContainer = try ModelContainer(for: schema, configurations: [config])
         modelContext = modelContainer.mainContext
@@ -189,6 +192,20 @@ final class DataManager: ObservableObject {
         try? modelContext.save()
     }
 
+    func setTitle(_ title: String, for assetId: String) {
+        let meta = getOrCreateMeta(for: assetId)
+        meta.title = title
+        meta.updatedAt = Date()
+        try? modelContext.save()
+    }
+
+    func setCaption(_ caption: String, for assetId: String) {
+        let meta = getOrCreateMeta(for: assetId)
+        meta.caption = caption
+        meta.updatedAt = Date()
+        try? modelContext.save()
+    }
+
     func favoriteAssetIds() -> [String] {
         let descriptor = FetchDescriptor<PhotoMeta>(
             predicate: #Predicate { $0.isFavorite == true && $0.trashedAt == nil }
@@ -300,14 +317,38 @@ final class DataManager: ObservableObject {
         }
     }
 
+    // MARK: - Projects (collage / book / card / calendar)
+
+    func fetchProjects() -> [PhotoProject] {
+        let descriptor = FetchDescriptor<PhotoProject>(
+            sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
+        )
+        return (try? modelContext.fetch(descriptor)) ?? []
+    }
+
+    @discardableResult
+    func createProject(name: String, type: ProjectType, photoIds: [String] = []) -> PhotoProject {
+        let project = PhotoProject(name: name, type: type, photoIds: photoIds)
+        modelContext.insert(project)
+        try? modelContext.save()
+        return project
+    }
+
+    func deleteProject(_ project: PhotoProject) {
+        modelContext.delete(project)
+        try? modelContext.save()
+    }
+
     /// Hard-deletes any PhotoMeta whose trashedAt is older than 30 days.
     func purgeExpiredTrash() {
         let cutoff = Date().addingTimeInterval(-30 * 24 * 3600)
         let descriptor = FetchDescriptor<PhotoMeta>(
-            predicate: #Predicate { $0.trashedAt != nil && ($0.trashedAt ?? Date()) < cutoff }
+            predicate: #Predicate { $0.trashedAt != nil }
         )
-        let expired = (try? modelContext.fetch(descriptor)) ?? []
-        for meta in expired { modelContext.delete(meta) }
+        let trashed = (try? modelContext.fetch(descriptor)) ?? []
+        for meta in trashed where (meta.trashedAt ?? Date()) < cutoff {
+            modelContext.delete(meta)
+        }
         try? modelContext.save()
     }
 

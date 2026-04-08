@@ -13,6 +13,10 @@ struct PhotoInfoSheet: View {
     @State private var isLoading = true
     @State private var rating: Int = 0
     @State private var isFavorite: Bool = false
+    @State private var title: String = ""
+    @State private var caption: String = ""
+    @FocusState private var titleFocused: Bool
+    @FocusState private var captionFocused: Bool
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -39,6 +43,8 @@ struct PhotoInfoSheet: View {
             let meta = dataManager.metaIfExists(for: identifier)
             rating = meta?.rating ?? 0
             isFavorite = meta?.isFavorite ?? false
+            title = meta?.title ?? ""
+            caption = meta?.caption ?? ""
             isLoading = false
         }
     }
@@ -81,6 +87,7 @@ struct PhotoInfoSheet: View {
     private func content(for info: PhotoMetadata) -> some View {
         VStack(spacing: 18) {
             ratingCard
+            titleCaptionCard
 
             section(title: "FILE") {
                 row("Dimensions", info.dimensions ?? "—")
@@ -119,6 +126,63 @@ struct PhotoInfoSheet: View {
         }
         .padding(.horizontal, 20)
         .padding(.bottom, 40)
+    }
+
+    /// Editable title + caption.
+    private var titleCaptionCard: some View {
+        VStack(spacing: 0) {
+            HStack {
+                Image(systemName: "textformat")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Theme.Palette.textMuted)
+                    .frame(width: 22)
+                TextField("Add a title", text: $title)
+                    .font(.system(size: 15, weight: .semibold))
+                    .focused($titleFocused)
+                    .submitLabel(.done)
+                    .onSubmit { commitTitle() }
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+
+            Rectangle().fill(Theme.Palette.divider).frame(height: 0.5).padding(.leading, 36)
+
+            HStack(alignment: .top) {
+                Image(systemName: "text.alignleft")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Theme.Palette.textMuted)
+                    .frame(width: 22)
+                    .padding(.top, 4)
+                TextField("Add a caption", text: $caption, axis: .vertical)
+                    .font(.system(size: 14))
+                    .focused($captionFocused)
+                    .lineLimit(1...4)
+                    .onChange(of: captionFocused) { _, focused in
+                        if !focused { commitCaption() }
+                    }
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Theme.Palette.bgElevated)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .strokeBorder(Theme.Palette.stroke, lineWidth: 0.5)
+        )
+        .onChange(of: titleFocused) { _, focused in
+            if !focused { commitTitle() }
+        }
+    }
+
+    private func commitTitle() {
+        dataManager.setTitle(title, for: identifier)
+    }
+
+    private func commitCaption() {
+        dataManager.setCaption(caption, for: identifier)
     }
 
     /// Star rating + favorite toggle in one card.

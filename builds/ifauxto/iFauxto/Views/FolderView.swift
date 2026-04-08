@@ -16,6 +16,8 @@ struct FolderView: View {
     @State private var showingPhotoPicker = false
     @State private var showingMoveSheet = false
     @State private var showingSubfolderCreation = false
+    @State private var showingSlideshow = false
+    @State private var showingFilesImport = false
 
     /// Bound to the Folder model so the sort survives launches.
     private var photoSortMode: String { folder.sortMode }
@@ -105,6 +107,20 @@ struct FolderView: View {
         }
         .sheet(isPresented: $showingSubfolderCreation, onDismiss: loadContent) {
             FolderCreationSheet(parentId: folder.id)
+        }
+        .fullScreenCover(isPresented: $showingSlideshow) {
+            SlideshowView(photoIds: photos.map(\.id))
+        }
+        .sheet(isPresented: $showingFilesImport) {
+            FilesImporterView { urls in
+                let identifiers = FilesImportService.importFiles(urls)
+                if !identifiers.isEmpty {
+                    dataManager.addPhotos(assetIdentifiers: identifiers, to: folder)
+                    Haptics.success()
+                    loadContent()
+                }
+            }
+            .presentationDetents([.height(120)])
         }
         .onAppear {
             loadContent()
@@ -250,6 +266,9 @@ struct FolderView: View {
                 Button { showingPhotoPicker = true } label: {
                     Label("Add Photos", systemImage: "photo.badge.plus")
                 }
+                Button { showingFilesImport = true } label: {
+                    Label("Import from Files", systemImage: "doc.badge.plus")
+                }
                 Button { showingSubfolderCreation = true } label: {
                     Label("New Subfolder", systemImage: "folder.badge.plus")
                 }
@@ -265,6 +284,12 @@ struct FolderView: View {
                     Label(isPinnedAsHome ? "Unpin as Home" : "Pin as Home",
                           systemImage: isPinnedAsHome ? "pin.slash.fill" : "pin.fill")
                 }
+                Button {
+                    showingSlideshow = true
+                } label: {
+                    Label("Play Slideshow", systemImage: "play.rectangle.fill")
+                }
+                .disabled(photos.isEmpty)
                 Divider()
                 Menu("Sort Photos") {
                     Button { setPhotoSortMode("custom") } label: {

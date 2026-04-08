@@ -13,6 +13,15 @@ struct EditAdjustments: Codable, Equatable {
     var vignette: Float = 0.0
     /// Quarter-turn rotations clockwise (0-3). Persists across sessions.
     var rotationQuarterTurns: Int = 0
+    /// Normalized crop rectangle in 0..1 space. Default is full image.
+    var cropOriginX: CGFloat = 0
+    var cropOriginY: CGFloat = 0
+    var cropWidth: CGFloat = 1
+    var cropHeight: CGFloat = 1
+
+    var hasCustomCrop: Bool {
+        cropOriginX > 0.001 || cropOriginY > 0.001 || cropWidth < 0.999 || cropHeight < 0.999
+    }
 }
 
 /// SwiftData model representing non-destructive photo editing state.

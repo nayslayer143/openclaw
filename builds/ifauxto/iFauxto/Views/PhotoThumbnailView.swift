@@ -10,6 +10,7 @@ struct PhotoThumbnailView: View {
     @State private var thumbnail: UIImage?
 
     private var isDemo: Bool { photo.id.hasPrefix("demo:") }
+    private var isFileURL: Bool { photo.id.hasPrefix("file://") }
 
     private var demoColor: Color {
         DemoPalette.color(for: photo.id)
@@ -43,12 +44,30 @@ struct PhotoThumbnailView: View {
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
                         .padding(6)
                 }
+
+                if !isDemo && photoKitService.isVideo(identifier: photo.id) {
+                    Image(systemName: "play.fill")
+                        .font(.system(size: 10, weight: .bold))
+                        .foregroundStyle(.white)
+                        .padding(5)
+                        .background(Circle().fill(Color.black.opacity(0.55)))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                        .padding(6)
+                }
             }
         }
         .aspectRatio(1, contentMode: .fit)
         .animation(.easeInOut(duration: 0.15), value: isSelected)
         .task(id: photo.id) {
             guard !isDemo else { return }
+            if isFileURL {
+                if let url = URL(string: photo.id),
+                   let data = try? Data(contentsOf: url),
+                   let img = UIImage(data: data) {
+                    thumbnail = img
+                }
+                return
+            }
             thumbnail = await photoKitService.loadThumbnail(
                 for: photo.id,
                 targetSize: CGSize(width: 300, height: 300)

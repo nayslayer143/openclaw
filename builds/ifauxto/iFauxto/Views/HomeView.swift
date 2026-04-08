@@ -99,6 +99,9 @@ struct HomeView: View {
             .sheet(isPresented: $showingSettings) {
                 SettingsView()
             }
+            .sheet(isPresented: $showingCreateSmartAlbum, onDismiss: { loadFolders() }) {
+                CreateSmartAlbumSheet()
+            }
             .sheet(isPresented: $showingSearch) {
                 if let service = searchService {
                     SearchView(searchService: service)
@@ -338,6 +341,47 @@ struct HomeView: View {
                     ids: trashed,
                     subtitle: trashed.isEmpty ? nil : "Auto-purged after 30 days"
                 )
+
+                let savedSmartAlbums = dataManager.fetchSmartAlbums()
+                if !savedSmartAlbums.isEmpty {
+                    divider
+                    ForEach(savedSmartAlbums) { album in
+                        smartAlbumNavRow(
+                            title: album.name,
+                            icon: "rectangle.dashed",
+                            tint: Color(red: 0.40, green: 0.65, blue: 0.40),
+                            route: .smartList(id: album.id, title: album.name)
+                        )
+                        if album.id != savedSmartAlbums.last?.id {
+                            divider
+                        }
+                    }
+                }
+
+                divider
+                Button {
+                    Haptics.tap()
+                    showingCreateSmartAlbum = true
+                } label: {
+                    HStack(spacing: 14) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                .fill(Theme.Palette.accent.opacity(0.15))
+                                .frame(width: 38, height: 38)
+                            Image(systemName: "plus")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundStyle(Theme.Palette.accent)
+                        }
+                        Text("New Smart Album")
+                            .font(.system(size: 17))
+                            .foregroundStyle(Theme.Palette.accent)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 10)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
             }
             .background(
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -481,6 +525,22 @@ struct HomeView: View {
         if args.contains("-autoShowImport") {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 showingImport = true
+            }
+        }
+        if let idx = args.firstIndex(of: "-openSmart"), idx + 1 < args.count {
+            let target = args[idx + 1]
+            let route: SmartAlbumRoute? = {
+                switch target {
+                case "events": return .events
+                case "places": return .places
+                case "faces":  return .faces
+                default: return nil
+                }
+            }()
+            if let route {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                    navCoordinator.path.append(route)
+                }
             }
         }
     }

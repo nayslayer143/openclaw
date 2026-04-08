@@ -38,6 +38,36 @@ struct SettingsView: View {
                         }
                     }
 
+                    section(title: "iCloud", subtitle: dataManager.isCloudKitEnabled
+                            ? "Albums and metadata sync via iCloud."
+                            : "Sync is off. Sign in with an Apple Developer account and flip iFauxtoCloudKitEnabled to enable.") {
+                        HStack(spacing: 14) {
+                            Image(systemName: dataManager.isCloudKitEnabled ? "icloud.fill" : "icloud.slash")
+                                .font(.system(size: 18, weight: .semibold))
+                                .foregroundStyle(dataManager.isCloudKitEnabled ? Theme.Palette.accent : Theme.Palette.textMuted)
+                                .frame(width: 28)
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("iCloud Sync")
+                                    .font(.system(size: 15, weight: .semibold))
+                                    .foregroundStyle(Theme.Palette.text)
+                                Text(dataManager.isCloudKitEnabled ? "Enabled" : "Off")
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(Theme.Palette.textMuted)
+                            }
+                            Spacer()
+                        }
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .fill(.ultraThinMaterial)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .strokeBorder(Theme.Palette.stroke, lineWidth: 1)
+                        )
+                    }
+
                     section(title: "About", subtitle: nil) {
                         VStack(alignment: .leading, spacing: 6) {
                             Text("iFauxto v1.0")

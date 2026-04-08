@@ -75,14 +75,41 @@ final class PhotoKitService: ObservableObject {
         }
     }
 
+    /// Returns true if the asset is a video.
+    func isVideo(identifier: String) -> Bool {
+        guard let asset = fetchAsset(withIdentifier: identifier) else { return false }
+        return asset.mediaType == .video
+    }
+
+    /// Loads an AVPlayerItem for a video asset, async/await wrapped.
+    func loadPlayerItem(for identifier: String) async -> AVPlayerItem? {
+        guard let asset = fetchAsset(withIdentifier: identifier),
+              asset.mediaType == .video else { return nil }
+        return await withCheckedContinuation { continuation in
+            let options = PHVideoRequestOptions()
+            options.deliveryMode = .automatic
+            options.isNetworkAccessAllowed = true
+            PHImageManager.default().requestPlayerItem(
+                forVideo: asset,
+                options: options
+            ) { item, _ in
+                continuation.resume(returning: item)
+            }
+        }
+    }
+
     /// Fetches all PHAsset identifiers from the user's library (for the photo picker flow).
+    /// Includes both images and videos.
     func fetchAllAssetIdentifiers() -> [String] {
         let fetchOptions = PHFetchOptions()
         fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-        let result = PHAsset.fetchAssets(with: .image, options: fetchOptions)
+        // .image OR .video — leave mediaType filter off to include both.
+        let result = PHAsset.fetchAssets(with: fetchOptions)
         var identifiers: [String] = []
         result.enumerateObjects { asset, _, _ in
-            identifiers.append(asset.localIdentifier)
+            if asset.mediaType == .image || asset.mediaType == .video {
+                identifiers.append(asset.localIdentifier)
+            }
         }
         return identifiers
     }

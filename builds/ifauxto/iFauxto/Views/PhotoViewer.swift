@@ -1,6 +1,7 @@
 import SwiftUI
 import Photos
 import CoreLocation
+import AVKit
 
 struct PhotoViewer: View {
     let photoIds: [String]
@@ -131,12 +132,14 @@ struct PhotoViewer: View {
     }
 }
 
-// MARK: - Full photo view (zoomable)
+// MARK: - Full photo view (zoomable, video-aware)
 
 private struct FullPhotoView: View {
     let identifier: String
     @EnvironmentObject var photoKitService: PhotoKitService
     @State private var image: UIImage?
+    @State private var playerItem: AVPlayerItem?
+    @State private var isVideo: Bool = false
 
     @State private var scale: CGFloat = 1
     @State private var lastScale: CGFloat = 1
@@ -144,12 +147,16 @@ private struct FullPhotoView: View {
     @State private var lastOffset: CGSize = .zero
 
     private var isDemo: Bool { identifier.hasPrefix("demo:") }
+    private var isDemoVideo: Bool { identifier.hasPrefix("demo:video:") }
 
     var body: some View {
         GeometryReader { geo in
             Group {
                 if isDemo {
                     demoArt
+                        .frame(width: geo.size.width, height: geo.size.height)
+                } else if isVideo, let item = playerItem {
+                    VideoPlayer(player: AVPlayer(playerItem: item))
                         .frame(width: geo.size.width, height: geo.size.height)
                 } else if let img = image {
                     Image(uiImage: img)
@@ -183,7 +190,14 @@ private struct FullPhotoView: View {
         }
         .task(id: identifier) {
             guard !isDemo else { return }
-            image = await photoKitService.loadFullImage(for: identifier)
+            if photoKitService.isVideo(identifier: identifier) {
+                isVideo = true
+                playerItem = await photoKitService.loadPlayerItem(for: identifier)
+            } else {
+                isVideo = false
+                playerItem = nil
+                image = await photoKitService.loadFullImage(for: identifier)
+            }
         }
         .onChange(of: identifier) { _, _ in
             // Reset zoom when swiping to a new photo.
