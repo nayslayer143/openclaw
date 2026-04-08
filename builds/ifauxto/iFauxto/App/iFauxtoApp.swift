@@ -39,7 +39,7 @@ struct iFauxtoApp: App {
                 .environmentObject(navCoordinator)
                 .environment(\.searchService, searchService)
                 .modelContainer(dataManager.modelContainer)
-                .preferredColorScheme(.dark)
+                .preferredColorScheme(.light)
                 .onAppear {
                     indexingManager.startBackgroundIndexing()
                 }

@@ -5,6 +5,7 @@ struct PhotoViewer: View {
     let startIndex: Int
 
     @EnvironmentObject var photoKitService: PhotoKitService
+    @EnvironmentObject var navCoordinator: NavCoordinator
     @Environment(\.dismiss) var dismiss
     @State private var currentIndex: Int
     @State private var showingEditor = false
@@ -26,34 +27,32 @@ struct PhotoViewer: View {
         .background(Color.black)
         .ignoresSafeArea()
         .toolbar(.hidden, for: .navigationBar)
-        .overlay(alignment: .topLeading) {
-            Button {
-                dismiss()
-            } label: {
-                Image(systemName: "xmark.circle.fill")
-                    .font(.title)
-                    .foregroundStyle(.white, .black.opacity(0.5))
-                    .padding(16)
+        .overlay(alignment: .top) {
+            HStack(spacing: 10) {
+                GlassIconButton(systemName: "chevron.left") {
+                    dismiss()
+                }
+                GlassIconButton(systemName: "house.fill") {
+                    navCoordinator.popToRoot()
+                }
+                Spacer()
+                Text("\(currentIndex + 1) / \(photos.count)")
+                    .font(Theme.Font.mono(13, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .background(Capsule().fill(.ultraThinMaterial))
+                    .overlay(Capsule().strokeBorder(Theme.Palette.stroke, lineWidth: 1))
+                Spacer()
+                GlassIconButton(systemName: "slider.horizontal.3") {
+                    showingEditor = true
+                }
             }
-        }
-        .overlay(alignment: .topTrailing) {
-            Button {
-                showingEditor = true
-            } label: {
-                Image(systemName: "slider.horizontal.3")
-                    .font(.title2)
-                    .foregroundStyle(.white, .black.opacity(0.5))
-                    .padding(16)
-            }
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
         }
         .sheet(isPresented: $showingEditor) {
             PhotoEditorView(photoIdentifier: photos[currentIndex].id)
-        }
-        .overlay(alignment: .bottom) {
-            Text("\(currentIndex + 1) / \(photos.count)")
-                .font(.caption)
-                .foregroundStyle(.white.opacity(0.7))
-                .padding(.bottom, 20)
         }
         .onAppear { currentIndex = startIndex }
     }

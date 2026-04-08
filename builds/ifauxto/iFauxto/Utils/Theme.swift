@@ -1,43 +1,48 @@
 import SwiftUI
 
-/// iFauxto brand system. Playful, slightly anti-Apple, unmistakable.
-/// Dark-first. Sharp typography. Warm accent. Glass materials.
+/// iFauxto theme — modeled directly on iPhoto.
+/// Light backgrounds, San Francisco type, system blue accent, Apple-yellow folders.
 enum Theme {
 
     // MARK: - Color
 
     enum Palette {
-        /// Near-black with a warm tint — not Apple's cold #000
-        static let bg           = Color(red: 0.055, green: 0.055, blue: 0.063)
-        static let bgElevated   = Color(red: 0.094, green: 0.094, blue: 0.106)
-        static let bgCard       = Color(red: 0.125, green: 0.125, blue: 0.137)
+        /// iOS grouped-list background — what iPhoto / Photos.app sit on.
+        static let bg           = Color(red: 0.949, green: 0.949, blue: 0.969)   // #F2F2F7
+        /// Card / list-cell background.
+        static let bgElevated   = Color.white
+        static let bgCard       = Color.white
 
-        /// Warm off-white text — reduces eye strain vs pure white
-        static let text         = Color(red: 0.965, green: 0.961, blue: 0.949)
-        static let textMuted    = Color(red: 0.608, green: 0.604, blue: 0.588)
-        static let textDim      = Color(red: 0.408, green: 0.404, blue: 0.388)
+        static let text         = Color(red: 0.110, green: 0.110, blue: 0.118)   // #1C1C1E
+        static let textMuted    = Color(red: 0.557, green: 0.557, blue: 0.576)   // #8E8E93
+        static let textDim      = Color(red: 0.780, green: 0.780, blue: 0.800)
 
-        /// Tangerine — the anti-Apple-blue.
-        static let accent       = Color(red: 1.000, green: 0.463, blue: 0.118)
-        static let accentSoft   = Color(red: 1.000, green: 0.580, blue: 0.290)
-        static let accentGlow   = Color(red: 1.000, green: 0.463, blue: 0.118).opacity(0.35)
+        /// Apple system blue — iPhoto's selection / link / action color.
+        static let accent       = Color(red: 0.000, green: 0.478, blue: 1.000)   // #007AFF
+        static let accentSoft   = Color(red: 0.357, green: 0.612, blue: 1.000)
+        static let accentGlow   = Color(red: 0.000, green: 0.478, blue: 1.000).opacity(0.18)
 
-        static let divider      = Color.white.opacity(0.06)
-        static let stroke       = Color.white.opacity(0.10)
+        /// Apple Finder / iPhoto folder yellow.
+        static let folder       = Color(red: 1.000, green: 0.831, blue: 0.310)   // #FFD44F
+        static let folderEdge   = Color(red: 0.918, green: 0.733, blue: 0.184)
+
+        static let divider      = Color(red: 0.847, green: 0.847, blue: 0.859)   // #D8D8DB
+        static let stroke       = Color.black.opacity(0.08)
     }
 
-    // MARK: - Typography
+    // MARK: - Typography (San Francisco only — no serif)
 
-    /// Serif display face for brand moments. Falls back to rounded sans elsewhere.
     enum Font {
-        static func display(_ size: CGFloat, weight: SwiftUI.Font.Weight = .black) -> SwiftUI.Font {
-            .system(size: size, weight: weight, design: .serif)
+        /// Large titles, exactly like iOS navigation .large titles.
+        static func display(_ size: CGFloat, weight: SwiftUI.Font.Weight = .bold) -> SwiftUI.Font {
+            .system(size: size, weight: weight, design: .default)
         }
-        static func title(_ size: CGFloat, weight: SwiftUI.Font.Weight = .bold) -> SwiftUI.Font {
-            .system(size: size, weight: weight, design: .rounded)
+        /// Body/control labels.
+        static func title(_ size: CGFloat, weight: SwiftUI.Font.Weight = .semibold) -> SwiftUI.Font {
+            .system(size: size, weight: weight, design: .default)
         }
         static func body(_ size: CGFloat = 16, weight: SwiftUI.Font.Weight = .regular) -> SwiftUI.Font {
-            .system(size: size, weight: weight, design: .rounded)
+            .system(size: size, weight: weight, design: .default)
         }
         static func mono(_ size: CGFloat = 12, weight: SwiftUI.Font.Weight = .medium) -> SwiftUI.Font {
             .system(size: size, weight: weight, design: .monospaced)
@@ -47,56 +52,50 @@ enum Theme {
     // MARK: - Motion
 
     enum Motion {
-        static let snappy    = Animation.spring(response: 0.32, dampingFraction: 0.72)
-        static let bouncy    = Animation.spring(response: 0.45, dampingFraction: 0.68)
-        static let soft      = Animation.spring(response: 0.55, dampingFraction: 0.82)
+        static let snappy    = Animation.spring(response: 0.32, dampingFraction: 0.78)
+        static let bouncy    = Animation.spring(response: 0.45, dampingFraction: 0.72)
+        static let soft      = Animation.spring(response: 0.55, dampingFraction: 0.86)
         static let instant   = Animation.interactiveSpring(response: 0.22, dampingFraction: 0.86)
     }
 
     // MARK: - Shape
 
     enum Radius {
-        static let s: CGFloat  = 10
-        static let m: CGFloat  = 16
-        static let l: CGFloat  = 22
-        static let xl: CGFloat = 32
+        static let s: CGFloat  = 8
+        static let m: CGFloat  = 12
+        static let l: CGFloat  = 14
+        static let xl: CGFloat = 18
     }
 }
 
 // MARK: - View modifiers
 
 extension View {
-    /// Applies the app's base background.
     func brandBackground() -> some View {
         self.background(Theme.Palette.bg.ignoresSafeArea())
     }
 
-    /// Elevated glass card — translucent, stroked, shadowed.
-    func glassCard(radius: CGFloat = Theme.Radius.l, stroke: Bool = true) -> some View {
+    /// White card with hairline divider stroke and a soft drop shadow —
+    /// the iPhoto / Photos.app cell look.
+    func iphotoCard(radius: CGFloat = Theme.Radius.l) -> some View {
         self
             .background(
                 RoundedRectangle(cornerRadius: radius, style: .continuous)
-                    .fill(.ultraThinMaterial)
-            )
-            .overlay {
-                if stroke {
-                    RoundedRectangle(cornerRadius: radius, style: .continuous)
-                        .strokeBorder(Theme.Palette.stroke, lineWidth: 1)
-                }
-            }
-            .shadow(color: .black.opacity(0.35), radius: 18, x: 0, y: 10)
-    }
-
-    /// Solid elevated card with hairline stroke.
-    func elevatedCard(radius: CGFloat = Theme.Radius.l) -> some View {
-        self
-            .background(
-                RoundedRectangle(cornerRadius: radius, style: .continuous)
-                    .fill(Theme.Palette.bgCard)
+                    .fill(Theme.Palette.bgElevated)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: radius, style: .continuous)
-                    .strokeBorder(Theme.Palette.stroke, lineWidth: 1)
+                    .strokeBorder(Theme.Palette.stroke, lineWidth: 0.5)
             )
+            .shadow(color: .black.opacity(0.06), radius: 6, x: 0, y: 2)
+    }
+
+    /// Legacy alias used by earlier views — same as iphotoCard now.
+    func glassCard(radius: CGFloat = Theme.Radius.l, stroke: Bool = true) -> some View {
+        iphotoCard(radius: radius)
+    }
+
+    func elevatedCard(radius: CGFloat = Theme.Radius.l) -> some View {
+        iphotoCard(radius: radius)
     }
 }

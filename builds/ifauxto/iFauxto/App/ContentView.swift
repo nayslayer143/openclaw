@@ -15,38 +15,58 @@ struct ContentView: View {
 
     var body: some View {
         Group {
-            if !hasCheckedAuth {
-                ZStack {
-                    Theme.Palette.bg.ignoresSafeArea()
-                    ProgressView()
-                        .controlSize(.large)
-                        .tint(Theme.Palette.accent)
-                }
-                .task { await checkAuthorization() }
-            } else if photoKitService.isAuthorized {
-                if showOnboarding {
-                    OnboardingView {
-                        withAnimation(Theme.Motion.soft) {
-                            showOnboarding = false
-                        }
+            if showOnboarding {
+                OnboardingView {
+                    withAnimation(Theme.Motion.soft) {
+                        showOnboarding = false
                     }
-                    .transition(.opacity)
-                } else {
-                    mainView
-                        .transition(.opacity.combined(with: .scale(scale: 0.98)))
                 }
+                .transition(.opacity)
             } else {
-                PhotoPermissionView {
-                    Task { await photoKitService.requestAuthorization() }
-                }
+                mainView
+                    .transition(.opacity.combined(with: .scale(scale: 0.98)))
             }
         }
         .animation(Theme.Motion.soft, value: showOnboarding)
         .animation(Theme.Motion.soft, value: settings.homeViewMode)
-        .onChange(of: photoKitService.authorizationStatus) { _, _ in
+        .task {
+            // Photo permission is requested lazily from views that actually
+            // need it (chronological feed, import, photo picker) — not here.
+            let dm: DataManager = dataManager
+            #if DEBUG
+            seedDebugDataIfNeeded(dm)
+            #endif
+            if !dm.getOrCreateSettings().hasCompletedOnboarding {
+                withAnimation(Theme.Motion.soft) {
+                    showOnboarding = true
+                }
+            }
             hasCheckedAuth = true
         }
     }
+
+    #if DEBUG
+    @MainActor
+    private func seedDebugDataIfNeeded(_ dm: DataManager) {
+        let args = ProcessInfo.processInfo.arguments
+        let existing = dm.fetchFolders(parentId: nil)
+        if existing.isEmpty {
+            let names = ["Travel", "Family", "Screenshots", "Food", "Everything Else"]
+            for name in names {
+                dm.createFolder(name: name)
+            }
+        }
+        let s = dm.getOrCreateSettings()
+        if args.contains("-showOnboarding") {
+            // Force the onboarding flow for screenshots.
+            s.hasCompletedOnboarding = false
+            dm.saveSettings()
+        } else if !s.hasCompletedOnboarding {
+            s.hasCompletedOnboarding = true
+            dm.saveSettings()
+        }
+    }
+    #endif
 
     @ViewBuilder
     private var mainView: some View {
@@ -54,17 +74,6 @@ struct ContentView: View {
             ChronologicalFeedView()
         } else {
             HomeView()
-        }
-    }
-
-    private func checkAuthorization() async {
-        if photoKitService.authorizationStatus == .notDetermined {
-            await photoKitService.requestAuthorization()
-        }
-        hasCheckedAuth = true
-        let dm: DataManager = dataManager
-        if !dm.getOrCreateSettings().hasCompletedOnboarding {
-            showOnboarding = true
         }
     }
 }

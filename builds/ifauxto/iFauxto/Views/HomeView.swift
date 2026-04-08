@@ -31,15 +31,14 @@ struct HomeView: View {
         NavigationStack(path: $navCoordinator.path) {
             ZStack {
                 Theme.Palette.bg.ignoresSafeArea()
-                ambientGlow
 
                 VStack(spacing: 0) {
                     BrandHeader(
                         title: "iFauxto",
                         subtitle: "Your photos. Your order."
                     ) {
-                        HStack(spacing: 10) {
-                            GlassIconButton(systemName: "gearshape.fill") {
+                        HStack(spacing: 2) {
+                            GlassIconButton(systemName: "gearshape") {
                                 showingSettings = true
                             }
                             sortMenu
@@ -49,11 +48,9 @@ struct HomeView: View {
                         }
                     }
 
-                    HeroSearchField(placeholder: "Find anything. Instantly.") {
+                    HeroSearchField(placeholder: "Search photos") {
                         showingSearch = true
                     }
-                    .padding(.top, 4)
-                    .padding(.bottom, 18)
 
                     if folders.isEmpty {
                         emptyState
@@ -89,27 +86,10 @@ struct HomeView: View {
                 seedDemoFoldersIfEmpty()
                 #endif
                 loadFolders()
+                #if DEBUG
+                autoNavigateForScreenshot()
+                #endif
             }
-        }
-    }
-
-    // MARK: - Ambient glow
-
-    private var ambientGlow: some View {
-        GeometryReader { geo in
-            Circle()
-                .fill(
-                    RadialGradient(
-                        colors: [Theme.Palette.accent.opacity(0.22), .clear],
-                        center: .center,
-                        startRadius: 0,
-                        endRadius: 280
-                    )
-                )
-                .frame(width: 520, height: 520)
-                .position(x: geo.size.width * 0.85, y: 80)
-                .blur(radius: 40)
-                .allowsHitTesting(false)
         }
     }
 
@@ -146,32 +126,51 @@ struct HomeView: View {
             }
         } label: {
             Image(systemName: "arrow.up.arrow.down")
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(Theme.Palette.text)
-                .frame(width: 38, height: 38)
-                .background(Circle().fill(.ultraThinMaterial))
-                .overlay(Circle().strokeBorder(Theme.Palette.stroke, lineWidth: 1))
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(Theme.Palette.accent)
+                .frame(width: 34, height: 34)
+                .contentShape(Rectangle())
         }
+        .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
     }
 
     // MARK: - Folder list
 
     private var folderList: some View {
         ScrollView {
-            LazyVStack(spacing: 12) {
-                ForEach(Array(displayFolders.enumerated()), id: \.element.id) { index, folder in
-                    NavigationLink(value: folder) {
-                        FolderCard(folder: folder, accentIndex: index)
+            VStack(alignment: .leading, spacing: 6) {
+                Text("ALBUMS")
+                    .font(.system(size: 12, weight: .regular))
+                    .foregroundStyle(Theme.Palette.textMuted)
+                    .tracking(0.4)
+                    .padding(.horizontal, 32)
+                    .padding(.top, 4)
+
+                VStack(spacing: 0) {
+                    ForEach(Array(displayFolders.enumerated()), id: \.element.id) { index, folder in
+                        NavigationLink(value: folder) {
+                            FolderRow(folder: folder)
+                        }
+                        .buttonStyle(.plain)
+                        .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
+                        if index < displayFolders.count - 1 {
+                            Rectangle()
+                                .fill(Theme.Palette.divider)
+                                .frame(height: 0.5)
+                                .padding(.leading, 64)
+                        }
                     }
-                    .buttonStyle(.plain)
-                    .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
-                    .transition(.asymmetric(
-                        insertion: .scale(scale: 0.9).combined(with: .opacity),
-                        removal: .opacity
-                    ))
                 }
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(Theme.Palette.bgElevated)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .strokeBorder(Theme.Palette.stroke, lineWidth: 0.5)
+                )
+                .padding(.horizontal, 16)
             }
-            .padding(.horizontal, 20)
             .padding(.bottom, 40)
             .animation(Theme.Motion.soft, value: folders.count)
         }
@@ -180,74 +179,53 @@ struct HomeView: View {
     // MARK: - Empty state
 
     private var emptyState: some View {
-        VStack(spacing: 22) {
+        VStack(spacing: 18) {
             Spacer(minLength: 40)
 
-            ZStack {
-                Circle()
-                    .fill(Theme.Palette.accent.opacity(0.12))
-                    .frame(width: 140, height: 140)
-                    .blur(radius: 20)
-                Image(systemName: "folder.badge.plus")
-                    .font(.system(size: 54, weight: .light))
-                    .foregroundStyle(Theme.Palette.accent)
-                    .symbolRenderingMode(.hierarchical)
-            }
+            Image(systemName: "folder.badge.plus")
+                .font(.system(size: 64, weight: .light))
+                .foregroundStyle(Theme.Palette.folder)
+                .symbolRenderingMode(.hierarchical)
 
-            VStack(spacing: 8) {
-                Text("A clean slate")
-                    .font(Theme.Font.display(28))
+            VStack(spacing: 6) {
+                Text("No Albums Yet")
+                    .font(.system(size: 22, weight: .semibold))
                     .foregroundStyle(Theme.Palette.text)
-                Text("Import your albums, or start a folder.\nNothing auto-shuffles. Ever.")
-                    .font(Theme.Font.body(15))
+                Text("Import your photo library or create an album to get started.")
+                    .font(.system(size: 15))
                     .foregroundStyle(Theme.Palette.textMuted)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 32)
+                    .padding(.horizontal, 40)
             }
 
-            VStack(spacing: 10) {
+            VStack(spacing: 12) {
                 Button {
                     Haptics.medium()
                     showingImport = true
                 } label: {
-                    HStack {
-                        Image(systemName: "square.and.arrow.down.on.square.fill")
-                        Text("Import from Photos")
-                    }
-                    .font(Theme.Font.body(16, weight: .bold))
-                    .foregroundStyle(Color.black)
-                    .frame(maxWidth: 280)
-                    .padding(.vertical, 14)
-                    .background(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .fill(Theme.Palette.accent)
-                    )
-                    .shadow(color: Theme.Palette.accentGlow, radius: 18, x: 0, y: 8)
+                    Text("Import from Photos")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .frame(maxWidth: 260)
+                        .padding(.vertical, 13)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .fill(Theme.Palette.accent)
+                        )
                 }
+                .buttonStyle(.plain)
 
                 Button {
                     Haptics.tap()
                     showingCreateFolder = true
                 } label: {
-                    HStack {
-                        Image(systemName: "folder.badge.plus")
-                        Text("Create Folder")
-                    }
-                    .font(Theme.Font.body(16, weight: .semibold))
-                    .foregroundStyle(Theme.Palette.text)
-                    .frame(maxWidth: 280)
-                    .padding(.vertical, 14)
-                    .background(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .fill(.ultraThinMaterial)
-                    )
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 14, style: .continuous)
-                            .strokeBorder(Theme.Palette.stroke, lineWidth: 1)
-                    )
+                    Text("Create Album")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(Theme.Palette.accent)
                 }
+                .buttonStyle(.plain)
             }
-            .padding(.top, 4)
+            .padding(.top, 6)
 
             Spacer()
         }
@@ -271,73 +249,70 @@ struct HomeView: View {
             dataManager.createFolder(name: name)
         }
     }
+
+    /// Allows screenshots of nested screens by passing launch args.
+    /// Examples:
+    ///   `... -autoPushFolder Travel`
+    ///   `... -autoShowSettings`
+    private func autoNavigateForScreenshot() {
+        let args = ProcessInfo.processInfo.arguments
+        if let idx = args.firstIndex(of: "-autoPushFolder"), idx + 1 < args.count {
+            let target = args[idx + 1]
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                if let folder = folders.first(where: { $0.name == target }) {
+                    navCoordinator.path.append(folder)
+                }
+            }
+        }
+        if args.contains("-autoShowSettings") {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                showingSettings = true
+            }
+        }
+    }
     #endif
 }
 
-// MARK: - FolderCard
+// MARK: - FolderRow
 
-private struct FolderCard: View {
+/// Single grouped-list row. Yellow Apple folder icon, name, count, chevron.
+private struct FolderRow: View {
     let folder: Folder
-    let accentIndex: Int
     @State private var isPressed = false
 
     private var photoCount: Int {
         (folder.photoReferences ?? []).count
     }
 
-    private var accent: Color {
-        let colors: [Color] = [
-            Theme.Palette.accent,
-            Color(red: 0.43, green: 0.78, blue: 0.98),
-            Color(red: 0.62, green: 0.42, blue: 0.94),
-            Color(red: 0.98, green: 0.75, blue: 0.31),
-            Color(red: 0.40, green: 0.84, blue: 0.55)
-        ]
-        return colors[accentIndex % colors.count]
-    }
-
     var body: some View {
         HStack(spacing: 14) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .fill(accent.opacity(0.18))
-                    .frame(width: 56, height: 56)
-                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                    .strokeBorder(accent.opacity(0.45), lineWidth: 1)
-                    .frame(width: 56, height: 56)
-                Image(systemName: "folder.fill")
-                    .font(.system(size: 22, weight: .regular))
-                    .foregroundStyle(accent)
-            }
+            // Filled yellow folder, exactly like Finder/iPhoto
+            Image(systemName: "folder.fill")
+                .font(.system(size: 30, weight: .regular))
+                .foregroundStyle(Theme.Palette.folder)
+                .shadow(color: Theme.Palette.folderEdge.opacity(0.5), radius: 0.5, x: 0, y: 0.5)
+                .frame(width: 38, height: 38)
 
-            VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 1) {
                 Text(folder.name)
-                    .font(Theme.Font.title(17, weight: .semibold))
+                    .font(.system(size: 17))
                     .foregroundStyle(Theme.Palette.text)
                     .lineLimit(1)
                 Text("\(photoCount) \(photoCount == 1 ? "photo" : "photos")")
-                    .font(Theme.Font.body(12, weight: .medium))
+                    .font(.system(size: 13))
                     .foregroundStyle(Theme.Palette.textMuted)
             }
 
             Spacer()
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 13, weight: .bold))
+                .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(Theme.Palette.textDim)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 14)
-        .background(
-            RoundedRectangle(cornerRadius: Theme.Radius.l, style: .continuous)
-                .fill(.ultraThinMaterial)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: Theme.Radius.l, style: .continuous)
-                .strokeBorder(Theme.Palette.stroke, lineWidth: 1)
-        )
-        .scaleEffect(isPressed ? 0.97 : 1)
-        .animation(Theme.Motion.instant, value: isPressed)
+        .padding(.vertical, 10)
+        .contentShape(Rectangle())
+        .background(isPressed ? Color.black.opacity(0.04) : .clear)
         .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity,
                             pressing: { pressing in isPressed = pressing },
                             perform: {})

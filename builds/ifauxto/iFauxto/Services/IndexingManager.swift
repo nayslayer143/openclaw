@@ -22,6 +22,11 @@ final class IndexingManager: ObservableObject {
 
     func startBackgroundIndexing() {
         guard indexingTask == nil else { return }
+        // Only run indexing if the user has already granted Photos access.
+        // Never trigger the permission prompt from here — that's up to
+        // the views that actually need it (Import, ChronologicalFeed, etc.).
+        let status = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+        guard status == .authorized || status == .limited else { return }
         indexingTask = Task.detached(priority: .utility) { [weak self] in
             await self?.runIndexing()
         }
