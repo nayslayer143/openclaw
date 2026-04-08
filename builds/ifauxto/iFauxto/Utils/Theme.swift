@@ -70,7 +70,31 @@ enum Theme {
 
 // MARK: - View modifiers
 
+// MARK: - Interaction modifiers
+
+/// Adds a brief inward scale on press — gives any view a "pressable" feel
+/// without wrapping it in a Button. Use on rows, cells, cards.
+struct PressScale: ViewModifier {
+    var scale: CGFloat = 0.97
+    @State private var pressed = false
+    func body(content: Content) -> some View {
+        content
+            .scaleEffect(pressed ? scale : 1)
+            .animation(Theme.Motion.instant, value: pressed)
+            .onLongPressGesture(
+                minimumDuration: 0,
+                maximumDistance: .infinity,
+                pressing: { pressed = $0 },
+                perform: {}
+            )
+    }
+}
+
 extension View {
+    func pressScale(_ scale: CGFloat = 0.97) -> some View {
+        modifier(PressScale(scale: scale))
+    }
+
     func brandBackground() -> some View {
         self.background(Theme.Palette.bg.ignoresSafeArea())
     }

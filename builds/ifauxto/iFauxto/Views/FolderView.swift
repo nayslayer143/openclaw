@@ -143,35 +143,44 @@ struct FolderView: View {
 
     private var subfolderSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Folders")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 16)
-                .padding(.top, 12)
+            Text("ALBUMS")
+                .font(.system(size: 12))
+                .foregroundStyle(Theme.Palette.textMuted)
+                .tracking(0.4)
+                .padding(.horizontal, 24)
+                .padding(.top, 8)
+
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 12) {
+                HStack(spacing: 14) {
                     ForEach(subfolders) { sub in
-                        NavigationLink {
-                            FolderView(folder: sub)
-                        } label: {
-                            VStack(spacing: 6) {
+                        NavigationLink(value: sub) {
+                            VStack(spacing: 8) {
                                 Image(systemName: "folder.fill")
-                                    .font(.system(size: 36))
-                                    .foregroundStyle(.yellow)
+                                    .font(.system(size: 44, weight: .regular))
+                                    .foregroundStyle(Theme.Palette.folder)
+                                    .shadow(color: Theme.Palette.folderEdge.opacity(0.5), radius: 0.5, x: 0, y: 0.5)
                                 Text(sub.name)
-                                    .font(.caption)
+                                    .font(.system(size: 12))
+                                    .foregroundStyle(Theme.Palette.text)
                                     .lineLimit(2)
                                     .multilineTextAlignment(.center)
-                                    .frame(width: 72)
+                                    .frame(width: 78)
                             }
+                            .padding(8)
+                            .contentShape(Rectangle())
                         }
-                        .foregroundStyle(.primary)
+                        .buttonStyle(.plain)
+                        .pressScale()
+                        .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
                     }
                 }
                 .padding(.horizontal, 16)
-                .padding(.bottom, 12)
+                .padding(.bottom, 14)
             }
-            Divider()
+
+            Rectangle()
+                .fill(Theme.Palette.divider)
+                .frame(height: 0.5)
         }
     }
 
@@ -179,18 +188,23 @@ struct FolderView: View {
 
     private var emptyState: some View {
         VStack(spacing: 16) {
-            Image(systemName: "photo.on.rectangle")
-                .font(.system(size: 48))
-                .foregroundStyle(.secondary)
-            Text("Empty Folder")
-                .font(.title3.weight(.medium))
+            Spacer(minLength: 80)
+            Image(systemName: "photo.on.rectangle.angled")
+                .font(.system(size: 56, weight: .light))
+                .foregroundStyle(Theme.Palette.textDim)
+                .symbolRenderingMode(.hierarchical)
+            Text("Empty Album")
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundStyle(Theme.Palette.text)
             Text("Tap ··· to add photos or create a subfolder.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                .font(.system(size: 14))
+                .foregroundStyle(Theme.Palette.textMuted)
                 .multilineTextAlignment(.center)
+                .padding(.horizontal, 40)
+            Spacer()
         }
         .frame(maxWidth: .infinity)
-        .padding(.top, 80)
+        .padding(.top, 20)
     }
 
     // MARK: Brand menu

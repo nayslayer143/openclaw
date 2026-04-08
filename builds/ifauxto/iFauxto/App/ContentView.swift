@@ -65,6 +65,18 @@ struct ContentView: View {
             s.hasCompletedOnboarding = true
             dm.saveSettings()
         }
+        if args.contains("-mode") {
+            if let idx = args.firstIndex(of: "-mode"), idx + 1 < args.count {
+                let mode = args[idx + 1]
+                if mode == "chrono" || mode == "chronological" {
+                    s.homeViewMode = "chronological_feed"
+                    dm.saveSettings()
+                } else if mode == "folders" {
+                    s.homeViewMode = "folder_list"
+                    dm.saveSettings()
+                }
+            }
+        }
     }
     #endif
 

@@ -9,34 +9,34 @@ struct PhotoThumbnailView: View {
     @EnvironmentObject var dataManager: DataManager
     @State private var thumbnail: UIImage?
 
-    private let size: CGFloat = 120
-
     var body: some View {
-        ZStack(alignment: .topTrailing) {
-            thumbnailImage
-                .frame(width: size, height: size)
-                .clipped()
-                .contentShape(Rectangle())
+        GeometryReader { geo in
+            ZStack(alignment: .topTrailing) {
+                thumbnailImage
+                    .frame(width: geo.size.width, height: geo.size.width)
+                    .clipped()
+                    .contentShape(Rectangle())
 
-            if isEditMode {
-                selectionIndicator
-                    .padding(4)
-            }
-
-            if !isEditMode && dataManager.hasEdits(photoId: photo.id) {
-                Image(systemName: "slider.horizontal.3")
-                    .font(.caption2)
-                    .padding(4)
-                    .background(.ultraThinMaterial, in: Circle())
-                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
-                    .padding(4)
+                if isEditMode {
+                    selectionIndicator
+                        .padding(6)
+                } else if dataManager.hasEdits(photoId: photo.id) {
+                    Image(systemName: "slider.horizontal.3")
+                        .font(.system(size: 9, weight: .semibold))
+                        .foregroundStyle(.white)
+                        .padding(5)
+                        .background(Circle().fill(Color.black.opacity(0.55)))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
+                        .padding(6)
+                }
             }
         }
+        .aspectRatio(1, contentMode: .fit)
         .animation(.easeInOut(duration: 0.15), value: isSelected)
         .task(id: photo.id) {
             thumbnail = await photoKitService.loadThumbnail(
                 for: photo.id,
-                targetSize: CGSize(width: size * 2, height: size * 2)
+                targetSize: CGSize(width: 300, height: 300)
             )
         }
     }
@@ -49,24 +49,38 @@ struct PhotoThumbnailView: View {
                 .scaledToFill()
                 .overlay(
                     isSelected
-                        ? Color.black.opacity(0.3)
+                        ? Color.black.opacity(0.28)
                         : Color.clear
+                )
+                .overlay(
+                    Rectangle()
+                        .strokeBorder(
+                            isSelected ? Theme.Palette.accent : Color.clear,
+                            lineWidth: 3
+                        )
                 )
         } else {
             Rectangle()
-                .fill(Color.secondarySystemBackground)
-                .overlay(ProgressView())
+                .fill(Color(red: 0.918, green: 0.918, blue: 0.937))
+                .overlay(
+                    ProgressView()
+                        .controlSize(.small)
+                        .tint(Theme.Palette.textDim)
+                )
         }
     }
 
     private var selectionIndicator: some View {
         ZStack {
             Circle()
-                .fill(isSelected ? Color.accentColor : Color.white.opacity(0.7))
-                .frame(width: 22, height: 22)
+                .fill(isSelected ? Theme.Palette.accent : Color.black.opacity(0.35))
+                .frame(width: 24, height: 24)
+            Circle()
+                .strokeBorder(Color.white, lineWidth: 1.5)
+                .frame(width: 24, height: 24)
             if isSelected {
                 Image(systemName: "checkmark")
-                    .font(.caption.weight(.bold))
+                    .font(.system(size: 12, weight: .bold))
                     .foregroundStyle(.white)
             }
         }

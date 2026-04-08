@@ -12,8 +12,6 @@ struct ChronologicalFeedView: View {
     @State private var loadedCount = 0
     @State private var showingSettings = false
     @State private var showingSearch = false
-    @State private var showingViewModeSwitcher = false
-    @State private var showingModeChangeNotice = false
 
     private let pageSize = 100
     private let columns = [
@@ -37,8 +35,8 @@ struct ChronologicalFeedView: View {
                                 GlassIconButton(systemName: "gearshape.fill") {
                                     showingSettings = true
                                 }
-                                GlassIconButton(systemName: "square.grid.2x2.fill") {
-                                    showingViewModeSwitcher = true
+                                GlassIconButton(systemName: "rectangle.stack.fill") {
+                                    switchMode(to: "folder_list")
                                 }
                             }
                         }
@@ -59,20 +57,8 @@ struct ChronologicalFeedView: View {
                     .padding(.bottom, 40)
                 }
                 .scrollIndicators(.hidden)
-
-                if showingModeChangeNotice {
-                    toastBanner
-                        .transition(.move(edge: .top).combined(with: .opacity))
-                }
             }
             .navigationBarHidden(true)
-            .confirmationDialog("Home View", isPresented: $showingViewModeSwitcher, titleVisibility: .visible) {
-                Button("Folders") { switchMode(to: "folder_list") }
-                Button("Chronological Feed") { switchMode(to: "chronological_feed") }
-                Button("Cancel", role: .cancel) {}
-            } message: {
-                Text("Choose what you see when you open iFauxto.")
-            }
             .sheet(isPresented: $showingSettings) {
                 SettingsView()
             }
@@ -82,7 +68,15 @@ struct ChronologicalFeedView: View {
                 }
             }
             .task {
+                #if DEBUG
+                if ProcessInfo.processInfo.arguments.contains("-demoPhotos") {
+                    allIdentifiers = (0..<48).map { "demo:\($0)" }
+                } else {
+                    allIdentifiers = photoKitService.fetchAllAssetIdentifiers()
+                }
+                #else
                 allIdentifiers = photoKitService.fetchAllAssetIdentifiers()
+                #endif
                 loadNextPage()
                 withAnimation(Theme.Motion.soft) {
                     isLoading = false
@@ -94,7 +88,7 @@ struct ChronologicalFeedView: View {
     private var chronoSubtitle: String {
         if isLoading { return "Loading your library…" }
         if assetIdentifiers.isEmpty { return "No photos yet" }
-        return "\(allIdentifiers.count) photos, newest first"
+        return "\(allIdentifiers.count) photos · newest first"
     }
 
     // MARK: - Grid
@@ -153,45 +147,13 @@ struct ChronologicalFeedView: View {
         .frame(maxWidth: .infinity)
     }
 
-    // MARK: - Toast
-
-    private var toastBanner: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "checkmark.circle.fill")
-                .foregroundStyle(Theme.Palette.accent)
-            Text("Switched. Relaunch to see folders.")
-                .font(Theme.Font.body(13, weight: .semibold))
-                .foregroundStyle(Theme.Palette.text)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .background(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(.ultraThinMaterial)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .strokeBorder(Theme.Palette.accent.opacity(0.4), lineWidth: 1)
-        )
-        .padding(.top, 60)
-        .padding(.horizontal, 20)
-    }
-
     // MARK: - Helpers
 
     private func switchMode(to mode: String) {
+        Haptics.select()
         let settings = dataManager.getOrCreateSettings()
         settings.homeViewMode = mode
         dataManager.saveSettings()
-        Haptics.success()
-        withAnimation(Theme.Motion.snappy) {
-            showingModeChangeNotice = true
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.4) {
-            withAnimation(Theme.Motion.soft) {
-                showingModeChangeNotice = false
-            }
-        }
     }
 
     private func loadNextPage() {
@@ -206,10 +168,39 @@ private struct FeedThumbnailView: View {
     @EnvironmentObject var photoKitService: PhotoKitService
     @State private var thumbnail: UIImage?
 
+    private var isDemo: Bool { identifier.hasPrefix("demo:") }
+
+    private var demoColor: Color {
+        let palette: [Color] = [
+            Color(red: 0.84, green: 0.86, blue: 0.91),
+            Color(red: 0.95, green: 0.85, blue: 0.71),
+            Color(red: 0.74, green: 0.86, blue: 0.78),
+            Color(red: 0.92, green: 0.79, blue: 0.84),
+            Color(red: 0.78, green: 0.83, blue: 0.92),
+            Color(red: 0.89, green: 0.91, blue: 0.74),
+            Color(red: 0.95, green: 0.81, blue: 0.67),
+            Color(red: 0.81, green: 0.78, blue: 0.92)
+        ]
+        let n = abs(identifier.hashValue) % palette.count
+        return palette[n]
+    }
+
     var body: some View {
         GeometryReader { geo in
             Group {
-                if let img = thumbnail {
+                if isDemo {
+                    ZStack {
+                        LinearGradient(
+                            colors: [demoColor, demoColor.opacity(0.7)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                        Image(systemName: "photo")
+                            .font(.system(size: 22, weight: .light))
+                            .foregroundStyle(.white.opacity(0.65))
+                    }
+                    .frame(width: geo.size.width, height: geo.size.width)
+                } else if let img = thumbnail {
                     Image(uiImage: img)
                         .resizable()
                         .scaledToFill()
@@ -230,6 +221,7 @@ private struct FeedThumbnailView: View {
         }
         .aspectRatio(1, contentMode: .fit)
         .task(id: identifier) {
+            guard !isDemo else { return }
             thumbnail = await photoKitService.loadThumbnail(
                 for: identifier,
                 targetSize: CGSize(width: 300, height: 300)

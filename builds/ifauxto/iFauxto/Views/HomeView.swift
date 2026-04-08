@@ -12,6 +12,7 @@ struct HomeView: View {
     @State private var showingSearch = false
     @State private var folderSortMode: String = "custom"
     @State private var editMode: EditMode = .inactive
+    @State private var listAppeared = false
     @Environment(\.searchService) var searchService
 
     private var displayFolders: [Folder] {
@@ -40,6 +41,9 @@ struct HomeView: View {
                         HStack(spacing: 2) {
                             GlassIconButton(systemName: "gearshape") {
                                 showingSettings = true
+                            }
+                            GlassIconButton(systemName: "square.grid.2x2") {
+                                switchToFeed()
                             }
                             sortMenu
                             GlassIconButton(systemName: "plus") {
@@ -86,6 +90,10 @@ struct HomeView: View {
                 seedDemoFoldersIfEmpty()
                 #endif
                 loadFolders()
+                listAppeared = false
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    listAppeared = true
+                }
                 #if DEBUG
                 autoNavigateForScreenshot()
                 #endif
@@ -153,6 +161,13 @@ struct HomeView: View {
                         }
                         .buttonStyle(.plain)
                         .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
+                        .opacity(listAppeared ? 1 : 0)
+                        .offset(y: listAppeared ? 0 : 12)
+                        .animation(
+                            .spring(response: 0.45, dampingFraction: 0.85)
+                                .delay(0.04 * Double(index)),
+                            value: listAppeared
+                        )
                         if index < displayFolders.count - 1 {
                             Rectangle()
                                 .fill(Theme.Palette.divider)
@@ -240,6 +255,13 @@ struct HomeView: View {
         }
     }
 
+    private func switchToFeed() {
+        Haptics.select()
+        let s = dataManager.getOrCreateSettings()
+        s.homeViewMode = "chronological_feed"
+        dataManager.saveSettings()
+    }
+
     #if DEBUG
     private func seedDemoFoldersIfEmpty() {
         let existing = dataManager.fetchFolders(parentId: nil)
@@ -274,6 +296,16 @@ struct HomeView: View {
                 showingSearch = true
             }
         }
+        if args.contains("-autoShowCreate") {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                showingCreateFolder = true
+            }
+        }
+        if args.contains("-autoShowImport") {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                showingImport = true
+            }
+        }
     }
     #endif
 }
@@ -283,7 +315,6 @@ struct HomeView: View {
 /// Single grouped-list row. Yellow Apple folder icon, name, count, chevron.
 private struct FolderRow: View {
     let folder: Folder
-    @State private var isPressed = false
 
     private var photoCount: Int {
         (folder.photoReferences ?? []).count
@@ -291,7 +322,6 @@ private struct FolderRow: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            // Filled yellow folder, exactly like Finder/iPhoto
             Image(systemName: "folder.fill")
                 .font(.system(size: 30, weight: .regular))
                 .foregroundStyle(Theme.Palette.folder)
@@ -317,9 +347,6 @@ private struct FolderRow: View {
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
         .contentShape(Rectangle())
-        .background(isPressed ? Color.black.opacity(0.04) : .clear)
-        .onLongPressGesture(minimumDuration: 0, maximumDistance: .infinity,
-                            pressing: { pressing in isPressed = pressing },
-                            perform: {})
+        .pressScale(0.985)
     }
 }
