@@ -18,14 +18,52 @@ final class DataManager: ObservableObject {
         let cloudEnabled = (Bundle.main.object(forInfoDictionaryKey: "iFauxtoCloudKitEnabled") as? Bool) ?? false
         self.isCloudKitEnabled = cloudEnabled
 
-        let schema = Schema([Folder.self, PhotoReference.self, AppSettings.self, EditState.self, PhotoMeta.self, SmartAlbum.self, PhotoProject.self, FaceCluster.self])
-        let config = ModelConfiguration(
-            schema: schema,
-            isStoredInMemoryOnly: inMemory,
-            cloudKitDatabase: cloudEnabled ? .automatic : .none
-        )
+        let schema = Schema([Folder.self, PhotoReference.self, AppSettings.self, EditState.self, PhotoMeta.self, SmartAlbum.self, PhotoProject.self, FaceCluster.self, PhotoComment.self, UserProfile.self])
+
+        let config: ModelConfiguration
+        if inMemory {
+            config = ModelConfiguration(
+                schema: schema,
+                isStoredInMemoryOnly: true,
+                cloudKitDatabase: .none
+            )
+        } else {
+            // Per-user store path: each signed-in user gets their own
+            // SQLite file under Documents/users/<userId>/store.sqlite.
+            // _local is the unauthenticated guest bucket.
+            let userDir = UserSession.shared.activeUserDirectory
+            let storeURL = userDir.appendingPathComponent("store.sqlite")
+            config = ModelConfiguration(
+                schema: schema,
+                url: storeURL,
+                cloudKitDatabase: cloudEnabled ? .automatic : .none
+            )
+        }
+
         modelContainer = try ModelContainer(for: schema, configurations: [config])
         modelContext = modelContainer.mainContext
+    }
+
+    // MARK: - User profile helpers
+
+    func fetchUserProfile(id: String) -> UserProfile? {
+        let descriptor = FetchDescriptor<UserProfile>(
+            predicate: #Predicate { $0.id == id }
+        )
+        return try? modelContext.fetch(descriptor).first
+    }
+
+    @discardableResult
+    func createUserProfile(id: String, displayName: String, email: String, provider: AuthProvider) -> UserProfile {
+        let profile = UserProfile(
+            id: id,
+            displayName: displayName,
+            email: email,
+            provider: provider
+        )
+        modelContext.insert(profile)
+        try? modelContext.save()
+        return profile
     }
 
     // MARK: Folder CRUD
@@ -315,6 +353,34 @@ final class DataManager: ObservableObject {
             let title = PhotoDateGrouper.group([identifier]).first?.title ?? ""
             return title.localizedCaseInsensitiveContains(rule.value)
         }
+    }
+
+    // MARK: - Comments
+
+    func fetchComments(for assetId: String) -> [PhotoComment] {
+        let descriptor = FetchDescriptor<PhotoComment>(
+            predicate: #Predicate { $0.assetIdentifier == assetId },
+            sortBy: [SortDescriptor(\.createdAt, order: .forward)]
+        )
+        return (try? modelContext.fetch(descriptor)) ?? []
+    }
+
+    @discardableResult
+    func addComment(to assetId: String, body: String, authorId: String, authorName: String) -> PhotoComment {
+        let comment = PhotoComment(
+            assetIdentifier: assetId,
+            body: body,
+            authorId: authorId,
+            authorName: authorName
+        )
+        modelContext.insert(comment)
+        try? modelContext.save()
+        return comment
+    }
+
+    func deleteComment(_ comment: PhotoComment) {
+        modelContext.delete(comment)
+        try? modelContext.save()
     }
 
     // MARK: - Face clusters

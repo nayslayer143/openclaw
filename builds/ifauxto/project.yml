@@ -37,6 +37,7 @@ targets:
   iFauxto:
     type: application
     platform: iOS
+    supportedDestinations: [iOS, macCatalyst]
     sources:
       - path: iFauxto
         excludes:
@@ -46,6 +47,8 @@ targets:
       DEVELOPMENT_TEAM: ""
       CODE_SIGN_STYLE: Automatic
       INFOPLIST_FILE: iFauxto/Resources/Info.plist
+      SUPPORTS_MACCATALYST: YES
+      DERIVE_MACCATALYST_PRODUCT_BUNDLE_IDENTIFIER: NO
     info:
       path: iFauxto/Resources/Info.plist
       properties:
@@ -79,6 +82,8 @@ targets:
         com.apple.developer.ubiquity-kvstore-identifier: "$(TeamIdentifierPrefix)com.ifauxto.app"
         com.apple.developer.icloud-container-development-container-identifiers:
           - iCloud.com.ifauxto.app
+        com.apple.developer.applesignin:
+          - Default
 
   iFauxtoTests:
     type: bundle.unit-test

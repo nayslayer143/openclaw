@@ -15,8 +15,11 @@ struct PhotoInfoSheet: View {
     @State private var isFavorite: Bool = false
     @State private var title: String = ""
     @State private var caption: String = ""
+    @State private var comments: [PhotoComment] = []
+    @State private var newCommentText: String = ""
     @FocusState private var titleFocused: Bool
     @FocusState private var captionFocused: Bool
+    @FocusState private var commentFocused: Bool
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -45,6 +48,7 @@ struct PhotoInfoSheet: View {
             isFavorite = meta?.isFavorite ?? false
             title = meta?.title ?? ""
             caption = meta?.caption ?? ""
+            comments = dataManager.fetchComments(for: identifier)
             isLoading = false
         }
     }
@@ -88,6 +92,7 @@ struct PhotoInfoSheet: View {
         VStack(spacing: 18) {
             ratingCard
             titleCaptionCard
+            commentsSection
 
             section(title: "FILE") {
                 row("Dimensions", info.dimensions ?? "—")
@@ -126,6 +131,109 @@ struct PhotoInfoSheet: View {
         }
         .padding(.horizontal, 20)
         .padding(.bottom, 40)
+    }
+
+    /// Multi-comment thread. Each comment shows author + body + relative date.
+    @ViewBuilder
+    private var commentsSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("COMMENTS")
+                .font(.system(size: 12))
+                .foregroundStyle(Theme.Palette.textMuted)
+                .tracking(0.4)
+                .padding(.horizontal, 16)
+
+            VStack(spacing: 0) {
+                if comments.isEmpty {
+                    HStack {
+                        Text("No comments yet.")
+                            .font(.system(size: 13))
+                            .foregroundStyle(Theme.Palette.textMuted)
+                        Spacer()
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 14)
+                } else {
+                    ForEach(Array(comments.enumerated()), id: \.element.id) { index, comment in
+                        commentRow(comment)
+                        if index < comments.count - 1 {
+                            Rectangle()
+                                .fill(Theme.Palette.divider)
+                                .frame(height: 0.5)
+                                .padding(.leading, 14)
+                        }
+                    }
+                }
+
+                Rectangle().fill(Theme.Palette.divider).frame(height: 0.5)
+
+                HStack(spacing: 8) {
+                    TextField("Add a comment", text: $newCommentText, axis: .vertical)
+                        .font(.system(size: 14))
+                        .focused($commentFocused)
+                        .lineLimit(1...3)
+                    Button {
+                        postComment()
+                    } label: {
+                        Image(systemName: "arrow.up.circle.fill")
+                            .font(.system(size: 24))
+                            .foregroundStyle(
+                                newCommentText.trimmingCharacters(in: .whitespaces).isEmpty
+                                    ? Theme.Palette.textDim
+                                    : Theme.Palette.accent
+                            )
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(newCommentText.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 12)
+            }
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Theme.Palette.bgElevated)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .strokeBorder(Theme.Palette.stroke, lineWidth: 0.5)
+            )
+        }
+    }
+
+    private func commentRow(_ c: PhotoComment) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text(c.authorName.isEmpty ? "You" : c.authorName)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Theme.Palette.text)
+                Spacer()
+                Text(c.createdAt, format: .relative(presentation: .named))
+                    .font(.system(size: 11))
+                    .foregroundStyle(Theme.Palette.textMuted)
+            }
+            Text(c.body)
+                .font(.system(size: 14))
+                .foregroundStyle(Theme.Palette.text)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func postComment() {
+        let trimmed = newCommentText.trimmingCharacters(in: .whitespaces)
+        guard !trimmed.isEmpty else { return }
+        Haptics.success()
+        let user = UserSession.shared.currentProfile
+        dataManager.addComment(
+            to: identifier,
+            body: trimmed,
+            authorId: user?.id ?? "local",
+            authorName: user?.displayName ?? "You"
+        )
+        comments = dataManager.fetchComments(for: identifier)
+        newCommentText = ""
+        commentFocused = false
     }
 
     /// Editable title + caption.

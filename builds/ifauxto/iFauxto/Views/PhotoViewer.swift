@@ -132,15 +132,35 @@ struct PhotoViewer: View {
     private func presentShare() {
         Haptics.tap()
         Task {
-            // Try to load the real image; demo identifiers share a string.
+            var items: [Any] = []
             if currentId.hasPrefix("demo:") {
-                shareItems = ["iFauxto demo photo \(currentId)"]
+                // Demo: render the placeholder gradient as a UIImage
+                // so the share sheet has something concrete.
+                if let img = renderDemoPlaceholder(for: currentId) {
+                    items.append(img)
+                }
+                items.append("iFauxto demo photo")
             } else if let img = await photoKitService.loadFullImage(for: currentId) {
-                shareItems = [img]
-            } else {
-                shareItems = [currentId]
+                items.append(img)
+                if let pdf = PDFExportService.renderPDF(images: [img]) {
+                    items.append(pdf)
+                }
             }
+            shareItems = items
             showingShare = true
+        }
+    }
+
+    private func renderDemoPlaceholder(for identifier: String) -> UIImage? {
+        let size = CGSize(width: 1024, height: 1024)
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { ctx in
+            let cg = ctx.cgContext
+            let palette = DemoPalette.color(for: identifier)
+            // SwiftUI Color → CGColor via UIColor bridge.
+            let uic = UIColor(palette)
+            cg.setFillColor(uic.cgColor)
+            cg.fill(CGRect(origin: .zero, size: size))
         }
     }
 

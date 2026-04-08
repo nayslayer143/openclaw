@@ -9,6 +9,7 @@ struct iFauxtoApp: App {
     @StateObject private var importService: LibraryImportService
     @StateObject private var indexingManager: IndexingManager
     @StateObject private var navCoordinator = NavCoordinator()
+    @StateObject private var userSession = UserSession.shared
 
     private let tagStore: TagStore
     private let searchService: SearchService
@@ -37,10 +38,12 @@ struct iFauxtoApp: App {
                 .environmentObject(importService)
                 .environmentObject(indexingManager)
                 .environmentObject(navCoordinator)
+                .environmentObject(userSession)
                 .environment(\.searchService, searchService)
                 .modelContainer(dataManager.modelContainer)
                 .preferredColorScheme(.light)
                 .onAppear {
+                    userSession.bootstrap(dataManager: dataManager)
                     indexingManager.startBackgroundIndexing()
                 }
         }

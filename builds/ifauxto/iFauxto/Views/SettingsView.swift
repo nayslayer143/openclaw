@@ -9,6 +9,8 @@ private struct ModeOption: Identifiable {
 
 struct SettingsView: View {
     @EnvironmentObject var dataManager: DataManager
+    @EnvironmentObject var indexingManager: IndexingManager
+    @ObservedObject var userSession = UserSession.shared
     @Environment(\.dismiss) var dismiss
 
     @State private var homeMode: String = "folder_list"
@@ -30,12 +32,60 @@ struct SettingsView: View {
                 Spacer().frame(height: 80)
 
                 VStack(alignment: .leading, spacing: 28) {
+                    accountCard
+
                     section(title: "Home Screen", subtitle: "What you see when you open iFauxto.") {
                         VStack(spacing: 10) {
                             ForEach(modes) { mode in
                                 modeRow(mode)
                             }
                         }
+                    }
+
+                    section(title: "Search Index", subtitle: indexingManager.isIndexing
+                            ? "Indexing your library so search works."
+                            : "Auto-tags every photo on device using Apple Vision.") {
+                        VStack(alignment: .leading, spacing: 10) {
+                            HStack {
+                                Image(systemName: "magnifyingglass.circle.fill")
+                                    .font(.system(size: 18, weight: .semibold))
+                                    .foregroundStyle(Theme.Palette.accent)
+                                    .frame(width: 28)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Photo Index")
+                                        .font(.system(size: 15, weight: .semibold))
+                                        .foregroundStyle(Theme.Palette.text)
+                                    Text(indexStatus)
+                                        .font(.system(size: 12))
+                                        .foregroundStyle(Theme.Palette.textMuted)
+                                }
+                                Spacer()
+                                Button {
+                                    Haptics.tap()
+                                    indexingManager.startBackgroundIndexing()
+                                } label: {
+                                    Text(indexingManager.isIndexing ? "Indexing…" : "Re-index")
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundStyle(Theme.Palette.accent)
+                                }
+                                .buttonStyle(.plain)
+                                .disabled(indexingManager.isIndexing)
+                            }
+                            if indexingManager.isIndexing {
+                                ProgressView(value: indexingManager.progress)
+                                    .tint(Theme.Palette.accent)
+                            }
+                        }
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 12)
+                        .background(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .fill(.ultraThinMaterial)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .strokeBorder(Theme.Palette.stroke, lineWidth: 1)
+                        )
                     }
 
                     section(title: "iCloud", subtitle: dataManager.isCloudKitEnabled
@@ -187,6 +237,72 @@ struct SettingsView: View {
             )
         }
         .buttonStyle(.plain)
+    }
+
+    private var accountCard: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("ACCOUNT")
+                .font(.system(size: 12))
+                .foregroundStyle(Theme.Palette.textMuted)
+                .tracking(0.4)
+                .padding(.horizontal, 16)
+
+            HStack(spacing: 14) {
+                ZStack {
+                    Circle()
+                        .fill(Theme.Palette.accent.opacity(0.15))
+                        .frame(width: 44, height: 44)
+                    Image(systemName: userSession.isAuthenticated ? "person.fill" : "person")
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundStyle(Theme.Palette.accent)
+                }
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(userSession.currentProfile?.displayName ?? "Guest")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(Theme.Palette.text)
+                    Text(userSession.isAuthenticated
+                         ? (userSession.currentProfile?.email.isEmpty == false
+                            ? userSession.currentProfile!.email
+                            : "Signed in with \(userSession.currentProfile?.provider.label ?? "Apple")")
+                         : "Photos stay on this device only")
+                        .font(.system(size: 12))
+                        .foregroundStyle(Theme.Palette.textMuted)
+                }
+                Spacer()
+                if userSession.isAuthenticated {
+                    Button {
+                        Haptics.warning()
+                        userSession.signOut()
+                        dismiss()
+                    } label: {
+                        Text("Sign Out")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(.red)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(.ultraThinMaterial)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .strokeBorder(Theme.Palette.stroke, lineWidth: 1)
+            )
+        }
+    }
+
+    private var indexStatus: String {
+        if indexingManager.isIndexing {
+            return "\(indexingManager.indexedCount) of \(indexingManager.totalCount)"
+        }
+        if indexingManager.indexedCount > 0 {
+            return "\(indexingManager.indexedCount) photos indexed"
+        }
+        return "Tap Re-index to start"
     }
 
     private func saveAndDismiss() {

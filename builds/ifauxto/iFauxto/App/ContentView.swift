@@ -6,17 +6,27 @@ import UIKit
 struct ContentView: View {
     @EnvironmentObject var dataManager: DataManager
     @EnvironmentObject var photoKitService: PhotoKitService
+    @ObservedObject var userSession = UserSession.shared
     @Query private var allSettings: [AppSettings]
     @State private var hasCheckedAuth = false
     @State private var showOnboarding = false
+    @State private var authDecided = false
 
     private var settings: AppSettings {
         allSettings.first ?? dataManager.getOrCreateSettings()
     }
 
+    /// True if the user opted into guest mode in a prior launch.
+    private var hasGuestSession: Bool {
+        UserDefaults.standard.string(forKey: "iFauxto.activeUserId") == "_local"
+    }
+
     var body: some View {
         Group {
-            if showOnboarding {
+            if !authDecided && !userSession.isAuthenticated && !hasGuestSession {
+                SignInView { authDecided = true }
+                    .transition(.opacity)
+            } else if showOnboarding {
                 OnboardingView {
                     withAnimation(Theme.Motion.soft) {
                         showOnboarding = false
@@ -29,6 +39,7 @@ struct ContentView: View {
             }
         }
         .animation(Theme.Motion.soft, value: showOnboarding)
+        .animation(Theme.Motion.soft, value: authDecided)
         .animation(Theme.Motion.soft, value: settings.homeViewMode)
         .task {
             // Photo permission is requested lazily from views that actually
