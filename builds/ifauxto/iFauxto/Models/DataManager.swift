@@ -18,7 +18,7 @@ final class DataManager: ObservableObject {
         let cloudEnabled = (Bundle.main.object(forInfoDictionaryKey: "iFauxtoCloudKitEnabled") as? Bool) ?? false
         self.isCloudKitEnabled = cloudEnabled
 
-        let schema = Schema([Folder.self, PhotoReference.self, AppSettings.self, EditState.self, PhotoMeta.self, SmartAlbum.self, PhotoProject.self])
+        let schema = Schema([Folder.self, PhotoReference.self, AppSettings.self, EditState.self, PhotoMeta.self, SmartAlbum.self, PhotoProject.self, FaceCluster.self])
         let config = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: inMemory,
@@ -315,6 +315,26 @@ final class DataManager: ObservableObject {
             let title = PhotoDateGrouper.group([identifier]).first?.title ?? ""
             return title.localizedCaseInsensitiveContains(rule.value)
         }
+    }
+
+    // MARK: - Face clusters
+
+    func fetchFaceClusters() -> [FaceCluster] {
+        let descriptor = FetchDescriptor<FaceCluster>(
+            sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
+        )
+        return (try? modelContext.fetch(descriptor)) ?? []
+    }
+
+    func saveFaceClusters(_ clusters: [(displayName: String, cover: String, members: [String])]) {
+        // Wipe existing then re-insert. Naive but fine for the size we're dealing with.
+        let existing = fetchFaceClusters()
+        for c in existing { modelContext.delete(c) }
+        for c in clusters {
+            let cluster = FaceCluster(displayName: c.displayName, coverAssetId: c.cover, memberIds: c.members)
+            modelContext.insert(cluster)
+        }
+        try? modelContext.save()
     }
 
     // MARK: - Projects (collage / book / card / calendar)

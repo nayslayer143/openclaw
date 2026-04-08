@@ -93,6 +93,22 @@ struct FacesView: View {
 
     private func load() {
         defer { isLoading = false }
+
+        // 1) Prefer real saved clusters from the SwiftData store.
+        let stored = dataManager.fetchFaceClusters()
+        if !stored.isEmpty {
+            people = stored.map {
+                Person(
+                    id: $0.id,
+                    name: $0.displayName.isEmpty ? "Unnamed" : $0.displayName,
+                    coverIdentifier: $0.coverAssetId,
+                    photoIds: $0.memberIds
+                )
+            }
+            return
+        }
+
+        // 2) Fall back to deterministic mock clusters from demo data.
         let raw: [String]
         if DemoLibrary.isEnabled {
             raw = DemoLibrary.identifiers
@@ -102,12 +118,9 @@ struct FacesView: View {
         let excluded = dataManager.excludedAssetIdSet()
         let visible = raw.filter { !excluded.contains($0) }
 
-        // Mock person clusters from demo data — deterministic so each
-        // launch reproduces the same set.
         let names = ["Alex", "Sam", "Jordan", "Riley", "Casey", "Morgan", "Quinn", "Avery"]
         var clusters: [Person] = []
         for (i, name) in names.enumerated() {
-            // Each "person" gets every Nth photo from the visible set.
             let stride = max(1, names.count)
             let ids = visible.enumerated()
                 .filter { $0.offset % stride == i }
@@ -121,6 +134,17 @@ struct FacesView: View {
             ))
         }
         people = clusters
+    }
+
+    /// Triggers a real face index pass over PhotoKit assets.
+    func runRealFaceIndex() async {
+        let raw = photoKitService.fetchAllAssetIdentifiers()
+        let service = FaceClusteringService()
+        let clusters = await service.cluster(identifiers: raw)
+        await MainActor.run {
+            dataManager.saveFaceClusters(clusters)
+            load()
+        }
     }
 }
 

@@ -80,4 +80,32 @@ final class VisionTaggingService {
             try? handler.perform([request])
         }
     }
+
+    /// Returns the number of detected faces and a coarse "feature
+    /// signature" per face that can be used for naive clustering. The
+    /// signature is the face's normalized bounding-box position + size,
+    /// quantized so visually similar faces hash to the same bucket.
+    /// Real apps would use embeddings — this is a stand-in good enough
+    /// to demo grouping behavior.
+    func faceSignatures(image: CGImage) async -> [String] {
+        await withCheckedContinuation { continuation in
+            let request = VNDetectFaceRectanglesRequest { request, error in
+                guard let faces = request.results as? [VNFaceObservation] else {
+                    continuation.resume(returning: [])
+                    return
+                }
+                let sigs = faces.map { face -> String in
+                    let bb = face.boundingBox
+                    let cx = Int((bb.midX * 8).rounded())
+                    let cy = Int((bb.midY * 8).rounded())
+                    let sw = Int((bb.width * 8).rounded())
+                    let sh = Int((bb.height * 8).rounded())
+                    return "f-\(cx)-\(cy)-\(sw)-\(sh)"
+                }
+                continuation.resume(returning: sigs)
+            }
+            let handler = VNImageRequestHandler(cgImage: image, options: [:])
+            try? handler.perform([request])
+        }
+    }
 }

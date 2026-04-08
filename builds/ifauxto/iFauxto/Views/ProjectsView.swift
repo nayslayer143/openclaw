@@ -58,7 +58,13 @@ struct ProjectsView: View {
         ScrollView {
             LazyVGrid(columns: columns, spacing: 14) {
                 ForEach(projects) { project in
-                    ProjectCard(project: project)
+                    NavigationLink {
+                        CollageEditorView(project: project)
+                    } label: {
+                        ProjectCard(project: project)
+                    }
+                    .buttonStyle(PressableButtonStyle(scale: 0.97))
+                    .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
                 }
             }
             .padding(.horizontal, 16)

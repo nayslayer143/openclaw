@@ -14,6 +14,8 @@ struct PhotoViewer: View {
     @State private var currentIndex: Int
     @State private var showingEditor = false
     @State private var showingInfo = false
+    @State private var showingShare = false
+    @State private var shareItems: [Any] = []
     @State private var chromeVisible = true
     @State private var isFavorite = false
 
@@ -71,6 +73,9 @@ struct PhotoViewer: View {
                 .presentationDetents([.medium, .large])
                 .presentationDragIndicator(.visible)
         }
+        .sheet(isPresented: $showingShare) {
+            ShareSheet(items: shareItems)
+        }
         .onAppear {
             currentIndex = startIndex
             refreshFavorite()
@@ -113,7 +118,7 @@ struct PhotoViewer: View {
     private var bottomBar: some View {
         HStack(spacing: 14) {
             Spacer()
-            PhotoOverlayButton(systemName: "square.and.arrow.up") { /* share, future */ }
+            PhotoOverlayButton(systemName: "square.and.arrow.up") { presentShare() }
             PhotoOverlayButton(
                 systemName: isFavorite ? "heart.fill" : "heart",
                 tint: isFavorite ? Color(red: 1.0, green: 0.30, blue: 0.30) : .white
@@ -122,6 +127,21 @@ struct PhotoViewer: View {
             Spacer()
         }
         .padding(.bottom, 36)
+    }
+
+    private func presentShare() {
+        Haptics.tap()
+        Task {
+            // Try to load the real image; demo identifiers share a string.
+            if currentId.hasPrefix("demo:") {
+                shareItems = ["iFauxto demo photo \(currentId)"]
+            } else if let img = await photoKitService.loadFullImage(for: currentId) {
+                shareItems = [img]
+            } else {
+                shareItems = [currentId]
+            }
+            showingShare = true
+        }
     }
 
     private func trashCurrent() {
