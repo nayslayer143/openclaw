@@ -258,6 +258,12 @@ struct FolderView: View {
                 } label: {
                     Label("Select Photos", systemImage: "checkmark.circle")
                 }
+                Button {
+                    togglePinAsHome()
+                } label: {
+                    Label(isPinnedAsHome ? "Unpin as Home" : "Pin as Home",
+                          systemImage: isPinnedAsHome ? "pin.slash.fill" : "pin.fill")
+                }
                 Divider()
                 Menu("Sort Photos") {
                     Button { setPhotoSortMode("custom") } label: {
@@ -303,5 +309,25 @@ struct FolderView: View {
         selectedPhotoIds.removeAll()
         isEditMode = false
         loadContent()
+    }
+
+    // MARK: Pinning
+
+    private var isPinnedAsHome: Bool {
+        let s = dataManager.getOrCreateSettings()
+        return s.pinnedViewId == folder.id && s.homeViewMode == "custom_view"
+    }
+
+    private func togglePinAsHome() {
+        Haptics.success()
+        let s = dataManager.getOrCreateSettings()
+        if isPinnedAsHome {
+            s.pinnedViewId = nil
+            s.homeViewMode = "folder_list"
+        } else {
+            s.pinnedViewId = folder.id
+            s.homeViewMode = "custom_view"
+        }
+        dataManager.saveSettings()
     }
 }

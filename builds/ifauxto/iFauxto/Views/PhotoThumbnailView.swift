@@ -12,17 +12,15 @@ struct PhotoThumbnailView: View {
     private var isDemo: Bool { photo.id.hasPrefix("demo:") }
 
     private var demoColor: Color {
-        let palette: [Color] = [
-            Color(red: 0.84, green: 0.86, blue: 0.91),
-            Color(red: 0.95, green: 0.85, blue: 0.71),
-            Color(red: 0.74, green: 0.86, blue: 0.78),
-            Color(red: 0.92, green: 0.79, blue: 0.84),
-            Color(red: 0.78, green: 0.83, blue: 0.92),
-            Color(red: 0.89, green: 0.91, blue: 0.74),
-            Color(red: 0.95, green: 0.81, blue: 0.67),
-            Color(red: 0.81, green: 0.78, blue: 0.92)
-        ]
-        return palette[abs(photo.id.hashValue) % palette.count]
+        DemoPalette.color(for: photo.id)
+    }
+
+    private var demoLabel: String {
+        DemoPalette.label(for: photo.id)
+    }
+
+    private var demoIcon: String {
+        DemoPalette.icon(for: photo.id)
     }
 
     var body: some View {
@@ -63,13 +61,21 @@ struct PhotoThumbnailView: View {
         if isDemo {
             ZStack {
                 LinearGradient(
-                    colors: [demoColor, demoColor.opacity(0.7)],
+                    colors: [demoColor, demoColor.opacity(0.65)],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
-                Image(systemName: "photo")
+                Image(systemName: demoIcon)
                     .font(.system(size: 22, weight: .light))
-                    .foregroundStyle(.white.opacity(0.65))
+                    .foregroundStyle(.white.opacity(0.85))
+                Text(demoLabel)
+                    .font(.system(size: 9, weight: .semibold))
+                    .foregroundStyle(.white.opacity(0.95))
+                    .padding(.horizontal, 5)
+                    .padding(.vertical, 2)
+                    .background(Capsule().fill(.black.opacity(0.25)))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                    .padding(4)
             }
             .overlay(
                 isSelected ? Color.black.opacity(0.28) : Color.clear

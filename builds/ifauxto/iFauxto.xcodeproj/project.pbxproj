@@ -13,6 +13,7 @@
 		085157E7B2DE03FBA64EAE6E /* AppSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27E72FCC622DB23B083C78E2 /* AppSettingsTests.swift */; };
 		094E27A1098F5E9EF9D9DB66 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD38D022FE4A582684EA0039 /* Extensions.swift */; };
 		100F405A571736B4946179FB /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D64040B42537E9E93C089351 /* libsqlite3.tbd */; };
+		1148F3E282A2B8E4CA17B883 /* DemoPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70E34F688AD64C36854E8894 /* DemoPalette.swift */; };
 		19DC61DE427733174D5244C2 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2114EB78270B8BB2409C3163 /* SettingsView.swift */; };
 		2CC7D911B76212DBC768C41F /* IndexingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1FC9AF40754C1E1DAF5E2F4E /* IndexingManager.swift */; };
 		2EE98CAC45810000A6B9186F /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0C38A48A61707E873A3258A /* Theme.swift */; };
@@ -97,6 +98,7 @@
 		69C58BC719D64219558E6C51 /* FolderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderTests.swift; sourceTree = "<group>"; };
 		6E37E26D083740E160EDE6DB /* iFauxtoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iFauxtoTests.swift; sourceTree = "<group>"; };
 		6ECDE847A4204338D50CAD3D /* iFauxto.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = iFauxto.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		70E34F688AD64C36854E8894 /* DemoPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DemoPalette.swift; sourceTree = "<group>"; };
 		71023995B7DB672B2865A799 /* LibraryImportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryImportService.swift; sourceTree = "<group>"; };
 		72BFD302313DA02BDFEF8540 /* FolderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderView.swift; sourceTree = "<group>"; };
 		7CFBD37FDF056876440DC5F1 /* TagStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagStore.swift; sourceTree = "<group>"; };
@@ -246,6 +248,7 @@
 			isa = PBXGroup;
 			children = (
 				4A0F6EB4589CB6E67CA92662 /* BrandCopy.swift */,
+				70E34F688AD64C36854E8894 /* DemoPalette.swift */,
 				251CD3FA94D23C242095B0C4 /* DragDropManager.swift */,
 				FD38D022FE4A582684EA0039 /* Extensions.swift */,
 				EDD8D7A43593B4EB20DF851C /* Haptics.swift */,
@@ -389,6 +392,7 @@
 				438AB899ACAA984393E046DB /* CloudKitService.swift in Sources */,
 				A7678EC57B62624613697C1B /* ContentView.swift in Sources */,
 				3BEE3255A6884AB725D44FBE /* DataManager.swift in Sources */,
+				1148F3E282A2B8E4CA17B883 /* DemoPalette.swift in Sources */,
 				C8913675E02E0F3C8E6F321B /* DragDropManager.swift in Sources */,
 				0435630BF033D88ADBD676C5 /* EditModeToolbar.swift in Sources */,
 				FD0AE9CC674550522A527F3B /* EditService.swift in Sources */,

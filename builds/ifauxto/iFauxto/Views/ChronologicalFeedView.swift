@@ -170,34 +170,27 @@ private struct FeedThumbnailView: View {
 
     private var isDemo: Bool { identifier.hasPrefix("demo:") }
 
-    private var demoColor: Color {
-        let palette: [Color] = [
-            Color(red: 0.84, green: 0.86, blue: 0.91),
-            Color(red: 0.95, green: 0.85, blue: 0.71),
-            Color(red: 0.74, green: 0.86, blue: 0.78),
-            Color(red: 0.92, green: 0.79, blue: 0.84),
-            Color(red: 0.78, green: 0.83, blue: 0.92),
-            Color(red: 0.89, green: 0.91, blue: 0.74),
-            Color(red: 0.95, green: 0.81, blue: 0.67),
-            Color(red: 0.81, green: 0.78, blue: 0.92)
-        ]
-        let n = abs(identifier.hashValue) % palette.count
-        return palette[n]
-    }
-
     var body: some View {
         GeometryReader { geo in
             Group {
                 if isDemo {
                     ZStack {
                         LinearGradient(
-                            colors: [demoColor, demoColor.opacity(0.7)],
+                            colors: [DemoPalette.color(for: identifier), DemoPalette.color(for: identifier).opacity(0.65)],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
                         )
-                        Image(systemName: "photo")
+                        Image(systemName: DemoPalette.icon(for: identifier))
                             .font(.system(size: 22, weight: .light))
-                            .foregroundStyle(.white.opacity(0.65))
+                            .foregroundStyle(.white.opacity(0.85))
+                        Text(DemoPalette.label(for: identifier))
+                            .font(.system(size: 9, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.95))
+                            .padding(.horizontal, 5)
+                            .padding(.vertical, 2)
+                            .background(Capsule().fill(.black.opacity(0.25)))
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                            .padding(4)
                     }
                     .frame(width: geo.size.width, height: geo.size.width)
                 } else if let img = thumbnail {

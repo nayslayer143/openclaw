@@ -73,44 +73,64 @@ struct ContentView: View {
         }
         // Synthetic photos for visual preview without real PhotoKit access.
         // Identifiers prefixed with "demo:" render as colored placeholders.
+        // Total: 100 photos at the album level + 44 in nested subalbums.
         if args.contains("-seedDemoPhotos") {
             let folders = dm.fetchFolders(parentId: nil)
+
+            // Travel — 30 photos in root + 4 subalbums (Japan/Iceland/Coast/City)
             if let target = folders.first(where: { $0.name == "Travel" }) ?? folders.first {
-                let existingPhotos = dm.fetchPhotos(in: target)
-                if existingPhotos.isEmpty {
-                    let identifiers = (0..<24).map { "demo:travel:\($0)" }
+                if dm.fetchPhotos(in: target).isEmpty {
+                    let identifiers = (0..<30).map { "demo:travel:\($0)" }
                     dm.addPhotos(assetIdentifiers: identifiers, to: target)
                 }
-                // Subfolders + photos so the horizontal subfolder strip
-                // and the mixed grid both render.
                 let existingSubs = dm.fetchFolders(parentId: target.id)
                 if existingSubs.isEmpty {
-                    let subNames = ["Japan 2026", "Iceland", "Coast Roadtrip", "City Breaks"]
-                    for (i, name) in subNames.enumerated() {
+                    let subSpec: [(String, Int)] = [
+                        ("Japan 2026", 8),
+                        ("Iceland", 10),
+                        ("Coast Roadtrip", 12),
+                        ("City Breaks", 14)
+                    ]
+                    for (name, count) in subSpec {
                         let sub = dm.createFolder(name: name, parentId: target.id)
-                        let ids = (0..<(6 + i * 2)).map { "demo:sub:\(name):\($0)" }
+                        let ids = (0..<count).map { "demo:sub:\(name):\($0)" }
                         dm.addPhotos(assetIdentifiers: ids, to: sub)
                     }
                 }
             }
+
+            // Family — 18 photos
             if let family = folders.first(where: { $0.name == "Family" }) {
                 if dm.fetchPhotos(in: family).isEmpty {
-                    let identifiers = (0..<12).map { "demo:family:\($0)" }
+                    let identifiers = (0..<18).map { "demo:family:\($0)" }
                     dm.addPhotos(assetIdentifiers: identifiers, to: family)
                 }
             }
+
+            // Screenshots — 16 photos
             if let screenshots = folders.first(where: { $0.name == "Screenshots" }) {
                 if dm.fetchPhotos(in: screenshots).isEmpty {
-                    let identifiers = (0..<9).map { "demo:screens:\($0)" }
+                    let identifiers = (0..<16).map { "demo:screens:\($0)" }
                     dm.addPhotos(assetIdentifiers: identifiers, to: screenshots)
                 }
             }
+
+            // Food — 14 photos
             if let food = folders.first(where: { $0.name == "Food" }) {
                 if dm.fetchPhotos(in: food).isEmpty {
-                    let identifiers = (0..<6).map { "demo:food:\($0)" }
+                    let identifiers = (0..<14).map { "demo:food:\($0)" }
                     dm.addPhotos(assetIdentifiers: identifiers, to: food)
                 }
             }
+
+            // Everything Else — 22 photos (the messy bucket to sort)
+            if let misc = folders.first(where: { $0.name == "Everything Else" }) {
+                if dm.fetchPhotos(in: misc).isEmpty {
+                    let identifiers = (0..<22).map { "demo:misc:\($0)" }
+                    dm.addPhotos(assetIdentifiers: identifiers, to: misc)
+                }
+            }
+            // Grand total at root: 30 + 18 + 16 + 14 + 22 = 100. Plus 44 in subalbums.
         }
         let s = dm.getOrCreateSettings()
         if args.contains("-showOnboarding") {
@@ -142,17 +162,21 @@ struct ContentView: View {
         case "chronological_feed":
             ChronologicalFeedView()
         case "last_opened":
-            LastOpenedRouter()
+            LastOpenedRouter(modeKey: "last_opened")
+        case "custom_view":
+            LastOpenedRouter(modeKey: "custom_view")
         default:
             HomeView()
         }
     }
 }
 
-/// When the user picked "Last Opened" as their entry mode, this router
-/// pushes the most recently opened folder onto the nav stack on launch.
-/// Falls back to HomeView if there's nothing to restore.
+/// Routes the user straight into a folder on launch. Backs both the
+/// "Last Opened" and "Custom View" (pinned) home modes — only the
+/// settings key it reads from differs.
 struct LastOpenedRouter: View {
+    let modeKey: String  // "last_opened" or "custom_view"
+
     @EnvironmentObject var dataManager: DataManager
     @EnvironmentObject var navCoordinator: NavCoordinator
     @State private var didRestore = false
@@ -162,14 +186,24 @@ struct LastOpenedRouter: View {
             .onAppear {
                 guard !didRestore else { return }
                 didRestore = true
-                let id = dataManager.getOrCreateSettings().lastOpenedViewId
-                guard let id,
-                      let folder = dataManager.fetchFolders(parentId: nil)
-                        .first(where: { $0.id == id }) else { return }
+                let s = dataManager.getOrCreateSettings()
+                let targetId = (modeKey == "custom_view") ? s.pinnedViewId : s.lastOpenedViewId
+                guard let id = targetId else { return }
+                // Search across both root and nested folders.
+                guard let folder = findFolder(id: id) else { return }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                     navCoordinator.path.append(folder)
                 }
             }
+    }
+
+    private func findFolder(id: String) -> Folder? {
+        var stack = dataManager.fetchFolders(parentId: nil)
+        while let next = stack.popLast() {
+            if next.id == id { return next }
+            stack.append(contentsOf: dataManager.fetchFolders(parentId: next.id))
+        }
+        return nil
     }
 }
 
