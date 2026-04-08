@@ -2830,10 +2830,12 @@ async def orchestrator_embed(request: Request):
 # ── Gonzoclaw chat dashboard (SPA) ────────────────────────────────────────────
 # Built React app from ~/gonzoclaw/frontend/dist. Vite is configured with
 # base="/chat-app/" so asset URLs resolve under that prefix. The SPA's API
-# calls go to a separate cloudflared ingress (gonzoclaw-api.asdfghjk.lol)
-# that points at the gonzoclaw FastAPI backend on localhost:18790.
+# calls go to /api/gonzoclaw/* on this same server, which proxies to the
+# gonzoclaw FastAPI backend on localhost:18790. Same-origin = no CORS, no
+# new auth, the existing oc_token gate covers the chat backend automatically.
 GONZOCLAW_DIST = Path.home() / "gonzoclaw" / "frontend" / "dist"
 GONZOCLAW_ASSETS = GONZOCLAW_DIST / "assets"
+GONZOCLAW_BACKEND = "http://localhost:18790"
 
 
 @app.get("/chat-app")
@@ -2847,7 +2849,7 @@ async def chat_app_index(request: Request):
     index = GONZOCLAW_DIST / "index.html"
     if not index.exists():
         return HTMLResponse(
-            content="<h1>chat-app build missing</h1><p>run: cd ~/gonzoclaw/frontend && VITE_BASE_PATH=/chat-app/ VITE_API_BASE=https://gonzoclaw-api.asdfghjk.lol npm run build</p>",
+            content="<h1>chat-app build missing</h1><p>run: cd ~/gonzoclaw/frontend && VITE_BASE_PATH=/chat-app/ VITE_API_PATH=/api/gonzoclaw npm run build</p>",
             status_code=503,
         )
     return HTMLResponse(
@@ -2862,6 +2864,68 @@ if GONZOCLAW_ASSETS.exists():
         "/chat-app/assets",
         StaticFiles(directory=str(GONZOCLAW_ASSETS)),
         name="chat_app_assets",
+    )
+
+
+# ── Streaming proxy: /api/gonzoclaw/* → gonzoclaw FastAPI backend ────────────
+# Same-origin proxy so the SPA's API calls inherit this dashboard's oc_token
+# auth gate (GitHub OAuth) without any extra plumbing. Critical for SSE: we
+# stream raw bytes both directions with no buffering.
+@app.api_route(
+    "/api/gonzoclaw/{path:path}",
+    methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
+)
+async def gonzoclaw_proxy(path: str, request: Request):
+    # Auth gate — same as the rest of the dashboard's protected routes.
+    # Return 401 instead of redirecting to /login because EventSource and
+    # fetch can't follow auth redirects in any useful way.
+    token = request.cookies.get("oc_token")
+    if not token or not verify_token(token):
+        if not is_localhost(request):
+            return JSONResponse({"error": "unauthorized"}, status_code=401)
+
+    # Build target URL on the gonzoclaw backend, preserving query string.
+    target = f"{GONZOCLAW_BACKEND}/api/{path}"
+    if request.url.query:
+        target = f"{target}?{request.url.query}"
+
+    # Forward request headers, dropping hop-by-hop and host header so the
+    # backend sees its own host.
+    drop_req = {"host", "content-length", "connection", "keep-alive",
+                "transfer-encoding", "upgrade"}
+    fwd_headers = {k: v for k, v in request.headers.items()
+                   if k.lower() not in drop_req}
+
+    body = await request.body() if request.method != "GET" else None
+
+    # Stream both directions. timeout=None because SSE can be long-lived.
+    client = httpx.AsyncClient(timeout=None)
+    upstream_req = client.build_request(
+        method=request.method,
+        url=target,
+        headers=fwd_headers,
+        content=body,
+    )
+    upstream = await client.send(upstream_req, stream=True)
+
+    async def relay():
+        try:
+            async for chunk in upstream.aiter_raw():
+                yield chunk
+        finally:
+            await upstream.aclose()
+            await client.aclose()
+
+    drop_resp = {"content-length", "content-encoding", "transfer-encoding",
+                 "connection", "keep-alive"}
+    resp_headers = {k: v for k, v in upstream.headers.items()
+                    if k.lower() not in drop_resp}
+
+    return StreamingResponse(
+        relay(),
+        status_code=upstream.status_code,
+        headers=resp_headers,
+        media_type=upstream.headers.get("content-type"),
     )
 
 
