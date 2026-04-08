@@ -91,7 +91,15 @@ TERMINAL_PID   = LOGS_DIR / "terminal-relay.pid"
 
 # ── App ───────────────────────────────────────────────────────────────────────
 app = FastAPI(title="OpenClaw Dashboard")
-app.add_middleware(GZipMiddleware, minimum_size=1000)
+# GZip is set to a very high minimum so it effectively never triggers.
+# Starlette's GZipMiddleware buffers the first `minimum_size` bytes of ANY
+# response to decide whether to compress, which catastrophically breaks SSE:
+# the /api/gonzoclaw/*/stream proxy delivers tokens live but gzip holds them
+# in its buffer until the stream ends. Cloudflare's edge handles compression
+# for all remote clients anyway (asdfghjk.lol via cloudflared), so local
+# gzip is redundant. Raising this threshold keeps the middleware registered
+# in case something depends on it, without actually compressing anything.
+app.add_middleware(GZipMiddleware, minimum_size=10_000_000)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
                    allow_methods=["*"], allow_headers=["*"])
 
