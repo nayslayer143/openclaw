@@ -57,6 +57,44 @@ struct ContentView: View {
         }
     }
 
+    /// Scans the per-user Imports directory for any file:// photos
+    /// that haven't been registered yet and auto-adds them to a
+    /// "My Favorites" album. Safe to call on every launch — idempotent
+    /// based on existing PhotoReference identifiers.
+    @MainActor
+    private func autoImportLooseFiles(_ dm: DataManager) {
+        let userDir = UserSession.shared.activeUserDirectory
+        let importsDir = userDir.appendingPathComponent("Imports", isDirectory: true)
+        guard FileManager.default.fileExists(atPath: importsDir.path) else { return }
+
+        let files = (try? FileManager.default.contentsOfDirectory(
+            at: importsDir,
+            includingPropertiesForKeys: nil
+        )) ?? []
+
+        let imageExtensions: Set<String> = ["jpg", "jpeg", "heic", "heif", "png", "gif"]
+        let imageFiles = files.filter {
+            imageExtensions.contains($0.pathExtension.lowercased())
+        }
+        guard !imageFiles.isEmpty else { return }
+
+        // Find or create the "My Favorites" album
+        let folderName = "My Favorites"
+        let roots = dm.fetchFolders(parentId: nil)
+        let album = roots.first(where: { $0.name == folderName })
+            ?? dm.createFolder(name: folderName)
+
+        // Only add files that aren't already referenced
+        let existingIds: Set<String> = Set((album.photoReferences ?? []).map(\.id))
+        let newIdentifiers: [String] = imageFiles.compactMap { url in
+            let id = "file://\(url.path)"
+            return existingIds.contains(id) ? nil : id
+        }
+        guard !newIdentifiers.isEmpty else { return }
+
+        dm.addPhotos(assetIdentifiers: newIdentifiers, to: album)
+    }
+
     #if DEBUG
     @MainActor
     private func seedDebugDataIfNeeded(_ dm: DataManager) {
@@ -100,6 +138,13 @@ struct ContentView: View {
             }
             dm.saveSettings()
         }
+
+        // On every launch: scan Documents/users/_local/Imports for any
+        // file:// photos that aren't yet registered in a folder, and
+        // auto-create a "My Favorites" album containing them. Lets us
+        // drop photos into the sim container outside the app and have
+        // them show up on next launch. Only runs when the folder exists.
+        autoImportLooseFiles(dm)
         let s = dm.getOrCreateSettings()
         if args.contains("-showOnboarding") {
             // Force the onboarding flow for screenshots.
