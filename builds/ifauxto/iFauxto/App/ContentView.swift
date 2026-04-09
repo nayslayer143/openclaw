@@ -46,6 +46,7 @@ struct ContentView: View {
         }
         .animation(Theme.Motion.soft, value: showOnboarding)
         .animation(Theme.Motion.soft, value: authDecided)
+        .animation(Theme.Motion.soft, value: didBootstrap)
         .animation(Theme.Motion.soft, value: settings.homeViewMode)
         .task {
             // Photo permission is requested lazily from views that actually
@@ -60,6 +61,7 @@ struct ContentView: View {
                 }
             }
             hasCheckedAuth = true
+            didBootstrap = true
         }
     }
 
