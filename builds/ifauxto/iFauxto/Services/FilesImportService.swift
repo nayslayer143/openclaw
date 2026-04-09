@@ -7,15 +7,16 @@ import UIKit
 /// these identifiers via the `file:` prefix path.
 enum FilesImportService {
 
-    /// Copies a list of security-scoped URLs into Documents/Imports/
-    /// and returns the new on-disk URLs as identifiers.
+    /// Copies a list of security-scoped URLs into the current user's
+    /// Imports directory and returns stable `local:` identifiers.
+    /// Relative paths survive reinstalls — iOS rolls the app container
+    /// UUID on every install, so absolute file:// paths would orphan.
+    @MainActor
     static func importFiles(_ urls: [URL]) -> [String] {
         var imported: [String] = []
         let fm = FileManager.default
-        guard let docs = fm.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            return []
-        }
-        let importsDir = docs.appendingPathComponent("Imports", isDirectory: true)
+        let importsDir = UserSession.shared.activeUserDirectory
+            .appendingPathComponent("Imports", isDirectory: true)
         if !fm.fileExists(atPath: importsDir.path) {
             try? fm.createDirectory(at: importsDir, withIntermediateDirectories: true)
         }
@@ -28,9 +29,7 @@ enum FilesImportService {
             let dest = importsDir.appendingPathComponent(unique)
             do {
                 try fm.copyItem(at: src, to: dest)
-                // Use file:// URL string as the identifier so the rest of
-                // the app can branch on the prefix.
-                imported.append("file://\(dest.path)")
+                imported.append("local:Imports/\(unique)")
             } catch {
                 continue
             }

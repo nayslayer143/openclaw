@@ -11,6 +11,7 @@ struct ContentView: View {
     @State private var hasCheckedAuth = false
     @State private var showOnboarding = false
     @State private var authDecided = false
+    @State private var didBootstrap = false
 
     private var settings: AppSettings {
         allSettings.first ?? dataManager.getOrCreateSettings()
@@ -26,6 +27,11 @@ struct ContentView: View {
             if !authDecided && !userSession.isAuthenticated && !hasGuestSession {
                 SignInView { authDecided = true }
                     .transition(.opacity)
+            } else if !didBootstrap {
+                // Hold the main view until seed + auto-import have run so
+                // HomeView sees the final folder list on its first onAppear.
+                Color(red: 0.949, green: 0.949, blue: 0.969).ignoresSafeArea()
+                    .overlay(ProgressView().tint(Color(red: 0.0, green: 0.478, blue: 1.0)))
             } else if showOnboarding {
                 OnboardingView {
                     withAnimation(Theme.Motion.soft) {
@@ -57,10 +63,15 @@ struct ContentView: View {
         }
     }
 
-    /// Scans the per-user Imports directory for any file:// photos
+    /// Scans the per-user Imports directory for any local photos
     /// that haven't been registered yet and auto-adds them to a
-    /// "My Favorites" album. Safe to call on every launch — idempotent
-    /// based on existing PhotoReference identifiers.
+    /// "My Favorites" album.
+    ///
+    /// Identifiers are stored as `local:Imports/<filename>` — a
+    /// RELATIVE path resolved against the current user's Documents
+    /// directory at load time. Absolute file:// paths would break on
+    /// every reinstall because the iOS Application container UUID
+    /// changes and the stored path becomes dead.
     @MainActor
     private func autoImportLooseFiles(_ dm: DataManager) {
         let userDir = UserSession.shared.activeUserDirectory
@@ -84,10 +95,11 @@ struct ContentView: View {
         let album = roots.first(where: { $0.name == folderName })
             ?? dm.createFolder(name: folderName)
 
-        // Only add files that aren't already referenced
-        let existingIds: Set<String> = Set((album.photoReferences ?? []).map(\.id))
+        // Dedupe against a fresh fetch (relationship accessor is stale
+        // on cold launches).
+        let existingIds: Set<String> = Set(dm.fetchPhotos(in: album).map(\.id))
         let newIdentifiers: [String] = imageFiles.compactMap { url in
-            let id = "file://\(url.path)"
+            let id = "local:Imports/\(url.lastPathComponent)"
             return existingIds.contains(id) ? nil : id
         }
         guard !newIdentifiers.isEmpty else { return }

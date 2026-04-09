@@ -94,7 +94,7 @@ struct ChronologicalFeedView: View {
                     .padding(.bottom, isSelectMode ? 96 : 40)
                 }
                 .scrollIndicators(.hidden)
-                .gesture(pinchGesture)
+                .simultaneousGesture(pinchGesture)
 
                 // Bottom action bar in select mode
                 if isSelectMode {

@@ -188,6 +188,7 @@ private struct FullPhotoView: View {
 
     private var isDemo: Bool { identifier.hasPrefix("demo:") }
     private var isDemoVideo: Bool { identifier.hasPrefix("demo:video:") }
+    private var isLocalFile: Bool { FileImageLoader.isLocalIdentifier(identifier) }
 
     var body: some View {
         GeometryReader { geo in
@@ -230,6 +231,12 @@ private struct FullPhotoView: View {
         }
         .task(id: identifier) {
             guard !isDemo else { return }
+            if isLocalFile, let url = FileImageLoader.resolveURL(for: identifier) {
+                isVideo = false
+                playerItem = nil
+                image = await FileImageLoader.loadFull(url: url)
+                return
+            }
             if photoKitService.isVideo(identifier: identifier) {
                 isVideo = true
                 playerItem = await photoKitService.loadPlayerItem(for: identifier)

@@ -38,7 +38,12 @@ struct FolderView: View {
         }
     }
 
-    private let columns = [GridItem(.adaptive(minimum: 110), spacing: 2)]
+    @AppStorage("iFauxto.folderColumns") private var columnCount: Int = 3
+    @State private var pinchBase: CGFloat = 0
+
+    private var columns: [GridItem] {
+        Array(repeating: GridItem(.flexible(), spacing: 2), count: max(2, min(8, columnCount)))
+    }
 
     var body: some View {
         ZStack(alignment: .top) {
@@ -68,6 +73,7 @@ struct FolderView: View {
                 .padding(.bottom, 60)
             }
             .scrollIndicators(.hidden)
+            .simultaneousGesture(pinchGesture)
 
             BrandTopBar(
                 title: folder.name,
@@ -111,6 +117,7 @@ struct FolderView: View {
         .fullScreenCover(isPresented: $showingSlideshow) {
             SlideshowView(photoIds: photos.map(\.id))
         }
+        #if targetEnvironment(macCatalyst)
         .dropDestination(for: URL.self) { urls, _ in
             let ids = FilesImportService.importFiles(urls)
             guard !ids.isEmpty else { return false }
@@ -119,6 +126,7 @@ struct FolderView: View {
             loadContent()
             return true
         }
+        #endif
         .sheet(isPresented: $showingFilesImport) {
             FilesImporterView { urls in
                 let identifiers = FilesImportService.importFiles(urls)
@@ -144,38 +152,34 @@ struct FolderView: View {
 
     @ViewBuilder
     private func photoCell(_ photo: PhotoReference) -> some View {
+        // Minimal gesture stack: a single Button handles tap + nav in
+        // non-edit mode, a tap gesture handles selection in edit mode.
+        // `.draggable` / `.dropDestination` were removed from individual
+        // cells because the gesture arbitration cost on 100+ cells was
+        // eating scroll and pinch events. Reordering lives in a future
+        // dedicated Reorder mode instead.
         let thumb = PhotoThumbnailView(
             photo: photo,
             isSelected: selectedPhotoIds.contains(photo.id),
             isEditMode: isEditMode
         )
-        .draggable(photo.id) {
-            PhotoThumbnailView(photo: photo, isSelected: false, isEditMode: false)
-                .frame(width: 80, height: 80)
-                .opacity(0.9)
-        }
-        .dropDestination(for: String.self) { items, _ in
-            guard photoSortMode == "custom" else { return false }
-            guard let sourceId = items.first, sourceId != photo.id else { return false }
-            withAnimation(.easeInOut(duration: 0.2)) {
-                photos = DragDropManager.reorder(photos, draggedId: sourceId, targetId: photo.id)
-            }
-            dataManager.updatePhotoOrder(photos)
-            return true
-        }
 
         if isEditMode {
             thumb
+                .contentShape(Rectangle())
                 .onTapGesture { toggleSelection(photo.id) }
         } else {
-            NavigationLink(value: PhotoViewerRoute(
-                photoIds: photos.map(\.id),
-                startIndex: photos.firstIndex(where: { $0.id == photo.id }) ?? 0
-            )) {
+            Button {
+                Haptics.tap()
+                let route = PhotoViewerRoute(
+                    photoIds: photos.map(\.id),
+                    startIndex: photos.firstIndex(where: { $0.id == photo.id }) ?? 0
+                )
+                navCoordinator.path.append(route)
+            } label: {
                 thumb
             }
             .buttonStyle(PressableButtonStyle(scale: 0.97))
-            .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
         }
     }
 
@@ -320,6 +324,26 @@ struct FolderView: View {
             }
             .simultaneousGesture(TapGesture().onEnded { Haptics.tap() })
         }
+    }
+
+    // MARK: Pinch gesture
+
+    private var pinchGesture: some Gesture {
+        MagnificationGesture()
+            .onChanged { value in
+                if pinchBase == 0 { pinchBase = value }
+                let delta = value / max(pinchBase, 0.01)
+                if delta > 1.25, columnCount < 8 {
+                    columnCount += 1
+                    Haptics.tap()
+                    pinchBase = value
+                } else if delta < 0.8, columnCount > 2 {
+                    columnCount -= 1
+                    Haptics.tap()
+                    pinchBase = value
+                }
+            }
+            .onEnded { _ in pinchBase = 0 }
     }
 
     // MARK: Actions

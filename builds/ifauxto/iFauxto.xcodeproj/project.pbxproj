@@ -59,6 +59,7 @@
 		86CB63B6797FFB57931E6EFF /* PhotoDateGrouper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 061AD383146F0172B281AE5F /* PhotoDateGrouper.swift */; };
 		87020180D373F43B388B6C66 /* PhotoReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B59C50C8B9DC6F9843D3F4 /* PhotoReferenceTests.swift */; };
 		8A3046BDE020FFABBB140FA6 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 79A56CD0AC746AF69D860C82 /* MainInterface.storyboard */; };
+		94898F992A94364953AE6D5E /* FileImageLoader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 774E34D0AB20B408B8D9F661 /* FileImageLoader.swift */; };
 		999870C5A6DF2F6641712009 /* CropOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = D63EA566C1F7C5D9854D08B9 /* CropOverlay.swift */; };
 		9CA9EC633A3EFB42F1370DAE /* FilesImporterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E02CE1F6D0771E6E25C9D30C /* FilesImporterView.swift */; };
 		9F04A334184A10519ECFE62D /* ShareInboxService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75EC41AE44C86B553F0EDA60 /* ShareInboxService.swift */; };
@@ -179,6 +180,7 @@
 		72BFD302313DA02BDFEF8540 /* FolderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderView.swift; sourceTree = "<group>"; };
 		7499D48A43F67A41182CF0AA /* FacesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FacesView.swift; sourceTree = "<group>"; };
 		75EC41AE44C86B553F0EDA60 /* ShareInboxService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareInboxService.swift; sourceTree = "<group>"; };
+		774E34D0AB20B408B8D9F661 /* FileImageLoader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FileImageLoader.swift; sourceTree = "<group>"; };
 		7CFBD37FDF056876440DC5F1 /* TagStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagStore.swift; sourceTree = "<group>"; };
 		7D1EF0CC048FBD2DF20CC251 /* EventsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventsView.swift; sourceTree = "<group>"; };
 		835020AA28B85DD9AEB9F5D7 /* EditState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditState.swift; sourceTree = "<group>"; };
@@ -308,6 +310,7 @@
 				01ED550A03711B56F8827E42 /* CloudKitService.swift */,
 				64BB2C611F152A155801D7B4 /* EditService.swift */,
 				1E1C5EA945845DC26E8621ED /* FaceClusteringService.swift */,
+				774E34D0AB20B408B8D9F661 /* FileImageLoader.swift */,
 				64AB2284389624C8BA317DB2 /* FilesImportService.swift */,
 				1FC9AF40754C1E1DAF5E2F4E /* IndexingManager.swift */,
 				71023995B7DB672B2865A799 /* LibraryImportService.swift */,
@@ -594,6 +597,7 @@
 				AC11C28C711ABAFF06157016 /* FaceCluster.swift in Sources */,
 				E19245602C45468D38273ADB /* FaceClusteringService.swift in Sources */,
 				7C146E6FDDA738D958884002 /* FacesView.swift in Sources */,
+				94898F992A94364953AE6D5E /* FileImageLoader.swift in Sources */,
 				1A8DDC0088C88DAD76BFE673 /* FilesImportService.swift in Sources */,
 				9CA9EC633A3EFB42F1370DAE /* FilesImporterView.swift in Sources */,
 				7F88F49A9FD589DE5A853A92 /* Folder.swift in Sources */,

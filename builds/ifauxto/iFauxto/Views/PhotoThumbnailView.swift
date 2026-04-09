@@ -10,7 +10,7 @@ struct PhotoThumbnailView: View {
     @State private var thumbnail: UIImage?
 
     private var isDemo: Bool { photo.id.hasPrefix("demo:") }
-    private var isFileURL: Bool { photo.id.hasPrefix("file://") }
+    private var isLocalFile: Bool { FileImageLoader.isLocalIdentifier(photo.id) }
 
     private var demoColor: Color {
         DemoPalette.color(for: photo.id)
@@ -60,12 +60,8 @@ struct PhotoThumbnailView: View {
         .animation(.easeInOut(duration: 0.15), value: isSelected)
         .task(id: photo.id) {
             guard !isDemo else { return }
-            if isFileURL {
-                if let url = URL(string: photo.id),
-                   let data = try? Data(contentsOf: url),
-                   let img = UIImage(data: data) {
-                    thumbnail = img
-                }
+            if isLocalFile, let url = FileImageLoader.resolveURL(for: photo.id) {
+                thumbnail = await FileImageLoader.loadThumbnail(url: url, maxPixelSize: 400)
                 return
             }
             thumbnail = await photoKitService.loadThumbnail(

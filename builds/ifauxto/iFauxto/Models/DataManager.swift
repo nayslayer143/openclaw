@@ -130,9 +130,11 @@ final class DataManager: ObservableObject {
     }
 
     func addPhotos(assetIdentifiers: [String], to folder: Folder) {
+        // Dedupe against the CURRENT persisted set, not the relationship
+        // accessor which can be stale on cold launches.
+        let existing = Set(fetchPhotos(in: folder).map(\.id))
         for identifier in assetIdentifiers {
-            // Skip duplicates in this folder
-            guard !(folder.photoReferences ?? []).contains(where: { $0.id == identifier }) else { continue }
+            guard !existing.contains(identifier) else { continue }
             _ = addPhoto(assetIdentifier: identifier, to: folder)
         }
     }
