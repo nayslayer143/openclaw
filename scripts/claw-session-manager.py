@@ -32,8 +32,8 @@ SNAPSHOT_DIR = STATE_DIR / "snapshots"
 PID_FILE = STATE_DIR / "claw-session-manager.pid"
 
 POLL_INTERVAL = 5        # seconds
-STALL_TIMEOUT = 600      # 10 minutes — no output = stalled
-STALL_PROBE_WAIT = 120   # 2 minutes after probe before kill
+STALL_TIMEOUT = 14400    # 4 hours — Claude Code idles silently; never kill a healthy session
+STALL_PROBE_WAIT = 600   # 10 minutes after probe before kill
 
 # Hardcoded claw definitions: session_name -> workdir
 CLAWS = {
@@ -134,12 +134,47 @@ def get_pane_pid(session):
 
 
 def find_claude_pid(pane_pid):
-    """Find a claude process that is a child of the given pane PID."""
+    """Detect whether claude is running in the pane.
+
+    Uses two complementary checks:
+    1. pgrep on the pane PID's direct children AND grandchildren — covers the
+       typical shell → wrapper → claude-electron tree.
+    2. Falls back to checking the pane's current foreground command via the
+       pane_pid → pane_id mapping (reliable even if claude re-execs).
+
+    Returns a truthy string (PID) if claude is found, None otherwise.
+    """
     if not pane_pid:
         return None
+
+    # Direct children first (fast path, works when shell directly execs claude)
     rc, out = run_cmd(f"pgrep -P {pane_pid} -f claude 2>/dev/null")
     if rc == 0 and out:
         return out.split("\n")[0].strip()
+
+    # Grandchildren — covers shell → node/wrapper → claude-electron
+    rc2, children = run_cmd(f"pgrep -P {pane_pid} 2>/dev/null")
+    if rc2 == 0 and children:
+        for child in children.split("\n"):
+            child = child.strip()
+            if not child:
+                continue
+            rc3, out3 = run_cmd(f"pgrep -P {child} -f claude 2>/dev/null")
+            if rc3 == 0 and out3:
+                return out3.split("\n")[0].strip()
+
+    # Last resort: ask tmux what the foreground command is for this pane_pid
+    rc4, pane_id = run_cmd(
+        f"tmux list-panes -a -F '#{{pane_pid}} #{{pane_id}}' 2>/dev/null"
+        f" | awk '$1==\"{pane_pid}\" {{print $2; exit}}'"
+    )
+    if rc4 == 0 and pane_id:
+        rc5, cmd = run_cmd(
+            f"tmux display-message -t {pane_id} -p '#{{pane_current_command}}' 2>/dev/null"
+        )
+        if rc5 == 0 and "claude" in cmd.lower():
+            return pane_pid  # Return pane_pid as a stand-in PID
+
     return None
 
 
