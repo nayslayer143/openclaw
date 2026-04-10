@@ -52,6 +52,15 @@ SESSION_TO_NAME = {
 }
 
 # ---------------------------------------------------------------------------
+# PATH fix — ensure homebrew bin is reachable when started with minimal env
+# (e.g. via nohup/launchd which provides only PATH=/usr/bin:/bin)
+# ---------------------------------------------------------------------------
+
+for _p in ("/opt/homebrew/bin", "/usr/local/bin"):
+    if _p not in os.environ.get("PATH", "").split(":"):
+        os.environ["PATH"] = _p + ":" + os.environ.get("PATH", "")
+
+# ---------------------------------------------------------------------------
 # Logging
 # ---------------------------------------------------------------------------
 
@@ -63,7 +72,8 @@ logging.basicConfig(
     format="[%(asctime)s] %(levelname)s %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
     handlers=[
-        logging.StreamHandler(),
+        # FileHandler only — no StreamHandler to avoid duplicate lines when
+        # the process stdout is also redirected to this same log file by nohup.
         logging.FileHandler(LOG_DIR / "session-manager.log"),
     ],
 )
