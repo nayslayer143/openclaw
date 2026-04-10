@@ -4,24 +4,24 @@
       "command": "repowise",
       "args": [
         "mcp",
-        "/Users/nayslayer/openclaw",
+        "/Users/nayslayer/code/claw-core/openclaw",
         "--transport",
         "stdio"
       ],
-      "description": "repowise: codebase intelligence \u2014 docs, graph, git signals, dead code, decisions"
+      "description": "repowise: codebase intelligence — docs, graph, git signals, dead code, decisions"
     },
     "pinterest-style-engine": {
-      "command": "/Users/nayslayer/pinterest-style-engine/.venv/bin/python",
+      "command": "/Users/nayslayer/code/claw-intelligence/pinterest-style-engine/.venv/bin/python",
       "args": [
         "-m",
         "src.mcp_server.server"
       ],
-      "cwd": "/Users/nayslayer/pinterest-style-engine",
+      "cwd": "/Users/nayslayer/code/claw-intelligence/pinterest-style-engine",
       "env": {
-        "PSE_DB_PATH": "/Users/nayslayer/pinterest-style-engine/data/style_engine.db",
-        "PSE_DATA_DIR": "/Users/nayslayer/pinterest-style-engine/data"
+        "PSE_DB_PATH": "/Users/nayslayer/code/claw-intelligence/pinterest-style-engine/data/style_engine.db",
+        "PSE_DATA_DIR": "/Users/nayslayer/code/claw-intelligence/pinterest-style-engine/data"
       },
-      "description": "pinterest-style-engine: visual style index \u2014 search scraped Pinterest references, fetch recreation prompts, build design briefs"
+      "description": "pinterest-style-engine: visual style index — search scraped Pinterest references, fetch recreation prompts, build design briefs"
     }
   }
 }

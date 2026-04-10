@@ -5,7 +5,7 @@ Uses BrowserPool for persistent browser reuse across calls.
 Returns structured dicts so Claude Code can inspect results.
 
 Usage from Claude Code session:
-    import sys; sys.path.insert(0, '/Users/nayslayer/openclaw/scripts')
+    import sys; sys.path.insert(0, '/Users/nayslayer/code/claw-core/openclaw/scripts')
     from browser.browser_tools import browser_open, browser_screenshot, browser_click
 """
 from __future__ import annotations

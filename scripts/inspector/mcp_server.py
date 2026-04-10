@@ -20,7 +20,7 @@ Usage (Claude Code settings.json):
     "mcpServers": {
       "inspector-gadget": {
         "command": "python3",
-        "args": ["/Users/nayslayer/openclaw/scripts/inspector/mcp_server.py"]
+        "args": ["/Users/nayslayer/code/claw-core/openclaw/scripts/inspector/mcp_server.py"]
       }
     }
   }
