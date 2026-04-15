@@ -34,13 +34,14 @@ PID_FILE = STATE_DIR / "claw-session-manager.pid"
 POLL_INTERVAL = 5        # seconds
 STALL_TIMEOUT = 14400    # 4 hours — Claude Code idles silently; never kill a healthy session
 STALL_PROBE_WAIT = 600   # 10 minutes after probe before kill
+MIN_REBOOT_INTERVAL = 900  # 15 minutes — hard circuit breaker against restart loops
 
 # Hardcoded claw definitions: session_name -> workdir
 CLAWS = {
-    "claw-clawmpson": str(HOME / "openclaw"),
-    "claw-rival":     str(HOME / "rivalclaw"),
-    "claw-quant":     str(HOME / "quantumentalclaw"),
-    "claw-monkey":    str(HOME / "codemonkeyclaw"),
+    "claw-clawmpson": str(HOME / "code" / "claw-core" / "openclaw"),
+    "claw-rival":     str(HOME / "code" / "claw-core" / "rivalclaw"),
+    "claw-quant":     str(HOME / "code" / "claw-core" / "quantumentalclaw"),
+    "claw-monkey":    str(HOME / "code" / "claw-platform" / "codemonkeyclaw"),
 }
 
 # Map session names to friendly names (for state file keys)
@@ -338,6 +339,20 @@ def ensure_state_entry(state, name, session, workdir):
 # ---------------------------------------------------------------------------
 
 
+def can_reboot(entry):
+    """Circuit breaker: only allow a reboot if at least MIN_REBOOT_INTERVAL
+    has passed since the last one. Prevents runaway restart loops."""
+    last = entry.get("_lastRebootTs", 0)
+    return (time.time() - last) >= MIN_REBOOT_INTERVAL
+
+
+def mark_reboot(entry, reason):
+    entry["_lastRebootTs"] = time.time()
+    entry["reboots"] = entry.get("reboots", 0) + 1
+    entry["lastRebootReason"] = reason
+    entry["started"] = now_iso()
+
+
 def monitor_claw(name, session, workdir, state):
     """Check and manage a single claw instance. Returns updated state entry."""
     entry = ensure_state_entry(state, name, session, workdir)
@@ -351,6 +366,9 @@ def monitor_claw(name, session, workdir, state):
 
     # ── Check 2: Does the tmux session exist? ──
     if not tmux_session_exists(session):
+        if not can_reboot(entry):
+            entry["status"] = "cooldown"
+            return entry
         log.warning(f"[{name}] tmux session '{session}' is dead — recreating")
         log_health_event(name, "tmux_died")
         create_tmux_session(session, workdir)
@@ -358,9 +376,7 @@ def monitor_claw(name, session, workdir, state):
         restart_claude(session, name)
         entry["status"] = "restarting"
         entry["pid"] = None
-        entry["started"] = now_iso()
-        entry["reboots"] = entry.get("reboots", 0) + 1
-        entry["lastRebootReason"] = "tmux_died"
+        mark_reboot(entry, "tmux_died")
         return entry
 
     # ── Check 3: Is claude running? ──
@@ -369,6 +385,11 @@ def monitor_claw(name, session, workdir, state):
 
     if not claude_pid:
         # Claude is not running — check why
+        if not can_reboot(entry):
+            entry["status"] = "cooldown"
+            entry["pid"] = None
+            return entry
+
         pane_content = capture_pane(session, 300)
 
         if detect_token_exhaustion(pane_content):
@@ -377,8 +398,6 @@ def monitor_claw(name, session, workdir, state):
             save_snapshot(name, pane_content, reason)
             log_health_event(name, reason)
             restart_claude(session, name, resume_flag="--resume")
-            entry["reboots"] = entry.get("reboots", 0) + 1
-            entry["lastRebootReason"] = reason
 
         elif detect_crash(pane_content):
             reason = "crash"
@@ -386,20 +405,16 @@ def monitor_claw(name, session, workdir, state):
             save_snapshot(name, pane_content, reason)
             log_health_event(name, reason)
             restart_claude(session, name)
-            entry["reboots"] = entry.get("reboots", 0) + 1
-            entry["lastRebootReason"] = reason
 
         else:
             reason = "process_exited"
             log.info(f"[{name}] claude not running — restarting")
             log_health_event(name, reason)
             restart_claude(session, name)
-            entry["reboots"] = entry.get("reboots", 0) + 1
-            entry["lastRebootReason"] = reason
 
         entry["status"] = "restarting"
         entry["pid"] = None
-        entry["started"] = now_iso()
+        mark_reboot(entry, reason)
         return entry
 
     # Claude IS running
@@ -424,6 +439,9 @@ def monitor_claw(name, session, workdir, state):
 
             if now_ts - probe_sent > STALL_PROBE_WAIT and probe_sent > 0:
                 # Already probed and still stalled — kill and restart
+                if not can_reboot(entry):
+                    entry["status"] = "cooldown"
+                    return entry
                 log.warning(
                     f"[{name}] stalled for {stall_duration:.0f}s "
                     f"(probe sent {now_ts - probe_sent:.0f}s ago) — killing"
@@ -438,9 +456,7 @@ def monitor_claw(name, session, workdir, state):
                 restart_claude(session, name, resume_flag="--resume")
                 entry["status"] = "restarting"
                 entry["pid"] = None
-                entry["started"] = now_iso()
-                entry["reboots"] = entry.get("reboots", 0) + 1
-                entry["lastRebootReason"] = "stall"
+                mark_reboot(entry, "stall")
                 entry["_probeSent"] = 0
                 entry["_lastOutputChange"] = now_ts
 
