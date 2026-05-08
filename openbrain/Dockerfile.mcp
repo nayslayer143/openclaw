@@ -1,0 +1,21 @@
+# openbrain-mcp Docker image
+# Adapted from openbrain/upstream/integrations/kubernetes-deployment/Dockerfile
+# (Deno 2.3.3, Hono, MCP SDK, Postgres pool).
+#
+# Build context = openbrain/ so the COPY can reach upstream/.
+
+FROM denoland/deno:2.3.3
+
+WORKDIR /app
+
+# Cache deps from upstream's deno.json
+COPY upstream/integrations/kubernetes-deployment/deno.json ./
+RUN deno install
+
+# Source
+COPY upstream/integrations/kubernetes-deployment/index.ts ./
+
+USER deno
+EXPOSE 8000
+
+CMD ["deno", "run", "--allow-net", "--allow-env", "--allow-read", "index.ts"]
