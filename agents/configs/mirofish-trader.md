@@ -133,3 +133,16 @@ JORDAN_TELEGRAM_CHAT_ID=<your_chat_id>
 - Expired market P&L uses last cached price, not actual binary settlement (approximation)
 - Sharpe ratio requires 14+ days of data (std=0 guard before that)
 - No backtest mode in current version (future phase)
+
+---
+
+## OpenBrain (OB1) memory
+
+This agent: **search-only — never capture (trading state stays in clawmson.db)**.
+
+Recall before non-trivial work, capture per role rules, never store raw
+transcripts or secrets. Full instructions: [_openbrain.md](_openbrain.md).
+
+Quick path:
+
+    python3 -m scripts.openbrain search "<task>" -k 5

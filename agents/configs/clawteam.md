@@ -65,3 +65,16 @@ All swarm state persists in `~/.openclaw/clawmson.db`:
 - Swarm output never transmitted externally — local only
 - --notify Telegram ping is Tier-1 (auto, no Jordan approval needed)
 - No production deploys triggered by swarm output without Tier-2 approval
+
+---
+
+## OpenBrain (OB1) memory
+
+This agent: **search-only by default**.
+
+Recall before non-trivial work, capture per role rules, never store raw
+transcripts or secrets. Full instructions: [_openbrain.md](_openbrain.md).
+
+Quick path:
+
+    python3 -m scripts.openbrain search "<task>" -k 5

@@ -68,3 +68,16 @@ python ~/openclaw/scripts/inspector/run_inspection.py --report
 
 ## Phase Status
 Phase 5+ — active. Run daily or after each trading session.
+
+---
+
+## OpenBrain (OB1) memory
+
+This agent: **search + capture (compact only)**.
+
+Recall before non-trivial work, capture per role rules, never store raw
+transcripts or secrets. Full instructions: [_openbrain.md](_openbrain.md).
+
+Quick path:
+
+    python3 -m scripts.openbrain search "<task>" -k 5

@@ -60,3 +60,16 @@ python3 ~/openclaw/scripts/skill_auditor.py mcp
 ```
 
 **Known limitation:** Hash verification runs on daily cron + at approval time. No loader hook at Python import level — deferred to future phase.
+
+---
+
+## OpenBrain (OB1) memory
+
+This agent: **search + capture (compact only)**.
+
+Recall before non-trivial work, capture per role rules, never store raw
+transcripts or secrets. Full instructions: [_openbrain.md](_openbrain.md).
+
+Quick path:
+
+    python3 -m scripts.openbrain search "<task>" -k 5

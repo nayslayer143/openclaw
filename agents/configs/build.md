@@ -125,3 +125,16 @@ For new repos with no existing production code, an autonomous loop is available 
 - If specs are inconsistent, use an Opus subagent to resolve the conflict and update the spec
 
 **Invoke:** `bash ~/openclaw/scripts/ralph-loop.sh [plan|build] [max_iterations]`
+
+---
+
+## OpenBrain (OB1) memory
+
+This agent: **search-only by default**.
+
+Recall before non-trivial work, capture per role rules, never store raw
+transcripts or secrets. Full instructions: [_openbrain.md](_openbrain.md).
+
+Quick path:
+
+    python3 -m scripts.openbrain search "<task>" -k 5

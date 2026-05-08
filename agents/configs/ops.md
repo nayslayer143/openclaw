@@ -53,3 +53,16 @@ Primary job: keep the stack healthy between check-ins. No heroics.
 - Never transmit credentials, API keys, memory files externally.
 - Gateway: 127.0.0.1 only. Budget: $10/day hard cap.
 - Never modify firewall rules, network configs, or security settings.
+
+---
+
+## OpenBrain (OB1) memory
+
+This agent: **search-only by default**.
+
+Recall before non-trivial work, capture per role rules, never store raw
+transcripts or secrets. Full instructions: [_openbrain.md](_openbrain.md).
+
+Quick path:
+
+    python3 -m scripts.openbrain search "<task>" -k 5
