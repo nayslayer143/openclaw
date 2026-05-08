@@ -117,3 +117,52 @@
 - All idle work appends to `memory/IDLE_LOG.md`
 - If a cycle fails 3 consecutive times: pause it, Tier-2 Telegram
 - Jordan's engagement is the ONLY limiting factor. Clawmpson keeps the engine running.
+
+---
+
+## Cycle 8: OpenBrain (OB1) maintenance
+
+**Stack:** `~/code/claw-core/openclaw/openbrain/` — Postgres + pgvector + Deno MCP server.
+**Adapter / CLI:** `python3 -m scripts.openbrain` (capture/search/list/fetch/stats).
+**Health:** `bash scripts/openbrain_health.sh`.
+
+### Cron entries to add (DO NOT auto-install — Tier-3 needs Jordan)
+
+```cron
+# OB1 nightly backup → ~/.openclaw/backups/, 30-day retention
+0  3 * * * bash $HOME/code/claw-core/openclaw/scripts/openbrain_backup.sh
+
+# OB1 health check → syslog (oncall picks it up if "FAIL" appears)
+15 3 * * * bash $HOME/code/claw-core/openclaw/scripts/openbrain_health.sh | logger -t openbrain-health
+```
+
+Print these with: `tail -8 IDLE_PROTOCOL.md` and add via `crontab -e`.
+
+### Memory consolidation hook (idle-protocol consolidation script)
+
+After any consolidation pass appends to `memory/MEMORY.md`, ALSO capture
+the new entry into OB1 so it becomes searchable across sessions:
+
+```python
+# in your consolidation script, after MEMORY.md write succeeds:
+try:
+    from scripts.openbrain import OpenBrain
+    with OpenBrain() as ob:
+        ob.capture(entry_text, source="idle-protocol", scope="workspace")
+except Exception as e:
+    print(f"warn: openbrain capture failed: {e}", file=sys.stderr)
+    # MEMORY.md write is authoritative; OB1 capture is best-effort secondary.
+```
+
+### Post-cycle summary capture (Cycles 1, 4, 6, 7)
+
+Each cycle that produces a deliverable should end with a one-line capture:
+
+```bash
+python3 -m scripts.openbrain capture \
+  "Cycle <N> ran at <time>: <one-line outcome>. Output: <path>" \
+  --source idle-protocol --scope workspace
+```
+
+So Jordan's morning review can `python3 -m scripts.openbrain list --source idle-protocol -n 5`
+to see what happened overnight without parsing IDLE_LOG.md.
