@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>PDF Watermark</title>
-<link rel="stylesheet" href="/watermark/static/styles.css" />
+<link rel="stylesheet" href="/watermark/static/styles.css?v=4" />
 </head>
 <body>
 <header>
@@ -28,6 +28,27 @@
     </div>
   </section>
 
+  <section class="step hidden" id="step-crop">
+    <div class="toolbar">
+      <strong>Crop logo</strong>
+      <span class="hint">Drag on the logo to choose a crop region.</span>
+      <span class="sep"></span>
+      <button id="crop-apply" class="primary">Apply crop</button>
+      <button id="crop-cancel">Cancel</button>
+    </div>
+    <div class="stage" id="crop-stage">
+      <canvas id="crop-canvas"></canvas>
+      <div id="crop-overlay">
+        <div id="crop-box" class="hidden">
+          <div class="handle" data-dir="nw"></div>
+          <div class="handle" data-dir="ne"></div>
+          <div class="handle" data-dir="sw"></div>
+          <div class="handle" data-dir="se"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="step hidden" id="step-place">
     <div class="toolbar">
       <button id="prev-page">&larr;</button>
@@ -37,7 +58,9 @@
       <label class="check"><input type="checkbox" id="apply-all" checked> apply to all pages</label>
       <span class="sep"></span>
       <button id="reset-page" title="Reset this page's override">reset page</button>
-      <span class="hint">Drag on the page to draw the logo box, or drag/resize an existing box.</span>
+      <span class="sep"></span>
+      <button id="crop-open" disabled>Crop logo…</button>
+      <span class="hint">Drag on the page to draw the logo box, or drag corners to resize (aspect locked).</span>
     </div>
     <div class="stage" id="stage">
       <canvas id="pdf-canvas"></canvas>
@@ -53,14 +76,19 @@
     </div>
   </section>
 
-  <section class="step hidden" id="step-download">
-    <button id="download-btn" class="primary">Download watermarked PDF</button>
+  <section class="step" id="step-download">
+    <label class="fname">
+      <span>Filename</span>
+      <input type="text" id="filename-input" placeholder="document-watermarked" />
+      <span class="ext">.pdf</span>
+    </label>
+    <button id="download-btn" class="primary" disabled>Download watermarked PDF</button>
     <span id="status"></span>
   </section>
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs" type="module"></script>
 <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-<script type="module" src="/watermark/static/app.js"></script>
+<script type="module" src="/watermark/static/app.js?v=4"></script>
 </body>
 </html>

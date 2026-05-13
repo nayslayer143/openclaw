@@ -51,4 +51,16 @@ main { padding: 16px 32px 64px; display: flex; flex-direction: column; gap: 16px
 button.primary { background: var(--accent); color: #0c1018; border: 0;
   padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; }
 button.primary:hover { filter: brightness(1.1); }
+button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+#crop-overlay { position: absolute; inset: 0; cursor: crosshair; }
+#crop-box { position: absolute; border: 1.5px solid var(--accent);
+  box-shadow: 0 0 0 9999px rgba(0,0,0,0.55); cursor: move; }
 #status { color: var(--mute); margin-left: 12px; font-size: 12px; }
+
+.fname { display: inline-flex; align-items: center; gap: 8px; margin-right: 16px; }
+.fname > span { color: var(--mute); font-size: 12px; }
+.fname input { background: #1f232b; color: var(--ink); border: 1px solid var(--line);
+  border-radius: 6px; padding: 8px 10px; min-width: 280px; font: inherit; }
+.fname input:focus { outline: none; border-color: var(--accent); }
+.fname .ext { color: var(--mute); }
