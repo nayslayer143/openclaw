@@ -2841,6 +2841,28 @@ async def orchestrator_embed(request: Request):
 # calls go to /api/gonzoclaw/* on this same server, which proxies to the
 # gonzoclaw FastAPI backend on localhost:18790. Same-origin = no CORS, no
 # new auth, the existing oc_token gate covers the chat backend automatically.
+# ── /watermark — client-side PDF logo stamper ─────────────────────────────────
+# Cloudflare Access gates this at the edge; no app-level auth here.
+WATERMARK_DIR = Path(__file__).parent / "watermark"
+
+
+@app.get("/watermark", response_class=HTMLResponse)
+@app.get("/watermark/", response_class=HTMLResponse)
+async def watermark_index():
+    return HTMLResponse(
+        content=(WATERMARK_DIR / "index.html").read_text(),
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
+if WATERMARK_DIR.exists():
+    app.mount(
+        "/watermark/static",
+        StaticFiles(directory=str(WATERMARK_DIR)),
+        name="watermark_static",
+    )
+
+
 GONZOCLAW_DIST = Path.home() / "gonzoclaw" / "frontend" / "dist"
 GONZOCLAW_ASSETS = GONZOCLAW_DIST / "assets"
 GONZOCLAW_BACKEND = "http://localhost:18790"
