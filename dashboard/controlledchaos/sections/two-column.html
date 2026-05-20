@@ -1,0 +1,22 @@
+<!-- cc-section: two-column
+     best:  swiss, gallery
+     ok:    immersive, editorial moods
+     avoid: kinetic (steals motion budget)
+     variants: editorial, dialogue, before-after
+     placeholders: left{heading,body}, right{heading,body} -->
+<section class="cc-section cc-two-col"
+         data-pattern="two-column"
+         data-variant="editorial">
+  <div class="container --wide">
+    <div class="cc-two-col__grid">
+      <div class="cc-two-col__col">
+        <h3 class="cc-two-col__heading voice-monument">{{left.heading}}</h3>
+        <p class="cc-two-col__body voice-swiss">{{left.body}}</p>
+      </div>
+      <div class="cc-two-col__col">
+        <h3 class="cc-two-col__heading voice-monument">{{right.heading}}</h3>
+        <p class="cc-two-col__body voice-swiss">{{right.body}}</p>
+      </div>
+    </div>
+  </div>
+</section>

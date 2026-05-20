@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" data-mood="signal" data-forces="immersive">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page Title</title>
+
+  <!-- Fonts (drop voices you don't use to save bytes) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;700&family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Tokens (order matters: forces.css last) -->
+  <link rel="stylesheet" href="tokens/layout.css">
+  <link rel="stylesheet" href="tokens/typography.css">
+  <link rel="stylesheet" href="tokens/color.css">
+  <link rel="stylesheet" href="tokens/motion.css">
+  <link rel="stylesheet" href="tokens/forces.css">
+
+  <style>
+    body {
+      font-family: var(--font-swiss);
+      background: var(--color-bg);
+      color: var(--color-fg);
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <section class="section-hero">
+    <div class="container">
+      <h1 class="voice-monument --massive">Replace with hero copy</h1>
+      <p class="voice-swiss">Subhead — one line that earns its room.</p>
+    </div>
+  </section>
+
+  <!-- BODY -->
+  <section class="section-breath">
+    <div class="container --regular flow">
+      <h2 class="voice-editorial --display">Section title</h2>
+      <p class="voice-swiss">Body paragraph. Use `.flow` on the parent for vertical rhythm. Add `.motion-reveal` to scroll-triggered children and copy the IntersectionObserver snippet from a showcase page if you want fade-up.</p>
+      <p class="voice-swiss">Second paragraph keeps the rhythm.</p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="section-breath">
+    <div class="container flex-between">
+      <span class="voice-swiss --label">© 2026</span>
+      <span class="voice-brutalist --caption">Built with Controlled Chaos</span>
+    </div>
+  </footer>
+
+</body>
+</html>

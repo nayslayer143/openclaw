@@ -1,0 +1,20 @@
+<!-- cc-section: logo-wall
+     best:  swiss, brutalist
+     ok:    gallery
+     avoid: kinetic (motion fights monumentality)
+     variants: grid, marquee, monolith
+     placeholders: heading, logos[] (label, optional href) -->
+<section class="cc-section cc-logo-wall"
+         data-pattern="logo-wall"
+         data-variant="grid">
+  <div class="container --wide flow">
+    <h2 class="cc-logo-wall__heading voice-swiss --label">{{heading}}</h2>
+    <ul class="cc-logo-wall__items">
+      {{#logos}}
+      <li class="cc-logo-wall__item">
+        <a href="{{href}}" class="voice-monument">{{label}}</a>
+      </li>
+      {{/logos}}
+    </ul>
+  </div>
+</section>

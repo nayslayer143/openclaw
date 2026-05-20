@@ -1,0 +1,28 @@
+<!-- cc-section: testimonial
+     best:  all
+     ok:    -
+     avoid: -
+     variants: card (default — single quote), grid (3 side-by-side), featured (large single with company logo)
+     placeholders: testimonials[] (quote, author, role, company, monogram (1-2 char string)) -->
+<section class="cc-section cc-testimonial"
+         data-pattern="testimonial"
+         data-variant="card">
+  <div class="container --regular motion-reveal">
+    <div class="cc-testimonial__items motion-stagger">
+      {{#testimonials}}
+      <figure class="cc-quote-card">
+        <blockquote class="cc-quote-card__quote">
+          <p class="voice-editorial --display">{{quote}}</p>
+        </blockquote>
+        <figcaption class="cc-quote-card__author">
+          <span class="cc-quote-card__avatar" aria-hidden="true">{{monogram}}</span>
+          <span class="cc-quote-card__meta">
+            <span class="cc-quote-card__name voice-monument">{{author}}</span>
+            <span class="cc-quote-card__role voice-swiss">{{role}} · {{company}}</span>
+          </span>
+        </figcaption>
+      </figure>
+      {{/testimonials}}
+    </div>
+  </div>
+</section>

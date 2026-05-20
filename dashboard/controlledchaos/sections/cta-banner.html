@@ -1,0 +1,45 @@
+<!-- cc-section: cta-banner
+     best:  all
+     ok:    -
+     avoid: -
+     variants: inline (default — between sections), sticky-bottom (fixed at bottom, dismissible), divider (decorative orange hairlines)
+     placeholders: heading, supporting (optional), action_text, action_href, dismissible (bool, defaults true for sticky-bottom), banner_key (string for localStorage dismissal key, defaults 'cc-banner-default') -->
+<section class="cc-section cc-banner"
+         data-pattern="cta-banner"
+         data-variant="inline"
+         data-key="{{banner_key}}">
+  <div class="container --wide cc-banner__inner">
+    <div class="cc-banner__copy">
+      <h2 class="cc-banner__heading voice-monument">{{heading}}</h2>
+      <p class="cc-banner__supporting voice-swiss">{{supporting}}</p>
+    </div>
+    <a class="cc-banner__action voice-swiss --label" href="{{action_href}}">
+      {{action_text}}
+      <span aria-hidden="true">→</span>
+    </a>
+    <button class="cc-banner__dismiss" type="button" aria-label="Dismiss" hidden>
+      <span aria-hidden="true">×</span>
+    </button>
+  </div>
+</section>
+
+<script>
+  (function () {
+    document.querySelectorAll('.cc-banner[data-variant="sticky-bottom"]').forEach(function (banner) {
+      var key = 'cc-banner-dismissed-' + (banner.dataset.key || 'default');
+      if (localStorage.getItem(key) === '1') {
+        banner.remove();
+        return;
+      }
+      var dismiss = banner.querySelector('.cc-banner__dismiss');
+      if (dismiss) {
+        dismiss.hidden = false;
+        dismiss.addEventListener('click', function () {
+          localStorage.setItem(key, '1');
+          banner.setAttribute('data-dismissing', '');
+          setTimeout(function () { banner.remove(); }, 300);
+        });
+      }
+    });
+  })();
+</script>

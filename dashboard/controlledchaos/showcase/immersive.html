@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en" data-mood="signal" data-forces="immersive">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mode 03 — Immersive Dark</title>
+  <link rel="stylesheet" href="../tokens/layout.css">
+  <link rel="stylesheet" href="../tokens/typography.css">
+  <link rel="stylesheet" href="../tokens/color.css">
+  <link rel="stylesheet" href="../tokens/motion.css">
+  <link rel="stylesheet" href="../tokens/forces.css">
+  <style>
+    body {
+      font-family: var(--font-expressive);
+      background: var(--color-bg);
+      color: var(--color-fg);
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    /* --- GRAIN OVERLAY --- */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      opacity: 0.04;
+      pointer-events: none;
+      z-index: 9999;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 256px 256px;
+      animation: grain-shift 8s steps(10) infinite;
+    }
+
+    /* --- NAV --- */
+    .immersive-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-m) var(--gutter);
+      font-size: var(--type-caption);
+      letter-spacing: var(--tracking-wider);
+      text-transform: uppercase;
+      color: var(--color-muted);
+      mix-blend-mode: difference;
+    }
+
+    .immersive-nav a {
+      color: inherit;
+      text-decoration: none;
+      transition: color var(--dur-snap) ease;
+    }
+
+    .immersive-nav a:hover {
+      color: var(--color-accent-1);
+    }
+
+    /* --- HERO --- */
+    .immersive-hero {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      position: relative;
+      padding: var(--space-xl);
+    }
+
+    /* Radial glow */
+    .immersive-hero::before {
+      content: '';
+      position: absolute;
+      width: 60vw;
+      height: 60vw;
+      border-radius: 50%;
+      background: radial-gradient(circle, var(--color-accent-1) 0%, transparent 70%);
+      opacity: 0.06;
+      pointer-events: none;
+      animation: pulse-scale var(--dur-meditate) var(--ease-in-out-sine) infinite;
+    }
+
+    .immersive-title {
+      font-family: var(--font-expressive);
+      font-size: clamp(3rem, 9vw + 1rem, 12rem);
+      font-weight: var(--weight-thin);
+      line-height: 0.9;
+      letter-spacing: var(--tracking-snug);
+      position: relative;
+    }
+
+    .immersive-title em {
+      font-style: italic;
+      font-family: var(--font-editorial);
+      color: var(--color-accent-1);
+    }
+
+    .immersive-subtitle {
+      font-size: var(--type-body);
+      font-weight: var(--weight-light);
+      color: var(--color-muted);
+      margin-top: var(--space-xl);
+      max-width: 40ch;
+      line-height: var(--leading-relaxed);
+    }
+
+    /* Scroll indicator */
+    .scroll-indicator {
+      position: absolute;
+      bottom: var(--space-xl);
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-s);
+      font-size: var(--type-micro);
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      color: var(--color-muted);
+      animation: drift-float 3s var(--ease-in-out-sine) infinite;
+    }
+
+    .scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--color-accent-1), transparent);
+    }
+
+    /* --- FLOATING SECTIONS --- */
+    .float-section {
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      padding: var(--space-3xl) var(--gutter);
+      position: relative;
+    }
+
+    .float-section.--right {
+      justify-content: flex-end;
+    }
+
+    .float-content {
+      max-width: 550px;
+    }
+
+    .float-label {
+      font-size: var(--type-micro);
+      letter-spacing: var(--tracking-mega);
+      text-transform: uppercase;
+      color: var(--color-accent-1);
+      margin-bottom: var(--space-m);
+    }
+
+    .float-heading {
+      font-family: var(--font-expressive);
+      font-size: var(--type-display);
+      font-weight: var(--weight-light);
+      line-height: var(--leading-tight);
+      margin-bottom: var(--space-l);
+    }
+
+    .float-body {
+      font-size: var(--type-body);
+      line-height: var(--leading-relaxed);
+      color: var(--color-muted);
+      max-width: var(--measure-regular);
+    }
+
+    /* Ambient orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      opacity: 0.12;
+    }
+
+    .orb.--1 {
+      width: 400px;
+      height: 400px;
+      background: var(--color-accent-1);
+      top: 20%;
+      right: 10%;
+      animation: drift-float 8s var(--ease-in-out-sine) infinite;
+    }
+
+    .orb.--2 {
+      width: 300px;
+      height: 300px;
+      background: var(--color-accent-2);
+      bottom: 30%;
+      left: 5%;
+      animation: drift-float 12s var(--ease-in-out-sine) infinite reverse;
+    }
+
+    .orb.--3 {
+      width: 250px;
+      height: 250px;
+      background: var(--color-discord);
+      top: 60%;
+      right: 30%;
+      animation: drift-float 10s var(--ease-in-out-sine) infinite;
+      animation-delay: -3s;
+    }
+
+    /* --- STAT ROW --- */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--color-border);
+      margin: var(--space-3xl) 0;
+    }
+
+    .stat {
+      background: var(--color-bg);
+      padding: var(--space-xl);
+      text-align: center;
+    }
+
+    .stat-value {
+      font-family: var(--font-monument);
+      font-size: var(--type-display);
+      font-weight: var(--weight-bold);
+      color: var(--color-accent-1);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: var(--type-micro);
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-top: var(--space-s);
+    }
+
+    /* --- HORIZONTAL SCROLL TYPE --- */
+    .hscroll {
+      overflow: hidden;
+      padding: var(--space-3xl) 0;
+      border-top: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .hscroll-inner {
+      display: flex;
+      gap: var(--space-xl);
+      animation: marquee-scroll 25s linear infinite;
+      white-space: nowrap;
+    }
+
+    .hscroll-word {
+      font-family: var(--font-expressive);
+      font-size: clamp(4rem, 10vw, 10rem);
+      font-weight: var(--weight-thin);
+      line-height: 1;
+      flex-shrink: 0;
+      color: var(--color-muted);
+    }
+
+    .hscroll-word.--accent {
+      color: var(--color-accent-1);
+      font-style: italic;
+      font-family: var(--font-editorial);
+    }
+
+    /* --- GLASS CARD --- */
+    .glass-section {
+      padding: var(--space-4xl) var(--gutter);
+      display: flex;
+      justify-content: center;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 16px;
+      padding: var(--space-2xl);
+      max-width: 600px;
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    }
+
+    .glass-card h3 {
+      font-family: var(--font-monument);
+      font-size: var(--type-headline);
+      font-weight: var(--weight-bold);
+      letter-spacing: var(--tracking-snug);
+      margin-bottom: var(--space-m);
+    }
+
+    .glass-card p {
+      font-size: var(--type-body);
+      line-height: var(--leading-relaxed);
+      color: var(--color-muted);
+      margin-bottom: var(--space-l);
+    }
+
+    .glass-tag {
+      display: inline-block;
+      font-size: var(--type-micro);
+      letter-spacing: var(--tracking-wider);
+      text-transform: uppercase;
+      padding: var(--space-2xs) var(--space-s);
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      color: var(--color-accent-1);
+      margin-right: var(--space-xs);
+      margin-bottom: var(--space-xs);
+    }
+
+    /* --- FOOTER --- */
+    .immersive-footer {
+      padding: var(--space-3xl) var(--gutter);
+      text-align: center;
+    }
+
+    .immersive-footer-mark {
+      font-family: var(--font-expressive);
+      font-size: clamp(3rem, 8vw, 8rem);
+      font-weight: var(--weight-thin);
+      line-height: 1;
+      opacity: 0.15;
+      margin-bottom: var(--space-l);
+    }
+
+    .immersive-footer a {
+      color: var(--color-muted);
+      text-decoration: none;
+      font-size: var(--type-caption);
+      letter-spacing: var(--tracking-wider);
+      text-transform: uppercase;
+      transition: color var(--dur-snap) ease;
+    }
+
+    .immersive-footer a:hover {
+      color: var(--color-accent-1);
+    }
+
+    @media (max-width: 768px) {
+      .stats { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="immersive-nav">
+    <a href="index.html">&larr; CC/DS</a>
+    <span>Mode 03 / Immersive Dark</span>
+    <span>Sound On</span>
+  </nav>
+
+  <!-- HERO -->
+  <section class="immersive-hero">
+    <h1 class="immersive-title motion-reveal">
+      Into the<br><em>Void</em>
+    </h1>
+    <p class="immersive-subtitle motion-reveal">
+      Where light meets darkness. Where interaction becomes immersion. Where the interface dissolves into pure experience.
+    </p>
+    <div class="scroll-indicator">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- SECTION 1 -->
+  <section class="float-section">
+    <div class="orb --1"></div>
+    <div class="float-content motion-reveal">
+      <div class="float-label">01 / Atmosphere</div>
+      <h2 class="float-heading">Depth without decoration</h2>
+      <p class="float-body">
+        Immersive design isn't about adding more. It's about creating a space so considered that the user forgets they're looking at a screen. Grain, glow, and glass create tactile depth without visual noise.
+      </p>
+    </div>
+  </section>
+
+  <!-- SECTION 2 -->
+  <section class="float-section --right">
+    <div class="orb --2"></div>
+    <div class="float-content motion-reveal">
+      <div class="float-label">02 / Motion</div>
+      <h2 class="float-heading">Choreography over animation</h2>
+      <p class="float-body">
+        Every movement serves the narrative. Scroll-driven reveals, floating orbs, pulsing glows — each is timed and sequenced. The pause between motions is as important as the motion itself.
+      </p>
+    </div>
+  </section>
+
+  <!-- HORIZONTAL TYPE -->
+  <div class="hscroll">
+    <div class="hscroll-inner">
+      <span class="hscroll-word">Immersive</span>
+      <span class="hscroll-word --accent">Garden</span>
+      <span class="hscroll-word">Atmospheric</span>
+      <span class="hscroll-word --accent">Depth</span>
+      <span class="hscroll-word">Experiential</span>
+      <span class="hscroll-word --accent">Flow</span>
+      <span class="hscroll-word">Immersive</span>
+      <span class="hscroll-word --accent">Garden</span>
+      <span class="hscroll-word">Atmospheric</span>
+      <span class="hscroll-word --accent">Depth</span>
+    </div>
+  </div>
+
+  <!-- SECTION 3 -->
+  <section class="float-section">
+    <div class="orb --3"></div>
+    <div class="float-content motion-reveal">
+      <div class="float-label">03 / Texture</div>
+      <h2 class="float-heading">Materiality in the digital</h2>
+      <p class="float-body">
+        Film grain, ambient light, glass surfaces — these aren't decorations. They're the texture of the digital medium itself. A screen that feels like a surface, not a window.
+      </p>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat motion-reveal">
+      <div class="stat-value">0.04</div>
+      <div class="stat-label">Grain Opacity</div>
+    </div>
+    <div class="stat motion-reveal">
+      <div class="stat-value">80px</div>
+      <div class="stat-label">Blur Radius</div>
+    </div>
+    <div class="stat motion-reveal">
+      <div class="stat-value">8s</div>
+      <div class="stat-label">Drift Cycle</div>
+    </div>
+    <div class="stat motion-reveal">
+      <div class="stat-value">0.12</div>
+      <div class="stat-label">Orb Opacity</div>
+    </div>
+  </div>
+
+  <!-- GLASS CARD -->
+  <section class="glass-section">
+    <div class="glass-card motion-reveal">
+      <h3>The Immersive Toolkit</h3>
+      <p>
+        This mode draws from studios like Immersive Garden, Unseen Studio, and Qream — Awwwards regulars who treat the browser as a canvas, not a document viewer.
+      </p>
+      <div>
+        <span class="glass-tag">WebGL</span>
+        <span class="glass-tag">Scroll-driven</span>
+        <span class="glass-tag">Grain</span>
+        <span class="glass-tag">Glass</span>
+        <span class="glass-tag">Ambient Light</span>
+        <span class="glass-tag">Parallax</span>
+        <span class="glass-tag">Blend Modes</span>
+        <span class="glass-tag">Cursor FX</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="immersive-footer">
+    <div class="immersive-footer-mark">CC</div>
+    <a href="index.html">&larr; Back to Index</a>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('--visible');
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+    document.querySelectorAll('.motion-reveal').forEach(el => observer.observe(el));
+
+    // Parallax orbs on mouse move
+    document.addEventListener('mousemove', (e) => {
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
+
+      document.querySelectorAll('.orb').forEach((orb, i) => {
+        const factor = (i + 1) * 15;
+        orb.style.transform = `translate(${x * factor}px, ${y * factor}px)`;
+      });
+    });
+  </script>
+</body>
+</html>

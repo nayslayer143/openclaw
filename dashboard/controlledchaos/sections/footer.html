@@ -1,0 +1,18 @@
+<!-- cc-section: footer
+     best:  all
+     ok:    -
+     avoid: -
+     variants: minimal, editorial, bleed
+     placeholders: copyright, links[] (label, href) -->
+<footer class="cc-section cc-footer"
+        data-pattern="footer"
+        data-variant="minimal">
+  <div class="container flex-between">
+    <span class="cc-footer__copyright voice-swiss --label">{{copyright}}</span>
+    <nav class="cc-footer__nav">
+      {{#links}}
+      <a class="cc-footer__link voice-swiss --label" href="{{href}}">{{label}}</a>
+      {{/links}}
+    </nav>
+  </div>
+</footer>

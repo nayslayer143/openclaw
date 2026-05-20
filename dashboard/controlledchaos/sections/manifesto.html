@@ -1,0 +1,18 @@
+<!-- cc-section: manifesto
+     best:  swiss, brutalist, immersive
+     ok:    kinetic
+     avoid: gallery (too loud for the white cube)
+     variants: default, numbered
+     placeholders: heading, paragraphs[] -->
+<section class="cc-section cc-manifesto"
+         data-pattern="manifesto"
+         data-variant="default">
+  <div class="container --regular flow">
+    <h2 class="cc-manifesto__heading voice-editorial --display">{{heading}}</h2>
+    <div class="cc-manifesto__body">
+      {{#paragraphs}}
+      <p class="voice-swiss">{{text}}</p>
+      {{/paragraphs}}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://controlledchaos.local/adapters/style-schema.json",
+  "title": "Controlled Chaos style.json",
+  "type": "object",
+  "required": ["name"],
+  "anyOf": [
+    { "required": ["palette"] },
+    { "required": ["mood_id"] }
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "name": { "type": "string", "minLength": 1 },
+    "thesis": { "type": "string" },
+    "palette": {
+      "type": "object",
+      "required": ["bg", "fg"],
+      "additionalProperties": false,
+      "properties": {
+        "bg":       { "type": "string", "pattern": "^#[0-9a-fA-F]{3,8}$" },
+        "fg":       { "type": "string", "pattern": "^#[0-9a-fA-F]{3,8}$" },
+        "accent_1": { "type": "string", "pattern": "^#[0-9a-fA-F]{3,8}$" },
+        "accent_2": { "type": "string", "pattern": "^#[0-9a-fA-F]{3,8}$" },
+        "discord":  { "type": "string", "pattern": "^#[0-9a-fA-F]{3,8}$" }
+      }
+    },
+    "typography": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "monument":   { "$ref": "#/$defs/voice" },
+        "swiss":      { "$ref": "#/$defs/voice" },
+        "editorial":  { "$ref": "#/$defs/voice" },
+        "brutalist":  { "$ref": "#/$defs/voice" },
+        "expressive": { "$ref": "#/$defs/voice" }
+      }
+    },
+    "forces": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "structure":  { "$ref": "#/$defs/unitDial" },
+        "disruption": { "$ref": "#/$defs/unitDial" },
+        "density":    { "$ref": "#/$defs/unitDial" },
+        "breath":     { "$ref": "#/$defs/unitDial" },
+        "edge":       { "$ref": "#/$defs/unitDial" },
+        "warmth":     { "$ref": "#/$defs/unitDial" },
+        "motion":     { "$ref": "#/$defs/unitDial" },
+        "shout":      { "$ref": "#/$defs/unitDial" },
+        "stillness":  { "$ref": "#/$defs/unitDial" },
+        "whisper":    { "$ref": "#/$defs/unitDial" }
+      }
+    },
+    "motion_intensity": { "$ref": "#/$defs/unitDial" },
+    "texture": { "enum": ["none", "grain", "glass"] },
+    "mode_id": { "enum": ["swiss", "brutalist", "immersive", "kinetic", "gallery"] },
+    "mood_id": { "enum": ["void", "void-inverse", "dusk", "signal", "earth", "frost", "blaze", "bruise", "concrete"] },
+    "dos":   { "type": "array", "items": { "type": "string" } },
+    "donts": { "type": "array", "items": { "type": "string" } }
+  },
+  "$defs": {
+    "unitDial": { "type": "number", "minimum": 0, "maximum": 1 },
+    "voice": {
+      "type": "object",
+      "required": ["family"],
+      "additionalProperties": false,
+      "properties": {
+        "family":  { "type": "string", "minLength": 1 },
+        "weights": { "type": "array", "items": { "type": "integer", "minimum": 100, "maximum": 1000 } },
+        "google":  { "type": "boolean" }
+      }
+    }
+  }
+}

@@ -1,0 +1,48 @@
+<!--
+  controlledchaos · meta.partial.html
+  ====================================
+  Copy these <meta> tags into the <head> of any page that should
+  inherit CC's SEO/OG/Twitter/JSON-LD defaults. Mustache placeholders
+  ({{...}}) are filled inline by the agent from the page brief.
+
+  Schema stays vibe-only; this partial carries page-level meta only.
+-->
+
+<!-- SEO -->
+<title>{{seo.title}}</title>
+<meta name="description" content="{{seo.description}}">
+<link rel="canonical" href="{{seo.canonical_url}}">
+<meta name="theme-color" content="{{seo.theme_color}}">
+<meta name="color-scheme" content="light dark">
+
+<!-- Open Graph -->
+<meta property="og:type" content="{{seo.og_type}}">
+<meta property="og:site_name" content="{{seo.og_site_name}}">
+<meta property="og:title" content="{{seo.og_title}}">
+<meta property="og:description" content="{{seo.og_description}}">
+<meta property="og:url" content="{{seo.og_url}}">
+<meta property="og:image" content="{{seo.og_image_url}}">
+<meta property="og:image:alt" content="{{seo.og_image_alt}}">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="{{seo.twitter_card}}">
+<meta name="twitter:title" content="{{seo.twitter_title}}">
+<meta name="twitter:description" content="{{seo.twitter_description}}">
+<meta name="twitter:image" content="{{seo.twitter_image}}">
+<meta name="twitter:site" content="{{seo.twitter_site}}">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+<!-- JSON-LD Organization -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "{{org.name}}",
+  "url": "{{org.url}}",
+  "logo": "{{org.logo_url}}",
+  "sameAs": [{{#org.same_as}}"{{.}}"{{^last}},{{/last}}{{/org.same_as}}]
+}
+</script>

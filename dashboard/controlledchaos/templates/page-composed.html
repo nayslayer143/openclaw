@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en" data-mood="signal" data-forces="immersive">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="format-detection" content="telephone=no">
+
+  <!-- SEO -->
+  <title>{{seo.title}}</title>
+  <meta name="description" content="{{seo.description}}">
+  <link rel="canonical" href="{{seo.canonical_url}}">
+  <meta name="theme-color" content="{{seo.theme_color}}">
+  <meta name="color-scheme" content="light dark">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="{{seo.og_type}}">
+  <meta property="og:site_name" content="{{seo.og_site_name}}">
+  <meta property="og:title" content="{{seo.og_title}}">
+  <meta property="og:description" content="{{seo.og_description}}">
+  <meta property="og:url" content="{{seo.og_url}}">
+  <meta property="og:image" content="{{seo.og_image_url}}">
+  <meta property="og:image:alt" content="{{seo.og_image_alt}}">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="{{seo.twitter_card}}">
+  <meta name="twitter:title" content="{{seo.twitter_title}}">
+  <meta name="twitter:description" content="{{seo.twitter_description}}">
+  <meta name="twitter:image" content="{{seo.twitter_image}}">
+  <meta name="twitter:site" content="{{seo.twitter_site}}">
+
+  <!-- Favicon (SVG default; brand replaces) -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+
+  <!-- JSON-LD Organization stub -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "{{org.name}}",
+    "url": "{{org.url}}",
+    "logo": "{{org.logo_url}}",
+    "sameAs": [{{#org.same_as}}"{{.}}"{{^last}},{{/last}}{{/org.same_as}}]
+  }
+  </script>
+
+  <!-- Fonts (drop voices you don't use to save bytes) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;700&family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Tokens (order matters: textures + states + sections last) -->
+  <link rel="stylesheet" href="../tokens/layout.css">
+  <link rel="stylesheet" href="../tokens/typography.css">
+  <link rel="stylesheet" href="../tokens/color.css">
+  <link rel="stylesheet" href="../tokens/motion.css">
+  <link rel="stylesheet" href="../tokens/forces.css">
+  <link rel="stylesheet" href="../tokens/textures.css">
+  <link rel="stylesheet" href="../tokens/states.css">
+  <link rel="stylesheet" href="../sections/sections.css">
+
+  <!-- STYLE-GUIDE-OVERRIDES
+       When driven from style.json, the adapter emits a <style> block
+       here containing the custom mood scope, force overrides, voice
+       font-family overrides, and motion-scale. Leave empty for
+       three-decision (no style.json) authoring. -->
+  <style id="style-overrides"></style>
+
+  <style>
+    body {
+      font-family: var(--font-swiss);
+      background: var(--color-bg);
+      color: var(--color-fg);
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- COMPOSE SECTIONS FROM sections/.
+       Read sections/README.md for the catalog.
+       Each section partial uses Mustache {{...}} placeholders the
+       agent fills via string substitution.
+
+       Recommended ordering for a typical page:
+         hero → manifesto → stat-grid → quote → cta → footer
+
+       For pages composed from style.json:
+         Honor dos[] / donts[] when picking sections + variants. -->
+
+  <!-- SECTION: HERO -->
+  <!-- replace with content of sections/hero.html, fill placeholders -->
+
+  <!-- SECTION: BODY -->
+  <!-- one or more of: manifesto / stat-grid / quote / two-column /
+       process / gallery / full-bleed / marquee / logo-wall -->
+
+  <!-- SECTION: CTA -->
+  <!-- replace with content of sections/cta.html -->
+
+  <!-- SECTION: FOOTER -->
+  <!-- replace with content of sections/footer.html -->
+
+</body>
+</html>

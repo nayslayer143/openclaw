@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en" data-mood="void-inverse" data-forces="gallery">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mode 05 — Gallery Minimal</title>
+  <link rel="stylesheet" href="../tokens/layout.css">
+  <link rel="stylesheet" href="../tokens/typography.css">
+  <link rel="stylesheet" href="../tokens/color.css">
+  <link rel="stylesheet" href="../tokens/motion.css">
+  <link rel="stylesheet" href="../tokens/forces.css">
+  <style>
+    body {
+      font-family: var(--font-swiss);
+      background: #fff;
+      color: #0a0a0a;
+      overflow-x: hidden;
+    }
+
+    /* --- NAV --- */
+    .gallery-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-m) var(--gutter);
+      font-size: var(--type-caption);
+      letter-spacing: var(--tracking-wider);
+      border-bottom: 1px solid #eee;
+    }
+
+    .gallery-nav a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .gallery-nav-center {
+      font-weight: var(--weight-medium);
+      text-transform: uppercase;
+    }
+
+    /* --- HERO: Just a name, nothing else --- */
+    .gallery-hero {
+      min-height: 70dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: var(--space-3xl) var(--gutter) var(--space-2xl);
+    }
+
+    .gallery-hero h1 {
+      font-family: var(--font-editorial);
+      font-size: clamp(2.5rem, 5vw + 1rem, 5rem);
+      font-weight: var(--weight-regular);
+      font-style: italic;
+      line-height: var(--leading-tight);
+      letter-spacing: -0.01em;
+    }
+
+    .gallery-hero-meta {
+      display: flex;
+      gap: var(--space-xl);
+      margin-top: var(--space-l);
+      font-size: var(--type-caption);
+      color: #999;
+      letter-spacing: var(--tracking-wide);
+    }
+
+    /* --- IMAGE GRID: Let the work speak --- */
+    .gallery-grid {
+      padding: 0 var(--gutter);
+      display: grid;
+      gap: var(--space-xs);
+    }
+
+    .gallery-grid.--two {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .gallery-grid.--three {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    .gallery-grid.--asymmetric {
+      grid-template-columns: 2fr 1fr;
+    }
+
+    .gallery-grid.--full {
+      padding: 0;
+    }
+
+    .gallery-item {
+      overflow: hidden;
+      position: relative;
+      background: #f5f5f5;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform var(--dur-drift) var(--ease-out-expo);
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.04);
+    }
+
+    /* Placeholder for images */
+    .gallery-placeholder {
+      aspect-ratio: var(--ratio, 3/2);
+      background: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--type-micro);
+      color: #ccc;
+      letter-spacing: var(--tracking-wider);
+      text-transform: uppercase;
+    }
+
+    .gallery-placeholder.--tall {
+      --ratio: 2/3;
+    }
+
+    .gallery-placeholder.--square {
+      --ratio: 1/1;
+    }
+
+    .gallery-placeholder.--wide {
+      --ratio: 16/9;
+    }
+
+    .gallery-placeholder.--cinema {
+      --ratio: 21/9;
+    }
+
+    /* --- CAPTION --- */
+    .gallery-caption {
+      padding: var(--space-l) var(--gutter) var(--space-3xl);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .gallery-caption-text {
+      font-family: var(--font-editorial);
+      font-size: var(--type-body);
+      font-style: italic;
+      max-width: var(--measure-regular);
+      line-height: var(--leading-relaxed);
+      color: #666;
+    }
+
+    .gallery-caption-number {
+      font-family: var(--font-swiss);
+      font-size: var(--type-micro);
+      color: #ccc;
+      letter-spacing: var(--tracking-widest);
+    }
+
+    /* --- TEXT SECTION --- */
+    .gallery-text {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: var(--space-4xl) var(--gutter);
+      text-align: center;
+    }
+
+    .gallery-text h2 {
+      font-family: var(--font-editorial);
+      font-size: var(--type-headline);
+      font-weight: var(--weight-regular);
+      font-style: italic;
+      line-height: var(--leading-snug);
+      margin-bottom: var(--space-l);
+    }
+
+    .gallery-text p {
+      font-size: var(--type-body);
+      line-height: var(--leading-relaxed);
+      color: #666;
+    }
+
+    /* --- SPACER --- */
+    .gallery-space {
+      height: var(--space-3xl);
+    }
+
+    .gallery-space.--small {
+      height: var(--space-xl);
+    }
+
+    /* --- SINGLE IMAGE: Full bleed --- */
+    .gallery-full {
+      width: 100%;
+    }
+
+    .gallery-full .gallery-placeholder {
+      --ratio: 16/7;
+    }
+
+    /* --- INFO COLUMNS --- */
+    .gallery-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: var(--space-xl);
+      padding: var(--space-3xl) var(--gutter);
+      border-top: 1px solid #eee;
+    }
+
+    .gallery-info dt {
+      font-size: var(--type-micro);
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: var(--space-xs);
+    }
+
+    .gallery-info dd {
+      font-size: var(--type-body-small);
+      line-height: var(--leading-normal);
+      color: #333;
+    }
+
+    /* --- NEXT PROJECT --- */
+    .gallery-next {
+      padding: var(--space-4xl) var(--gutter);
+      text-align: center;
+      border-top: 1px solid #eee;
+      cursor: pointer;
+      transition: background var(--dur-swift) ease;
+    }
+
+    .gallery-next:hover {
+      background: #fafafa;
+    }
+
+    .gallery-next-label {
+      font-size: var(--type-micro);
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: var(--space-m);
+    }
+
+    .gallery-next-title {
+      font-family: var(--font-editorial);
+      font-size: var(--type-display);
+      font-weight: var(--weight-regular);
+      font-style: italic;
+      line-height: var(--leading-tight);
+      transition: letter-spacing var(--dur-swift) var(--ease-out-expo);
+    }
+
+    .gallery-next:hover .gallery-next-title {
+      letter-spacing: 0.02em;
+    }
+
+    /* --- FOOTER --- */
+    .gallery-footer {
+      padding: var(--space-l) var(--gutter);
+      display: flex;
+      justify-content: space-between;
+      font-size: var(--type-micro);
+      color: #ccc;
+      letter-spacing: var(--tracking-wider);
+      text-transform: uppercase;
+    }
+
+    .gallery-footer a {
+      color: #999;
+      text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+      .gallery-grid.--two,
+      .gallery-grid.--three,
+      .gallery-grid.--asymmetric {
+        grid-template-columns: 1fr;
+      }
+
+      .gallery-info {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="gallery-nav">
+    <a href="index.html">&larr; Back</a>
+    <span class="gallery-nav-center">Selected Work</span>
+    <span>05 / 05</span>
+  </nav>
+
+  <!-- HERO -->
+  <section class="gallery-hero">
+    <h1 class="motion-reveal">The space between<br>silence and form</h1>
+    <div class="gallery-hero-meta motion-reveal">
+      <span>Photography</span>
+      <span>2026</span>
+      <span>Personal Project</span>
+    </div>
+  </section>
+
+  <!-- FULL BLEED IMAGE -->
+  <div class="gallery-full motion-reveal">
+    <div class="gallery-placeholder --cinema">16:7</div>
+  </div>
+
+  <div class="gallery-space"></div>
+
+  <!-- TWO COLUMN -->
+  <div class="gallery-grid --two motion-reveal">
+    <div class="gallery-item">
+      <div class="gallery-placeholder">3:2</div>
+    </div>
+    <div class="gallery-item">
+      <div class="gallery-placeholder">3:2</div>
+    </div>
+  </div>
+
+  <div class="gallery-caption motion-reveal">
+    <p class="gallery-caption-text">
+      The work exists in the tension between presence and absence. What is shown matters less than what is felt.
+    </p>
+    <span class="gallery-caption-number">01 / 08</span>
+  </div>
+
+  <!-- SINGLE CENTERED IMAGE -->
+  <div class="gallery-grid --full motion-reveal" style="max-width: 800px; margin: 0 auto; padding: 0 var(--gutter);">
+    <div class="gallery-item">
+      <div class="gallery-placeholder --tall">2:3</div>
+    </div>
+  </div>
+
+  <div class="gallery-space"></div>
+
+  <!-- TEXT BREAK -->
+  <div class="gallery-text motion-reveal">
+    <h2>In the quiet, the details surface</h2>
+    <p>Gallery minimal is about restraint. Every pixel of whitespace is intentional. The interface dissolves until only the work remains. This is the white cube — digital.</p>
+  </div>
+
+  <!-- THREE COLUMN -->
+  <div class="gallery-grid --three motion-reveal">
+    <div class="gallery-item">
+      <div class="gallery-placeholder --square">1:1</div>
+    </div>
+    <div class="gallery-item">
+      <div class="gallery-placeholder --square">1:1</div>
+    </div>
+    <div class="gallery-item">
+      <div class="gallery-placeholder --square">1:1</div>
+    </div>
+  </div>
+
+  <div class="gallery-caption motion-reveal">
+    <p class="gallery-caption-text">
+      Three moments. Three breaths. The grid holds them equally.
+    </p>
+    <span class="gallery-caption-number">04 / 08</span>
+  </div>
+
+  <!-- ASYMMETRIC -->
+  <div class="gallery-grid --asymmetric motion-reveal">
+    <div class="gallery-item">
+      <div class="gallery-placeholder" style="--ratio: 4/3;">4:3</div>
+    </div>
+    <div class="gallery-item">
+      <div class="gallery-placeholder" style="--ratio: 4/3;">4:3</div>
+    </div>
+  </div>
+
+  <div class="gallery-space"></div>
+
+  <!-- FULL BLEED -->
+  <div class="gallery-full motion-reveal">
+    <div class="gallery-placeholder --wide">16:9</div>
+  </div>
+
+  <div class="gallery-caption motion-reveal">
+    <p class="gallery-caption-text">
+      Full bleed. Edge to edge. The image becomes the environment.
+    </p>
+    <span class="gallery-caption-number">07 / 08</span>
+  </div>
+
+  <!-- PROJECT INFO -->
+  <dl class="gallery-info motion-reveal">
+    <div>
+      <dt>Client</dt>
+      <dd>Personal Project</dd>
+    </div>
+    <div>
+      <dt>Role</dt>
+      <dd>Photography, Art Direction</dd>
+    </div>
+    <div>
+      <dt>Year</dt>
+      <dd>2026</dd>
+    </div>
+    <div>
+      <dt>Medium</dt>
+      <dd>Digital, Film</dd>
+    </div>
+    <div>
+      <dt>Tools</dt>
+      <dd>Controlled Chaos DS</dd>
+    </div>
+    <div>
+      <dt>Mode</dt>
+      <dd>Gallery Minimal</dd>
+    </div>
+  </dl>
+
+  <!-- NEXT PROJECT -->
+  <div class="gallery-next" onclick="window.location='swiss.html'">
+    <div class="gallery-next-label">Next Project</div>
+    <div class="gallery-next-title motion-reveal">Swiss Editorial</div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="gallery-footer">
+    <a href="index.html">Index</a>
+    <span>Controlled Chaos &middot; 2026</span>
+    <span>Mode 05</span>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('--visible');
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.motion-reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

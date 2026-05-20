@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en" data-mood="--custom" data-forces="immersive" data-texture="grain">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controlled Chaos — A design system for the fearless</title>
+  <meta name="description" content="Award-level static HTML pages from a token-based design system. 5 modes × 9 moods × 5 voices × 22 sections. Pure HTML + CSS, no framework.">
+  <meta name="theme-color" content="#f5efe0">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Controlled Chaos">
+  <meta property="og:description" content="A design system for building award-level web pages. Five aesthetic modes, twenty-two reusable sections, style.json adapter, and the soul of San Francisco.">
+  <meta property="og:url" content="https://asdfghjk.lol/controlledchaos">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,700;1,400&family=Inter:wght@400;500;700&family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="tokens/layout.css">
+  <link rel="stylesheet" href="tokens/typography.css">
+  <link rel="stylesheet" href="tokens/color.css">
+  <link rel="stylesheet" href="tokens/motion.css">
+  <link rel="stylesheet" href="tokens/forces.css">
+  <link rel="stylesheet" href="tokens/textures.css">
+  <link rel="stylesheet" href="tokens/states.css">
+  <link rel="stylesheet" href="sections/sections.css">
+
+  <!-- Eats own dog food: applies the sf-vibe-fest.json palette so the landing
+       is a live demo of the style-driven authoring path. -->
+  <style id="style-overrides">
+    [data-mood="--custom"] {
+      --color-bg:       #f5efe0;
+      --color-fg:       #1a1815;
+      --color-accent-1: #ee5e3a;
+      --color-accent-2: #b87333;
+      --color-discord:  #2b6df0;
+      --color-muted:   color-mix(in oklch, var(--color-fg) 50%, var(--color-bg));
+      --color-subtle:  color-mix(in oklch, var(--color-fg)  8%, var(--color-bg));
+      --color-surface: color-mix(in oklch, var(--color-fg)  5%, var(--color-bg));
+      --color-border:  color-mix(in oklch, var(--color-fg) 18%, var(--color-bg));
+      --color-inverse: var(--color-fg);
+    }
+    :root {
+      --force-structure: 0.65; --force-disruption: 0.45; --force-density: 0.55;
+      --force-breath: 0.70; --force-edge: 0.75; --force-warmth: 0.85;
+      --force-motion: 0.45; --force-shout: 0.55;
+      --font-monument:   'Playfair Display', serif;
+      --font-editorial:  'Cormorant Garamond', serif;
+      --font-swiss:      'Inter', sans-serif;
+      --font-brutalist:  'Space Mono', monospace;
+      --font-expressive: 'DM Sans', sans-serif;
+      --motion-scale: 0.5;
+      --texture-grain-opacity: 0.10;
+    }
+    body { font-family: var(--font-swiss); background: var(--color-bg); color: var(--color-fg); margin: 0; }
+    .cc-hero__heading, .cc-feature-grid__heading, .cc-cta__heading {
+      text-transform: none; font-weight: 900; font-style: italic; letter-spacing: -0.03em;
+    }
+    .cc-hero[data-variant="editorial"] .cc-hero__heading::after { content: "."; color: var(--color-accent-1); }
+    .cc-hero__eyebrow { color: var(--color-accent-1); font-family: var(--font-brutalist); letter-spacing: 0.18em; }
+    .cc-section + .cc-section { border-top: 1px solid var(--color-border); }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="cc-section cc-nav" data-pattern="nav" data-variant="default" aria-label="Primary">
+    <div class="container --wide cc-nav__inner">
+      <a class="cc-nav__brand voice-monument" href="#">CONTROLLED CHAOS</a>
+      <button class="cc-nav__toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="cc-nav-menu">
+        <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
+      </button>
+      <div class="cc-nav__menu" id="cc-nav-menu">
+        <ul class="cc-nav__links">
+          <li><a class="cc-nav__link voice-swiss --label" href="#modes">Modes</a></li>
+          <li><a class="cc-nav__link voice-swiss --label" href="#sections">Sections</a></li>
+          <li><a class="cc-nav__link voice-swiss --label" href="#demos">Demos</a></li>
+        </ul>
+        <a class="cc-nav__cta voice-swiss --label" href="https://github.com/nayslayer143/controlledchaos">GitHub</a>
+      </div>
+    </div>
+  </nav>
+  <script>(function(){var n=document.querySelector('.cc-nav');if(!n)return;var t=n.querySelector('.cc-nav__toggle'),m=n.querySelector('.cc-nav__menu');document.documentElement.style.setProperty('--nav-height',(n.offsetHeight||64)+'px');t.addEventListener('click',function(){var o=n.toggleAttribute('data-open');t.setAttribute('aria-expanded',o?'true':'false');});n.addEventListener('keydown',function(e){if(e.key==='Escape'&&n.hasAttribute('data-open')){n.removeAttribute('data-open');t.setAttribute('aria-expanded','false');t.focus();}});m.addEventListener('click',function(e){if(e.target.closest('a')&&n.hasAttribute('data-open')){n.removeAttribute('data-open');t.setAttribute('aria-expanded','false');}});var s=function(){if(window.scrollY>4)n.setAttribute('data-scrolled','');else n.removeAttribute('data-scrolled');};window.addEventListener('scroll',s,{passive:true});s();})();</script>
+
+  <!-- HERO -->
+  <section class="cc-section cc-hero" data-pattern="hero" data-variant="editorial">
+    <div class="container --regular flow motion-reveal">
+      <span class="cc-hero__eyebrow voice-swiss --label">A design system for the fearless</span>
+      <h1 class="cc-hero__heading voice-monument --massive">Controlled Chaos</h1>
+      <p class="cc-hero__subhead voice-swiss">Award-level static HTML pages from a token-based design system. Five aesthetic modes, nine mood palettes, five typographic voices, twenty-two reusable sections, and a style.json adapter that lets any brand drive its own look. Pure HTML + CSS. No framework.</p>
+    </div>
+  </section>
+
+  <!-- MANIFESTO -->
+  <section class="cc-section cc-manifesto" data-pattern="manifesto" data-variant="default">
+    <div class="container --regular flow motion-reveal">
+      <h2 class="cc-manifesto__heading voice-editorial --display">The grid is not a cage. It is a trampoline.</h2>
+      <div class="cc-manifesto__body motion-stagger">
+        <p class="voice-swiss">Three axioms govern every choice: <em>Hierarchy is the only job. Tension is beauty. The medium is time.</em> Everything else is application.</p>
+        <p class="voice-swiss">Pages compose three decisions — a <strong>mode</strong> (Swiss, Brutalist, Immersive, Kinetic, Gallery), a <strong>mood</strong> (Void, Dusk, Signal, Earth, Frost, Blaze, Bruise, Concrete, Void-Inverse), and <strong>voices</strong> (Monument, Editorial, Swiss, Brutalist, Expressive). Tokens cascade. Sections compose. The output is HTML you can deploy anywhere.</p>
+        <p class="voice-swiss">The skill v2 adds an SMB-tech-grade out-of-the-box baseline: ten conversion-critical sections, an interaction-states polish layer, premium motion, and full SEO/OG/JSON-LD template scaffolding. <em class="io">Editorial-Generous</em> is the default — Stripe / Anthropic / Cursor-marketing DNA.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURE-GRID: what's inside -->
+  <section class="cc-section cc-feature-grid" data-pattern="feature-grid" data-variant="default" id="sections">
+    <div class="container --wide flow motion-reveal">
+      <span class="cc-feature-grid__eyebrow voice-swiss --label">WHAT'S INSIDE</span>
+      <h2 class="cc-feature-grid__heading voice-monument --display">Five decisions. Twenty-two sections. Infinite range.</h2>
+      <div class="cc-feature-grid__items motion-stagger">
+        <div class="cc-feature">
+          <div class="cc-feature__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2l10 5-10 5L2 7l10-5zM2 12l10 5 10-5M2 17l10 5 10-5"/></svg></div>
+          <h3 class="cc-feature__title voice-monument">22 section partials</h3>
+          <p class="cc-feature__body voice-swiss">Hero, manifesto, stat-grid, quote, two-column, process, gallery, full-bleed, marquee, logo-wall, cta, footer, plus the new SMB tech set: nav, feature-grid, product-showcase, pricing, faq, testimonial, signup-form, integration-logos, cta-banner, comparison-table.</p>
+        </div>
+        <div class="cc-feature">
+          <div class="cc-feature__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M5.6 18.4l2.8-2.8M15.6 8.4l2.8-2.8"/></svg></div>
+          <h3 class="cc-feature__title voice-monument">5 modes × 9 moods × 5 voices</h3>
+          <p class="cc-feature__body voice-swiss">Mix-and-match via two HTML attributes (<code>data-forces</code>, <code>data-mood</code>) and per-element voice classes. Two-decision recipe scales from minimal to maximalist without a build step.</p>
+        </div>
+        <div class="cc-feature">
+          <div class="cc-feature__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></div>
+          <h3 class="cc-feature__title voice-monument">style.json adapter</h3>
+          <p class="cc-feature__body voice-swiss">Any brand can drive the look via a single JSON file: palette, typography (per voice), force dials, motion intensity, texture, dos/donts. Hand-author or generate from SuperStyleGuide / Pinterest Style Engine.</p>
+        </div>
+        <div class="cc-feature">
+          <div class="cc-feature__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2L3 7v6c0 5 4 9 9 10 5-1 9-5 9-10V7l-9-5z"/><path d="M9 12l2 2 4-4"/></svg></div>
+          <h3 class="cc-feature__title voice-monument">Polish layer</h3>
+          <p class="cc-feature__body voice-swiss">Universal hover, focus-visible, active, disabled, loading states. 44px touch targets. Discord-cyan focus rings. Reduced-motion respect. Image-placeholder upgrade. Scroll-progress hairline.</p>
+        </div>
+        <div class="cc-feature">
+          <div class="cc-feature__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+          <h3 class="cc-feature__title voice-monument">Deploy-ready templates</h3>
+          <p class="cc-feature__body voice-swiss">page-composed.html ships full SEO / OG / Twitter / JSON-LD <code>&lt;head&gt;</code> with Mustache placeholders. Plus 404, privacy, terms scaffolds.</p>
+        </div>
+        <div class="cc-feature">
+          <div class="cc-feature__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2 2-6z"/></svg></div>
+          <h3 class="cc-feature__title voice-monument">Zero JS framework</h3>
+          <p class="cc-feature__body voice-swiss">Pure HTML + CSS custom properties. Tiny inline vanilla JS only for nav drawer, accordion siblings, and cta-banner dismissal. No React, no Vue, no bundler.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE: the thesis -->
+  <section class="cc-section cc-quote" data-pattern="quote" data-variant="gutter">
+    <div class="container --regular motion-reveal">
+      <blockquote class="cc-quote__body">
+        <p class="cc-quote__text voice-editorial --display">Every choice is intentional, but the result feels alive.</p>
+        <cite class="cc-quote__attribution voice-swiss --label">— Controlled Chaos · DESIGN.md</cite>
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- DEMOS / MODES -->
+  <section class="cc-section cc-feature-grid" data-pattern="feature-grid" data-variant="default" id="demos">
+    <div class="container --wide flow motion-reveal">
+      <span class="cc-feature-grid__eyebrow voice-swiss --label">LIVE DEMOS</span>
+      <h2 class="cc-feature-grid__heading voice-monument --display">See it work.</h2>
+      <div class="cc-feature-grid__items motion-stagger">
+        <a class="cc-feature" href="showcase/test-sf-vibe-fest.html" style="text-decoration:none;color:inherit">
+          <div class="cc-feature__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2c-4 0-7 3-7 7 0 5 7 13 7 13s7-8 7-13c0-4-3-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg></div>
+          <h3 class="cc-feature__title voice-monument">SF Vibe Fest 2027</h3>
+          <p class="cc-feature__body voice-swiss">15 sections rendered from a real adapter style.json. Fog City Futurism aesthetic. The v2 canary brand.</p>
+        </a>
+        <a class="cc-feature" href="showcase/test-lovetel.html" style="text-decoration:none;color:inherit">
+          <div class="cc-feature__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></svg></div>
+          <h3 class="cc-feature__title voice-monument">Lovetel</h3>
+          <p class="cc-feature__body voice-swiss">Dusk-quiet. A payphone-themed connection product. Different brand, same skill.</p>
+        </a>
+        <a class="cc-feature" href="showcase/sections-demo.html" style="text-decoration:none;color:inherit">
+          <div class="cc-feature__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+          <h3 class="cc-feature__title voice-monument">Sections demo</h3>
+          <p class="cc-feature__body voice-swiss">All 12 v1 section partials rendered in one signal-mood page. The library catalog made flesh.</p>
+        </a>
+        <a class="cc-feature" href="showcase/style-driven.html" style="text-decoration:none;color:inherit">
+          <div class="cc-feature__icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          <h3 class="cc-feature__title voice-monument">Style-driven demo</h3>
+          <p class="cc-feature__body voice-swiss">A page composed end-to-end from adapters/examples/dusk.json. The adapter workflow in action.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODES list -->
+  <section class="cc-section cc-integrations" data-pattern="integration-logos" data-variant="grid" id="modes">
+    <div class="container --wide flow motion-reveal">
+      <h2 class="cc-integrations__heading voice-swiss --label">THE FIVE MODES</h2>
+      <ul class="cc-integrations__items">
+        <li class="cc-integrations__item"><a class="voice-monument" href="showcase/swiss.html">Swiss</a></li>
+        <li class="cc-integrations__item"><a class="voice-monument" href="showcase/brutalist.html">Brutalist</a></li>
+        <li class="cc-integrations__item"><a class="voice-monument" href="showcase/immersive.html">Immersive</a></li>
+        <li class="cc-integrations__item"><a class="voice-monument" href="showcase/kinetic.html">Kinetic</a></li>
+        <li class="cc-integrations__item"><a class="voice-monument" href="showcase/gallery.html">Gallery</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- FULL-BLEED: the thesis -->
+  <section class="cc-section cc-bleed" data-pattern="full-bleed" data-variant="type">
+    <div class="cc-bleed__content cc-bleed__content--type motion-reveal">
+      <span class="voice-monument" data-bleed-text>Order creates the scaffolding. Disruption creates the emotion.</span>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cc-section cc-cta" data-pattern="cta" data-variant="discord">
+    <div class="container --regular flow motion-reveal">
+      <h2 class="cc-cta__heading voice-monument --display">Open source. MIT-flavored. Build fearlessly.</h2>
+      <p class="cc-cta__supporting voice-swiss">All tokens, sections, adapters, and templates live in the repo. Fork it, plug your style.json in, ship.</p>
+      <a class="cc-cta__action voice-swiss --label" href="https://github.com/nayslayer143/controlledchaos">
+        GET IT ON GITHUB
+        <span class="cc-cta__arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="cc-section cc-footer" data-pattern="footer" data-variant="editorial">
+    <div class="container flex-between">
+      <span class="cc-footer__copyright voice-swiss --label">Controlled Chaos · A design system for the fearless</span>
+      <nav class="cc-footer__nav">
+        <a class="cc-footer__link voice-swiss --label" href="README.md">README</a>
+        <a class="cc-footer__link voice-swiss --label" href="AXIOMS.md">Axioms</a>
+        <a class="cc-footer__link voice-swiss --label" href="DESIGN.md">Design</a>
+        <a class="cc-footer__link voice-swiss --label" href="https://github.com/nayslayer143/controlledchaos">GitHub</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- IntersectionObserver -->
+  <script>
+    (function(){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('--visible');io.unobserve(e.target);}});},{threshold:0.1,rootMargin:'0px 0px -10% 0px'});document.querySelectorAll('.motion-reveal,.motion-stagger').forEach(function(el){io.observe(el);});})();
+  </script>
+</body>
+</html>

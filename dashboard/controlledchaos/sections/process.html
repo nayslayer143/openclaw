@@ -1,0 +1,21 @@
+<!-- cc-section: process
+     best:  swiss, immersive
+     ok:    brutalist, kinetic
+     avoid: gallery (sequence feels businesslike for white cube)
+     variants: numbered, timeline, vertical
+     placeholders: heading, steps[] (title, body) -->
+<section class="cc-section cc-process"
+         data-pattern="process"
+         data-variant="numbered">
+  <div class="container --regular flow">
+    <h2 class="cc-process__heading voice-editorial --display">{{heading}}</h2>
+    <ol class="cc-process__steps">
+      {{#steps}}
+      <li class="cc-process__step">
+        <h3 class="cc-process__step-title voice-monument">{{title}}</h3>
+        <p class="cc-process__step-body voice-swiss">{{body}}</p>
+      </li>
+      {{/steps}}
+    </ol>
+  </div>
+</section>

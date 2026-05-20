@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" data-mood="--custom" data-forces="swiss" data-texture="grain">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Style-Driven Demo — Dakota's bedroom</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:wght@400;900&family=Cormorant+Garamond:wght@400;700&family=Inter:wght@400;600&family=JetBrains+Mono:wght@400;700&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../tokens/layout.css">
+  <link rel="stylesheet" href="../tokens/typography.css">
+  <link rel="stylesheet" href="../tokens/color.css">
+  <link rel="stylesheet" href="../tokens/motion.css">
+  <link rel="stylesheet" href="../tokens/forces.css">
+  <link rel="stylesheet" href="../tokens/textures.css">
+  <link rel="stylesheet" href="../sections/sections.css">
+
+  <!-- STYLE-OVERRIDES: emitted by adapter from adapters/examples/dusk.json -->
+  <style id="style-overrides">
+    /* Custom palette scope */
+    [data-mood="--custom"] {
+      --color-bg:       #1a0e08;
+      --color-fg:       #f4e8d0;
+      --color-accent-1: #d97a2c;
+      --color-accent-2: #7a5a3a;
+      --color-discord:  #22d3ee;
+      --color-muted:   color-mix(in oklch, var(--color-fg) 50%, var(--color-bg));
+      --color-subtle:  color-mix(in oklch, var(--color-fg)  8%, var(--color-bg));
+      --color-surface: color-mix(in oklch, var(--color-fg)  5%, var(--color-bg));
+      --color-border:  color-mix(in oklch, var(--color-fg) 15%, var(--color-bg));
+      --color-inverse: var(--color-fg);
+    }
+    /* Force overrides */
+    :root {
+      --force-structure: 0.7;
+      --force-breath: 0.7;
+      --force-warmth: 0.8;
+      --force-edge: 0.5;
+      --force-motion: 0.4;
+      /* Voice overrides */
+      --font-monument:  'Bodoni Moda', serif;
+      --font-swiss:     'Inter', sans-serif;
+      --font-editorial: 'Cormorant Garamond', serif;
+      --font-brutalist: 'JetBrains Mono', monospace;
+      --font-expressive:'DM Sans', sans-serif;
+      /* Motion scaling (motion_intensity: 0.5) */
+      --motion-scale: 0.5;
+      --dur-instant:  calc(150ms  * var(--motion-scale, 1));
+      --dur-swift:    calc(300ms  * var(--motion-scale, 1));
+      --dur-natural:  calc(500ms  * var(--motion-scale, 1));
+      --dur-drift:    calc(900ms  * var(--motion-scale, 1));
+      --dur-meditate: calc(1800ms * var(--motion-scale, 1));
+      --texture-grain-duration: calc(8s * var(--motion-scale, 1));
+    }
+  </style>
+
+  <style>
+    body { font-family: var(--font-swiss); background: var(--color-bg); color: var(--color-fg); margin: 0; }
+  </style>
+</head>
+<body>
+
+  <section class="cc-section cc-hero" data-pattern="hero" data-variant="editorial">
+    <div class="container --regular flow">
+      <span class="cc-hero__eyebrow voice-swiss --label">style.json · dusk</span>
+      <h1 class="cc-hero__heading voice-monument --massive">Dakota's bedroom</h1>
+      <p class="cc-hero__subhead voice-swiss">Liminal warmth at the edge of suburban dusk. A page composed from a style guide, not a brief.</p>
+    </div>
+  </section>
+
+  <section class="cc-section cc-manifesto" data-pattern="manifesto" data-variant="default">
+    <div class="container --regular flow">
+      <h2 class="cc-manifesto__heading voice-editorial --display">The room remembers.</h2>
+      <div class="cc-manifesto__body">
+        <p class="voice-swiss">Amber lamp on a particle-board desk. The window cracked open against the cicada heat. A Discman, still spinning. The blinds drawing horizontal lines on the carpet.</p>
+        <p class="voice-swiss">Style guides describe vibes. They do not supply photographs. The amber on this page is the amber the guide named — not a picture of it.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="cc-section cc-quote" data-pattern="quote" data-variant="gutter">
+    <div class="container --regular">
+      <blockquote class="cc-quote__body">
+        <p class="cc-quote__text voice-editorial --display">Lean into warm grain. Type breathes. Avoid pure black backgrounds.</p>
+        <cite class="cc-quote__attribution voice-swiss --label">— dusk.json, dos[]</cite>
+      </blockquote>
+    </div>
+  </section>
+
+  <section class="cc-section cc-cta" data-pattern="cta" data-variant="default">
+    <div class="container --regular flow">
+      <h2 class="cc-cta__heading voice-monument --display">Hand over a style.json. Get a page.</h2>
+      <p class="cc-cta__supporting voice-swiss">No image embedded from a Pinterest board. Just the vibe — palette, fonts, forces, motion, texture — rendered in HTML and CSS.</p>
+      <a class="cc-cta__action voice-swiss --label" href="../adapters/from-style-json.md">Read the workflow<span class="cc-cta__arrow" aria-hidden="true">→</span></a>
+    </div>
+  </section>
+
+  <footer class="cc-section cc-footer" data-pattern="footer" data-variant="minimal">
+    <div class="container flex-between">
+      <span class="cc-footer__copyright voice-swiss --label">© Controlled Chaos · 2026</span>
+      <nav class="cc-footer__nav">
+        <a class="cc-footer__link voice-swiss --label" href="../adapters/examples/dusk.json">View dusk.json</a>
+        <a class="cc-footer__link voice-swiss --label" href="../adapters/style-schema.json">Schema</a>
+      </nav>
+    </div>
+  </footer>
+
+</body>
+</html>

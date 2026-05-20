@@ -1,0 +1,52 @@
+/* ============================================
+   TEXTURES — Page material layer
+   ============================================
+   Activated via <html data-texture="...">.
+   - none  (default) — no overlay
+   - grain           — body::after SVG noise overlay, slow drift
+   - glass           — .cc-glass utility class with backdrop-filter
+
+   Load AFTER tokens/forces.css.
+   Reuses the grain-shift @keyframes already defined in motion.css.
+   ============================================ */
+
+:root {
+  --texture-grain-opacity:  0.08;
+  --texture-grain-scale:    0.85;
+  --texture-grain-duration: 8s;
+  --texture-glass-blur:     20px;
+  --texture-glass-saturate: 180%;
+}
+
+/* --- GRAIN -------------------------------------------------------- */
+html[data-texture="grain"] body { position: relative; }
+
+html[data-texture="grain"] body::after {
+  content: "";
+  position: fixed;
+  inset: -50%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: var(--texture-grain-opacity);
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/></svg>");
+  background-size: calc(200px * var(--texture-grain-scale));
+  animation: grain-shift var(--texture-grain-duration) steps(8) infinite;
+}
+
+/* --- GLASS -------------------------------------------------------- */
+html[data-texture="glass"] .cc-glass {
+  backdrop-filter: blur(var(--texture-glass-blur))
+                  saturate(var(--texture-glass-saturate));
+  -webkit-backdrop-filter: blur(var(--texture-glass-blur))
+                          saturate(var(--texture-glass-saturate));
+  background: color-mix(in oklch, var(--color-bg) 60%, transparent);
+  border: 1px solid color-mix(in oklch, var(--color-fg) 12%, transparent);
+}
+
+/* --- REDUCED-MOTION ---------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  html[data-texture="grain"] body::after {
+    animation: none;
+  }
+}

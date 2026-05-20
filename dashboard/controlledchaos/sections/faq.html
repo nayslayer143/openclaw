@@ -1,0 +1,41 @@
+<!-- cc-section: faq
+     best:  swiss, gallery, immersive
+     ok:    -
+     avoid: kinetic
+     variants: accordion (default — one-at-a-time toggle), static (all visible), numbered
+     placeholders: heading, items[] (question, answer) -->
+<section class="cc-section cc-faq"
+         data-pattern="faq"
+         data-variant="accordion">
+  <div class="container --regular flow motion-reveal">
+    <h2 class="cc-faq__heading voice-monument --display">{{heading}}</h2>
+    <div class="cc-faq__items">
+      {{#items}}
+      <details class="cc-faq__item">
+        <summary class="cc-faq__question voice-monument">
+          {{question}}
+          <span class="cc-faq__marker" aria-hidden="true">+</span>
+        </summary>
+        <div class="cc-faq__answer">
+          <p class="voice-swiss">{{answer}}</p>
+        </div>
+      </details>
+      {{/items}}
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    document.querySelectorAll('.cc-faq[data-variant="accordion"]').forEach(function (faq) {
+      faq.querySelectorAll('.cc-faq__item').forEach(function (item) {
+        item.addEventListener('toggle', function () {
+          if (!item.open) return;
+          faq.querySelectorAll('.cc-faq__item').forEach(function (sibling) {
+            if (sibling !== item) sibling.open = false;
+          });
+        });
+      });
+    });
+  })();
+</script>

@@ -1,0 +1,18 @@
+<!-- cc-section: cta
+     best:  all
+     ok:    -
+     avoid: -
+     variants: default, discord, monument
+     placeholders: heading, action_text, action_href, (optional) supporting -->
+<section class="cc-section cc-cta"
+         data-pattern="cta"
+         data-variant="default">
+  <div class="container --regular flow">
+    <h2 class="cc-cta__heading voice-monument --display">{{heading}}</h2>
+    <p class="cc-cta__supporting voice-swiss">{{supporting}}</p>
+    <a class="cc-cta__action voice-swiss --label" href="{{action_href}}">
+      {{action_text}}
+      <span class="cc-cta__arrow" aria-hidden="true">→</span>
+    </a>
+  </div>
+</section>

@@ -2925,6 +2925,31 @@ if COVEN_DIR.exists():
     )
 
 
+# ── /controlledchaos — Controlled Chaos design system showcase ────────────────
+# Public-facing landing for the design system itself. Eats its own dog food —
+# the landing page uses the SF Vibe Fest style.json palette and the v2 section
+# library to introduce the system, with links to every showcase mode + the two
+# real-world adapter demos (Lovetel, SF Vibe Fest).
+CONTROLLEDCHAOS_DIR = Path(__file__).parent / "controlledchaos"
+
+
+@app.get("/controlledchaos", response_class=HTMLResponse)
+@app.get("/controlledchaos/", response_class=HTMLResponse)
+async def controlledchaos_index():
+    return HTMLResponse(
+        content=(CONTROLLEDCHAOS_DIR / "index.html").read_text(),
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
+if CONTROLLEDCHAOS_DIR.exists():
+    app.mount(
+        "/controlledchaos",
+        StaticFiles(directory=str(CONTROLLEDCHAOS_DIR), html=True),
+        name="controlledchaos_static",
+    )
+
+
 GONZOCLAW_DIST = Path.home() / "gonzoclaw" / "frontend" / "dist"
 GONZOCLAW_ASSETS = GONZOCLAW_DIST / "assets"
 GONZOCLAW_BACKEND = "http://localhost:18790"

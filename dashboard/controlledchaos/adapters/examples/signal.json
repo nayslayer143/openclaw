@@ -1,0 +1,21 @@
+{
+  "name": "Signal — neon kinetic",
+  "thesis": "Terminal glow at 2 a.m. The screen is the city.",
+  "palette": {
+    "bg":       "#0a0a0f",
+    "fg":       "#e0ffe0",
+    "accent_1": "#00ff88",
+    "accent_2": "#0088ff",
+    "discord":  "#ff0066"
+  },
+  "typography": {
+    "monument":  { "family": "Space Grotesk", "weights": [400, 700], "google": true },
+    "swiss":     { "family": "Inter",         "weights": [400, 600], "google": true },
+    "brutalist": { "family": "Space Mono",    "weights": [400, 700], "google": true }
+  },
+  "motion_intensity": 1.0,
+  "texture": "grain",
+  "mode_id": "kinetic",
+  "dos":   ["sharp edges", "loud type", "motion has volume"],
+  "donts": ["warm tones", "negative space"]
+}

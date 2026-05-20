@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" data-mood="signal" data-forces="immersive" data-texture="grain">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controlled Chaos — Sections Demo</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;700&family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../tokens/layout.css">
+  <link rel="stylesheet" href="../tokens/typography.css">
+  <link rel="stylesheet" href="../tokens/color.css">
+  <link rel="stylesheet" href="../tokens/motion.css">
+  <link rel="stylesheet" href="../tokens/forces.css">
+  <link rel="stylesheet" href="../tokens/textures.css">
+  <link rel="stylesheet" href="../sections/sections.css">
+
+  <style>
+    body { font-family: var(--font-swiss); background: var(--color-bg); color: var(--color-fg); margin: 0; }
+    .cc-section + .cc-section { border-top: 1px solid var(--color-border); }
+  </style>
+</head>
+<body>
+
+  <!-- 1. hero -->
+  <section class="cc-section cc-hero" data-pattern="hero" data-variant="monument">
+    <div class="container --regular flow">
+      <span class="cc-hero__eyebrow voice-swiss --label">CC · sections demo</span>
+      <h1 class="cc-hero__heading voice-monument --massive">Twelve sections, one system.</h1>
+      <p class="cc-hero__subhead voice-swiss">Every section below renders from a partial in <code>sections/</code> — token-driven, mode-agnostic, no JavaScript.</p>
+    </div>
+  </section>
+
+  <!-- 2. manifesto -->
+  <section class="cc-section cc-manifesto" data-pattern="manifesto" data-variant="default">
+    <div class="container --regular flow">
+      <h2 class="cc-manifesto__heading voice-editorial --display">A manifesto for compositional pages.</h2>
+      <div class="cc-manifesto__body">
+        <p class="voice-swiss">Sections are units of intent. A hero answers "who is this?" A stat-grid answers "how big?" A quote earns the room a paragraph cannot.</p>
+        <p class="voice-swiss">The partial decides the structure. The mode decides the mood. The author decides the words. Compose, don't invent.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. stat-grid -->
+  <section class="cc-section cc-stat-grid" data-pattern="stat-grid" data-variant="default">
+    <div class="container --wide flow">
+      <h2 class="cc-stat-grid__heading voice-monument --display">By the numbers.</h2>
+      <div class="cc-stat-grid__items">
+        <div class="cc-stat"><span class="cc-stat__num voice-monument --massive">12</span><span class="cc-stat__label voice-swiss --label">Sections shipped</span><span class="cc-stat__caption voice-swiss">From hero to footer.</span></div>
+        <div class="cc-stat"><span class="cc-stat__num voice-monument --massive">~30</span><span class="cc-stat__label voice-swiss --label">Variants total</span><span class="cc-stat__caption voice-swiss">≈ 2.5 per section.</span></div>
+        <div class="cc-stat"><span class="cc-stat__num voice-monument --massive">5×9</span><span class="cc-stat__label voice-swiss --label">Mode × mood</span><span class="cc-stat__caption voice-swiss">All combinations supported.</span></div>
+        <div class="cc-stat"><span class="cc-stat__num voice-monument --massive">0</span><span class="cc-stat__label voice-swiss --label">JS dependencies</span><span class="cc-stat__caption voice-swiss">Pure HTML + CSS.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. quote -->
+  <section class="cc-section cc-quote" data-pattern="quote" data-variant="default">
+    <div class="container --regular">
+      <blockquote class="cc-quote__body">
+        <p class="cc-quote__text voice-editorial --display">The grid is not a cage. It is a trampoline.</p>
+        <cite class="cc-quote__attribution voice-swiss --label">— Controlled Chaos, DESIGN.md</cite>
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- 5. two-column -->
+  <section class="cc-section cc-two-col" data-pattern="two-column" data-variant="editorial">
+    <div class="container --wide">
+      <div class="cc-two-col__grid">
+        <div class="cc-two-col__col"><h3 class="cc-two-col__heading voice-monument">Order</h3><p class="cc-two-col__body voice-swiss">The grid, the rhythm, the scaffolding. Five forces in restraint. Where one element sits, the others know where they belong.</p></div>
+        <div class="cc-two-col__col"><h3 class="cc-two-col__heading voice-monument">Chaos</h3><p class="cc-two-col__body voice-swiss">The discord, the deviation, the proof that the rest is intentional. One element that doesn't belong. One color that doesn't match.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. process -->
+  <section class="cc-section cc-process" data-pattern="process" data-variant="numbered">
+    <div class="container --regular flow">
+      <h2 class="cc-process__heading voice-editorial --display">How a page comes together.</h2>
+      <ol class="cc-process__steps">
+        <li class="cc-process__step"><h3 class="cc-process__step-title voice-monument">Pick the vibe</h3><p class="cc-process__step-body voice-swiss">Mode + mood. Or hand over a <code>style.json</code> and let the adapter do it.</p></li>
+        <li class="cc-process__step"><h3 class="cc-process__step-title voice-monument">Compose sections</h3><p class="cc-process__step-body voice-swiss">Read <code>sections/README.md</code>. Pick what serves the brief. Honor the dos and don'ts.</p></li>
+        <li class="cc-process__step"><h3 class="cc-process__step-title voice-monument">Verify in the browser</h3><p class="cc-process__step-body voice-swiss">Open the page. Confirm the bg color, the hero font, no leaking placeholders, no console errors.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- 7. gallery -->
+  <section class="cc-section cc-gallery" data-pattern="gallery" data-variant="rigid">
+    <div class="container --wide flow">
+      <h2 class="cc-gallery__heading voice-swiss --label">Image placeholders, not pins.</h2>
+      <div class="cc-gallery__grid">
+        <figure class="cc-gallery__item"><div class="cc-img-placeholder" data-slot="frame-1"></div><figcaption class="cc-gallery__caption voice-swiss --label">Frame 01</figcaption></figure>
+        <figure class="cc-gallery__item"><div class="cc-img-placeholder" data-slot="frame-2"></div><figcaption class="cc-gallery__caption voice-swiss --label">Frame 02</figcaption></figure>
+        <figure class="cc-gallery__item"><div class="cc-img-placeholder" data-slot="frame-3"></div><figcaption class="cc-gallery__caption voice-swiss --label">Frame 03</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. full-bleed -->
+  <section class="cc-section cc-bleed" data-pattern="full-bleed" data-variant="type">
+    <div class="cc-bleed__content cc-bleed__content--type">
+      <span class="voice-monument" data-bleed-text>SECTION BREAK</span>
+    </div>
+  </section>
+
+  <!-- 9. marquee -->
+  <section class="cc-section cc-marquee-section" data-pattern="marquee" data-variant="default">
+    <div class="cc-marquee__track">
+      <div class="cc-marquee__inner motion-marquee">
+        <span class="cc-marquee__item voice-monument">HIERARCHY</span><span class="cc-marquee__sep" aria-hidden="true">●</span>
+        <span class="cc-marquee__item voice-monument">TENSION</span><span class="cc-marquee__sep" aria-hidden="true">●</span>
+        <span class="cc-marquee__item voice-monument">TIME</span><span class="cc-marquee__sep" aria-hidden="true">●</span>
+        <span class="cc-marquee__item voice-monument">HIERARCHY</span><span class="cc-marquee__sep" aria-hidden="true">●</span>
+        <span class="cc-marquee__item voice-monument">TENSION</span><span class="cc-marquee__sep" aria-hidden="true">●</span>
+        <span class="cc-marquee__item voice-monument">TIME</span><span class="cc-marquee__sep" aria-hidden="true">●</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10. logo-wall -->
+  <section class="cc-section cc-logo-wall" data-pattern="logo-wall" data-variant="grid">
+    <div class="container --wide flow">
+      <h2 class="cc-logo-wall__heading voice-swiss --label">As featured at</h2>
+      <ul class="cc-logo-wall__items">
+        <li class="cc-logo-wall__item"><a href="#" class="voice-monument">CARGO</a></li>
+        <li class="cc-logo-wall__item"><a href="#" class="voice-monument">AWWWARDS</a></li>
+        <li class="cc-logo-wall__item"><a href="#" class="voice-monument">FWA</a></li>
+        <li class="cc-logo-wall__item"><a href="#" class="voice-monument">SOTD</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 11. cta -->
+  <section class="cc-section cc-cta" data-pattern="cta" data-variant="discord">
+    <div class="container --regular flow">
+      <h2 class="cc-cta__heading voice-monument --display">Build something that earns the room.</h2>
+      <p class="cc-cta__supporting voice-swiss">Pick a mode. Pick a mood. Compose sections. Verify in the browser.</p>
+      <a class="cc-cta__action voice-swiss --label" href="../README.md">Read the catalog<span class="cc-cta__arrow" aria-hidden="true">→</span></a>
+    </div>
+  </section>
+
+  <!-- 12. footer -->
+  <footer class="cc-section cc-footer" data-pattern="footer" data-variant="minimal">
+    <div class="container flex-between">
+      <span class="cc-footer__copyright voice-swiss --label">© Controlled Chaos · 2026</span>
+      <nav class="cc-footer__nav">
+        <a class="cc-footer__link voice-swiss --label" href="../README.md">README</a>
+        <a class="cc-footer__link voice-swiss --label" href="../AXIOMS.md">Axioms</a>
+        <a class="cc-footer__link voice-swiss --label" href="../DESIGN.md">Design</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('--visible'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.motion-reveal, .motion-stagger').forEach(el => io.observe(el));
+  </script>
+
+</body>
+</html>

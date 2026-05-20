@@ -1,0 +1,24 @@
+<!-- cc-section: feature-grid
+     best:  swiss, gallery, immersive
+     ok:    -
+     avoid: brutalist (loud fights feature-density), kinetic (motion fights the read)
+     variants: default (3-col), wide (2-col, longer body), compact (4-col)
+     placeholders: heading, eyebrow (optional), features[] (icon (raw SVG), title, body)
+     icons: agent fills inline SVG from sections/icons.md curated set -->
+<section class="cc-section cc-feature-grid"
+         data-pattern="feature-grid"
+         data-variant="default">
+  <div class="container --wide flow motion-reveal">
+    <span class="cc-feature-grid__eyebrow voice-swiss --label">{{eyebrow}}</span>
+    <h2 class="cc-feature-grid__heading voice-monument --display">{{heading}}</h2>
+    <div class="cc-feature-grid__items motion-stagger">
+      {{#features}}
+      <div class="cc-feature">
+        <div class="cc-feature__icon" aria-hidden="true">{{{icon}}}</div>
+        <h3 class="cc-feature__title voice-monument">{{title}}</h3>
+        <p class="cc-feature__body voice-swiss">{{body}}</p>
+      </div>
+      {{/features}}
+    </div>
+  </div>
+</section>
