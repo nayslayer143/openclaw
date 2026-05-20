@@ -2901,6 +2901,30 @@ if ARYZE_DIR.exists():
     )
 
 
+# ── /coven — COVEN.art A/B/C/D/E/F redesign concept ──────────────────────────
+# Public-facing client demo. Three responsive aesthetic modes (Cathedral /
+# Manifesto Journal / Sacred Rave) at /coven/{cathedral,manifesto,rave}.html
+# plus a comparison index at /coven/.
+COVEN_DIR = Path(__file__).parent / "coven"
+
+
+@app.get("/coven", response_class=HTMLResponse)
+@app.get("/coven/", response_class=HTMLResponse)
+async def coven_index():
+    return HTMLResponse(
+        content=(COVEN_DIR / "index.html").read_text(),
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
+if COVEN_DIR.exists():
+    app.mount(
+        "/coven",
+        StaticFiles(directory=str(COVEN_DIR), html=True),
+        name="coven_static",
+    )
+
+
 GONZOCLAW_DIST = Path.home() / "gonzoclaw" / "frontend" / "dist"
 GONZOCLAW_ASSETS = GONZOCLAW_DIST / "assets"
 GONZOCLAW_BACKEND = "http://localhost:18790"
