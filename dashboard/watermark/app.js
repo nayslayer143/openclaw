@@ -21,8 +21,15 @@ const applyAllChk = $("apply-all");
 const statusEl  = $("status");
 const downloadBtn = $("download-btn");
 
+// 16:9 target for page normalization. Matches the dominant size in typical
+// Keynote/PowerPoint exports (1376×768 pt), so most pages need zero scaling
+// and only off-aspect pages get letterboxed.
+const NORMALIZE_W = 1376;
+const NORMALIZE_H = 768;
+
 const state = {
-  pdfBytes: null,        // ArrayBuffer of original PDF
+  pdfBytesOriginal: null,// ArrayBuffer of original uploaded PDF (untouched)
+  pdfBytes: null,        // ArrayBuffer used for rendering & stamping (may be normalized)
   logoBytes: null,       // ArrayBuffer of logo (current — may be cropped)
   logoMime: null,        // "image/png" | "image/jpeg"
   logoNaturalW: 0,
@@ -39,19 +46,66 @@ const state = {
 pdfInput.addEventListener("change", async (e) => {
   const file = e.target.files[0]; if (!file) return;
   $("pdf-name").textContent = file.name;
-  state.pdfBytes = await file.arrayBuffer();
-  // Pre-fill the filename input with "<orig>-watermarked".
+  state.pdfBytesOriginal = await file.arrayBuffer();
   const baseName = file.name.replace(/\.pdf$/i, "");
   $("filename-input").value = `${baseName}-watermarked`;
-  state.pdfDoc = await pdfjsLib.getDocument({ data: state.pdfBytes.slice(0) }).promise;
-  state.pageCount = state.pdfDoc.numPages;
-  state.pageNum = 1;
-  state.overrides.clear();
-  state.globalRect = null;
-  await renderPage();
+  await loadPdfFromOriginal();
   $("step-place").classList.remove("hidden");
   updateDownloadButton();
 });
+
+// Re-normalize and re-render when the user toggles the checkbox.
+$("normalize").addEventListener("change", async () => {
+  if (!state.pdfBytesOriginal) return;
+  statusEl.textContent = "re-processing pages…";
+  state.overrides.clear();
+  state.globalRect = null;
+  await loadPdfFromOriginal();
+  // If a logo was already loaded, re-apply default placement on the new render.
+  if (state.logoBytes) await setLogoFromBytes(state.logoBytes, state.logoMime);
+  statusEl.textContent = "";
+  updateDownloadButton();
+});
+
+async function loadPdfFromOriginal() {
+  const wantNormalize = $("normalize").checked;
+  state.pdfBytes = wantNormalize
+    ? await normalizePDF(state.pdfBytesOriginal, NORMALIZE_W, NORMALIZE_H)
+    : state.pdfBytesOriginal.slice(0);
+  state.pdfDoc = await pdfjsLib.getDocument({ data: state.pdfBytes.slice(0) }).promise;
+  state.pageCount = state.pdfDoc.numPages;
+  state.pageNum = 1;
+  await renderPage();
+}
+
+// Build a new PDF with every page resized to (targetW × targetH).
+// Source pages are letterboxed: scaled to fit while preserving aspect, centered
+// on a white background. Rotation is baked in via drawPage so downstream
+// stamping never has to deal with rotated coords.
+async function normalizePDF(srcBytes, targetW, targetH) {
+  const { PDFDocument: PD, rgb } = PDFLib;
+  const srcDoc = await PD.load(srcBytes);
+  const newDoc = await PD.create();
+  const srcPages = srcDoc.getPages();
+  // Embed all source pages in one call — faster than per-page.
+  const embeds = await newDoc.embedPages(srcPages);
+  for (let i = 0; i < srcPages.length; i++) {
+    const srcPage = srcPages[i];
+    const { width: sw, height: sh } = srcPage.getSize();
+    const rot = srcPage.getRotation().angle % 360;
+    const effW = (rot === 90 || rot === 270) ? sh : sw;
+    const effH = (rot === 90 || rot === 270) ? sw : sh;
+    const newPage = newDoc.addPage([targetW, targetH]);
+    newPage.drawRectangle({ x: 0, y: 0, width: targetW, height: targetH, color: rgb(1, 1, 1) });
+    const scale = Math.min(targetW / effW, targetH / effH);
+    const drawW = effW * scale;
+    const drawH = effH * scale;
+    const dx = (targetW - drawW) / 2;
+    const dy = (targetH - drawH) / 2;
+    newPage.drawPage(embeds[i], { x: dx, y: dy, width: drawW, height: drawH });
+  }
+  return await newDoc.save();
+}
 
 logoInput.addEventListener("change", async (e) => {
   const file = e.target.files[0]; if (!file) return;
@@ -356,10 +410,15 @@ downloadBtn.addEventListener("click", async () => {
       ? await pdfDoc.embedPng(state.logoBytes)
       : await pdfDoc.embedJpg(state.logoBytes);
     const pages = pdfDoc.getPages();
+    // Always derive logo height from its own pixel aspect, not from r.h.
+    // r.h is only meaningful in the preview (where pages are uniform); on
+    // mixed-aspect pages, multiplying r.h by page-height stretches the logo.
+    const imgAR = state.logoNaturalW / state.logoNaturalH;
     pages.forEach((page, i) => {
       const r = state.overrides.get(i) || state.globalRect;
       const { width: pw, height: ph } = page.getSize();
-      const w = r.w * pw, h = r.h * ph;
+      const w = r.w * pw;
+      const h = w / imgAR;
       const x = r.x * pw;
       const y = ph - (r.y * ph) - h;
       page.drawImage(embed, { x, y, width: w, height: h, opacity: 1 });

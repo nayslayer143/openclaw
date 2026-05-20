@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>PDF Watermark</title>
-<link rel="stylesheet" href="/watermark/static/styles.css?v=4" />
+<link rel="stylesheet" href="/watermark/static/styles.css?v=5" />
 </head>
 <body>
 <header>
@@ -19,6 +19,7 @@
         <span class="label">1. PDF</span>
         <input type="file" id="pdf-input" accept="application/pdf" />
         <span class="filename" id="pdf-name">no file</span>
+        <label class="check" style="margin-top:6px"><input type="checkbox" id="normalize" checked> Normalize all pages to 16:9 (1376×768)</label>
       </label>
       <label class="filebox">
         <span class="label">2. Logo (PNG / JPG)</span>
@@ -89,6 +90,6 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.0.379/pdf.min.mjs" type="module"></script>
 <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-<script type="module" src="/watermark/static/app.js?v=4"></script>
+<script type="module" src="/watermark/static/app.js?v=5"></script>
 </body>
 </html>
