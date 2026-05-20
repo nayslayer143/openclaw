@@ -2881,6 +2881,9 @@ async def aryze_index():
 @app.get("/aryze/a", response_class=HTMLResponse)
 @app.get("/aryze/b", response_class=HTMLResponse)
 @app.get("/aryze/c", response_class=HTMLResponse)
+@app.get("/aryze/d", response_class=HTMLResponse)
+@app.get("/aryze/e", response_class=HTMLResponse)
+@app.get("/aryze/f", response_class=HTMLResponse)
 async def aryze_variant(request: Request):
     # Direct variant link — serves app.html with ?v= already applied.
     variant = request.url.path.rsplit("/", 1)[-1]
