@@ -2863,6 +2863,41 @@ if WATERMARK_DIR.exists():
     )
 
 
+# ── /aryze — Aryze Eatery A/B/C concept site ─────────────────────────────────
+# Public-facing client demo. Explicit /aryze + /aryze/ routes bypass the SPA
+# catch-all (which would redirect unauthenticated visitors to /login).
+ARYZE_DIR = Path(__file__).parent / "aryze"
+
+
+@app.get("/aryze", response_class=HTMLResponse)
+@app.get("/aryze/", response_class=HTMLResponse)
+async def aryze_index():
+    return HTMLResponse(
+        content=(ARYZE_DIR / "index.html").read_text(),
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
+@app.get("/aryze/a", response_class=HTMLResponse)
+@app.get("/aryze/b", response_class=HTMLResponse)
+@app.get("/aryze/c", response_class=HTMLResponse)
+async def aryze_variant(request: Request):
+    # Direct variant link — serves app.html with ?v= already applied.
+    variant = request.url.path.rsplit("/", 1)[-1]
+    html = (ARYZE_DIR / "app.html").read_text()
+    # Inject default theme so the page renders the right variant if JS lags
+    html = html.replace('class="theme-a"', f'class="theme-{variant}"', 1)
+    return HTMLResponse(content=html, headers={"Cache-Control": "no-cache"})
+
+
+if ARYZE_DIR.exists():
+    app.mount(
+        "/aryze",
+        StaticFiles(directory=str(ARYZE_DIR), html=True),
+        name="aryze_static",
+    )
+
+
 GONZOCLAW_DIST = Path.home() / "gonzoclaw" / "frontend" / "dist"
 GONZOCLAW_ASSETS = GONZOCLAW_DIST / "assets"
 GONZOCLAW_BACKEND = "http://localhost:18790"
