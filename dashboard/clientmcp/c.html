@@ -136,6 +136,54 @@ body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--i
 .feat .more{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:6px}
 .feat:hover .more{color:var(--accent)}
 
+/* ── Interactive demo widgets ─────────────────────────────────────────── */
+.try{max-width:1240px;margin:90px auto 0;padding:0 24px}
+.try-head{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:32px;flex-wrap:wrap}
+.try h2{font-size:clamp(28px,4vw,40px);font-weight:700;letter-spacing:-0.025em;line-height:1.05;max-width:18ch}
+.try h2 em{font-style:normal;color:var(--accent)}
+.try .try-sub{font-size:14px;color:var(--ink-soft);max-width:42ch;font-family:'JetBrains Mono',monospace;text-align:right}
+.try .try-sub b{color:var(--green);font-weight:600}
+@media (max-width:820px){.try-sub{text-align:left}.try-head{flex-direction:column;align-items:flex-start}}
+
+.try-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+@media (max-width:980px){.try-grid{grid-template-columns:1fr}}
+
+.widget{background:var(--bg-elev);border:1px solid var(--rule-strong);border-radius:10px;padding:22px 22px 18px;display:flex;flex-direction:column;gap:14px;min-height:340px}
+.widget-head{display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase}
+.widget-head::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.widget h4{font-size:16px;font-weight:600;color:var(--ink);line-height:1.25}
+.widget p.hint{font-size:12px;color:var(--muted);line-height:1.5;font-family:'JetBrains Mono',monospace}
+.widget input[type=text], .widget input[type=url], .widget textarea{
+  width:100%;background:var(--bg);border:1px solid var(--rule-strong);border-radius:6px;
+  padding:10px 12px;color:var(--ink);font-family:inherit;font-size:13px;line-height:1.5;
+  resize:none;font-feature-settings:'liga' on;
+}
+.widget input:focus, .widget textarea:focus{outline:none;border-color:var(--accent)}
+.widget textarea{min-height:64px}
+.widget button{
+  background:var(--accent);color:#1a1815;border:0;padding:9px 16px;border-radius:6px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;font-weight:600;
+  text-transform:uppercase;cursor:pointer;transition:background .15s;align-self:flex-start;
+}
+.widget button:disabled{background:var(--rule-strong);color:var(--muted);cursor:not-allowed}
+.widget button:not(:disabled):hover{background:#fff}
+.widget .out{
+  flex:1;font-size:12px;color:var(--ink-soft);line-height:1.55;
+  background:var(--bg);border:1px dashed var(--rule);border-radius:6px;padding:12px;
+  overflow-y:auto;max-height:260px;
+}
+.widget .out:empty::before{content:'output appears here';color:var(--muted);font-style:italic}
+.widget .out .ok{color:var(--ink)}
+.widget .out .meta{color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.widget .out .pill{display:inline-block;background:rgba(233,201,123,0.15);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;padding:2px 7px;border-radius:3px;margin-right:5px;text-transform:uppercase}
+.widget .out ul{padding-left:0;list-style:none;margin:0}
+.widget .out li{padding:7px 0;border-bottom:1px solid var(--rule)}
+.widget .out li:last-child{border-bottom:0}
+.widget .out li b{color:var(--ink);font-weight:600;margin-right:8px}
+.widget .out .citation{padding:6px 8px;background:var(--bg-card);border-left:2px solid var(--accent);border-radius:0 4px 4px 0;font-size:11px;color:var(--ink-soft);margin-top:6px;font-style:italic}
+.widget .err{color:var(--red);font-size:11px;font-family:'JetBrains Mono',monospace}
+.widget .swatch{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:4px;border:1px solid rgba(0,0,0,0.2)}
+
 .closer{padding:120px 24px;text-align:center;border-top:1px solid var(--rule);margin-top:60px}
 .closer h3{font-size:clamp(32px,4.5vw,52px);font-weight:700;letter-spacing:-0.025em;line-height:1.1;margin-bottom:18px;max-width:18ch;margin-left:auto;margin-right:auto}
 .closer p{font-size:16px;color:var(--ink-soft);max-width:46ch;margin:0 auto 32px}
@@ -318,6 +366,42 @@ footer a:hover{color:var(--accent)}
   </div>
 </section>
 
+<section class="try" id="try">
+  <div class="try-head">
+    <h2>Try the agents <em>live</em>.</h2>
+    <p class="try-sub">Backed by <b>localhost</b> via the dashboard same-origin proxy. Inference runs on Ollama qwen3:32b (zero API cost). Each widget is rate-limited; spend cap applies.</p>
+  </div>
+
+  <div class="try-grid">
+    <div class="widget" data-widget="qa">
+      <div class="widget-head">01 · Q&amp;A</div>
+      <h4>Ask anything across the seeded workspace.</h4>
+      <p class="hint">Permission-aware retrieval over messages, briefs, decisions. Hallucination guardrail strips citations not in the retrieved set.</p>
+      <textarea data-role="input" placeholder="e.g. What was approved about naming?" maxlength="500">What was approved about naming?</textarea>
+      <button data-role="run">Ask</button>
+      <div class="out" data-role="out"></div>
+    </div>
+
+    <div class="widget" data-widget="naming">
+      <div class="widget-head">02 · Naming · draft mode</div>
+      <h4>Generate eight candidates with rationale.</h4>
+      <p class="hint">Draft Mode is the cheap-fast batch. Brand context is auto-injected from the demo workspace's BrandKit.</p>
+      <textarea data-role="input" placeholder="One-paragraph brief…" maxlength="2000">A Brooklyn-based design studio doing cinematic web work for indie hospitality brands. Confident, slightly literary, not corporate.</textarea>
+      <button data-role="run">Generate</button>
+      <div class="out" data-role="out"></div>
+    </div>
+
+    <div class="widget" data-widget="brand">
+      <div class="widget-head">03 · Brand ingest</div>
+      <h4>Paste a URL — extract the brand kit.</h4>
+      <p class="hint">Fetches HTML, infers voice + archetype, extracts palette + vocabulary. Doesn't persist in demo mode.</p>
+      <input data-role="input" type="url" placeholder="https://basecamp.com" value="https://basecamp.com" />
+      <button data-role="run">Ingest</button>
+      <div class="out" data-role="out"></div>
+    </div>
+  </div>
+</section>
+
 <section id="why" class="below">
   <h2>Stop reading three Slacks, two WhatsApps, and an email thread to remember what you said.</h2>
   <p class="lead">Foyer ingests inbound across every channel into structured artifacts, classifies intent and urgency, and threads it back to the right project and brief — so your studio's institutional memory isn't trapped in a half-dozen apps.</p>
@@ -460,6 +544,119 @@ footer a:hover{color:var(--accent)}
   hydrate();
   // Refresh every 30s on the page so a real ingest shows up live
   setInterval(hydrate, 30000);
+})();
+
+// ── Interactive demo widgets ──────────────────────────────────────────────
+(function () {
+  const widgets = document.querySelectorAll('.widget[data-widget]');
+  if (!widgets.length) return;
+
+  function esc(s) {
+    return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  async function post(path, body) {
+    const r = await fetch(path, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await r.json();
+    if (!r.ok) throw Object.assign(new Error(data.error || `http ${r.status}`), { status: r.status, body: data });
+    return data;
+  }
+
+  function setBusy(btn, busy, busyLabel) {
+    if (busy) {
+      btn._orig = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = busyLabel || 'Working…';
+    } else {
+      btn.disabled = false;
+      if (btn._orig) btn.textContent = btn._orig;
+    }
+  }
+
+  function renderError(out, e) {
+    if (e.status === 429) {
+      out.innerHTML = `<div class="err">Rate-limited. Try again in a few minutes (per-IP cap; demo is public).</div>`;
+    } else if (e.body && e.body.error === 'demo_budget_exhausted_today') {
+      out.innerHTML = `<div class="err">Demo budget exhausted for today. Reset at midnight UTC.</div>`;
+    } else {
+      out.innerHTML = `<div class="err">${esc(e.message || 'request failed')}</div>`;
+    }
+  }
+
+  function renderQA(out, data) {
+    const cites = (data.citations || [])
+      .map((c) => `<div class="citation"><span class="pill">${esc(c.kind || '')}</span>${esc(c.snippet || '')}</div>`)
+      .join('');
+    out.innerHTML = `
+      <div class="meta">Source: ${esc(data.source || '?')} · ${data.retrieved} retrieved</div>
+      <div class="ok">${esc(data.answer || '(no answer)')}</div>
+      ${cites ? `<div style="margin-top:10px">${cites}</div>` : ''}
+    `;
+  }
+
+  function renderNaming(out, data) {
+    const items = (data.candidates || [])
+      .map((c) => `<li><b>${esc(c.candidate)}</b> — ${esc(c.rationale || '')}</li>`)
+      .join('');
+    out.innerHTML = `
+      <div class="meta">Mode: ${esc(data.mode || 'draft')} · ${data.candidates?.length ?? 0} candidates</div>
+      <ul>${items || '<li>no candidates</li>'}</ul>
+    `;
+  }
+
+  function renderBrand(out, data) {
+    const ext = data.extracted || {};
+    const swatches = (ext.colorPalette || [])
+      .slice(0, 8)
+      .map((c) => `<span class="swatch" style="background:${esc(c.hex)}" title="${esc(c.hex)}"></span>`)
+      .join('');
+    const did = (ext.vocabularyDo || []).map((v) => `<li><b>do</b> ${esc(v.phrase)}</li>`).join('');
+    const dont = (ext.vocabularyDont || []).map((v) => `<li><b>don't</b> ${esc(v.phrase)}</li>`).join('');
+    out.innerHTML = `
+      <div class="meta">Archetype: ${esc(ext.archetype || 'undetected')} · v${data.version ?? '?'} · ${data.preview?.title ? esc(data.preview.title.slice(0, 80)) : 'no title'}</div>
+      <div class="ok" style="margin-bottom:8px">${esc((ext.voiceDescription || '').slice(0, 360))}${(ext.voiceDescription || '').length > 360 ? '…' : ''}</div>
+      ${swatches ? `<div style="margin-bottom:8px">${swatches}</div>` : ''}
+      <ul>${did}${dont}</ul>
+    `;
+  }
+
+  widgets.forEach((w) => {
+    const kind = w.dataset.widget;
+    const input = w.querySelector('[data-role=input]');
+    const btn = w.querySelector('[data-role=run]');
+    const out = w.querySelector('[data-role=out]');
+    if (!input || !btn || !out) return;
+    btn.addEventListener('click', async () => {
+      const value = (input.value || '').trim();
+      if (!value) {
+        out.innerHTML = `<div class="err">Provide an input first.</div>`;
+        return;
+      }
+      out.innerHTML = '';
+      setBusy(btn, true, kind === 'naming' ? 'Generating…' : kind === 'brand' ? 'Ingesting…' : 'Thinking…');
+      try {
+        let data;
+        if (kind === 'qa') {
+          data = await post('/clientmcp/api/v1/demo/qa', { question: value });
+          renderQA(out, data);
+        } else if (kind === 'naming') {
+          data = await post('/clientmcp/api/v1/demo/naming', { brief: value, mode: 'draft', count: 8 });
+          renderNaming(out, data);
+        } else if (kind === 'brand') {
+          data = await post('/clientmcp/api/v1/demo/brand-ingest', { url: value });
+          renderBrand(out, data);
+        }
+      } catch (e) {
+        renderError(out, e);
+      } finally {
+        setBusy(btn, false);
+      }
+    });
+  });
 })();
 </script>
 
