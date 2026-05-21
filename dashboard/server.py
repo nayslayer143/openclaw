@@ -121,15 +121,21 @@ def is_localhost(request: Request) -> bool:
     return request.client and request.client.host in ("127.0.0.1", "::1")
 
 def get_current_user(request: Request) -> str:
-    token = request.cookies.get("oc_token") or request.headers.get("Authorization", "").removeprefix("Bearer ")
-    if not token:
-        if is_localhost(request):
-            return "nayslayer"
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    user = verify_token(token)
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid token")
-    return user
+    # Auth gate removed 2026-05-20 (Tier-3 user decision). All endpoints are
+    # public. /auth/* routes remain wired but unreached — re-enable by
+    # restoring the original cookie/token check below if needed.
+    #
+    #   token = request.cookies.get("oc_token") or request.headers.get(
+    #       "Authorization", "").removeprefix("Bearer ")
+    #   if not token:
+    #       if is_localhost(request):
+    #           return "nayslayer"
+    #       raise HTTPException(status_code=401, detail="Not authenticated")
+    #   user = verify_token(token)
+    #   if not user:
+    #       raise HTTPException(status_code=401, detail="Invalid token")
+    #   return user
+    return "nayslayer"
 
 @app.get("/auth/token")
 async def token_login(t: str, response: Response):
@@ -328,15 +334,8 @@ async def event_stream(user: str) -> AsyncGenerator[str, None]:
 
 @app.get("/api/stream")
 async def stream(request: Request):
-    # Auth via cookie or query param token (for EventSource which can't set headers)
-    token = request.cookies.get("oc_token") or request.query_params.get("token")
-    if not token or not verify_token(token):
-        if is_localhost(request):
-            user = "nayslayer"
-        else:
-            raise HTTPException(401, "Not authenticated")
-    else:
-        user = verify_token(token)
+    # Auth gate removed 2026-05-20. Stream is public.
+    user = "nayslayer"
     return StreamingResponse(event_stream(user),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
@@ -1498,9 +1497,7 @@ async def terminal_events(n: int = 20, errors_only: bool = False,
 @app.get("/api/terminal/stream")
 async def terminal_stream(request: Request):
     """SSE stream of new terminal events."""
-    token = request.cookies.get("oc_token") or request.query_params.get("token")
-    if not token or not verify_token(token):
-        if not is_localhost(request): raise HTTPException(401, "Not authenticated")
+    # Auth gate removed 2026-05-20. Stream is public.
     async def event_gen():
         last_count = sum(1 for _ in open(TERMINAL_LOG)) if TERMINAL_LOG.exists() else 0
         while True:
@@ -2192,10 +2189,7 @@ async def intel_crawler_health(user: str = Depends(get_current_user)):
 @app.get("/api/intel/stream")
 async def intel_stream(request: Request):
     """SSE stream for new recommendations."""
-    token = request.cookies.get("oc_token") or request.query_params.get("token")
-    if not token or not verify_token(token):
-        if not is_localhost(request):
-            raise HTTPException(401, "Not authenticated")
+    # Auth gate removed 2026-05-20. Stream is public.
 
     async def event_gen():
         last_mtime = 0.0
@@ -2317,10 +2311,7 @@ async def signals_stats(user: str = Depends(get_current_user)):
 @app.get("/api/intel/signals/stream/live")
 async def signals_stream(request: Request):
     """SSE for real-time signal updates across all platforms."""
-    token = request.cookies.get("oc_token") or request.query_params.get("token")
-    if not token or not verify_token(token):
-        if not is_localhost(request):
-            raise HTTPException(401, "Not authenticated")
+    # Auth gate removed 2026-05-20. Stream is public.
 
     async def event_gen():
         last_mtimes = {}
@@ -2825,10 +2816,7 @@ async def cinema_serve_render(filename: str, user: str = Depends(get_current_use
 @app.get("/orchestrator-embed")
 async def orchestrator_embed(request: Request):
     """Serve the self-contained orchestrator HTML for iframe embedding."""
-    token = request.cookies.get("oc_token")
-    if not token or not verify_token(token):
-        if not is_localhost(request):
-            return RedirectResponse(url="/login")
+    # Auth gate removed 2026-05-20. Public.
     html = (Path(__file__).parent / "orchestrator-embed.html").read_text()
     return HTMLResponse(content=html, headers={
         "Cache-Control": "no-cache, no-store, must-revalidate",
@@ -2922,6 +2910,31 @@ if COVEN_DIR.exists():
         "/coven",
         StaticFiles(directory=str(COVEN_DIR), html=True),
         name="coven_static",
+    )
+
+
+# ── /coven-next — COVEN.next Next.js evolution ───────────────────────────────
+# Next.js 16 App Router build with five scenes stitched into one journey:
+# Cathedral · Manifesto · Threshold · Sermon · Readymade. Built with
+# `BUILD_STATIC=1 npm run build:static` from ~/code/apps/coven-next, output
+# at ./out, symlinked here. basePath=/coven-next baked into the build.
+COVEN_NEXT_DIR = Path(__file__).parent / "coven-next"
+
+
+@app.get("/coven-next", response_class=HTMLResponse)
+@app.get("/coven-next/", response_class=HTMLResponse)
+async def coven_next_index():
+    return HTMLResponse(
+        content=(COVEN_NEXT_DIR / "index.html").read_text(),
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
+if COVEN_NEXT_DIR.exists():
+    app.mount(
+        "/coven-next",
+        StaticFiles(directory=str(COVEN_NEXT_DIR), html=True),
+        name="coven_next_static",
     )
 
 
@@ -3033,11 +3046,7 @@ GONZOCLAW_BACKEND = "http://localhost:18790"
 @app.get("/chat-app")
 @app.get("/chat-app/")
 async def chat_app_index(request: Request):
-    """Serve the gonzoclaw chat SPA index.html with auth gate."""
-    token = request.cookies.get("oc_token")
-    if not token or not verify_token(token):
-        if not is_localhost(request):
-            return RedirectResponse(url="/login")
+    """Serve the gonzoclaw chat SPA index.html. Auth gate removed 2026-05-20."""
     index = GONZOCLAW_DIST / "index.html"
     if not index.exists():
         return HTMLResponse(
@@ -3068,13 +3077,8 @@ if GONZOCLAW_ASSETS.exists():
     methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
 )
 async def gonzoclaw_proxy(path: str, request: Request):
-    # Auth gate — same as the rest of the dashboard's protected routes.
-    # Return 401 instead of redirecting to /login because EventSource and
-    # fetch can't follow auth redirects in any useful way.
-    token = request.cookies.get("oc_token")
-    if not token or not verify_token(token):
-        if not is_localhost(request):
-            return JSONResponse({"error": "unauthorized"}, status_code=401)
+    # Auth gate removed 2026-05-20. Proxy is public — anyone reaching the
+    # dashboard can hit the gonzoclaw backend through it.
 
     # Build target URL on the gonzoclaw backend, preserving query string.
     target = f"{GONZOCLAW_BACKEND}/api/{path}"
@@ -3120,6 +3124,84 @@ async def gonzoclaw_proxy(path: str, request: Request):
         media_type=upstream.headers.get("content-type"),
     )
 
+
+# ── Streaming proxy: /blackmagic/* → Black Magic Invitations (Next.js) ─────
+# Mirrors the gonzoclaw_proxy pattern. The Next.js app is configured with
+# basePath=/blackmagic so we preserve the prefix when forwarding. After the
+# dashboard's own auth check, we inject X-User-Id so the downstream Next.js
+# app can identify the user without sharing the JWT secret.
+BLACKMAGIC_BACKEND = "http://localhost:3008"
+
+
+@app.api_route(
+    "/blackmagic",
+    methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
+)
+@app.api_route(
+    "/blackmagic/{path:path}",
+    methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
+)
+async def blackmagic_proxy(request: Request, path: str = ""):
+    # Identify the user opportunistically. Don't block on missing auth —
+    # recipient invitations (/blackmagic/i/[token]) and the marketing landing
+    # are intentionally public. Sender-only routes enforce auth themselves
+    # (Next.js API handlers return 401 when X-User-Id is absent).
+    # Auth gate removed 2026-05-20. Default sender identity to nayslayer when
+    # no token is present (was previously localhost-only).
+    token = request.cookies.get("oc_token")
+    user = verify_token(token) if token else None
+    if not user:
+        user = "nayslayer"
+
+    # Preserve the /blackmagic prefix because Next has basePath=/blackmagic.
+    suffix = f"/{path}" if path else ""
+    target = f"{BLACKMAGIC_BACKEND}/blackmagic{suffix}"
+    if request.url.query:
+        target = f"{target}?{request.url.query}"
+
+    # Force upstream to send uncompressed bytes. We stream raw bytes through
+    # (aiter_raw) and strip Content-Encoding from the response — if upstream
+    # gzip-compresses but the encoding header is stripped on the way out, the
+    # browser renders the gzip bytes as text. Identity upstream + Cloudflare
+    # re-compressing on its egress is the cleanest fix.
+    drop_req = {"host", "content-length", "connection", "keep-alive",
+                "transfer-encoding", "upgrade", "accept-encoding"}
+    fwd_headers = {k: v for k, v in request.headers.items()
+                   if k.lower() not in drop_req}
+    fwd_headers["accept-encoding"] = "identity"
+    if user:
+        fwd_headers["X-User-Id"] = user
+
+    body = await request.body() if request.method != "GET" else None
+
+    client = httpx.AsyncClient(timeout=None)
+    upstream_req = client.build_request(
+        method=request.method,
+        url=target,
+        headers=fwd_headers,
+        content=body,
+    )
+    upstream = await client.send(upstream_req, stream=True)
+
+    async def relay():
+        try:
+            async for chunk in upstream.aiter_raw():
+                yield chunk
+        finally:
+            await upstream.aclose()
+            await client.aclose()
+
+    drop_resp = {"content-length", "content-encoding", "transfer-encoding",
+                 "connection", "keep-alive"}
+    resp_headers = {k: v for k, v in upstream.headers.items()
+                    if k.lower() not in drop_resp}
+
+    return StreamingResponse(
+        relay(),
+        status_code=upstream.status_code,
+        headers=resp_headers,
+        media_type=upstream.headers.get("content-type"),
+    )
 
 # ── CodeMonkeyClaw Work Orders ────────────────────────────────────────────────
 _CMC_DB = Path.home() / "codemonkeyclaw" / "codemonkeyclaw.db"
@@ -3199,11 +3281,7 @@ async def spa(path: str, request: Request):
     # Let API and WebSocket routes through
     if path.startswith("api/") or path.startswith("auth/") or path.startswith("ws"):
         raise HTTPException(404)
-    # Check auth — localhost skips OAuth
-    token = request.cookies.get("oc_token")
-    if not token or not verify_token(token):
-        if not is_localhost(request):
-            return RedirectResponse(url="/login")
+    # Auth gate removed 2026-05-20. Dashboard SPA is public.
     html = (Path(__file__).parent / "index.html").read_text()
     return HTMLResponse(content=html, headers={
         "Cache-Control": "no-cache, no-store, must-revalidate",
