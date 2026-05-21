@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#fdf9f0">
-<title>Client MCP / Foyer — A/B/C landing concepts</title>
-<meta name="description" content="Three landing-page directions for the agentic CRM for creative agencies. Compare side-by-side.">
+<title>Client MCP / Foyer — A/B/C/D/E landing concepts</title>
+<meta name="description" content="Five landing-page directions for the agentic CRM for creative agencies. Compare side-by-side.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -45,18 +45,20 @@ iframe{width:100%;height:100%;border:0;display:block;background:#fff}
 <body>
 
 <header>
-  <div class="brand">Foyer<small>A/B/C landing compare · working name "Client MCP"</small></div>
+  <div class="brand">Foyer<small>A/B/C/D/E landing compare · working name "Client MCP"</small></div>
   <div class="tabs" role="tablist">
     <button class="tab active" data-v="a" role="tab">A · Editorial<span class="lbl">cream · serif · spacious</span></button>
     <button class="tab" data-v="b" role="tab">B · Blueprint<span class="lbl">mono · technical · diagram</span></button>
     <button class="tab" data-v="c" role="tab">C · Demo-first<span class="lbl">product · canvas · live</span></button>
+    <button class="tab" data-v="d" role="tab">D · Manifesto<span class="lbl">longform · paper · essay</span></button>
+    <button class="tab" data-v="e" role="tab">E · Stage<span class="lbl">amber · doorway · architectural</span></button>
   </div>
   <button class="share" id="share-btn">Copy link</button>
 </header>
 
 <div class="viewport"><iframe id="frame" src="/clientmcp/a" title="Foyer landing concept" loading="eager"></iframe></div>
 
-<div class="helper">Switch · <kbd>1</kbd> A &nbsp; <kbd>2</kbd> B &nbsp; <kbd>3</kbd> C</div>
+<div class="helper">Switch · <kbd>1</kbd> A &nbsp; <kbd>2</kbd> B &nbsp; <kbd>3</kbd> C &nbsp; <kbd>4</kbd> D &nbsp; <kbd>5</kbd> E</div>
 
 <script>
 (function(){
@@ -64,8 +66,8 @@ iframe{width:100%;height:100%;border:0;display:block;background:#fff}
   const tabs = document.querySelectorAll('.tab');
   const share = document.getElementById('share-btn');
 
-  const VALID = ['a','b','c'];
-  const KEYS = { '1':'a', '2':'b', '3':'c' };
+  const VALID = ['a','b','c','d','e'];
+  const KEYS = { '1':'a', '2':'b', '3':'c', '4':'d', '5':'e' };
 
   function go(v) {
     if (!VALID.includes(v)) v = 'a';

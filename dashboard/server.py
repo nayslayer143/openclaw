@@ -2986,6 +2986,8 @@ async def clientmcp_index():
 @app.get("/clientmcp/a", response_class=HTMLResponse)
 @app.get("/clientmcp/b", response_class=HTMLResponse)
 @app.get("/clientmcp/c", response_class=HTMLResponse)
+@app.get("/clientmcp/d", response_class=HTMLResponse)
+@app.get("/clientmcp/e", response_class=HTMLResponse)
 async def clientmcp_variant(request: Request):
     variant = request.url.path.rsplit("/", 1)[-1]
     file = CLIENTMCP_DIR / f"{variant}.html"
