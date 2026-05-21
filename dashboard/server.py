@@ -3143,6 +3143,27 @@ BLACKMAGIC_BACKEND = "http://localhost:3008"
     "/blackmagic/{path:path}",
     methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
 )
+async def blackmagic_legacy_redirect(path: str = "", request: Request = None):
+    """Legacy /blackmagic/* → permanent redirect to bmagic.rsvp at root.
+    The Next.js app no longer has basePath, so in-app navigation would break
+    if we proxied here. Once DNS is live for bmagic.rsvp, this URL is dead.
+    """
+    suffix = f"/{path}" if path else "/"
+    qs = f"?{request.url.query}" if request and request.url.query else ""
+    return RedirectResponse(url=f"https://bmagic.rsvp{suffix}{qs}", status_code=301)
+
+
+# Kept for reference but unreachable — the route above wins. Remove once
+# bmagic.rsvp DNS has been live for a few weeks and no clients still hit
+# the legacy URL.
+@app.api_route(
+    "/__blackmagic_disabled__",
+    methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
+)
+@app.api_route(
+    "/__blackmagic_disabled__/{path:path}",
+    methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
+)
 async def blackmagic_proxy(request: Request, path: str = ""):
     # Identify the user opportunistically. Don't block on missing auth —
     # recipient invitations (/blackmagic/i/[token]) and the marketing landing
@@ -3155,9 +3176,11 @@ async def blackmagic_proxy(request: Request, path: str = ""):
     if not user:
         user = "nayslayer"
 
-    # Preserve the /blackmagic prefix because Next has basePath=/blackmagic.
-    suffix = f"/{path}" if path else ""
-    target = f"{BLACKMAGIC_BACKEND}/blackmagic{suffix}"
+    # Next.js now serves at root (basePath removed when we moved to
+    # bmagic.rsvp). Strip the /blackmagic prefix before forwarding so this
+    # legacy URL still works.
+    suffix = f"/{path}" if path else "/"
+    target = f"{BLACKMAGIC_BACKEND}{suffix}"
     if request.url.query:
         target = f"{target}?{request.url.query}"
 
