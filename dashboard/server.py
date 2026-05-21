@@ -2950,6 +2950,81 @@ if CONTROLLEDCHAOS_DIR.exists():
     )
 
 
+# ── /clientmcp — Foyer (working name Client MCP) landing concepts ─────────────
+# Public-facing landing for the agentic CRM for creative agencies. Three A/B/C
+# directions: Editorial (a.html), Blueprint (b.html), Demo-first (c.html).
+# Chooser at /clientmcp/ embeds each in an iframe (Aryze pattern).
+# /clientmcp/api/* is a same-origin reverse proxy to the local Foyer Fastify
+# server at :4000, so landing pages can fetch live demo data without CORS or a
+# separate tunnel URL.
+CLIENTMCP_DIR = Path(__file__).parent / "clientmcp"
+CLIENTMCP_API_UPSTREAM = "http://localhost:4000"
+
+
+@app.get("/clientmcp", response_class=HTMLResponse)
+@app.get("/clientmcp/", response_class=HTMLResponse)
+async def clientmcp_index():
+    return HTMLResponse(
+        content=(CLIENTMCP_DIR / "index.html").read_text(),
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
+@app.get("/clientmcp/a", response_class=HTMLResponse)
+@app.get("/clientmcp/b", response_class=HTMLResponse)
+@app.get("/clientmcp/c", response_class=HTMLResponse)
+async def clientmcp_variant(request: Request):
+    variant = request.url.path.rsplit("/", 1)[-1]
+    file = CLIENTMCP_DIR / f"{variant}.html"
+    if not file.exists():
+        raise HTTPException(status_code=404, detail=f"clientmcp variant {variant} not found")
+    return HTMLResponse(content=file.read_text(), headers={"Cache-Control": "no-cache"})
+
+
+@app.api_route(
+    "/clientmcp/api/{rest:path}",
+    methods=["GET", "POST", "OPTIONS", "HEAD"],
+)
+async def clientmcp_api_proxy(request: Request, rest: str):
+    upstream = f"{CLIENTMCP_API_UPSTREAM}/{rest}"
+    if request.url.query:
+        upstream = f"{upstream}?{request.url.query}"
+    forward_headers = {
+        k: v
+        for k, v in request.headers.items()
+        if k.lower() not in {"host", "content-length", "connection"}
+    }
+    try:
+        body = await request.body() if request.method == "POST" else None
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            r = await client.request(
+                method=request.method,
+                url=upstream,
+                headers=forward_headers,
+                content=body,
+            )
+        out_headers = {
+            k: v
+            for k, v in r.headers.items()
+            if k.lower()
+            not in {"content-encoding", "transfer-encoding", "content-length", "connection"}
+        }
+        return Response(content=r.content, status_code=r.status_code, headers=out_headers)
+    except httpx.RequestError as e:
+        return JSONResponse(
+            status_code=503,
+            content={"error": "foyer-backend-unreachable", "detail": str(e)},
+        )
+
+
+if CLIENTMCP_DIR.exists():
+    app.mount(
+        "/clientmcp",
+        StaticFiles(directory=str(CLIENTMCP_DIR), html=True),
+        name="clientmcp_static",
+    )
+
+
 GONZOCLAW_DIST = Path.home() / "gonzoclaw" / "frontend" / "dist"
 GONZOCLAW_ASSETS = GONZOCLAW_DIST / "assets"
 GONZOCLAW_BACKEND = "http://localhost:18790"
