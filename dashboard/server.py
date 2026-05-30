@@ -3144,13 +3144,18 @@ BLACKMAGIC_BACKEND = "http://localhost:3008"
     methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
 )
 async def blackmagic_legacy_redirect(path: str = "", request: Request = None):
-    """Legacy /blackmagic/* → permanent redirect to bmagic.rsvp at root.
-    The Next.js app no longer has basePath, so in-app navigation would break
-    if we proxied here. Once DNS is live for bmagic.rsvp, this URL is dead.
+    """Legacy /blackmagic/* → temporary redirect to blackmagic.asdfghjk.lol.
+    bmagic.rsvp DNS is still stuck 'initializing' (9+ days), so we point at the
+    working subdomain on the asdfghjk.lol zone instead. The Next.js app serves
+    at root (no basePath), so in-app navigation works there. 302 (not 301)
+    because bmagic.rsvp may yet come alive — we don't want this permanently
+    browser-cached to the subdomain.
     """
     suffix = f"/{path}" if path else "/"
     qs = f"?{request.url.query}" if request and request.url.query else ""
-    return RedirectResponse(url=f"https://bmagic.rsvp{suffix}{qs}", status_code=301)
+    return RedirectResponse(
+        url=f"https://blackmagic.asdfghjk.lol{suffix}{qs}", status_code=302
+    )
 
 
 # Kept for reference but unreachable — the route above wins. Remove once
