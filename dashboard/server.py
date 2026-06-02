@@ -3011,7 +3011,9 @@ async def clientmcp_api_proxy(request: Request, rest: str):
     }
     try:
         body = await request.body() if request.method == "POST" else None
-        async with httpx.AsyncClient(timeout=15.0) as client:
+        # 90s — LLM-backed demo endpoints (qa, naming, brand-ingest) routinely
+        # take 10–60s on Ollama qwen2.5:7b. 15s was too aggressive.
+        async with httpx.AsyncClient(timeout=90.0) as client:
             r = await client.request(
                 method=request.method,
                 url=upstream,
