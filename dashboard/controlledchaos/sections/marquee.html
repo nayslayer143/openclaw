@@ -1,0 +1,24 @@
+<!-- cc-section: marquee
+     best:  kinetic, immersive, brutalist
+     ok:    swiss
+     avoid: gallery (kills the silence)
+     variants: default, slow, vertical
+     placeholders: items[] (text)
+     motion: respects prefers-reduced-motion (kept static when set) -->
+<section class="cc-section cc-marquee-section"
+         data-pattern="marquee"
+         data-variant="default">
+  <div class="cc-marquee__track">
+    <div class="cc-marquee__inner motion-marquee">
+      {{#items}}
+      <span class="cc-marquee__item voice-monument">{{text}}</span>
+      <span class="cc-marquee__sep" aria-hidden="true">●</span>
+      {{/items}}
+      <!-- Duplicate the items[] block once so the marquee animation loops seamlessly. -->
+      {{#items}}
+      <span class="cc-marquee__item voice-monument">{{text}}</span>
+      <span class="cc-marquee__sep" aria-hidden="true">●</span>
+      {{/items}}
+    </div>
+  </div>
+</section>

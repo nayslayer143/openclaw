@@ -64,3 +64,16 @@ Safe to re-run — all operations are idempotent.
 - **Chat / summarization / significance detection**: `qwen2.5:7b` (OLLAMA_CHAT_MODEL)
 - **Embeddings**: `nomic-embed-text` (CLAWMSON_EMBED_MODEL)
 - **Inference**: background ThreadPoolExecutor(max_workers=1) — never blocks Telegram replies
+
+---
+
+## OpenBrain (OB1) memory
+
+This agent: **search + capture (compact only)**.
+
+Recall before non-trivial work, capture per role rules, never store raw
+transcripts or secrets. Full instructions: [_openbrain.md](_openbrain.md).
+
+Quick path:
+
+    python3 -m scripts.openbrain search "<task>" -k 5

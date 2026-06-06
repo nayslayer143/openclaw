@@ -1,0 +1,54 @@
+{
+  "name": "Lovetel",
+  "thesis": "The phone, not the feed. Sodium-lamp warmth under a payphone hood.",
+
+  "palette": {
+    "bg":       "#0e0a06",
+    "fg":       "#f3e8d2",
+    "accent_1": "#e8a647",
+    "accent_2": "#6b5536",
+    "discord":  "#7ad4e0"
+  },
+
+  "typography": {
+    "monument":   { "family": "Playfair Display",     "weights": [400, 700, 900], "google": true },
+    "editorial":  { "family": "Cormorant Garamond",   "weights": [400, 500, 700], "google": true },
+    "swiss":      { "family": "Inter",                "weights": [400, 500],      "google": true },
+    "brutalist":  { "family": "Space Mono",           "weights": [400, 700],      "google": true },
+    "expressive": { "family": "DM Sans",              "weights": [400, 500],      "google": true }
+  },
+
+  "forces": {
+    "structure": 0.55,
+    "disruption": 0.20,
+    "density":    0.30,
+    "breath":     0.85,
+    "edge":       0.45,
+    "warmth":     0.95,
+    "motion":     0.40,
+    "shout":      0.20,
+    "stillness":  0.70,
+    "whisper":    0.85
+  },
+
+  "motion_intensity": 0.4,
+  "texture": "grain",
+  "mode_id": "immersive",
+
+  "dos": [
+    "editorial serif as the lead voice",
+    "warm grain over every surface",
+    "telephony references — booth, dial tone, receiver, cord",
+    "trust signals in cool cyan against warm amber",
+    "type breathes — generous line-height and margin",
+    "lowercase the brand voice; reserve caps for the brand promise"
+  ],
+  "donts": [
+    "no stock photos of people",
+    "no loud type",
+    "no cold blues as primary",
+    "no tech-bro language",
+    "no live recordings or pin-style images",
+    "no fake testimonial bios"
+  ]
+}

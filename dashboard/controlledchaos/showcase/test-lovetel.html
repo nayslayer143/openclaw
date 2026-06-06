@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" data-mood="--custom" data-forces="immersive" data-texture="grain">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lovetel — the phone, not the feed</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,700;1,400&family=Inter:wght@400;500&family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../tokens/layout.css">
+  <link rel="stylesheet" href="../tokens/typography.css">
+  <link rel="stylesheet" href="../tokens/color.css">
+  <link rel="stylesheet" href="../tokens/motion.css">
+  <link rel="stylesheet" href="../tokens/forces.css">
+  <link rel="stylesheet" href="../tokens/textures.css">
+  <link rel="stylesheet" href="../sections/sections.css">
+
+  <!-- STYLE-OVERRIDES: emitted by adapter from adapters/examples/lovetel.json -->
+  <style id="style-overrides">
+    /* Custom palette */
+    [data-mood="--custom"] {
+      --color-bg:       #0e0a06;
+      --color-fg:       #f3e8d2;
+      --color-accent-1: #e8a647;
+      --color-accent-2: #6b5536;
+      --color-discord:  #7ad4e0;
+      --color-muted:   color-mix(in oklch, var(--color-fg) 50%, var(--color-bg));
+      --color-subtle:  color-mix(in oklch, var(--color-fg)  8%, var(--color-bg));
+      --color-surface: color-mix(in oklch, var(--color-fg)  5%, var(--color-bg));
+      --color-border:  color-mix(in oklch, var(--color-fg) 15%, var(--color-bg));
+      --color-inverse: var(--color-fg);
+    }
+    /* Force overrides (10 dials) */
+    :root {
+      --force-structure: 0.55;
+      --force-disruption: 0.20;
+      --force-density:    0.30;
+      --force-breath:     0.85;
+      --force-edge:       0.45;
+      --force-warmth:     0.95;
+      --force-motion:     0.40;
+      --force-shout:      0.20;
+      --force-stillness:  0.70;
+      --force-whisper:    0.85;
+
+      /* Voice overrides */
+      --font-monument:   'Playfair Display', serif;
+      --font-editorial:  'Cormorant Garamond', serif;
+      --font-swiss:      'Inter', sans-serif;
+      --font-brutalist:  'Space Mono', monospace;
+      --font-expressive: 'DM Sans', sans-serif;
+
+      /* Motion scaling (motion_intensity: 0.4) */
+      --motion-scale: 0.4;
+      --dur-instant:  calc(150ms  * var(--motion-scale, 1));
+      --dur-swift:    calc(300ms  * var(--motion-scale, 1));
+      --dur-natural:  calc(500ms  * var(--motion-scale, 1));
+      --dur-drift:    calc(900ms  * var(--motion-scale, 1));
+      --dur-meditate: calc(1800ms * var(--motion-scale, 1));
+      --texture-grain-duration: calc(8s * var(--motion-scale, 1));
+
+      /* Lovetel grain tuning — slightly warmer, slightly more present */
+      --texture-grain-opacity: 0.10;
+    }
+
+    /* Lovetel-specific brand tuning (do NOT propagate to skill defaults) */
+    body { font-family: var(--font-editorial); }
+    .cc-hero__heading,
+    .cc-manifesto__heading,
+    .cc-cta__heading,
+    .cc-process__heading {
+      text-transform: none;
+      font-weight: 500;
+    }
+    /* Lowercase brand voice — eyebrows + labels stay in caps for tension */
+    .cc-hero__heading { font-style: italic; }
+    /* Cyan trust-signal hairline on key trust beats */
+    .cc-quote[data-variant="gutter"] .cc-quote__text {
+      border-left-color: var(--color-discord);
+    }
+  </style>
+
+  <style>
+    body {
+      background: var(--color-bg);
+      color: var(--color-fg);
+      margin: 0;
+    }
+    /* Hairline between sections — payphone-receipt feel */
+    .cc-section + .cc-section {
+      border-top: 1px solid color-mix(in oklch, var(--color-fg) 10%, transparent);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO (editorial variant) -->
+  <section class="cc-section cc-hero" data-pattern="hero" data-variant="editorial">
+    <div class="container --regular flow">
+      <span class="cc-hero__eyebrow voice-swiss --label">lovetel · est. 2026 · by introduction only</span>
+      <h1 class="cc-hero__heading voice-monument --massive">the phone, not the feed</h1>
+      <p class="cc-hero__subhead voice-swiss">a private telephone exchange for people who'd rather hear a voice than swipe a face. there is no app to download. there is a number to call.</p>
+    </div>
+  </section>
+
+  <!-- MANIFESTO -->
+  <section class="cc-section cc-manifesto" data-pattern="manifesto" data-variant="default">
+    <div class="container --regular flow">
+      <h2 class="cc-manifesto__heading voice-editorial --display">we never wanted to make another app.</h2>
+      <div class="cc-manifesto__body">
+        <p class="voice-swiss">we wanted to bring back the phone. the small ritual of picking up a receiver, waiting on a dial tone, telling someone real what you're looking for. lovetel is what's left when you take everything else away.</p>
+        <p class="voice-swiss">there is no feed. no profiles. no swipe. there is a switchboard. her name is sally. she listens — for thirty seconds or thirty minutes — and then, sometimes, the right phone rings.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS (timeline variant — feels like a payphone receipt) -->
+  <section class="cc-section cc-process" data-pattern="process" data-variant="timeline">
+    <div class="container --regular flow">
+      <h2 class="cc-process__heading voice-editorial --display">three steps. no account.</h2>
+      <ol class="cc-process__steps">
+        <li class="cc-process__step">
+          <h3 class="cc-process__step-title voice-monument">pick up</h3>
+          <p class="cc-process__step-body voice-swiss">dial in. tell sally — by voice — what kind of conversation you're hoping for tonight. there is no form. no profile to fill. she listens the way an old switchboard operator listened: for what you mean, not for what you check off.</p>
+        </li>
+        <li class="cc-process__step">
+          <h3 class="cc-process__step-title voice-monument">she listens</h3>
+          <p class="cc-process__step-body voice-swiss">sally remembers what's said, not what's typed. she keeps your vibe, not your data. anything you mark off the record never leaves the booth — not to us, not to anyone you'll be matched with.</p>
+        </li>
+        <li class="cc-process__step">
+          <h3 class="cc-process__step-title voice-monument">the phone rings</h3>
+          <p class="cc-process__step-body voice-swiss">if sally finds the right voice in the network, your phone rings. you decide whether to answer. you decide how long to stay on. you can hang up at any time, and nobody — including sally — gets to ask why.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- TWO-COLUMN (dialogue variant — Sally hears / we never see) -->
+  <section class="cc-section cc-two-col" data-pattern="two-column" data-variant="dialogue">
+    <div class="container --wide">
+      <div class="cc-two-col__grid">
+        <div class="cc-two-col__col">
+          <h3 class="cc-two-col__heading voice-monument">what sally hears</h3>
+          <p class="cc-two-col__body voice-swiss">your voice. your intent. the language you actually use. whether you laugh at your own jokes. whether you mean it when you say you're fine. the texture of what you said and the silence around it.</p>
+        </div>
+        <div class="cc-two-col__col">
+          <h3 class="cc-two-col__heading voice-monument">what we never see</h3>
+          <p class="cc-two-col__body voice-swiss">names you didn't give us. faces. addresses. live recordings. anything tagged off the record. nothing here is for sale and nothing here is sold. double opt-in or no introduction — written into the schema, not just the promise.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- QUOTE (gutter variant — cyan trust hairline) -->
+  <section class="cc-section cc-quote" data-pattern="quote" data-variant="gutter">
+    <div class="container --regular">
+      <blockquote class="cc-quote__body">
+        <p class="cc-quote__text voice-editorial --display">she doesn't matchmake. she remembers.</p>
+        <cite class="cc-quote__attribution voice-swiss --label">— the trust contract · lovetel v0.1</cite>
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- FULL-BLEED (type variant — the brand promise as a wall) -->
+  <section class="cc-section cc-bleed" data-pattern="full-bleed" data-variant="type">
+    <div class="cc-bleed__content cc-bleed__content--type">
+      <span class="voice-monument" data-bleed-text>you can hang up at any time.</span>
+    </div>
+  </section>
+
+  <!-- CTA (discord variant — cyan border as the trust signal) -->
+  <section class="cc-section cc-cta" data-pattern="cta" data-variant="discord">
+    <div class="container --regular flow">
+      <h2 class="cc-cta__heading voice-monument --display">by introduction only.</h2>
+      <p class="cc-cta__supporting voice-swiss">lovetel is closed. you can't sign up — you can request a vouch from someone already inside. if you don't know anyone, that's okay. it'll find you when it does. there is no waitlist; there is a network.</p>
+      <a class="cc-cta__action voice-swiss --label" href="mailto:vouch@lovetel.example">
+        REQUEST A VOUCH
+        <span class="cc-cta__arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER (editorial variant — quiet, lowercase) -->
+  <footer class="cc-section cc-footer" data-pattern="footer" data-variant="editorial">
+    <div class="container flex-between">
+      <span class="cc-footer__copyright voice-swiss --label">lovetel · 2026 · off the record</span>
+      <nav class="cc-footer__nav">
+        <a class="cc-footer__link voice-swiss --label" href="#about">about</a>
+        <a class="cc-footer__link voice-swiss --label" href="#privacy">privacy</a>
+        <a class="cc-footer__link voice-swiss --label" href="#sally">sally</a>
+      </nav>
+    </div>
+  </footer>
+
+</body>
+</html>

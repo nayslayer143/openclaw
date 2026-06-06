@@ -1,0 +1,32 @@
+<!-- cc-section: product-showcase
+     best:  gallery, immersive
+     ok:    swiss
+     avoid: brutalist
+     variants: split (default — image left, copy right), centered (copy above, full-width image below), callouts (image with numbered annotation pills)
+     placeholders: heading, body, image_slot, callouts[] (num, label, x_pct, y_pct) for callouts variant -->
+<section class="cc-section cc-showcase"
+         data-pattern="product-showcase"
+         data-variant="split">
+  <div class="container --wide">
+    <div class="cc-showcase__grid motion-reveal">
+      <div class="cc-showcase__copy">
+        <h2 class="cc-showcase__heading voice-monument --display">{{heading}}</h2>
+        <p class="cc-showcase__body voice-swiss">{{body}}</p>
+      </div>
+      <div class="cc-showcase__frame">
+        <div class="cc-showcase__chrome" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+        <div class="cc-img-placeholder cc-showcase__image" data-slot="{{image_slot}}"></div>
+        {{#callouts}}
+        <button class="cc-showcase__callout"
+                style="left:{{x_pct}}%;top:{{y_pct}}%"
+                aria-label="{{label}}">
+          <span class="cc-showcase__callout-num">{{num}}</span>
+          <span class="cc-showcase__callout-label">{{label}}</span>
+        </button>
+        {{/callouts}}
+      </div>
+    </div>
+  </div>
+</section>

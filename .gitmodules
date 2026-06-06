@@ -1,0 +1,3 @@
+[submodule "openbrain/upstream"]
+	path = openbrain/upstream
+	url = https://github.com/NateBJones-Projects/OB1.git

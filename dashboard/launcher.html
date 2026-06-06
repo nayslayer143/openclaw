@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en" data-pole="black">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GONZOCLAW — The Index</title>
+<meta name="description" content="A live index of the apps we've shipped. Restraint until you touch it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+/* ───────── POLES ─────────  Layers idiom: flat black / warm white.
+   No gradient backgrounds. One color shouts — only on interaction. */
+:root{
+  --black:#020202; --white:#FDFDFD;
+  --g-mid:#787878; --g-mid2:#777777; --g-soft:#C8C8C8;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --neon:#FF1FA4;                 /* set per-row on interaction */
+}
+html[data-pole="black"]{
+  --paper:var(--black); --ink:var(--white); --ink2:#cfcfcf;
+  --hair:rgba(253,253,253,.10); --hair2:rgba(253,253,253,.18);
+  --dim:#6f6f6f; --glass:rgba(253,253,253,.030); --vig:rgba(0,0,0,.66); --grain-op:.055;
+}
+html[data-pole="white"]{
+  --paper:var(--white); --ink:var(--black); --ink2:#2a2a2a;
+  --hair:rgba(2,2,2,.12); --hair2:rgba(2,2,2,.22);
+  --dim:#8a8a8a; --glass:rgba(2,2,2,.022); --vig:rgba(0,0,0,.10); --grain-op:.038;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:'Inter',system-ui,sans-serif; font-weight:300; overflow-x:hidden;
+  transition:background .9s var(--ease), color .9s var(--ease);
+}
+/* custom cursor only when JS turns it on (native cursor is the fallback) */
+html.cursorfx body{cursor:none}
+.cursor{display:none}
+html.cursorfx .cursor{display:block;position:fixed;top:0;left:0;z-index:120;width:26px;height:26px;border-radius:50%;
+  border:1px solid var(--ink2);transform:translate(-50%,-50%);pointer-events:none;mix-blend-mode:difference;
+  transition:width .25s var(--ease),height .25s var(--ease),border-color .25s var(--ease),background .25s var(--ease);}
+html.cursorfx .cursor.hot{width:54px;height:54px;border-color:var(--neon);background:color-mix(in srgb,var(--neon) 14%,transparent);mix-blend-mode:normal}
+html.cursorfx .cursor.tap{width:16px;height:16px}
+
+/* film grain + shadow vignette — texture from noise & shadow, never gradient bg */
+.grain{position:fixed;inset:-50%;z-index:60;pointer-events:none;opacity:var(--grain-op);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  transition:opacity .9s var(--ease);animation:grain 6s steps(6) infinite}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-4%,3%)}40%{transform:translate(3%,-5%)}60%{transform:translate(-3%,4%)}80%{transform:translate(4%,2%)}100%{transform:translate(0,0)}}
+.vignette{position:fixed;inset:0;z-index:55;pointer-events:none;box-shadow:inset 0 0 240px 40px var(--vig);transition:box-shadow .9s var(--ease)}
+
+/* ───────── SHELL ───────── */
+.bar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;gap:18px;
+  padding:20px 34px;backdrop-filter:blur(7px);border-bottom:1px solid var(--hair);background:var(--glass)}
+.brand{font-family:'Archivo';font-weight:900;letter-spacing:.5px;font-size:15px}
+.tag{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:2px;color:var(--dim);text-transform:uppercase}
+.bar .sp{flex:1}
+.count{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:2px;color:var(--dim)}
+.count b{color:var(--ink)}
+.pole{position:relative;width:46px;height:24px;border-radius:13px;border:1px solid var(--hair2);
+  background:transparent;cursor:inherit;display:flex;align-items:center;padding:0 3px;transition:border-color .3s}
+.pole:hover{border-color:var(--ink2)}
+.pole i{width:16px;height:16px;border-radius:50%;background:var(--ink);transition:transform .6s var(--ease),background .6s var(--ease)}
+html[data-pole="white"] .pole i{transform:translateX(22px)}
+
+/* ───────── HERO ───────── */
+main{max-width:1120px;margin:0 auto;padding:0 34px}
+.hero{padding:148px 0 54px}
+.kicker{font-family:'JetBrains Mono';font-size:11px;letter-spacing:5px;color:var(--dim);text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:30px}
+.kicker .rule{height:1px;width:64px;background:var(--hair2)}
+.title{font-family:'Archivo';font-weight:900;letter-spacing:-1.5px;line-height:.94;font-size:clamp(2.8rem,8.2vw,6.6rem)}
+.title em{font-family:'Playfair Display';font-weight:400;font-style:italic;letter-spacing:-1px;font-size:.92em}
+.lede{margin-top:26px;max-width:46ch;font-size:15px;line-height:1.7;color:var(--ink2);font-weight:300}
+.lede .mono{font-family:'JetBrains Mono';font-size:12.5px;color:var(--dim)}
+
+/* ───────── INDEX ───────── */
+.index{padding:30px 0 120px;border-top:1px solid var(--hair)}
+.row{position:relative;display:grid;grid-template-columns:54px 1fr auto 130px;align-items:center;gap:26px;
+  padding:34px 22px;border-bottom:1px solid var(--hair);text-decoration:none;color:inherit;cursor:inherit;isolation:isolate;overflow:hidden}
+.row .wash{position:absolute;inset:0;z-index:-1;background:var(--neon);opacity:0;transition:opacity .5s var(--ease)}
+.row.hot .wash{opacity:.06}
+.row .edge{position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--neon);transform:scaleY(0);transform-origin:50% 50%}
+.idx{font-family:'JetBrains Mono';font-size:12px;color:var(--dim);transition:color .4s}
+.row.hot .idx{color:var(--neon)}
+.meat .nm{font-family:'Archivo';font-weight:700;font-size:clamp(1.5rem,3.4vw,2.5rem);letter-spacing:-.5px;line-height:1;transition:color .35s var(--ease),text-shadow .35s var(--ease)}
+.row.hot .nm{color:var(--neon);-webkit-text-fill-color:var(--neon);text-shadow:0 0 28px color-mix(in srgb,var(--neon) 55%,transparent)}
+.meat .nm .sub{font-family:'JetBrains Mono';font-weight:400;font-size:.4em;letter-spacing:2px;color:var(--dim);vertical-align:middle;margin-left:10px;-webkit-text-fill-color:initial;text-shadow:none}
+.meat .ds{margin-top:10px;font-size:13.5px;color:var(--ink2);font-weight:300;max-width:48ch}
+.meta{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:9px}
+.dom{font-family:'JetBrains Mono';font-size:11px;color:var(--dim);letter-spacing:.4px}
+.st{font-family:'JetBrains Mono';font-size:10px;letter-spacing:2px;display:inline-flex;align-items:center;gap:7px;padding:4px 10px;border:1px solid var(--hair2);border-radius:2px;color:var(--dim)}
+.st .led{width:6px;height:6px;border-radius:50%;background:var(--dim)}
+.st.live{color:var(--ink2)} .st.live .led{background:#1fd17a;box-shadow:0 0 8px #1fd17a}
+.go{justify-self:end;font-family:'JetBrains Mono';font-size:11px;letter-spacing:2px;color:var(--neon);opacity:0;transform:translateX(-8px);transition:opacity .35s var(--ease),transform .35s var(--ease);white-space:nowrap}
+.row.hot .go{opacity:1;transform:translateX(0)}
+.row.soon .go{color:var(--dim)}
+.foot{padding:26px 34px;border-top:1px solid var(--hair);font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:1.5px;color:var(--dim);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.foot a{color:var(--dim);text-decoration:none;transition:color .3s}
+.foot a:hover{color:var(--ink2)}
+
+@media(max-width:720px){
+  .row{grid-template-columns:34px 1fr;gap:14px;padding:24px 14px}
+  .meta{display:none}.go{display:none}.hero{padding:120px 0 30px}
+  .bar{padding:16px 18px}
+  main,.foot{padding-left:18px;padding-right:18px}
+}
+@media(prefers-reduced-motion:reduce){.grain{animation:none}}
+</style>
+</head>
+<body>
+<div class="grain"></div>
+<div class="vignette"></div>
+<div class="cursor" id="cur"></div>
+
+<header class="bar">
+  <div class="brand">GONZOCLAW</div>
+  <div class="tag">// the index</div>
+  <div class="sp"></div>
+  <button class="pole" id="pole" aria-label="swing pole" title="swing the pole"><i></i></button>
+  <div class="count"><b>2</b> / 4 LIVE</div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="kicker"><span class="rule"></span>GONZOCLAW DISPATCH · LIVE FROM THE PIPELINE</div>
+    <h1 class="title">An index of<br><em>small machines.</em></h1>
+    <p class="lede">Everything we've shipped, in one place. The surface stays quiet — <span class="mono">restraint at rest</span> — until you touch it, and one of them shouts.</p>
+  </section>
+
+  <section class="index" id="index">
+    <a class="row" data-neon="#FF1FA4" href="https://superstyleguide.asdfghjk.lol" target="_blank" rel="noopener">
+      <span class="wash"></span><span class="edge"></span>
+      <span class="idx">01</span>
+      <div class="meat"><div class="nm">SuperStyleGuide</div><div class="ds">Brand style guides generated from a single URL or a vibe.</div></div>
+      <div class="meta"><div class="dom">superstyleguide.asdfghjk.lol</div><div class="st live"><span class="led"></span>LIVE</div></div>
+      <span class="go">OPEN →</span>
+    </a>
+    <a class="row soon" data-neon="#00E6FF" href="https://dossier.asdfghjk.lol" target="_blank" rel="noopener">
+      <span class="wash"></span><span class="edge"></span>
+      <span class="idx">02</span>
+      <div class="meat"><div class="nm">Dossier</div><div class="ds">Background search engine — every digital footprint, one query.</div></div>
+      <div class="meta"><div class="dom">dossier.asdfghjk.lol</div><div class="st"><span class="led"></span>SOON</div></div>
+      <span class="go">PREVIEW →</span>
+    </a>
+    <a class="row" data-neon="#9D4BFF" href="https://blackmagic.asdfghjk.lol" target="_blank" rel="noopener">
+      <span class="wash"></span><span class="edge"></span>
+      <span class="idx">03</span>
+      <div class="meat"><div class="nm">Black Magic</div><div class="ds">Cinematic invitations, conjured for any occasion.</div></div>
+      <div class="meta"><div class="dom">blackmagic.asdfghjk.lol</div><div class="st live"><span class="led"></span>LIVE</div></div>
+      <span class="go">OPEN →</span>
+    </a>
+    <a class="row soon" data-neon="#B6FF1A" href="https://clientmcp.asdfghjk.lol" target="_blank" rel="noopener">
+      <span class="wash"></span><span class="edge"></span>
+      <span class="idx">04</span>
+      <div class="meat"><div class="nm">Client MCP <span class="sub">FOYER</span></div><div class="ds">Agentic CRM that runs client relationships for creative studios.</div></div>
+      <div class="meta"><div class="dom">clientmcp.asdfghjk.lol</div><div class="st"><span class="led"></span>SOON</div></div>
+      <span class="go">PREVIEW →</span>
+    </a>
+  </section>
+</main>
+
+<footer class="foot">
+  <span>// 4 apps indexed · 2 live · the crons don't stop</span>
+  <a href="/ops" title="ops dashboard">GONZOCLAW © bat country</a>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+(function(){
+  var reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  var hasG = typeof gsap !== 'undefined';
+  var root = document.documentElement;
+  var fine = matchMedia('(pointer:fine)').matches;
+  var cur = document.getElementById('cur');
+
+  /* custom cursor — opt-in via class so native cursor is the fallback */
+  if(fine){
+    root.classList.add('cursorfx');
+    var cx=innerWidth/2, cy=innerHeight/2, tx=cx, ty=cy;
+    addEventListener('pointermove', function(e){ tx=e.clientX; ty=e.clientY; });
+    (function loop(){ cx+=(tx-cx)*.2; cy+=(ty-cy)*.2; cur.style.transform='translate('+cx+'px,'+cy+'px) translate(-50%,-50%)'; requestAnimationFrame(loop); })();
+    addEventListener('pointerdown', function(){ cur.classList.add('tap'); });
+    addEventListener('pointerup', function(){ cur.classList.remove('tap'); });
+  }
+
+  /* pole swing — the bipolar move */
+  document.getElementById('pole').addEventListener('click', function(){
+    root.setAttribute('data-pole', root.getAttribute('data-pole')==='black' ? 'white':'black');
+  });
+
+  /* neon detonation — exactly one shouts at a time (hover is inherently single) */
+  document.querySelectorAll('.row').forEach(function(row){
+    var neon = row.getAttribute('data-neon'); row.style.setProperty('--neon', neon);
+    var edge = row.querySelector('.edge'), nm = row.querySelector('.nm');
+    row.addEventListener('mouseenter', function(){
+      row.classList.add('hot');
+      if(fine && cur){ cur.style.setProperty('--neon', neon); cur.classList.add('hot'); }
+      if(hasG && !reduce){
+        gsap.fromTo(edge,{scaleY:0},{scaleY:1,duration:.5,ease:'expo.out'});
+        gsap.fromTo(nm,{filter:'brightness(2.4)'},{filter:'brightness(1)',duration:.55,ease:'power2.out'});
+      }
+    });
+    row.addEventListener('mouseleave', function(){
+      row.classList.remove('hot'); if(cur) cur.classList.remove('hot');
+      if(hasG && !reduce) gsap.to(edge,{scaleY:0,duration:.35,ease:'power3.in'});
+    });
+  });
+
+  /* entrance — content is visible by default (CSS). Animate FROM hidden only when
+     GSAP is present, motion is allowed, and the tab is actually visible.
+     Safety net force-reveals in case the rAF ticker was throttled. */
+  function entrance(){
+    var tl = gsap.timeline();
+    tl.from('.kicker',{opacity:0,duration:.7,ease:'power2.out'})
+      .from('.title',{y:24,opacity:0,duration:1,ease:'expo.out'},'-=.4')
+      .from('.lede',{y:14,opacity:0,duration:.8,ease:'power3.out'},'-=.6')
+      .from('.row',{y:30,opacity:0,duration:.9,stagger:.09,ease:'expo.out'},'-=.4');
+    setTimeout(function(){ gsap.set(['.kicker','.title','.lede','.row'],{clearProps:'all'}); }, 2800);
+  }
+  if(hasG && !reduce){
+    if(document.visibilityState === 'visible') entrance();
+    else document.addEventListener('visibilitychange', function h(){
+      if(document.visibilityState==='visible'){ document.removeEventListener('visibilitychange',h); entrance(); }
+    });
+  }
+})();
+</script>
+</body>
+</html>

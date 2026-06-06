@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Foyer — a manifesto for agency tooling that respects you</title>
+<meta name="description" content="A longform argument for the agentic CRM the creative industry actually needed. No diagrams. No screenshots. Just the case.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f5f0e3;
+  --paper-deep:#ebe4d2;
+  --ink:#1a1612;
+  --ink-soft:#3a342c;
+  --muted:#7c7163;
+  --rule:rgba(26,22,18,0.12);
+  --rule-fade:rgba(26,22,18,0.05);
+  --accent:#9a3a1d;
+  --pen:#2a2017;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'EB Garamond','EB Garamond Variable',Georgia,serif;
+  background:var(--paper);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  line-height:1.62;
+  font-size:21px;
+  font-feature-settings:'liga' on,'kern' on,'onum' on;
+}
+.sans{font-family:'Inter',system-ui,sans-serif;font-feature-settings:'tnum' on}
+
+/* Top masthead — newspaper-style */
+.mast{
+  border-bottom:2px solid var(--ink);
+  padding:18px 32px 14px;
+  display:flex;justify-content:space-between;align-items:baseline;gap:24px;
+  position:sticky;top:0;background:rgba(245,240,227,0.96);backdrop-filter:blur(6px);z-index:20;
+}
+.mast .name{font-family:'EB Garamond',serif;font-size:34px;font-weight:600;letter-spacing:-0.5px}
+.mast .name::after{content:' · a manifesto';font-family:inherit;font-style:italic;font-size:14px;font-weight:400;color:var(--muted);letter-spacing:0;margin-left:8px;vertical-align:middle}
+.mast .meta{font-family:'Inter',sans-serif;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);display:flex;gap:18px}
+.mast .meta a{color:inherit;text-decoration:none;border-bottom:1px solid var(--rule);padding-bottom:1px}
+.mast .meta a:hover{color:var(--accent);border-color:var(--accent)}
+@media (max-width:680px){.mast{padding:14px 18px}.mast .meta{display:none}.mast .name{font-size:24px}.mast .name::after{display:block;margin-left:0;font-size:12px}}
+
+article{
+  max-width:660px;
+  margin:0 auto;
+  padding:80px 32px 40px;
+}
+@media (max-width:680px){article{padding:48px 22px 32px}}
+
+article > p {margin-bottom:22px}
+article > p.lede{
+  font-size:1.18em;
+  font-style:italic;
+  color:var(--ink-soft);
+  margin-bottom:48px;
+  text-wrap:balance;
+}
+
+h1.title{
+  font-family:'EB Garamond',serif;
+  font-weight:600;
+  font-size:clamp(46px,7vw,82px);
+  line-height:1.04;
+  letter-spacing:-0.025em;
+  margin-bottom:36px;
+  text-wrap:balance;
+  font-feature-settings:'liga' on,'dlig' on,'onum' on;
+}
+h1.title em{font-style:italic;color:var(--accent);font-weight:500}
+
+h2.section{
+  font-family:'EB Garamond',serif;
+  font-weight:500;
+  font-style:italic;
+  font-size:30px;
+  line-height:1.2;
+  letter-spacing:-0.01em;
+  margin:64px 0 28px;
+  color:var(--ink);
+  position:relative;
+}
+h2.section::before{
+  content:'§';
+  font-family:'EB Garamond',serif;
+  font-style:normal;
+  color:var(--accent);
+  font-weight:500;
+  margin-right:14px;
+  font-size:0.85em;
+  vertical-align:1px;
+}
+
+p.byline{
+  font-family:'Inter',sans-serif;
+  font-size:11px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:48px;
+  padding-bottom:18px;
+  border-bottom:1px solid var(--rule);
+}
+p.byline strong{color:var(--ink);font-weight:600}
+
+blockquote.pull{
+  font-family:'EB Garamond',serif;
+  font-style:italic;
+  font-weight:500;
+  font-size:clamp(28px,3.2vw,36px);
+  line-height:1.25;
+  letter-spacing:-0.01em;
+  color:var(--ink);
+  margin:48px -32px;
+  padding:0 32px 0 36px;
+  border-left:3px solid var(--accent);
+  text-wrap:balance;
+}
+@media (max-width:680px){blockquote.pull{margin:36px 0;padding-left:20px}}
+
+article em{font-style:italic}
+article strong{font-weight:600;color:var(--ink)}
+article a{color:var(--accent);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+article a:hover{background:rgba(154,58,29,0.08)}
+
+.dropcap::first-letter{
+  font-family:'EB Garamond',serif;
+  font-weight:600;
+  float:left;
+  font-size:5em;
+  line-height:0.86;
+  padding:6px 12px 0 0;
+  color:var(--accent);
+  font-feature-settings:'lnum' on;
+}
+
+/* Marginalia style aside */
+.aside{
+  background:var(--paper-deep);
+  border-left:2px solid var(--ink-soft);
+  padding:20px 24px;
+  font-size:0.86em;
+  line-height:1.55;
+  color:var(--ink-soft);
+  margin:36px 0;
+  font-style:italic;
+}
+.aside b{color:var(--ink);font-style:normal;font-weight:600;font-family:'Inter',sans-serif;font-size:0.85em;letter-spacing:1.5px;text-transform:uppercase;display:block;margin-bottom:6px}
+
+/* List of resolutions */
+ul.resolutions{
+  list-style:none;
+  counter-reset:r;
+  margin:36px 0;
+  padding:0;
+}
+ul.resolutions li{
+  counter-increment:r;
+  position:relative;
+  padding:14px 0 14px 56px;
+  border-bottom:1px solid var(--rule);
+  font-family:'EB Garamond',serif;
+  font-size:1em;
+  line-height:1.5;
+}
+ul.resolutions li:last-child{border-bottom:0}
+ul.resolutions li::before{
+  content:counter(r);
+  position:absolute;
+  left:0;
+  top:14px;
+  font-family:'Inter',sans-serif;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:1px;
+  color:var(--accent);
+  background:none;
+  width:34px;
+  text-align:right;
+  padding-top:4px;
+}
+ul.resolutions li b{display:block;font-weight:600;color:var(--ink);margin-bottom:2px;font-family:'EB Garamond',serif}
+
+/* Closing colophon */
+.colophon{
+  margin-top:80px;
+  padding-top:32px;
+  border-top:1px solid var(--rule);
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:36px;
+  font-family:'Inter',sans-serif;
+  font-size:13px;
+  line-height:1.55;
+  color:var(--ink-soft);
+}
+.colophon .sign{
+  font-family:'EB Garamond',serif;
+  font-style:italic;
+  font-size:22px;
+  color:var(--ink);
+  line-height:1.3;
+}
+.colophon .sign small{display:block;font-size:11px;font-family:'Inter',sans-serif;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:6px;font-style:normal}
+.colophon .cta a{
+  display:inline-block;
+  font-family:'Inter',sans-serif;
+  font-size:12px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  font-weight:600;
+  padding:10px 18px;
+  background:var(--ink);
+  color:var(--paper);
+  border-radius:0;
+  text-decoration:none;
+  margin-right:8px;
+  margin-top:4px;
+  transition:background .15s;
+}
+.colophon .cta a:hover{background:var(--accent)}
+.colophon .cta a.ghost{background:none;color:var(--ink);border:1px solid var(--ink)}
+.colophon .cta a.ghost:hover{background:var(--ink);color:var(--paper)}
+@media (max-width:680px){.colophon{grid-template-columns:1fr;gap:24px}}
+
+footer{
+  padding:28px 32px;
+  text-align:center;
+  font-family:'Inter',sans-serif;
+  font-size:11px;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--muted);
+  border-top:1px solid var(--rule);
+  margin-top:60px;
+}
+footer a{color:var(--ink-soft);text-decoration:none;margin:0 12px;border-bottom:1px solid var(--rule);padding-bottom:1px}
+footer a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<header class="mast">
+  <div class="name">Foyer</div>
+  <div class="meta">
+    <span>vol. i · no. i</span>
+    <a href="/clientmcp/a">a</a>
+    <a href="/clientmcp/b">b</a>
+    <a href="/clientmcp/c">c</a>
+    <a href="/clientmcp">compare</a>
+    <a href="mailto:hello@asdfghjk.lol?subject=Foyer">subscribe</a>
+  </div>
+</header>
+
+<article>
+  <h1 class="title">An agency tool that <em>respects you</em>.</h1>
+  <p class="byline">A manifesto · <strong>For studios that already have a voice</strong> · 2026</p>
+
+  <p class="lede">Every project-management tool the creative industry has tried was built for software teams and offered to us as a hand-me-down. We've been working in someone else's furniture for twenty years. This is the case for our own.</p>
+
+  <p class="dropcap">Imagine, for a moment, that you ran an agency the way the major tools assume you do. You'd open a board on Monday morning and watch the percentage-complete bars edge sideways. You'd file your client's Slack messages into a category called <em>Tasks</em> and tag them with priority <em>P1</em>. You'd accept that the brand voice you spent three workshops landing exists as a four-line note in a Google Doc somewhere, periodically referred to and rarely consulted. You'd live, in other words, like a software team that happens to make brands.</p>
+
+  <p>This is, by and large, what's happened. The studios who chose to use the available tools have come to resemble them. They've adopted the language of <em>tickets</em> and <em>sprints</em>. They've measured their work in burndowns. They've turned the slow, conversational, profoundly human act of helping a founder figure out what their company is <em>actually about</em> into a backlog grooming exercise.</p>
+
+  <blockquote class="pull">The available tools have asked the industry to become more like them. We think the tools should become more like the industry.</blockquote>
+
+  <h2 class="section">The premise</h2>
+
+  <p>The creative agency is not a software team. Its rhythms are different. The work is produced through dialogue — across channels, across time zones, between half-formed ideas and the moment a client says <em>actually, can we try the other thing</em>. A brand is built out of a thousand small decisions, most of them not documented, many of them re-litigated three months later because the room that decided them dispersed.</p>
+
+  <p>Foyer is the room. Or more precisely: Foyer is the room <em>before</em> the room — the threshold where conversations land, brand context lives, and creative decisions are <strong>remembered</strong>. It is the system of record for what your studio has said, decided, and produced, on behalf of a specific client, across all the surfaces through which that conversation actually takes place.</p>
+
+  <p>It is not a project manager. It is not a chat tool. It is not a design canvas. There are already good versions of all of those. What there is not — what the industry has been missing for as long as it has been a category — is a place where the unique state of <em>a creative engagement with a specific client</em> can live with the dignity it deserves.</p>
+
+  <h2 class="section">Six convictions</h2>
+
+  <p>Below is the foundation. These are not features. Features are the residue of conviction. If a tool's convictions are coherent, the features fall out of them; if they are not, no amount of clever feature design will save the experience. Ours:</p>
+
+  <ul class="resolutions">
+    <li><b>Brand is context, not a tab.</b> The brand is not a thing you visit in settings. It is the scaffolding behind every word the system helps you write. We inject it. Always. Quietly.</li>
+    <li><b>Conversations are first-class.</b> A message from your client is not a comment on a task. It is the work. We treat inbound across every channel — Telegram, Slack, WhatsApp, SMS — as the primary substance, not the metadata.</li>
+    <li><b>Clients are free.</b> Always. Unlimited. Your client paying for a seat to look at the work you did for them is the kind of decision a financial controller makes in the absence of taste. Charge for the agency seat. Charge for the AI. Never charge for the client.</li>
+    <li><b>Agents are colleagues, not chatbots.</b> Each has a name, a scope, a budget, an audit trail, and a track record. They propose. Humans approve. Outbound never sends without consent. Cost is visible.</li>
+    <li><b>Audit is the floor.</b> Every write, every actor, every diff — recorded. Three hundred sixty-five days standard. Seven years for the regulated industries. We assume you may someday be asked to prove what was decided. We make that possible.</li>
+    <li><b>External agents are first-class.</b> You shouldn't have to leave the surface where you do real work. If your studio lives in Claude Code, in Cursor, in Codex, in the next tool we haven't seen yet — we have a hosted MCP server with OAuth, and we are happy to be the system of record beneath whatever surface you actually use.</li>
+  </ul>
+
+  <div class="aside">
+    <b>A note on what we are not</b>
+    Foyer is not a billing system. (Productive is.) It is not a project-management tool. (Basecamp is.) It is not a design canvas. (Figma is.) We do not believe in <em>all-in-one</em>. We believe in <em>does one thing exceptionally</em>, and integrates with the rest. The one thing we do exceptionally is hold the state of your client work.
+  </div>
+
+  <h2 class="section">The bet</h2>
+
+  <p>The bet is that there are roughly five hundred to two thousand studios in the world for whom this — exactly this, no less and no more — would be transformative. We are building for them, in the open, with the door propped open and a kettle on. This essay is the welcome.</p>
+
+  <p>If your studio has institutional memory trapped in seven Slack channels and three Notion pages and a chain of emails about a logo you did in 2022, we would like to talk. Not to sell you, yet — to <em>listen</em>. The product is being shaped, still, in conversation with the people who will live in it. Your hour of pushback is worth more than our month of conviction.</p>
+
+  <blockquote class="pull">A studio that uses Foyer should feel, after the first week, that it has finally found its own furniture.</blockquote>
+
+  <p>That is the standard. Anything less, and we will have built another tool the industry has to bend itself around. The history of agency tooling is, at this point, mostly a history of that. We would like ours to be the exception.</p>
+
+  <div class="colophon">
+    <div class="sign">
+      Foyer<small>working name "Client MCP" · brand TBC pending domain &amp; trademark clearance</small>
+    </div>
+    <div class="cta">
+      <a href="mailto:hello@asdfghjk.lol?subject=Foyer%20%E2%80%94%20early%20access">Request early access</a>
+      <a href="/clientmcp/b" class="ghost">See the architecture</a>
+    </div>
+  </div>
+</article>
+
+<footer>
+  <a href="/clientmcp/a">A variant</a>
+  <a href="/clientmcp/b">B variant</a>
+  <a href="/clientmcp/c">C variant</a>
+  <a href="/clientmcp/e">E variant</a>
+  <a href="/clientmcp">compare</a>
+</footer>
+
+</body>
+</html>

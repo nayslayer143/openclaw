@@ -1,0 +1,21 @@
+<!-- cc-section: gallery
+     best:  gallery, immersive, kinetic
+     ok:    swiss
+     avoid: brutalist (image grids cool the volume)
+     variants: rigid, asymmetric, mosaic
+     placeholders: heading, items[] (slot_name, optional caption) -->
+<section class="cc-section cc-gallery"
+         data-pattern="gallery"
+         data-variant="rigid">
+  <div class="container --wide flow">
+    <h2 class="cc-gallery__heading voice-swiss --label">{{heading}}</h2>
+    <div class="cc-gallery__grid">
+      {{#items}}
+      <figure class="cc-gallery__item">
+        <div class="cc-img-placeholder" data-slot="{{slot_name}}"></div>
+        <figcaption class="cc-gallery__caption voice-swiss --label">{{caption}}</figcaption>
+      </figure>
+      {{/items}}
+    </div>
+  </div>
+</section>

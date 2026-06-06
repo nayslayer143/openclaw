@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" data-mood="signal" data-forces="immersive">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{seo.title}} · 404</title>
+  <meta name="description" content="Page not found.">
+  <meta name="theme-color" content="{{seo.theme_color}}">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;700&family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../tokens/layout.css">
+  <link rel="stylesheet" href="../tokens/typography.css">
+  <link rel="stylesheet" href="../tokens/color.css">
+  <link rel="stylesheet" href="../tokens/motion.css">
+  <link rel="stylesheet" href="../tokens/forces.css">
+  <link rel="stylesheet" href="../tokens/textures.css">
+  <link rel="stylesheet" href="../tokens/states.css">
+  <link rel="stylesheet" href="../sections/sections.css">
+
+  <!-- STYLE-GUIDE-OVERRIDES (filled by adapter when style.json drives) -->
+  <style id="style-overrides"></style>
+
+  <style>
+    body {
+      font-family: var(--font-swiss);
+      background: var(--color-bg);
+      color: var(--color-fg);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    main { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .cc-404__code {
+      font-family: var(--font-monument);
+      font-size: clamp(4rem, 14vw, 12rem);
+      line-height: 0.9;
+      letter-spacing: -0.04em;
+      color: var(--color-discord);
+      margin: 0 0 1rem;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="cc-section cc-hero" data-pattern="hero" data-variant="editorial">
+      <div class="container --regular flow">
+        <span class="cc-hero__eyebrow voice-swiss --label">404 · PAGE NOT FOUND</span>
+        <p class="cc-404__code">404</p>
+        <h1 class="cc-hero__heading voice-monument --massive">The room is dark.</h1>
+        <p class="cc-hero__subhead voice-swiss">The page you wanted didn't make it past the door. The link may be old, mistyped, or moved. Head back to the surface and try again.</p>
+      </div>
+    </section>
+
+    <section class="cc-section cc-cta" data-pattern="cta" data-variant="default">
+      <div class="container --regular flow">
+        <a class="cc-cta__action voice-swiss --label" href="/">
+          ← Back to home
+          <span class="cc-cta__arrow" aria-hidden="true">→</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="cc-section cc-footer" data-pattern="footer" data-variant="minimal">
+    <div class="container flex-between">
+      <span class="cc-footer__copyright voice-swiss --label">{{org.name}} · {{seo.year}}</span>
+      <nav class="cc-footer__nav">
+        <a class="cc-footer__link voice-swiss --label" href="/">Home</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

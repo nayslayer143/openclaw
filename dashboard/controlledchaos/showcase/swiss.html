@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en" data-mood="void-inverse" data-forces="swiss">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mode 01 — Swiss Editorial</title>
+  <link rel="stylesheet" href="../tokens/layout.css">
+  <link rel="stylesheet" href="../tokens/typography.css">
+  <link rel="stylesheet" href="../tokens/color.css">
+  <link rel="stylesheet" href="../tokens/motion.css">
+  <link rel="stylesheet" href="../tokens/forces.css">
+  <style>
+    body {
+      font-family: var(--font-swiss);
+      background: var(--color-bg);
+      color: var(--color-fg);
+    }
+
+    /* --- Top Bar --- */
+    .topbar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: var(--space-s) var(--gutter);
+      border-bottom: 1px solid var(--color-fg);
+      font-size: var(--type-caption);
+      letter-spacing: var(--tracking-wide);
+    }
+
+    .topbar a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .topbar .--right {
+      text-align: right;
+    }
+
+    /* --- Hero --- */
+    .swiss-hero {
+      padding: var(--space-2xl) var(--gutter) var(--space-xl);
+      border-bottom: 1px solid var(--color-fg);
+    }
+
+    .swiss-hero h1 {
+      font-family: var(--font-swiss);
+      font-size: clamp(3rem, 7vw + 0.5rem, 9rem);
+      font-weight: var(--weight-bold);
+      line-height: 0.95;
+      letter-spacing: var(--tracking-tight);
+      max-width: 15ch;
+    }
+
+    .swiss-hero-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-m);
+      margin-top: var(--space-xl);
+      font-size: var(--type-body-small);
+      line-height: var(--leading-normal);
+      color: var(--color-muted);
+    }
+
+    /* --- Issue Grid (Neue Grafik style) --- */
+    .issue-section {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      border-bottom: 1px solid var(--color-fg);
+    }
+
+    .issue-number {
+      font-family: var(--font-swiss);
+      font-size: clamp(6rem, 15vw, 20rem);
+      font-weight: var(--weight-bold);
+      line-height: 0.85;
+      padding: var(--space-l) var(--space-xl);
+      border-right: 1px solid var(--color-fg);
+      display: flex;
+      align-items: flex-start;
+    }
+
+    .issue-content {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+    }
+
+    .issue-article {
+      padding: var(--space-l);
+      border-right: 1px solid var(--color-subtle);
+    }
+
+    .issue-article:last-child {
+      border-right: none;
+    }
+
+    .issue-article-header {
+      font-size: var(--type-caption);
+      font-weight: var(--weight-medium);
+      color: var(--color-muted);
+      margin-bottom: var(--space-xs);
+      padding-bottom: var(--space-xs);
+      border-bottom: 1px solid var(--color-subtle);
+    }
+
+    .issue-article-title {
+      font-size: var(--type-subhead);
+      font-weight: var(--weight-semibold);
+      line-height: var(--leading-snug);
+      margin-bottom: var(--space-s);
+    }
+
+    .issue-article-body {
+      font-size: var(--type-body-small);
+      line-height: var(--leading-normal);
+      color: var(--color-muted);
+    }
+
+    /* --- Image Grid --- */
+    .image-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 1px;
+      background: var(--color-fg);
+      border-bottom: 1px solid var(--color-fg);
+    }
+
+    .image-cell {
+      aspect-ratio: 1;
+      background: var(--color-surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-swiss);
+      font-size: var(--type-caption);
+      color: var(--color-muted);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .image-cell.--span-2 {
+      grid-column: span 2;
+      grid-row: span 2;
+    }
+
+    .image-cell-label {
+      position: absolute;
+      bottom: var(--space-xs);
+      left: var(--space-xs);
+      font-size: var(--type-micro);
+      letter-spacing: var(--tracking-wider);
+      text-transform: uppercase;
+    }
+
+    /* --- Data Table --- */
+    .data-section {
+      padding: var(--space-2xl) var(--gutter);
+    }
+
+    .data-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 2px solid var(--color-fg);
+      padding-bottom: var(--space-s);
+      margin-bottom: var(--space-l);
+    }
+
+    .data-section-header h2 {
+      font-size: var(--type-headline);
+      font-weight: var(--weight-bold);
+      letter-spacing: var(--tracking-snug);
+    }
+
+    .data-section-header span {
+      font-size: var(--type-caption);
+      color: var(--color-muted);
+      letter-spacing: var(--tracking-wider);
+      text-transform: uppercase;
+    }
+
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th {
+      font-size: var(--type-micro);
+      font-weight: var(--weight-medium);
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      text-align: left;
+      padding: var(--space-s) 0;
+      border-bottom: 1px solid var(--color-fg);
+      color: var(--color-muted);
+    }
+
+    .data-table td {
+      padding: var(--space-s) 0;
+      border-bottom: 1px solid var(--color-subtle);
+      font-size: var(--type-body-small);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .data-table td:first-child {
+      font-weight: var(--weight-semibold);
+    }
+
+    /* --- Typography Specimen --- */
+    .specimen-section {
+      padding: var(--space-3xl) var(--gutter);
+      border-top: 1px solid var(--color-fg);
+    }
+
+    .specimen-row {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: var(--space-xl);
+      padding: var(--space-l) 0;
+      border-bottom: 1px solid var(--color-subtle);
+      align-items: baseline;
+    }
+
+    .specimen-label {
+      font-size: var(--type-micro);
+      font-weight: var(--weight-medium);
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      color: var(--color-muted);
+    }
+
+    /* --- Credits Footer --- */
+    .swiss-footer {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-m);
+      padding: var(--space-l) var(--gutter);
+      border-top: 1px solid var(--color-fg);
+      font-size: var(--type-caption);
+      color: var(--color-muted);
+    }
+
+    .swiss-footer a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .swiss-footer a:hover {
+      color: var(--color-fg);
+    }
+
+    /* Separator lines */
+    hr.swiss-rule {
+      border: none;
+      height: 1px;
+      background: var(--color-fg);
+    }
+
+    @media (max-width: 768px) {
+      .topbar { grid-template-columns: 1fr 1fr; }
+      .issue-section { grid-template-columns: 1fr; }
+      .issue-content { grid-template-columns: 1fr; }
+      .issue-article { border-right: none; border-bottom: 1px solid var(--color-subtle); }
+      .image-grid { grid-template-columns: repeat(3, 1fr); }
+      .specimen-row { grid-template-columns: 1fr; gap: var(--space-s); }
+      .swiss-footer { grid-template-columns: 1fr 1fr; }
+      .swiss-hero-meta { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <span><a href="index.html">&larr; CC/DS</a></span>
+    <span>Mode 01: Swiss Editorial</span>
+    <span>Controlled Chaos Design System</span>
+    <span class="--right">2026</span>
+  </header>
+
+  <!-- Hero -->
+  <section class="swiss-hero">
+    <h1 class="motion-reveal">Neue Grafik<br>New Graphic Design<br>Graphisme actuel</h1>
+    <div class="swiss-hero-meta motion-stagger">
+      <p>Internationale Zeitschrift f&uuml;r Grafik und verwandte Gebiete. Erscheint in deutscher, englischer und franz&ouml;sischer Sprache.</p>
+      <p>International Review of graphic design and related subjects. Issued in German, English and French language.</p>
+      <p>Revue internationale pour le graphisme et domaines annexes. Parution en langue allemande, anglaise et fran&ccedil;aise.</p>
+    </div>
+  </section>
+
+  <!-- Issue Grid -->
+  <section class="issue-section">
+    <div class="issue-number motion-reveal">3</div>
+    <div class="issue-content">
+      <article class="issue-article motion-reveal">
+        <div class="issue-article-header">Structure &middot; March 2026</div>
+        <h3 class="issue-article-title">The Grid as Generative Framework</h3>
+        <p class="issue-article-body">The grid is not a cage but a generative framework. When used with intention, constraint becomes the engine of creativity. M&uuml;ller-Brockmann understood that the space between elements carries as much meaning as the elements themselves.</p>
+      </article>
+      <article class="issue-article motion-reveal">
+        <div class="issue-article-header">Typography &middot; Type 0-24-DK</div>
+        <h3 class="issue-article-title">Helvetica After Sixty Years</h3>
+        <p class="issue-article-body">Neutrality was never the goal. Helvetica's endurance lies not in its invisibility but in its capacity to hold meaning without imposing it. Every decade rediscovers it differently.</p>
+      </article>
+      <article class="issue-article motion-reveal">
+        <div class="issue-article-header">Systems &middot; Digital ERA</div>
+        <h3 class="issue-article-title">Design Tokens as Swiss Method</h3>
+        <p class="issue-article-body">CSS custom properties are the modern grid system. Variables, constraints, and systematic variation &mdash; the International Typographic Style anticipated the design token by fifty years.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Image Grid -->
+  <div class="image-grid">
+    <div class="image-cell --span-2" style="background: var(--color-fg); color: var(--color-bg);">
+      <span class="image-cell-label">Plate 3.1</span>
+    </div>
+    <div class="image-cell"><span class="image-cell-label">3.2</span></div>
+    <div class="image-cell"><span class="image-cell-label">3.3</span></div>
+    <div class="image-cell"><span class="image-cell-label">3.4</span></div>
+    <div class="image-cell"><span class="image-cell-label">3.5</span></div>
+    <div class="image-cell"><span class="image-cell-label">3.6</span></div>
+    <div class="image-cell"><span class="image-cell-label">3.7</span></div>
+    <div class="image-cell --span-2" style="background: var(--color-subtle);">
+      <span class="image-cell-label">Plate 3.8</span>
+    </div>
+    <div class="image-cell"><span class="image-cell-label">3.9</span></div>
+    <div class="image-cell"><span class="image-cell-label">3.10</span></div>
+  </div>
+
+  <!-- Second Issue -->
+  <section class="issue-section">
+    <div class="issue-number motion-reveal">2</div>
+    <div class="issue-content">
+      <article class="issue-article motion-reveal">
+        <div class="issue-article-header">Color &middot; February 2026</div>
+        <h3 class="issue-article-title">Monochrome as Statement</h3>
+        <p class="issue-article-body">Black on white is not an absence of color. It is the most decisive color choice possible. Every other palette is measured against this fundamental relationship.</p>
+      </article>
+      <article class="issue-article motion-reveal">
+        <div class="issue-article-header">Composition &middot; Spatial</div>
+        <h3 class="issue-article-title">The Weight of Whitespace</h3>
+        <p class="issue-article-body">A page that is 70% empty is not 70% wasted. The negative space does the heavy lifting &mdash; it gives hierarchy its teeth and rhythm its silence between notes.</p>
+      </article>
+      <article class="issue-article motion-reveal">
+        <div class="issue-article-header">Process &middot; Methodology</div>
+        <h3 class="issue-article-title">Rules That Liberate</h3>
+        <p class="issue-article-body">Constraints are not limitations. They are the boundaries within which the mind can play freely. The tighter the structure, the more inventive the solution must become.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- Data Table -->
+  <section class="data-section">
+    <div class="data-section-header motion-reveal">
+      <h2>Type Specimens</h2>
+      <span>Inventory 2026</span>
+    </div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Voice</th>
+          <th>Family</th>
+          <th>Weights</th>
+          <th>Character</th>
+          <th>Use Case</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="motion-reveal">
+          <td>Monument</td>
+          <td>Space Grotesk</td>
+          <td>300&ndash;700</td>
+          <td>Architectural, Impact</td>
+          <td>Display, Heroes</td>
+        </tr>
+        <tr class="motion-reveal">
+          <td>Editorial</td>
+          <td>Playfair Display</td>
+          <td>400&ndash;900</td>
+          <td>Elegant, Literary</td>
+          <td>Long-form, Sophistication</td>
+        </tr>
+        <tr class="motion-reveal">
+          <td>Swiss</td>
+          <td>Inter</td>
+          <td>100&ndash;900</td>
+          <td>Systematic, Clean</td>
+          <td>Information, UI</td>
+        </tr>
+        <tr class="motion-reveal">
+          <td>Brutalist</td>
+          <td>Space Mono</td>
+          <td>400, 700</td>
+          <td>Raw, Mechanical</td>
+          <td>Disruption, Code</td>
+        </tr>
+        <tr class="motion-reveal">
+          <td>Expressive</td>
+          <td>DM Sans</td>
+          <td>100&ndash;1000</td>
+          <td>Versatile, Personal</td>
+          <td>Art Direction</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Typography Specimen -->
+  <section class="specimen-section">
+    <div class="specimen-row motion-reveal">
+      <span class="specimen-label">Massive / 8vw+</span>
+      <span style="font-size: var(--type-massive); font-weight: var(--weight-bold); line-height: 0.85; letter-spacing: var(--tracking-tight);">Ag</span>
+    </div>
+    <div class="specimen-row motion-reveal">
+      <span class="specimen-label">Display / 5vw+</span>
+      <span style="font-size: var(--type-display); font-weight: var(--weight-semibold); line-height: 0.9;">Neue Grafik</span>
+    </div>
+    <div class="specimen-row motion-reveal">
+      <span class="specimen-label">Headline / 3vw+</span>
+      <span style="font-size: var(--type-headline); font-weight: var(--weight-semibold); line-height: var(--leading-snug);">The Structure of Scientific Revolutions</span>
+    </div>
+    <div class="specimen-row motion-reveal">
+      <span class="specimen-label">Body / 1vw</span>
+      <span style="font-size: var(--type-body); line-height: var(--leading-normal); max-width: 65ch;">Praesent bibendum a elit non efficitur. Etiam et velit vitae quam aliquet fermentum. Quisque sit amet nulla dictum, cursus erat a, tempus est.</span>
+    </div>
+    <div class="specimen-row motion-reveal">
+      <span class="specimen-label">Caption / 0.3vw+</span>
+      <span style="font-size: var(--type-caption); letter-spacing: var(--tracking-wider); text-transform: uppercase;">Controlled Chaos Design System &middot; Swiss Editorial Mode &middot; 2026</span>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="swiss-footer">
+    <span><a href="index.html">&larr; Back to Index</a></span>
+    <span>Controlled Chaos / Mode 01</span>
+    <span>Swiss Editorial</span>
+    <span class="--right">&copy; 2026</span>
+  </footer>
+
+  <script>
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('--visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -30px 0px' });
+
+    document.querySelectorAll('.motion-reveal, .motion-stagger').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

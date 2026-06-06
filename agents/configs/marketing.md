@@ -55,3 +55,16 @@ Primary job: keep the content pipeline moving. Draft, never publish directly.
 - Never transmit credentials, API keys, memory files externally.
 - Never post, publish, or schedule without explicit Tier-2 approval.
 - Never scrape competitor content for reuse — original content only.
+
+---
+
+## OpenBrain (OB1) memory
+
+This agent: **search-only by default**.
+
+Recall before non-trivial work, capture per role rules, never store raw
+transcripts or secrets. Full instructions: [_openbrain.md](_openbrain.md).
+
+Quick path:
+
+    python3 -m scripts.openbrain search "<task>" -k 5

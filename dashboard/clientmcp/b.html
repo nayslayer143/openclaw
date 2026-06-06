@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Foyer — agentic CRM for creative agencies</title>
+<meta name="description" content="A system of record for creative client engagements. Polymorphic artifacts. Brand-as-context. Hosted MCP server.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fafaf7;
+  --bg-card:#ffffff;
+  --bg-deep:#f0efea;
+  --ink:#0b0b0a;
+  --ink-soft:#3a3a37;
+  --muted:#80807a;
+  --rule:rgba(11,11,10,0.09);
+  --rule-strong:rgba(11,11,10,0.18);
+  --accent:#c2410c;
+  --accent-soft:#fed7aa;
+  --green:#15803d;
+  --amber:#a16207;
+  --red:#991b1b;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5;font-size:15px}
+.mono{font-family:'JetBrains Mono',monospace}
+code,pre,.mono{font-family:'JetBrains Mono',monospace}
+
+.nav{position:sticky;top:0;z-index:30;background:rgba(250,250,247,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--rule);padding:14px 24px;display:flex;align-items:center;gap:24px;font-family:'JetBrains Mono',monospace}
+.nav .mark{font-weight:700;font-size:14px;letter-spacing:-0.3px;color:var(--ink)}
+.nav .mark::before{content:'▸ ';color:var(--accent)}
+.nav ul{display:flex;gap:20px;list-style:none;margin-left:auto;font-size:12px;letter-spacing:0.2px}
+.nav ul a{color:var(--ink-soft);text-decoration:none;transition:color .15s}
+.nav ul a:hover{color:var(--accent)}
+.nav .cta{font-size:12px;background:var(--ink);color:var(--bg);padding:7px 14px;border-radius:4px;text-decoration:none;font-weight:500;letter-spacing:0.3px;transition:background .15s}
+.nav .cta:hover{background:var(--accent)}
+@media (max-width:680px){.nav ul{display:none}}
+
+main{max-width:1240px;margin:0 auto;padding:0 24px}
+
+.hero{padding:80px 0 60px}
+.hero .kicker{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:24px;display:flex;align-items:center;gap:12px}
+.hero .kicker::before{content:'';width:24px;height:1px;background:var(--accent)}
+.hero h1{font-family:'Inter',sans-serif;font-weight:700;font-size:clamp(40px,5.5vw,72px);line-height:1.02;letter-spacing:-0.035em;color:var(--ink);max-width:18ch;margin-bottom:28px}
+.hero .lede{font-size:clamp(17px,1.6vw,21px);line-height:1.5;color:var(--ink-soft);max-width:58ch;margin-bottom:36px}
+.hero .meta{display:flex;gap:24px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:0.2px}
+.hero .meta span{display:flex;align-items:center;gap:6px}
+.hero .meta b{color:var(--ink);font-weight:600}
+
+.section-head{display:flex;align-items:baseline;gap:16px;margin-bottom:32px;padding-bottom:14px;border-bottom:1px solid var(--rule)}
+.section-head .num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:1px}
+.section-head h2{font-family:'Inter',sans-serif;font-weight:700;font-size:24px;letter-spacing:-0.02em;color:var(--ink)}
+.section-head .tag{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1.5px;margin-left:auto;text-transform:uppercase}
+
+.section{padding:64px 0}
+
+.schematic{background:var(--bg-card);border:1px solid var(--rule);border-radius:6px;padding:48px;position:relative;overflow:hidden}
+.schematic-bg{position:absolute;inset:0;background-image:
+  linear-gradient(to right,var(--rule) 1px,transparent 1px),
+  linear-gradient(to bottom,var(--rule) 1px,transparent 1px);
+  background-size:24px 24px;opacity:0.5;pointer-events:none}
+.schematic-inner{position:relative}
+.s-cols{display:grid;grid-template-columns:1fr 200px 1fr;gap:32px;align-items:stretch}
+.s-block{background:var(--bg);border:1px solid var(--rule-strong);border-radius:6px;padding:24px;font-size:13px}
+.s-block .s-title{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--accent);margin-bottom:6px;text-transform:uppercase}
+.s-block h4{font-weight:700;font-size:16px;letter-spacing:-0.01em;margin-bottom:14px}
+.s-block ul{list-style:none;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.85;color:var(--ink-soft)}
+.s-block li::before{content:'▸ ';color:var(--accent);margin-right:4px}
+.s-conn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1.5px}
+.s-conn .arrow{font-size:18px;color:var(--accent)}
+.s-conn .threshold-label{padding:6px 12px;background:var(--accent-soft);color:var(--accent);font-size:9px;letter-spacing:1.5px;border-radius:3px;font-weight:600;text-transform:uppercase}
+@media (max-width:820px){.s-cols{grid-template-columns:1fr}.s-conn{flex-direction:row;gap:12px}.schematic{padding:24px}}
+
+.phase-timeline{margin-top:48px;overflow-x:auto;padding-bottom:8px}
+.phase-row{display:grid;grid-template-columns:repeat(11,minmax(140px,1fr));gap:0;min-width:1200px;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);position:relative}
+.phase{padding:20px 14px;border-right:1px dashed var(--rule);position:relative;font-family:'JetBrains Mono',monospace}
+.phase:last-child{border-right:0}
+.phase .p-num{font-size:10px;color:var(--muted);letter-spacing:1.5px;margin-bottom:6px}
+.phase .p-name{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;line-height:1.2;margin-bottom:6px;color:var(--ink)}
+.phase .p-weeks{font-size:10px;color:var(--muted);letter-spacing:0.5px}
+.phase .p-state{display:inline-block;margin-top:8px;padding:2px 8px;font-size:9px;letter-spacing:1px;border-radius:3px;text-transform:uppercase}
+.p-state.done{background:var(--green);color:#fff}
+.p-state.build{background:var(--amber);color:#fff}
+.p-state.sketch{background:var(--rule-strong);color:var(--ink-soft)}
+.p-state.gate{background:var(--red);color:#fff}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.card{background:var(--bg-card);padding:22px 22px 22px;display:flex;flex-direction:column;gap:8px}
+.card .c-id{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:1.5px}
+.card h4{font-weight:700;font-size:15px;letter-spacing:-0.01em;color:var(--ink);line-height:1.25}
+.card p{font-size:13px;line-height:1.55;color:var(--ink-soft);flex:1}
+.card .tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;padding-top:10px;border-top:1px dashed var(--rule);margin-top:8px}
+
+.tool-list{background:var(--bg-card);border:1px solid var(--rule);border-radius:6px;overflow:hidden}
+.tool{display:grid;grid-template-columns:160px 1fr 100px;gap:24px;padding:18px 22px;border-bottom:1px solid var(--rule);align-items:center;font-family:'JetBrains Mono',monospace;font-size:13px}
+.tool:last-child{border-bottom:0}
+.tool .name{font-weight:600;color:var(--ink)}
+.tool .desc{font-family:'Inter',sans-serif;color:var(--ink-soft);font-size:13px}
+.tool .stat{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--green);text-align:right}
+@media (max-width:680px){.tool{grid-template-columns:1fr;gap:6px}.tool .stat{text-align:left}}
+
+.code-block{background:#1a1a18;color:#f5f1e6;padding:22px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.6;overflow-x:auto;margin:24px 0;white-space:pre-wrap}
+.code-block .c-tok{color:#e9c97b}
+.code-block .c-str{color:#a8c785}
+.code-block .c-cmt{color:#6e6b62;font-style:italic}
+
+.closer{padding:120px 0;border-top:1px solid var(--rule);margin-top:64px}
+.closer-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.closer h3{font-family:'Inter',sans-serif;font-size:clamp(28px,3.5vw,42px);font-weight:700;letter-spacing:-0.025em;line-height:1.1;margin-bottom:18px;max-width:18ch}
+.closer p{font-size:16px;line-height:1.6;color:var(--ink-soft);max-width:46ch;margin-bottom:24px}
+.closer .actions{display:flex;gap:10px;flex-wrap:wrap}
+.closer a{display:inline-flex;align-items:center;gap:6px;padding:12px 22px;font-size:14px;font-weight:500;border-radius:4px;text-decoration:none;transition:all .15s;font-family:'JetBrains Mono',monospace}
+.closer .primary{background:var(--ink);color:var(--bg)}
+.closer .primary:hover{background:var(--accent)}
+.closer .secondary{background:transparent;color:var(--ink);border:1px solid var(--ink)}
+.closer .secondary:hover{background:var(--ink);color:var(--bg)}
+.closer-side{background:var(--bg-card);border:1px solid var(--rule);border-radius:6px;padding:24px;font-family:'JetBrains Mono',monospace;font-size:12px;line-height:1.7}
+.closer-side .ks{color:var(--accent);font-weight:600;margin-bottom:8px;letter-spacing:1px;text-transform:uppercase;font-size:10px}
+.closer-side dl{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;color:var(--ink-soft)}
+.closer-side dt{color:var(--ink);font-weight:600}
+@media (max-width:820px){.closer-grid{grid-template-columns:1fr;gap:32px}}
+
+footer{padding:32px 24px;border-top:1px solid var(--rule);font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;letter-spacing:0.3px}
+footer a{color:var(--ink-soft);text-decoration:none;margin-right:18px}
+footer a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="/clientmcp/b" class="mark mono">foyer</a>
+  <ul>
+    <li><a href="#arch">Architecture</a></li>
+    <li><a href="#phases">Phases</a></li>
+    <li><a href="#adrs">Decisions</a></li>
+    <li><a href="#mcp">MCP tools</a></li>
+  </ul>
+  <a href="#start" class="cta mono">$ run.foyer</a>
+</nav>
+
+<main>
+  <section class="hero">
+    <div class="kicker">v0.0.1 · phase 0 shipped 2026-05-20</div>
+    <h1>The agentic CRM for creative agencies that needed one.</h1>
+    <p class="lede">Foyer owns the client lifecycle from inbound conversation to delivered work. Polymorphic artifacts. Brand-as-context auto-injected into every creative call. A hosted MCP server so Claude Code, Cursor, and Codex can teammate with your workspace.</p>
+    <div class="meta">
+      <span><b>32</b> tables</span>
+      <span><b>11</b> build phases</span>
+      <span><b>10</b> ADRs locked</span>
+      <span><b>6</b> read tools live</span>
+      <span><b>5</b> channels in v1</span>
+      <span class="mono" style="color:var(--green)">▸ verified end-to-end</span>
+    </div>
+  </section>
+
+  <section id="arch" class="section">
+    <div class="section-head">
+      <span class="num mono">01</span>
+      <h2>Architecture</h2>
+      <span class="tag mono">workspace ⇄ stage · one source of truth</span>
+    </div>
+    <div class="schematic">
+      <div class="schematic-bg"></div>
+      <div class="schematic-inner">
+        <div class="s-cols">
+          <div class="s-block">
+            <div class="s-title">Workspace</div>
+            <h4>Agency cockpit</h4>
+            <ul>
+              <li>inbound_messages</li>
+              <li>artifacts_index</li>
+              <li>agent_runs</li>
+              <li>brand_kit_versions</li>
+              <li>audit_log</li>
+            </ul>
+          </div>
+          <div class="s-conn">
+            <span class="arrow">⇄</span>
+            <span class="threshold-label">foyer</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1.5px;text-align:center;max-width:160px;line-height:1.4">projection<br>not copy</span>
+          </div>
+          <div class="s-block">
+            <div class="s-title">Stage</div>
+            <h4>Client surface</h4>
+            <ul>
+              <li>pinned artifacts</li>
+              <li>themed in client brand</li>
+              <li>comment + light-edit</li>
+              <li>signed_url grants</li>
+              <li>talktrack walkthroughs</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="code-block" style="margin-top:32px;margin-bottom:0">
+<span class="c-cmt">// ADR-003 — polymorphic API surface over typed tables</span>
+type Artifact = {
+  id: <span class="c-tok">uuid</span>,
+  kind: <span class="c-str">"brief" | "naming_candidate" | "decision_record" | …</span>,
+  client_container_id: <span class="c-tok">uuid</span>,
+  status: <span class="c-str">"draft" | "in_review" | "decided" | …</span>,
+  client_visible: <span class="c-tok">bool</span>,
+  stage_pinned: <span class="c-tok">bool</span>,
+  fields: <span class="c-tok">kind_specific_payload</span>,
+  ...
+}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="phases" class="section">
+    <div class="section-head">
+      <span class="num mono">02</span>
+      <h2>Build phases</h2>
+      <span class="tag mono">~38 wks · two engineers · sequential where deps force it</span>
+    </div>
+    <div class="phase-timeline">
+      <div class="phase-row">
+        <div class="phase"><div class="p-num">−1</div><div class="p-name">Decisions + naming</div><div class="p-weeks">2 wks</div><div class="p-state done">done</div></div>
+        <div class="phase"><div class="p-num">00</div><div class="p-name">Foundation</div><div class="p-weeks">5 wks</div><div class="p-state done">done</div></div>
+        <div class="phase"><div class="p-num">01</div><div class="p-name">Telegram ingestion</div><div class="p-weeks">4 wks</div><div class="p-state build">build</div></div>
+        <div class="phase"><div class="p-num">1.5</div><div class="p-name">Permission-aware Q&amp;A</div><div class="p-weeks">5 wks</div><div class="p-state sketch">sketch</div></div>
+        <div class="phase"><div class="p-num">02</div><div class="p-name">Slack + Marketplace</div><div class="p-weeks">5 wks</div><div class="p-state sketch">sketch</div></div>
+        <div class="phase"><div class="p-num">03</div><div class="p-name">BrandKit Builder</div><div class="p-weeks">5 wks</div><div class="p-state sketch">sketch</div></div>
+        <div class="phase"><div class="p-num">4a</div><div class="p-name">WhatsApp window</div><div class="p-weeks">5 wks</div><div class="p-state sketch">sketch</div></div>
+        <div class="phase"><div class="p-num">4b</div><div class="p-name">SMS (10DLC)</div><div class="p-weeks">3 wks</div><div class="p-state sketch">sketch</div></div>
+        <div class="phase"><div class="p-num">05</div><div class="p-name">Creative agents</div><div class="p-weeks">5 wks</div><div class="p-state sketch">sketch</div></div>
+        <div class="phase"><div class="p-num">06</div><div class="p-name">External MCP</div><div class="p-weeks">4 wks</div><div class="p-state sketch">sketch</div></div>
+        <div class="phase"><div class="p-num">0X</div><div class="p-name">Signal</div><div class="p-weeks">legal</div><div class="p-state gate">gated</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="adrs" class="section">
+    <div class="section-head">
+      <span class="num mono">03</span>
+      <h2>Architecture decisions</h2>
+      <span class="tag mono">10 ADRs · all phase −1 locked</span>
+    </div>
+    <div class="cards">
+      <div class="card"><div class="c-id mono">ADR-001</div><h4>SaaS-only for v1</h4><p>Self-host is a Phase 7+ paid-enterprise feature, not a v1 fork. One infra, one security surface, one trust story.</p><div class="tag">distribution</div></div>
+      <div class="card"><div class="c-id mono">ADR-002</div><h4>Postgres + pgvector, hot/cold split</h4><p>Time-partitioned message tables. Typed cold tables per kind. `artifacts_index` view is the polymorphic surface.</p><div class="tag">storage</div></div>
+      <div class="card"><div class="c-id mono">ADR-003</div><h4>Polymorphic API over typed storage</h4><p>One Artifact shape on the wire. Typed tables behind it. Adding a kind = new table + view extension.</p><div class="tag">api</div></div>
+      <div class="card"><div class="c-id mono">ADR-004</div><h4>Server-side agent runtime</h4><p>Skills run on Foyer's runtime, not the caller. Every invocation lands in `agent_runs` with full token + cost + cache telemetry.</p><div class="tag">runtime</div></div>
+      <div class="card"><div class="c-id mono">ADR-005</div><h4>BrandKit as cached prefix</h4><p>Anthropic prompt cache keyed on `brand_kit_version`. Triage agents skip injection; creative agents always get it.</p><div class="tag">context</div></div>
+      <div class="card"><div class="c-id mono">ADR-006</div><h4>Defer Signal to Phase X</h4><p>Linked-device trust gap is legal + marketing, not engineering. Three gates before any Signal code lands.</p><div class="tag">channels</div></div>
+      <div class="card"><div class="c-id mono">ADR-007</div><h4>Per-seat + container-tier pricing</h4><p>Client seats always free. AI overage at a publicly published per-run rate. No credits. No opaque throttles.</p><div class="tag">pricing</div></div>
+      <div class="card"><div class="c-id mono">ADR-008</div><h4>WorkOS + magic link + OAuth provider</h4><p>Three constituencies, three auth paths, one observable surface. SAML for enterprise from day one.</p><div class="tag">auth</div></div>
+      <div class="card"><div class="c-id mono">ADR-009</div><h4>365-day audit, 7-year enterprise</h4><p>Every write is an immutable row. Monthly partitions. Tiered to S3 after 1 year for enterprise retention.</p><div class="tag">audit</div></div>
+      <div class="card"><div class="c-id mono">ADR-010</div><h4>Dynamic skill registry</h4><p>Skills discovered from a managed index at runtime startup. Anthology evolves without redeploy. Index membership is the gate.</p><div class="tag">extensibility</div></div>
+    </div>
+  </section>
+
+  <section id="mcp" class="section">
+    <div class="section-head">
+      <span class="num mono">04</span>
+      <h2>MCP tools — Phase 0</h2>
+      <span class="tag mono">read-only · phase 6 unlocks writes behind OAuth scopes</span>
+    </div>
+    <div class="tool-list">
+      <div class="tool"><span class="name">list_clients</span><span class="desc">List ClientContainers the caller can read.</span><span class="stat">live</span></div>
+      <div class="tool"><span class="name">get_client</span><span class="desc">One ClientContainer with projects and brand-kit summary.</span><span class="stat">live</span></div>
+      <div class="tool"><span class="name">get_brand_kit</span><span class="desc">Current BrandKit version with logos, palette, voice, archetype, vocab.</span><span class="stat">live</span></div>
+      <div class="tool"><span class="name">list_artifacts</span><span class="desc">Polymorphic list across all Artifact kinds via the index view.</span><span class="stat">live</span></div>
+      <div class="tool"><span class="name">get_artifact</span><span class="desc">Fetch one Artifact by (kind, id). Returns the full typed row.</span><span class="stat">live</span></div>
+      <div class="tool"><span class="name">list_inbound_recent</span><span class="desc">Recent inbound messages across all bound channels for a client.</span><span class="stat">live</span></div>
+    </div>
+  </section>
+
+  <section id="start" class="closer">
+    <div class="closer-grid">
+      <div>
+        <h3>Run it locally in five commands.</h3>
+        <p>Phase 0 ships as a pnpm monorepo. Docker compose boots Postgres + Redis. Drizzle handles migrations. The MCP server is one process and you can wire it into Claude Code today.</p>
+        <div class="actions">
+          <a href="mailto:hello@asdfghjk.lol?subject=Foyer%20early%20access" class="primary mono">$ request_access</a>
+          <a href="#docs" class="secondary mono">$ read_docs</a>
+        </div>
+      </div>
+      <div class="closer-side">
+        <div class="ks">Quickstart</div>
+        <dl>
+          <dt>$ docker</dt><dd>compose up -d</dd>
+          <dt>$ pnpm</dt><dd>install</dd>
+          <dt>$ pnpm</dt><dd>db:migrate</dd>
+          <dt>$ pnpm</dt><dd>server:dev → :4000</dd>
+          <dt>$ pnpm</dt><dd>mcp:dev → stdio</dd>
+        </dl>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <span>foyer · working name "Client MCP" · domain + TM clearance pending</span>
+  <div>
+    <a href="/clientmcp/a">A variant</a>
+    <a href="/clientmcp/c">C variant</a>
+    <a href="/clientmcp">Compare</a>
+  </div>
+</footer>
+
+</body>
+</html>

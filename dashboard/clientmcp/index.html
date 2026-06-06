@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#fdf9f0">
+<title>Client MCP / Foyer — A/B/C/D/E landing concepts</title>
+<meta name="description" content="Five landing-page directions for the agentic CRM for creative agencies. Compare side-by-side.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Inter',system-ui,sans-serif;background:#0d0c0a;color:#f4ecd9;overflow:hidden;-webkit-font-smoothing:antialiased}
+
+header{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(13,12,10,0.94);backdrop-filter:blur(14px);border-bottom:1px solid rgba(244,236,217,0.08);height:60px;display:flex;align-items:center;padding:0 16px;gap:14px;padding-top:env(safe-area-inset-top)}
+.brand{display:flex;align-items:center;gap:10px;flex-shrink:0;color:#e9c97b;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase}
+.brand::before{content:'';width:10px;height:10px;background:#e9c97b;border-radius:50%;box-shadow:0 0 0 3px rgba(233,201,123,0.18);flex-shrink:0}
+.brand small{display:none;color:rgba(244,236,217,0.4);font-weight:500;letter-spacing:1.5px;font-size:10px;margin-left:6px;font-family:inherit;text-transform:none}
+@media (min-width:680px){.brand small{display:inline}}
+
+.tabs{display:flex;gap:6px;margin-left:auto;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-right:6px}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:9px 16px;font-size:11px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;background:rgba(244,236,217,0.04);color:rgba(244,236,217,0.55);border:1px solid rgba(244,236,217,0.08);cursor:pointer;font-family:inherit;border-radius:999px;transition:all .15s;display:flex;flex-direction:column;align-items:center;line-height:1.2;gap:2px}
+.tab:hover{color:#fff;border-color:rgba(244,236,217,0.2)}
+.tab.active{background:#e9c97b;color:#1a1815;border-color:#e9c97b}
+.tab .lbl{display:block;font-size:9px;font-weight:500;letter-spacing:0.5px;opacity:0.7;text-transform:none}
+.tab:not(.active) .lbl{color:rgba(244,236,217,0.5)}
+
+.viewport{position:fixed;top:60px;left:0;right:0;bottom:0;background:#fff}
+iframe{width:100%;height:100%;border:0;display:block;background:#fff}
+
+.helper{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:rgba(13,12,10,0.94);border:1px solid rgba(244,236,217,0.08);backdrop-filter:blur(14px);padding:8px 16px;border-radius:999px;font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:rgba(244,236,217,0.55);z-index:40;display:flex;align-items:center;gap:10px;pointer-events:none;animation:fadeOut 8s ease-in 4s forwards;font-family:'JetBrains Mono',monospace}
+.helper strong{color:#e9c97b;font-weight:700}
+.helper kbd{background:rgba(244,236,217,0.08);border:1px solid rgba(244,236,217,0.15);padding:2px 6px;border-radius:4px;font-family:inherit;font-size:9px;color:#fff}
+@keyframes fadeOut{to{opacity:0;visibility:hidden}}
+@media (max-width:480px){.helper{display:none}}
+
+.share{margin-left:8px;flex-shrink:0;font-size:10px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:rgba(244,236,217,0.45);border:1px solid rgba(244,236,217,0.1);padding:8px 12px;border-radius:999px;transition:all .15s;background:none;cursor:pointer;font-family:'JetBrains Mono',monospace;display:none}
+@media (min-width:680px){.share{display:inline-flex}}
+.share:hover{color:#e9c97b;border-color:#e9c97b}
+.share.ok{color:#7bc99b;border-color:#7bc99b}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Foyer<small>A/B/C/D/E landing compare · working name "Client MCP"</small></div>
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-v="a" role="tab">A · Editorial<span class="lbl">cream · serif · spacious</span></button>
+    <button class="tab" data-v="b" role="tab">B · Blueprint<span class="lbl">mono · technical · diagram</span></button>
+    <button class="tab" data-v="c" role="tab">C · Demo-first<span class="lbl">product · canvas · live</span></button>
+    <button class="tab" data-v="d" role="tab">D · Manifesto<span class="lbl">longform · paper · essay</span></button>
+    <button class="tab" data-v="e" role="tab">E · Stage<span class="lbl">amber · doorway · architectural</span></button>
+  </div>
+  <button class="share" id="share-btn">Copy link</button>
+</header>
+
+<div class="viewport"><iframe id="frame" src="/clientmcp/a" title="Foyer landing concept" loading="eager"></iframe></div>
+
+<div class="helper">Switch · <kbd>1</kbd> A &nbsp; <kbd>2</kbd> B &nbsp; <kbd>3</kbd> C &nbsp; <kbd>4</kbd> D &nbsp; <kbd>5</kbd> E</div>
+
+<script>
+(function(){
+  const frame = document.getElementById('frame');
+  const tabs = document.querySelectorAll('.tab');
+  const share = document.getElementById('share-btn');
+
+  const VALID = ['a','b','c','d','e'];
+  const KEYS = { '1':'a', '2':'b', '3':'c', '4':'d', '5':'e' };
+
+  function go(v) {
+    if (!VALID.includes(v)) v = 'a';
+    frame.src = '/clientmcp/' + v;
+    tabs.forEach(t => t.classList.toggle('active', t.dataset.v === v));
+    history.replaceState(null, '', '?v=' + v);
+  }
+
+  tabs.forEach(t => t.addEventListener('click', () => go(t.dataset.v)));
+
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    if (KEYS[e.key]) go(KEYS[e.key]);
+  });
+
+  const initial = new URLSearchParams(window.location.search).get('v');
+  if (VALID.includes(initial)) go(initial);
+
+  if (share) {
+    share.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        share.classList.add('ok');
+        const orig = share.textContent;
+        share.textContent = 'Copied';
+        setTimeout(() => { share.classList.remove('ok'); share.textContent = orig; }, 1600);
+      } catch {}
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

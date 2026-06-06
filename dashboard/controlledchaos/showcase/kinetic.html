@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en" data-mood="dusk" data-forces="kinetic">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mode 04 — Kinetic Type</title>
+  <link rel="stylesheet" href="../tokens/layout.css">
+  <link rel="stylesheet" href="../tokens/typography.css">
+  <link rel="stylesheet" href="../tokens/color.css">
+  <link rel="stylesheet" href="../tokens/motion.css">
+  <link rel="stylesheet" href="../tokens/forces.css">
+  <style>
+    body {
+      font-family: var(--font-monument);
+      background: var(--color-bg);
+      color: var(--color-fg);
+      overflow-x: hidden;
+    }
+
+    /* --- NAV --- */
+    .kinetic-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      padding: var(--space-m) var(--gutter);
+      font-size: var(--type-micro);
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      mix-blend-mode: difference;
+      color: #fff;
+    }
+
+    .kinetic-nav a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* --- HERO: Split word animation --- */
+    .kinetic-hero {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--gutter);
+      overflow: hidden;
+    }
+
+    .split-word {
+      font-size: clamp(4rem, 12vw + 1rem, 16rem);
+      font-weight: var(--weight-bold);
+      line-height: 0.85;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-tight);
+      overflow: hidden;
+    }
+
+    .split-word .char {
+      display: inline-block;
+      animation: reveal-up var(--dur-drift) var(--ease-out-expo) both;
+    }
+
+    .split-word:nth-child(2) .char {
+      animation-delay: calc(var(--char-index, 0) * 40ms + 200ms);
+    }
+
+    .split-word:nth-child(3) .char {
+      animation-delay: calc(var(--char-index, 0) * 40ms + 400ms);
+    }
+
+    .split-word.--italic {
+      font-family: var(--font-editorial);
+      font-weight: var(--weight-regular);
+      font-style: italic;
+      text-transform: none;
+      letter-spacing: -0.02em;
+    }
+
+    /* --- ROLLING TEXT --- */
+    .roll-section {
+      padding: var(--space-3xl) 0;
+      overflow: hidden;
+      border-top: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .roll-track {
+      display: flex;
+      white-space: nowrap;
+      will-change: transform;
+    }
+
+    .roll-track.--left {
+      animation: marquee-scroll 30s linear infinite;
+    }
+
+    .roll-track.--right {
+      animation: marquee-scroll 25s linear infinite reverse;
+    }
+
+    .roll-word {
+      font-size: clamp(3rem, 8vw, 8rem);
+      font-weight: var(--weight-bold);
+      text-transform: uppercase;
+      padding: 0 var(--space-l);
+      flex-shrink: 0;
+      line-height: 1.2;
+    }
+
+    .roll-word.--outline {
+      -webkit-text-stroke: 1.5px var(--color-fg);
+      -webkit-text-fill-color: transparent;
+    }
+
+    .roll-word.--accent {
+      color: var(--color-accent-1);
+    }
+
+    .roll-word.--serif {
+      font-family: var(--font-editorial);
+      font-style: italic;
+      font-weight: var(--weight-regular);
+      text-transform: none;
+    }
+
+    /* --- VERTICAL TYPE COLUMNS --- */
+    .vert-section {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      min-height: 80dvh;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .vert-col {
+      border-right: 1px solid var(--color-border);
+      padding: var(--space-l);
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .vert-col:last-child { border-right: none; }
+
+    .vert-text {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      font-size: clamp(1.5rem, 3vw, 3rem);
+      font-weight: var(--weight-bold);
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-wider);
+      position: absolute;
+      top: var(--space-l);
+      right: var(--space-l);
+      opacity: 0.15;
+    }
+
+    .vert-number {
+      font-size: clamp(5rem, 12vw, 12rem);
+      font-weight: var(--weight-black);
+      line-height: 0.85;
+    }
+
+    .vert-label {
+      font-size: var(--type-micro);
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      color: var(--color-muted);
+      margin-top: var(--space-s);
+    }
+
+    .vert-col.--filled {
+      background: var(--color-accent-1);
+      color: var(--color-inverse);
+    }
+
+    /* --- WEIGHT PARADE --- */
+    .weight-section {
+      padding: var(--space-3xl) var(--gutter);
+    }
+
+    .weight-line {
+      font-family: var(--font-monument);
+      font-size: clamp(2rem, 5vw + 0.5rem, 6rem);
+      line-height: 1.1;
+      text-transform: uppercase;
+      padding: var(--space-xs) 0;
+      border-bottom: 1px solid var(--color-border);
+      transition: all var(--dur-swift) var(--ease-out-expo);
+      cursor: default;
+    }
+
+    .weight-line:hover {
+      padding-left: var(--space-l);
+      color: var(--color-accent-1);
+      letter-spacing: 0.1em;
+    }
+
+    .weight-meta {
+      float: right;
+      font-size: var(--type-micro);
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      color: var(--color-muted);
+      line-height: inherit;
+    }
+
+    /* --- SCRAMBLE TEXT --- */
+    .scramble-section {
+      min-height: 60dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-xl);
+    }
+
+    .scramble-text {
+      font-family: var(--font-monument);
+      font-size: clamp(2rem, 6vw, 7rem);
+      font-weight: var(--weight-light);
+      text-align: center;
+      line-height: var(--leading-tight);
+      max-width: 20ch;
+    }
+
+    .scramble-text em {
+      font-family: var(--font-editorial);
+      font-style: italic;
+      font-weight: var(--weight-regular);
+      color: var(--color-accent-1);
+    }
+
+    /* --- FOOTER --- */
+    .kinetic-footer {
+      padding: var(--space-2xl) var(--gutter);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-top: 1px solid var(--color-border);
+    }
+
+    .kinetic-footer a {
+      color: var(--color-muted);
+      text-decoration: none;
+      font-size: var(--type-caption);
+      letter-spacing: var(--tracking-wider);
+      text-transform: uppercase;
+    }
+
+    .kinetic-footer-big {
+      font-size: clamp(4rem, 10vw, 10rem);
+      font-weight: var(--weight-black);
+      line-height: 0.8;
+      opacity: 0.08;
+    }
+
+    @media (max-width: 768px) {
+      .vert-section { grid-template-columns: repeat(3, 1fr); }
+      .vert-col:nth-child(n+4) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="kinetic-nav">
+    <a href="index.html">&larr; CC/DS</a>
+    <span>Mode 04 / Kinetic Type</span>
+  </nav>
+
+  <!-- HERO: Split character animation -->
+  <section class="kinetic-hero">
+    <div class="split-word" id="line1"></div>
+    <div class="split-word --italic" id="line2"></div>
+    <div class="split-word" id="line3"></div>
+  </section>
+
+  <!-- ROLLING TEXT -->
+  <section class="roll-section">
+    <div class="roll-track --left">
+      <span class="roll-word">Typography</span>
+      <span class="roll-word --outline">is</span>
+      <span class="roll-word --serif">Performance</span>
+      <span class="roll-word --accent">&mdash;</span>
+      <span class="roll-word">Letters</span>
+      <span class="roll-word --outline">that</span>
+      <span class="roll-word --serif">Breathe</span>
+      <span class="roll-word --accent">&mdash;</span>
+      <span class="roll-word">Typography</span>
+      <span class="roll-word --outline">is</span>
+      <span class="roll-word --serif">Performance</span>
+      <span class="roll-word --accent">&mdash;</span>
+      <span class="roll-word">Letters</span>
+      <span class="roll-word --outline">that</span>
+      <span class="roll-word --serif">Breathe</span>
+      <span class="roll-word --accent">&mdash;</span>
+    </div>
+    <div class="roll-track --right">
+      <span class="roll-word --outline">Weight</span>
+      <span class="roll-word --serif">Rhythm</span>
+      <span class="roll-word">Tension</span>
+      <span class="roll-word --outline">Scale</span>
+      <span class="roll-word --accent">Flow</span>
+      <span class="roll-word --serif">Chaos</span>
+      <span class="roll-word --outline">Weight</span>
+      <span class="roll-word --serif">Rhythm</span>
+      <span class="roll-word">Tension</span>
+      <span class="roll-word --outline">Scale</span>
+      <span class="roll-word --accent">Flow</span>
+      <span class="roll-word --serif">Chaos</span>
+    </div>
+  </section>
+
+  <!-- VERTICAL COLUMNS -->
+  <section class="vert-section">
+    <div class="vert-col">
+      <span class="vert-text">Thin</span>
+      <span class="vert-number" style="font-weight: 100">Aa</span>
+      <span class="vert-label">100</span>
+    </div>
+    <div class="vert-col">
+      <span class="vert-text">Light</span>
+      <span class="vert-number" style="font-weight: 300">Aa</span>
+      <span class="vert-label">300</span>
+    </div>
+    <div class="vert-col --filled">
+      <span class="vert-text">Medium</span>
+      <span class="vert-number" style="font-weight: 500">Aa</span>
+      <span class="vert-label">500</span>
+    </div>
+    <div class="vert-col">
+      <span class="vert-text">Bold</span>
+      <span class="vert-number" style="font-weight: 700">Aa</span>
+      <span class="vert-label">700</span>
+    </div>
+    <div class="vert-col">
+      <span class="vert-text">Black</span>
+      <span class="vert-number" style="font-weight: 900">Aa</span>
+      <span class="vert-label">900</span>
+    </div>
+  </section>
+
+  <!-- WEIGHT PARADE -->
+  <section class="weight-section">
+    <div class="weight-line" style="font-weight: 100">The quick brown fox <span class="weight-meta">Thin / 100</span></div>
+    <div class="weight-line" style="font-weight: 200">The quick brown fox <span class="weight-meta">Extra Light / 200</span></div>
+    <div class="weight-line" style="font-weight: 300">The quick brown fox <span class="weight-meta">Light / 300</span></div>
+    <div class="weight-line" style="font-weight: 400">The quick brown fox <span class="weight-meta">Regular / 400</span></div>
+    <div class="weight-line" style="font-weight: 500">The quick brown fox <span class="weight-meta">Medium / 500</span></div>
+    <div class="weight-line" style="font-weight: 600">The quick brown fox <span class="weight-meta">Semibold / 600</span></div>
+    <div class="weight-line" style="font-weight: 700">The quick brown fox <span class="weight-meta">Bold / 700</span></div>
+  </section>
+
+  <!-- SCRAMBLE -->
+  <section class="scramble-section">
+    <h2 class="scramble-text motion-reveal">
+      Letters are not <em>static.</em> They are <em>alive.</em>
+    </h2>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="kinetic-footer">
+    <a href="index.html">&larr; Back to Index</a>
+    <div class="kinetic-footer-big">04</div>
+  </footer>
+
+  <script>
+    // Split text into individual characters with staggered animation
+    function splitText(elementId, text) {
+      const el = document.getElementById(elementId);
+      el.innerHTML = text.split('').map((char, i) =>
+        char === ' '
+          ? ' '
+          : `<span class="char" style="--char-index:${i};animation-delay:calc(${i} * 40ms)">${char}</span>`
+      ).join('');
+    }
+
+    splitText('line1', 'Letters');
+    splitText('line2', 'in Motion');
+    splitText('line3', '2026');
+
+    // Scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('--visible');
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.motion-reveal').forEach(el => observer.observe(el));
+  </script>
+</body>
+</html>

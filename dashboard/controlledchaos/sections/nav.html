@@ -1,0 +1,76 @@
+<!-- cc-section: nav
+     best:  all (with per-mode density tuning)
+     ok:    -
+     avoid: -
+     variants: default (logo left + links right), centered (logo center), minimal (logo + 1 CTA)
+     placeholders: brand, links[] (label, href), cta_text, cta_href
+     motion: sets --nav-height via inline style; uses 8 lines of JS for mobile drawer + scroll-state -->
+<nav class="cc-section cc-nav"
+     data-pattern="nav"
+     data-variant="default"
+     aria-label="Primary">
+  <div class="container --wide cc-nav__inner">
+    <a class="cc-nav__brand voice-monument" href="/">{{brand}}</a>
+
+    <button class="cc-nav__toggle" type="button"
+            aria-label="Open menu"
+            aria-expanded="false"
+            aria-controls="cc-nav-menu">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </button>
+
+    <div class="cc-nav__menu" id="cc-nav-menu">
+      <ul class="cc-nav__links">
+        {{#links}}
+        <li><a class="cc-nav__link voice-swiss --label" href="{{href}}">{{label}}</a></li>
+        {{/links}}
+      </ul>
+      <a class="cc-nav__cta voice-swiss --label" href="{{cta_href}}">{{cta_text}}</a>
+    </div>
+  </div>
+</nav>
+
+<script>
+  (function () {
+    var nav = document.currentScript.previousElementSibling;
+    if (!nav || !nav.classList.contains('cc-nav')) return;
+    var toggle = nav.querySelector('.cc-nav__toggle');
+    var menu = nav.querySelector('.cc-nav__menu');
+
+    // Set --nav-height for scroll-padding-top in tokens
+    var h = nav.offsetHeight || 64;
+    document.documentElement.style.setProperty('--nav-height', h + 'px');
+
+    // Mobile drawer toggle
+    toggle.addEventListener('click', function () {
+      var open = nav.toggleAttribute('data-open');
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    });
+
+    // Close on Escape or link click
+    nav.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && nav.hasAttribute('data-open')) {
+        nav.removeAttribute('data-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        toggle.focus();
+      }
+    });
+    menu.addEventListener('click', function (e) {
+      if (e.target.closest('a') && nav.hasAttribute('data-open')) {
+        nav.removeAttribute('data-open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Scrolled-state for backdrop blur
+    var onScroll = function () {
+      if (window.scrollY > 4) nav.setAttribute('data-scrolled', '');
+      else nav.removeAttribute('data-scrolled');
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  })();
+</script>

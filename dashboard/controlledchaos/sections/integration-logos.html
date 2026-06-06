@@ -1,0 +1,22 @@
+<!-- cc-section: integration-logos
+     best:  swiss, gallery
+     ok:    -
+     avoid: kinetic
+     variants: grid (default — hairline-bordered cells), inline (single horizontal row), categorized (grouped under category labels)
+     placeholders: heading, logos[] (label, href (optional), category (optional, used by categorized variant))
+     note: text-only "logos" — agent supplies labels. CC does not ship third-party logo SVGs. -->
+<section class="cc-section cc-integrations"
+         data-pattern="integration-logos"
+         data-variant="grid">
+  <div class="container --wide flow motion-reveal">
+    <h2 class="cc-integrations__heading voice-swiss --label">{{heading}}</h2>
+    <ul class="cc-integrations__items">
+      {{#logos}}
+      <li class="cc-integrations__item" {{#category}}data-category="{{category}}"{{/category}}>
+        {{#href}}<a href="{{href}}" class="voice-monument">{{label}}</a>{{/href}}
+        {{^href}}<span class="voice-monument">{{label}}</span>{{/href}}
+      </li>
+      {{/logos}}
+    </ul>
+  </div>
+</section>

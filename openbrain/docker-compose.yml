@@ -1,0 +1,48 @@
+# openbrain stack — local OB1 (path A: MCP-only)
+# Bring up: set -a; source ../.env; set +a; docker compose up -d
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: openclaw-openbrain-pg
+    environment:
+      POSTGRES_DB: openbrain
+      POSTGRES_USER: openbrain
+      POSTGRES_PASSWORD: ${OPENBRAIN_DB_PASSWORD}
+    volumes:
+      - ${HOME}/.openclaw/openbrain/pgdata:/var/lib/postgresql/data
+      - ./schema-init.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    ports:
+      - "127.0.0.1:5433:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "openbrain", "-d", "openbrain"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  openbrain-mcp:
+    image: openclaw/openbrain-mcp:local
+    container_name: openclaw-openbrain-mcp
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: openbrain
+      DB_USER: openbrain
+      DB_PASSWORD: ${OPENBRAIN_DB_PASSWORD}
+      MCP_ACCESS_KEY: ${OPENBRAIN_ACCESS_KEY}
+      EMBEDDING_API_BASE: ${OPENBRAIN_EMBEDDING_API_BASE}
+      EMBEDDING_API_KEY: ${OPENBRAIN_EMBEDDING_API_KEY}
+      EMBEDDING_MODEL: ${OPENBRAIN_EMBEDDING_MODEL}
+      CHAT_API_BASE: ${OPENBRAIN_CHAT_API_BASE}
+      CHAT_API_KEY: ${OPENBRAIN_CHAT_API_KEY}
+      CHAT_MODEL: ${OPENBRAIN_CHAT_MODEL}
+      PORT: "8000"
+    ports:
+      - "127.0.0.1:8765:8000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped

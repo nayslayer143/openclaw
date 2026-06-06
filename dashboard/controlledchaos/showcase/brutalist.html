@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en" data-mood="concrete" data-forces="brutalist">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mode 02 — Brutalist Poster</title>
+  <link rel="stylesheet" href="../tokens/layout.css">
+  <link rel="stylesheet" href="../tokens/typography.css">
+  <link rel="stylesheet" href="../tokens/color.css">
+  <link rel="stylesheet" href="../tokens/motion.css">
+  <link rel="stylesheet" href="../tokens/forces.css">
+  <style>
+    body {
+      font-family: var(--font-brutalist);
+      background: var(--color-bg);
+      color: var(--color-fg);
+      overflow-x: hidden;
+    }
+
+    /* --- POSTER HERO --- */
+    .poster {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: var(--space-l);
+      background: #ff3d00;
+      color: #000;
+      position: relative;
+    }
+
+    .poster-title {
+      font-family: var(--font-brutalist);
+      font-size: clamp(3rem, 12vw + 1rem, 16rem);
+      font-weight: var(--weight-bold);
+      line-height: 0.85;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-tight);
+    }
+
+    .poster-subtitle {
+      font-size: var(--type-body);
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      margin-top: var(--space-xl);
+      max-width: 50ch;
+    }
+
+    .poster-border {
+      position: absolute;
+      inset: var(--space-s);
+      border: 2px solid #000;
+      pointer-events: none;
+    }
+
+    .poster-corner {
+      position: absolute;
+      font-size: var(--type-micro);
+      letter-spacing: var(--tracking-wider);
+      text-transform: uppercase;
+    }
+    .poster-corner.--tl { top: var(--space-m); left: var(--space-m); }
+    .poster-corner.--tr { top: var(--space-m); right: var(--space-m); }
+    .poster-corner.--bl { bottom: var(--space-m); left: var(--space-m); }
+    .poster-corner.--br { bottom: var(--space-m); right: var(--space-m); }
+
+    /* --- RAW GRID --- */
+    .raw-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-top: 3px solid var(--color-fg);
+    }
+
+    .raw-cell {
+      padding: var(--space-l);
+      border-right: 3px solid var(--color-fg);
+      border-bottom: 3px solid var(--color-fg);
+      min-height: 200px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .raw-cell:nth-child(4n) {
+      border-right: none;
+    }
+
+    .raw-cell-number {
+      font-size: clamp(4rem, 8vw, 10rem);
+      font-weight: var(--weight-bold);
+      line-height: 0.85;
+    }
+
+    .raw-cell-label {
+      font-size: var(--type-micro);
+      letter-spacing: var(--tracking-mega);
+      text-transform: uppercase;
+    }
+
+    /* Accent cells */
+    .raw-cell.--accent {
+      background: var(--color-fg);
+      color: var(--color-bg);
+    }
+
+    .raw-cell.--warning {
+      background: #ffcc00;
+      color: #000;
+    }
+
+    /* --- MANIFESTO --- */
+    .manifesto {
+      padding: var(--space-3xl) var(--gutter);
+      background: var(--color-fg);
+      color: var(--color-bg);
+    }
+
+    .manifesto-line {
+      font-family: var(--font-brutalist);
+      font-size: clamp(1.5rem, 4vw + 0.5rem, 5rem);
+      font-weight: var(--weight-bold);
+      text-transform: uppercase;
+      line-height: 1.1;
+      border-bottom: 2px solid rgba(255,255,255,0.15);
+      padding: var(--space-m) 0;
+    }
+
+    .manifesto-line .counter {
+      display: inline-block;
+      width: 3ch;
+      opacity: 0.3;
+      font-weight: var(--weight-regular);
+    }
+
+    .manifesto-line:hover {
+      background: #ff3d00;
+      color: #000;
+      padding-left: var(--space-m);
+    }
+
+    /* --- TYPE WALL --- */
+    .type-wall {
+      padding: var(--space-xl) 0;
+      overflow: hidden;
+    }
+
+    .type-wall-line {
+      font-family: var(--font-brutalist);
+      font-size: clamp(4rem, 15vw, 20rem);
+      font-weight: var(--weight-bold);
+      text-transform: uppercase;
+      line-height: 0.9;
+      white-space: nowrap;
+      padding: 0 var(--gutter);
+    }
+
+    .type-wall-line.--outline {
+      -webkit-text-stroke: 2px var(--color-fg);
+      -webkit-text-fill-color: transparent;
+    }
+
+    .type-wall-line.--invert {
+      background: var(--color-fg);
+      color: var(--color-bg);
+      padding: var(--space-xs) var(--gutter);
+    }
+
+    .type-wall-line.--red {
+      color: #ff3d00;
+    }
+
+    /* --- TICKER --- */
+    .ticker {
+      border-top: 3px solid var(--color-fg);
+      border-bottom: 3px solid var(--color-fg);
+      padding: var(--space-s) 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .ticker-inner {
+      display: inline-flex;
+      animation: marquee-scroll 15s linear infinite;
+    }
+
+    .ticker-text {
+      font-size: var(--type-body);
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      padding-right: var(--space-xl);
+    }
+
+    .ticker-text::after {
+      content: ' ★ ';
+    }
+
+    /* --- STAMP BLOCK --- */
+    .stamp-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 80dvh;
+    }
+
+    .stamp-left {
+      background: #000;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-xl);
+    }
+
+    .stamp-right {
+      background: #ffcc00;
+      color: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--space-xl);
+    }
+
+    .stamp-letter {
+      font-family: var(--font-brutalist);
+      font-size: clamp(10rem, 30vw, 40rem);
+      font-weight: var(--weight-bold);
+      line-height: 0.8;
+    }
+
+    .stamp-info {
+      font-size: var(--type-caption);
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      line-height: var(--leading-loose);
+    }
+
+    .stamp-info dt {
+      font-weight: var(--weight-bold);
+      margin-top: var(--space-m);
+    }
+
+    /* --- FOOTER --- */
+    .brutal-footer {
+      padding: var(--space-l) var(--gutter);
+      border-top: 3px solid var(--color-fg);
+      display: flex;
+      justify-content: space-between;
+      font-size: var(--type-caption);
+      letter-spacing: var(--tracking-wider);
+      text-transform: uppercase;
+    }
+
+    .brutal-footer a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    @media (max-width: 768px) {
+      .raw-grid { grid-template-columns: 1fr 1fr; }
+      .stamp-section { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- POSTER HERO -->
+  <section class="poster">
+    <div class="poster-border"></div>
+    <div class="poster-corner --tl">CC/DS</div>
+    <div class="poster-corner --tr">Mode 02</div>
+    <div class="poster-corner --bl">Brutalist</div>
+    <div class="poster-corner --br">2026</div>
+    <h1 class="poster-title">
+      No Rules<br>
+      No Masters<br>
+      No Apology
+    </h1>
+    <p class="poster-subtitle">The message is the medium. Maximum volume. Zero compromise.</p>
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-inner">
+      <span class="ticker-text">Controlled Chaos</span>
+      <span class="ticker-text">Brutalist Mode</span>
+      <span class="ticker-text">Type is Material</span>
+      <span class="ticker-text">Break the Grid</span>
+      <span class="ticker-text">Controlled Chaos</span>
+      <span class="ticker-text">Brutalist Mode</span>
+      <span class="ticker-text">Type is Material</span>
+      <span class="ticker-text">Break the Grid</span>
+    </div>
+  </div>
+
+  <!-- RAW GRID -->
+  <section class="raw-grid">
+    <div class="raw-cell">
+      <span class="raw-cell-number">01</span>
+      <span class="raw-cell-label">Structure</span>
+    </div>
+    <div class="raw-cell --accent">
+      <span class="raw-cell-number">02</span>
+      <span class="raw-cell-label">Disruption</span>
+    </div>
+    <div class="raw-cell">
+      <span class="raw-cell-number">03</span>
+      <span class="raw-cell-label">Density</span>
+    </div>
+    <div class="raw-cell --warning">
+      <span class="raw-cell-number">04</span>
+      <span class="raw-cell-label">Breath</span>
+    </div>
+    <div class="raw-cell --warning">
+      <span class="raw-cell-number">05</span>
+      <span class="raw-cell-label">Warmth</span>
+    </div>
+    <div class="raw-cell">
+      <span class="raw-cell-number">06</span>
+      <span class="raw-cell-label">Edge</span>
+    </div>
+    <div class="raw-cell --accent">
+      <span class="raw-cell-number">07</span>
+      <span class="raw-cell-label">Stillness</span>
+    </div>
+    <div class="raw-cell">
+      <span class="raw-cell-number">08</span>
+      <span class="raw-cell-label">Motion</span>
+    </div>
+  </section>
+
+  <!-- TYPE WALL -->
+  <section class="type-wall">
+    <div class="type-wall-line">Controlled</div>
+    <div class="type-wall-line --outline">Controlled</div>
+    <div class="type-wall-line --invert">Chaos</div>
+    <div class="type-wall-line --red">Design</div>
+    <div class="type-wall-line --outline">System</div>
+    <div class="type-wall-line">2026</div>
+  </section>
+
+  <!-- MANIFESTO -->
+  <section class="manifesto">
+    <div class="manifesto-line"><span class="counter">01</span> Typography is not decoration</div>
+    <div class="manifesto-line"><span class="counter">02</span> The grid is a trampoline</div>
+    <div class="manifesto-line"><span class="counter">03</span> Whitespace is pressurized</div>
+    <div class="manifesto-line"><span class="counter">04</span> Symmetry is cowardice</div>
+    <div class="manifesto-line"><span class="counter">05</span> Motion without meaning is noise</div>
+    <div class="manifesto-line"><span class="counter">06</span> The screen is not paper</div>
+    <div class="manifesto-line"><span class="counter">07</span> Break every rule here</div>
+    <div class="manifesto-line"><span class="counter">08</span> Then break it again</div>
+  </section>
+
+  <!-- STAMP -->
+  <section class="stamp-section">
+    <div class="stamp-left">
+      <span class="stamp-letter">B</span>
+    </div>
+    <div class="stamp-right">
+      <dl class="stamp-info">
+        <dt>Mode</dt>
+        <dd>02 / Brutalist Poster</dd>
+        <dt>Forces</dt>
+        <dd>High Disruption, Max Edge, Max Shout</dd>
+        <dt>Influence</dt>
+        <dd>Art & Language, Cargo P100, Wolfgang Weingart</dd>
+        <dt>Font</dt>
+        <dd>Space Mono / Bold / Uppercase</dd>
+        <dt>Color</dt>
+        <dd>Concrete + Signal Accents</dd>
+        <dt>Grid</dt>
+        <dd>Rigid cells with violent fills</dd>
+      </dl>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="brutal-footer">
+    <a href="index.html">&larr; Back</a>
+    <span>Controlled Chaos / Mode 02 / Brutalist</span>
+    <span>2026</span>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!-- cc-section: pricing
+     best:  swiss, gallery
+     ok:    -
+     avoid: brutalist
+     variants: cards (default — each tier in its own card), table (full comparison matrix)
+     placeholders: heading, eyebrow (optional), tiers[] (name, price, period, features[] (string), cta_text, cta_href, recommended (bool)) -->
+<section class="cc-section cc-pricing"
+         data-pattern="pricing"
+         data-variant="cards">
+  <div class="container --wide flow motion-reveal">
+    <span class="cc-pricing__eyebrow voice-swiss --label">{{eyebrow}}</span>
+    <h2 class="cc-pricing__heading voice-monument --display">{{heading}}</h2>
+    <div class="cc-pricing__tiers motion-stagger">
+      {{#tiers}}
+      <div class="cc-tier {{#recommended}}cc-tier--recommended{{/recommended}}">
+        {{#recommended}}<span class="cc-tier__badge voice-swiss --label">Recommended</span>{{/recommended}}
+        <h3 class="cc-tier__name voice-monument">{{name}}</h3>
+        <p class="cc-tier__price">
+          <span class="cc-tier__amount voice-monument">{{price}}</span>
+          <span class="cc-tier__period voice-brutalist">{{period}}</span>
+        </p>
+        <ul class="cc-tier__features">
+          {{#features}}
+          <li class="voice-swiss">
+            <svg class="cc-tier__check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l4 4 10-10"/></svg>
+            {{.}}
+          </li>
+          {{/features}}
+        </ul>
+        <a class="cc-tier__cta voice-swiss --label" href="{{cta_href}}">{{cta_text}}</a>
+      </div>
+      {{/tiers}}
+    </div>
+  </div>
+</section>

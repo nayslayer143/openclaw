@@ -1,0 +1,38 @@
+<!-- cc-section: comparison-table
+     best:  swiss, gallery
+     ok:    -
+     avoid: brutalist, kinetic
+     variants: vs-2 (default — you vs 1 competitor), vs-3 (you vs 2), vs-many (horizontal scroll on mobile)
+     placeholders: heading, eyebrow (optional), columns[] (name, is_you (bool)), rows[] (feature, values[] aligned with columns — each value is "✓", "—", or a short string) -->
+<section class="cc-section cc-compare"
+         data-pattern="comparison-table"
+         data-variant="vs-2">
+  <div class="container --wide flow motion-reveal">
+    <span class="cc-compare__eyebrow voice-swiss --label">{{eyebrow}}</span>
+    <h2 class="cc-compare__heading voice-monument --display">{{heading}}</h2>
+    <div class="cc-compare__scroll">
+      <table class="cc-compare__table">
+        <thead>
+          <tr>
+            <th scope="col" class="cc-compare__feature-col"></th>
+            {{#columns}}
+            <th scope="col" class="cc-compare__col {{#is_you}}cc-compare__col--you{{/is_you}}">
+              <span class="voice-monument">{{name}}</span>
+            </th>
+            {{/columns}}
+          </tr>
+        </thead>
+        <tbody>
+          {{#rows}}
+          <tr>
+            <th scope="row" class="cc-compare__feature voice-swiss">{{feature}}</th>
+            {{#values}}
+            <td class="cc-compare__cell">{{.}}</td>
+            {{/values}}
+          </tr>
+          {{/rows}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

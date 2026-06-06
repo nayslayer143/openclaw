@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en" data-mood="void-inverse" data-forces="gallery">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controlled Chaos — Design System</title>
+  <link rel="stylesheet" href="../tokens/layout.css">
+  <link rel="stylesheet" href="../tokens/typography.css">
+  <link rel="stylesheet" href="../tokens/color.css">
+  <link rel="stylesheet" href="../tokens/motion.css">
+  <link rel="stylesheet" href="../tokens/forces.css">
+  <style>
+    body {
+      background: var(--color-bg);
+      color: var(--color-fg);
+      font-family: var(--font-swiss);
+      overflow-x: hidden;
+    }
+
+    /* --- Navigation --- */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: var(--z-overlay);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-m) var(--gutter);
+      mix-blend-mode: difference;
+      color: white;
+    }
+
+    .nav-logo {
+      font-family: var(--font-monument);
+      font-size: var(--type-body);
+      font-weight: var(--weight-bold);
+      letter-spacing: var(--tracking-wider);
+      text-transform: uppercase;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: var(--space-l);
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: inherit;
+      text-decoration: none;
+      font-size: var(--type-caption);
+      font-weight: var(--weight-medium);
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
+      transition: opacity var(--dur-snap) var(--ease-out-expo);
+    }
+
+    .nav-links a:hover {
+      opacity: 0.5;
+    }
+
+    /* --- Hero --- */
+    .hero {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: var(--gutter);
+      padding-bottom: var(--space-3xl);
+      position: relative;
+    }
+
+    .hero-title {
+      font-family: var(--font-monument);
+      font-size: clamp(3rem, 10vw + 1rem, 14rem);
+      font-weight: var(--weight-bold);
+      line-height: 0.85;
+      letter-spacing: var(--tracking-tight);
+      text-transform: uppercase;
+    }
+
+    .hero-title .line-2 {
+      display: block;
+      font-weight: var(--weight-light);
+      font-style: italic;
+      font-family: var(--font-editorial);
+      text-transform: none;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-subtitle {
+      font-family: var(--font-swiss);
+      font-size: var(--type-caption);
+      font-weight: var(--weight-medium);
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      margin-top: var(--space-xl);
+      color: var(--color-muted);
+    }
+
+    /* Floating index number */
+    .hero-index {
+      position: absolute;
+      top: var(--space-3xl);
+      right: var(--gutter);
+      font-family: var(--font-monument);
+      font-size: clamp(8rem, 20vw, 30rem);
+      font-weight: var(--weight-thin);
+      line-height: 1;
+      opacity: 0.06;
+      pointer-events: none;
+    }
+
+    /* --- Modes Grid --- */
+    .modes-section {
+      padding: var(--space-3xl) var(--gutter);
+    }
+
+    .modes-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: var(--space-2xl);
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: var(--space-m);
+    }
+
+    .modes-header h2 {
+      font-family: var(--font-swiss);
+      font-size: var(--type-headline);
+      font-weight: var(--weight-semibold);
+      letter-spacing: var(--tracking-snug);
+    }
+
+    .modes-header span {
+      font-size: var(--type-caption);
+      color: var(--color-muted);
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
+    }
+
+    .modes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 1px;
+      background: var(--color-border);
+    }
+
+    /* --- Mode Card --- */
+    .mode-card {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 16 / 10;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: var(--space-l);
+    }
+
+    .mode-card-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      transition: transform var(--dur-drift) var(--ease-out-expo);
+    }
+
+    .mode-card:hover .mode-card-bg {
+      transform: scale(1.05);
+    }
+
+    .mode-card-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .mode-card-number {
+      font-family: var(--font-monument);
+      font-size: var(--type-micro);
+      font-weight: var(--weight-medium);
+      letter-spacing: var(--tracking-widest);
+      text-transform: uppercase;
+      margin-bottom: var(--space-xs);
+    }
+
+    .mode-card-title {
+      font-family: var(--font-monument);
+      font-size: var(--type-headline);
+      font-weight: var(--weight-bold);
+      line-height: var(--leading-tight);
+      text-transform: uppercase;
+    }
+
+    .mode-card-desc {
+      font-size: var(--type-body-small);
+      margin-top: var(--space-xs);
+      opacity: 0.7;
+      max-width: 40ch;
+    }
+
+    /* --- Individual Mode Styles --- */
+    .mode-card.--swiss .mode-card-bg {
+      background: #fafafa;
+    }
+    .mode-card.--swiss { color: #0a0a0a; }
+
+    .mode-card.--brutalist .mode-card-bg {
+      background: #ff3d00;
+    }
+    .mode-card.--brutalist { color: #000; }
+
+    .mode-card.--immersive .mode-card-bg {
+      background: #0a0a0f;
+    }
+    .mode-card.--immersive { color: #e0ffe0; }
+
+    .mode-card.--kinetic .mode-card-bg {
+      background: linear-gradient(135deg, #0d1117, #1a1f36);
+    }
+    .mode-card.--kinetic { color: #f0e6d3; }
+
+    .mode-card.--gallery .mode-card-bg {
+      background: #fff;
+    }
+    .mode-card.--gallery { color: #0a0a0a; }
+
+    /* --- Forces Diagram --- */
+    .forces-section {
+      padding: var(--space-4xl) var(--gutter);
+    }
+
+    .forces-title {
+      font-family: var(--font-editorial);
+      font-size: var(--type-display);
+      font-weight: var(--weight-regular);
+      font-style: italic;
+      line-height: var(--leading-tight);
+      max-width: 20ch;
+      margin-bottom: var(--space-3xl);
+    }
+
+    .force-row {
+      display: grid;
+      grid-template-columns: 120px 1fr 120px;
+      align-items: center;
+      gap: var(--space-m);
+      padding: var(--space-m) 0;
+      border-top: 1px solid var(--color-subtle);
+    }
+
+    .force-label {
+      font-family: var(--font-brutalist);
+      font-size: var(--type-caption);
+      letter-spacing: var(--tracking-wide);
+      text-transform: uppercase;
+    }
+
+    .force-label.--right {
+      text-align: right;
+    }
+
+    .force-bar {
+      height: 2px;
+      background: var(--color-subtle);
+      position: relative;
+    }
+
+    .force-bar::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: var(--value, 50%);
+      transform: translate(-50%, -50%);
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--color-fg);
+    }
+
+    /* --- Principles --- */
+    .principles-section {
+      padding: var(--space-4xl) var(--gutter);
+      background: var(--color-fg);
+      color: var(--color-bg);
+    }
+
+    .principle {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: var(--space-l);
+      padding: var(--space-l) 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .principle-number {
+      font-family: var(--font-monument);
+      font-size: var(--type-display);
+      font-weight: var(--weight-black);
+      line-height: 1;
+      opacity: 0.2;
+    }
+
+    .principle-text {
+      font-family: var(--font-editorial);
+      font-size: var(--type-headline);
+      font-weight: var(--weight-regular);
+      line-height: var(--leading-snug);
+      max-width: var(--measure-wide);
+      align-self: center;
+    }
+
+    .principle-text strong {
+      font-style: italic;
+    }
+
+    /* --- Footer --- */
+    .footer {
+      padding: var(--space-3xl) var(--gutter);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .footer-mark {
+      font-family: var(--font-monument);
+      font-size: clamp(4rem, 10vw, 12rem);
+      font-weight: var(--weight-black);
+      line-height: 0.85;
+      letter-spacing: var(--tracking-tight);
+      text-transform: uppercase;
+      opacity: 0.08;
+    }
+
+    .footer-info {
+      text-align: right;
+      font-size: var(--type-caption);
+      color: var(--color-muted);
+      line-height: var(--leading-relaxed);
+    }
+
+    @media (max-width: 768px) {
+      .modes-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .force-row {
+        grid-template-columns: 80px 1fr 80px;
+      }
+
+      .nav-links {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body class="mood-grain">
+
+  <nav class="nav">
+    <div class="nav-logo">CC/DS</div>
+    <ul class="nav-links">
+      <li><a href="#modes">Modes</a></li>
+      <li><a href="#forces">Forces</a></li>
+      <li><a href="#principles">Principles</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-index">01</div>
+    <h1 class="hero-title motion-reveal">
+      Controlled
+      <span class="line-2">Chaos</span>
+    </h1>
+    <p class="hero-subtitle motion-reveal">A Design System for the Fearless &mdash; 2026</p>
+  </section>
+
+  <!-- MODES -->
+  <section class="modes-section" id="modes">
+    <div class="modes-header">
+      <h2>Aesthetic Modes</h2>
+      <span>05 Templates</span>
+    </div>
+
+    <div class="modes-grid">
+      <a href="swiss.html" class="mode-card --swiss">
+        <div class="mode-card-bg"></div>
+        <div class="mode-card-content">
+          <div class="mode-card-number">Mode 01</div>
+          <h3 class="mode-card-title">Swiss Editorial</h3>
+          <p class="mode-card-desc">Neue Grafik. Information as beauty. The grid IS the art.</p>
+        </div>
+      </a>
+
+      <a href="brutalist.html" class="mode-card --brutalist">
+        <div class="mode-card-bg"></div>
+        <div class="mode-card-content">
+          <div class="mode-card-number">Mode 02</div>
+          <h3 class="mode-card-title">Brutalist Poster</h3>
+          <p class="mode-card-desc">The message is the medium. Maximum volume.</p>
+        </div>
+      </a>
+
+      <a href="immersive.html" class="mode-card --immersive">
+        <div class="mode-card-bg"></div>
+        <div class="mode-card-content">
+          <div class="mode-card-number">Mode 03</div>
+          <h3 class="mode-card-title">Immersive Dark</h3>
+          <p class="mode-card-desc">Atmospheric, enveloping. Scroll-driven experience.</p>
+        </div>
+      </a>
+
+      <a href="kinetic.html" class="mode-card --kinetic">
+        <div class="mode-card-bg"></div>
+        <div class="mode-card-content">
+          <div class="mode-card-number">Mode 04</div>
+          <h3 class="mode-card-title">Kinetic Type</h3>
+          <p class="mode-card-desc">Typography as performance. Letters that live.</p>
+        </div>
+      </a>
+
+      <a href="gallery.html" class="mode-card --gallery">
+        <div class="mode-card-bg"></div>
+        <div class="mode-card-content">
+          <div class="mode-card-number">Mode 05</div>
+          <h3 class="mode-card-title">Gallery Minimal</h3>
+          <p class="mode-card-desc">The white cube. Interface disappears. Work speaks.</p>
+        </div>
+      </a>
+
+      <a href="sections-demo.html" class="mode-card">
+        <div class="mode-card-bg"></div>
+        <div class="mode-card-content">
+          <div class="mode-card-number">Library</div>
+          <h3 class="mode-card-title">Sections Demo</h3>
+          <p class="mode-card-desc">All 12 reusable section partials rendered in one page.</p>
+        </div>
+      </a>
+
+      <a href="style-driven.html" class="mode-card">
+        <div class="mode-card-bg"></div>
+        <div class="mode-card-content">
+          <div class="mode-card-number">Adapter</div>
+          <h3 class="mode-card-title">Style-Driven</h3>
+          <p class="mode-card-desc">Page composed from <code>adapters/examples/dusk.json</code>.</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- FORCES -->
+  <section class="forces-section" id="forces">
+    <h2 class="forces-title motion-reveal">The five forces that shape every composition</h2>
+
+    <div class="force-row motion-reveal">
+      <span class="force-label">Structure</span>
+      <div class="force-bar" style="--value: 50%"></div>
+      <span class="force-label --right">Disruption</span>
+    </div>
+
+    <div class="force-row motion-reveal">
+      <span class="force-label">Density</span>
+      <div class="force-bar" style="--value: 50%"></div>
+      <span class="force-label --right">Breath</span>
+    </div>
+
+    <div class="force-row motion-reveal">
+      <span class="force-label">Warmth</span>
+      <div class="force-bar" style="--value: 50%"></div>
+      <span class="force-label --right">Edge</span>
+    </div>
+
+    <div class="force-row motion-reveal">
+      <span class="force-label">Stillness</span>
+      <div class="force-bar" style="--value: 50%"></div>
+      <span class="force-label --right">Motion</span>
+    </div>
+
+    <div class="force-row motion-reveal">
+      <span class="force-label">Whisper</span>
+      <div class="force-bar" style="--value: 50%"></div>
+      <span class="force-label --right">Shout</span>
+    </div>
+  </section>
+
+  <!-- PRINCIPLES -->
+  <section class="principles-section" id="principles">
+    <div class="container">
+      <div class="principle motion-reveal">
+        <span class="principle-number">01</span>
+        <p class="principle-text"><strong>Type is the hero.</strong> If you remove all color and images and it still works, you've won.</p>
+      </div>
+      <div class="principle motion-reveal">
+        <span class="principle-number">02</span>
+        <p class="principle-text"><strong>Tension is beauty.</strong> Perfect symmetry is boring. Near-symmetry is electric.</p>
+      </div>
+      <div class="principle motion-reveal">
+        <span class="principle-number">03</span>
+        <p class="principle-text"><strong>Whitespace is not empty.</strong> It's pressurized. It pushes elements apart with intent.</p>
+      </div>
+      <div class="principle motion-reveal">
+        <span class="principle-number">04</span>
+        <p class="principle-text"><strong>Motion has meaning.</strong> If you can't explain why it moves, it shouldn't.</p>
+      </div>
+      <div class="principle motion-reveal">
+        <span class="principle-number">05</span>
+        <p class="principle-text"><strong>Break your own rules.</strong> Every rule exists to be broken &mdash; once you understand why it exists.</p>
+      </div>
+      <div class="principle motion-reveal">
+        <span class="principle-number">06</span>
+        <p class="principle-text"><strong>The screen is not paper.</strong> Use viewport, scroll, pointer, time. The medium is dynamic.</p>
+      </div>
+      <div class="principle motion-reveal">
+        <span class="principle-number">07</span>
+        <p class="principle-text"><strong>Details at every zoom level.</strong> A great design rewards the glance AND the stare.</p>
+      </div>
+      <div class="principle motion-reveal">
+        <span class="principle-number">08</span>
+        <p class="principle-text"><strong>Steal like an artist.</strong> Study M&uuml;ller-Brockmann, Carson, Sagmeister, Toda. Then make it yours.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-mark">CC</div>
+    <div class="footer-info">
+      Controlled Chaos<br>
+      Design System v1.0<br>
+      2026
+    </div>
+  </footer>
+
+  <script>
+    // IntersectionObserver for scroll reveals
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('--visible');
+        }
+      });
+    }, {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    });
+
+    document.querySelectorAll('.motion-reveal, .motion-stagger').forEach(el => {
+      observer.observe(el);
+    });
+
+    // Interactive force bars
+    document.querySelectorAll('.force-bar').forEach(bar => {
+      bar.addEventListener('click', (e) => {
+        const rect = bar.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width * 100;
+        bar.style.setProperty('--value', `${x}%`);
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en" data-mood="signal" data-forces="swiss">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{org.name}} · Privacy Policy</title>
+  <meta name="description" content="Privacy policy for {{org.name}}.">
+  <meta name="theme-color" content="{{seo.theme_color}}">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;700&family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../tokens/layout.css">
+  <link rel="stylesheet" href="../tokens/typography.css">
+  <link rel="stylesheet" href="../tokens/color.css">
+  <link rel="stylesheet" href="../tokens/motion.css">
+  <link rel="stylesheet" href="../tokens/forces.css">
+  <link rel="stylesheet" href="../tokens/textures.css">
+  <link rel="stylesheet" href="../tokens/states.css">
+  <link rel="stylesheet" href="../sections/sections.css">
+
+  <style id="style-overrides"></style>
+  <style>
+    body { font-family: var(--font-swiss); background: var(--color-bg); color: var(--color-fg); margin: 0; }
+    .cc-policy { max-width: 70ch; padding-block: clamp(4rem, 8vh, 8rem); }
+    .cc-policy h2 { font-family: var(--font-editorial); font-style: italic; margin-top: 3rem; }
+    .cc-policy h3 { font-family: var(--font-monument); font-size: var(--type-headline); margin-top: 2rem; }
+    .cc-policy p, .cc-policy li { font-size: var(--type-body); line-height: 1.65; max-width: 65ch; }
+    .cc-policy ul { padding-left: 1.5rem; }
+    .cc-policy a { color: var(--color-discord); }
+  </style>
+</head>
+<body>
+  <main class="container --regular cc-policy">
+    <span class="voice-swiss --label" style="color: var(--color-muted); letter-spacing: 0.15em;">PRIVACY POLICY · LAST UPDATED {{policy.updated_date}}</span>
+    <h1 class="voice-monument --display" style="margin: 1rem 0 2rem; text-transform: none;">Privacy policy</h1>
+
+    <p>This is a placeholder privacy policy for <strong>{{org.name}}</strong>. Replace this content with your real policy before publishing. The structure below is a starting point.</p>
+
+    <h2>1. What we collect</h2>
+    <p>Describe the personal data your service collects: account info, usage data, cookies, payment data, third-party integrations.</p>
+    <ul>
+      <li>Account information (e.g., name, email, password hash)</li>
+      <li>Usage data (pages viewed, actions taken, device info)</li>
+      <li>Communications (support emails, feedback)</li>
+    </ul>
+
+    <h2>2. How we use it</h2>
+    <p>Explain the legitimate-interest, contractual, consent-based, and legal bases for processing.</p>
+
+    <h2>3. Who we share it with</h2>
+    <p>List sub-processors (hosting, analytics, payments, support). Link to their privacy policies.</p>
+
+    <h2>4. How long we keep it</h2>
+    <p>Retention windows by data type. When account data is deleted on request.</p>
+
+    <h2>5. Your rights</h2>
+    <p>Access, rectification, deletion, portability, objection. How to contact the data protection officer at <a href="mailto:{{org.privacy_email}}">{{org.privacy_email}}</a>.</p>
+
+    <h2>6. Cookies</h2>
+    <p>What cookies the site uses. Which are essential vs analytics vs marketing. How to opt out.</p>
+
+    <h2>7. Changes</h2>
+    <p>Notification policy when the policy changes.</p>
+
+    <h2>8. Contact</h2>
+    <p>How to reach the privacy team. Physical mailing address if required by jurisdiction.</p>
+  </main>
+
+  <footer class="cc-section cc-footer" data-pattern="footer" data-variant="minimal">
+    <div class="container flex-between">
+      <span class="cc-footer__copyright voice-swiss --label">{{org.name}} · {{seo.year}}</span>
+      <nav class="cc-footer__nav">
+        <a class="cc-footer__link voice-swiss --label" href="/">Home</a>
+        <a class="cc-footer__link voice-swiss --label" href="/terms">Terms</a>
+      </nav>
+    </div>
+  </footer>
+</body>
+</html>

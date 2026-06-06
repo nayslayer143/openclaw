@@ -86,3 +86,16 @@ overnight domain sweep automatically. To add a new entry: edit `watchlist.json`.
 ## Source
 
 `scripts/autoresearch/scholar.py`
+
+---
+
+## OpenBrain (OB1) memory
+
+This agent: **search + capture (compact only)**.
+
+Recall before non-trivial work, capture per role rules, never store raw
+transcripts or secrets. Full instructions: [_openbrain.md](_openbrain.md).
+
+Quick path:
+
+    python3 -m scripts.openbrain search "<task>" -k 5

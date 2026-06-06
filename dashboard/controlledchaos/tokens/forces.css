@@ -1,0 +1,129 @@
+/* ============================================
+   FORCES — The Five Creative Tensions
+   ============================================
+   Each force is a spectrum from 0 to 1.
+   Compositions set these values to shape their character.
+   Components read these values to adapt their behavior.
+   ============================================ */
+
+:root {
+  /* --- Force: Structure ↔ Disruption --- */
+  --force-structure: 0.5;     /* 0 = pure chaos, 1 = rigid grid */
+  --force-disruption: 0.5;    /* inverse of structure in spirit, but independent */
+
+  /* --- Force: Density ↔ Breath --- */
+  --force-density: 0.5;       /* 0 = airy, 1 = packed */
+  --force-breath: 0.5;        /* 0 = cramped, 1 = expansive whitespace */
+
+  /* --- Force: Warmth ↔ Edge --- */
+  --force-warmth: 0.5;        /* 0 = cold/mechanical, 1 = organic/human */
+  --force-edge: 0.5;          /* 0 = soft/rounded, 1 = sharp/angular */
+
+  /* --- Force: Stillness ↔ Motion --- */
+  --force-stillness: 0.5;     /* 0 = kinetic, 1 = monumental calm */
+  --force-motion: 0.5;        /* 0 = static, 1 = everything moves */
+
+  /* --- Force: Whisper ↔ Shout --- */
+  --force-whisper: 0.5;       /* 0 = loud, 1 = barely there */
+  --force-shout: 0.5;         /* 0 = quiet, 1 = MAXIMUM VOLUME */
+
+  /* ============================================
+     DERIVED VALUES — Computed from forces
+     ============================================ */
+
+  /* Border radius: sharp (0) to organic (1rem+) */
+  --derived-radius: calc(var(--force-warmth) * 1.5rem);
+
+  /* Letter spacing: tight to tracked */
+  --derived-tracking: calc((var(--force-edge) - 0.5) * 0.15em);
+
+  /* Line height: compressed to generous */
+  --derived-leading: calc(1.1 + var(--force-breath) * 0.6);
+
+  /* Section padding: dense to expansive */
+  --derived-section-pad: calc(2rem + var(--force-breath) * 10rem);
+
+  /* Element gap: packed to spacious */
+  --derived-gap: calc(0.25rem + var(--force-breath) * 3rem);
+
+  /* Animation duration multiplier */
+  --derived-duration: calc(0.15s + var(--force-motion) * 1.2s);
+
+  /* Hover intensity: subtle to dramatic */
+  --derived-hover-scale: calc(1 + var(--force-motion) * 0.08);
+  --derived-hover-lift: calc(var(--force-motion) * -8px);
+}
+
+/* ============================================
+   FORCE PRESETS — Named configurations
+   ============================================ */
+
+/* Swiss Editorial */
+[data-forces="swiss"] {
+  --force-structure: 0.85;
+  --force-disruption: 0.15;
+  --force-density: 0.4;
+  --force-breath: 0.65;
+  --force-warmth: 0.1;
+  --force-edge: 0.85;
+  --force-stillness: 0.8;
+  --force-motion: 0.1;
+  --force-whisper: 0.5;
+  --force-shout: 0.4;
+}
+
+/* Brutalist */
+[data-forces="brutalist"] {
+  --force-structure: 0.4;
+  --force-disruption: 0.8;
+  --force-density: 0.85;
+  --force-breath: 0.1;
+  --force-warmth: 0;
+  --force-edge: 1;
+  --force-stillness: 0.85;
+  --force-motion: 0.05;
+  --force-whisper: 0;
+  --force-shout: 1;
+}
+
+/* Immersive Dark */
+[data-forces="immersive"] {
+  --force-structure: 0.25;
+  --force-disruption: 0.6;
+  --force-density: 0.2;
+  --force-breath: 0.8;
+  --force-warmth: 0.6;
+  --force-edge: 0.4;
+  --force-stillness: 0.1;
+  --force-motion: 0.9;
+  --force-whisper: 0.5;
+  --force-shout: 0.4;
+}
+
+/* Kinetic Type */
+[data-forces="kinetic"] {
+  --force-structure: 0.55;
+  --force-disruption: 0.45;
+  --force-density: 0.4;
+  --force-breath: 0.5;
+  --force-warmth: 0.3;
+  --force-edge: 0.65;
+  --force-stillness: 0;
+  --force-motion: 1;
+  --force-whisper: 0.3;
+  --force-shout: 0.7;
+}
+
+/* Gallery Minimal */
+[data-forces="gallery"] {
+  --force-structure: 0.9;
+  --force-disruption: 0.05;
+  --force-density: 0.1;
+  --force-breath: 1;
+  --force-warmth: 0.3;
+  --force-edge: 0.6;
+  --force-stillness: 0.8;
+  --force-motion: 0.2;
+  --force-whisper: 0.9;
+  --force-shout: 0.05;
+}

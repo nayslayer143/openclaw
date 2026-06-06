@@ -1,0 +1,28 @@
+<!-- cc-section: signup-form
+     best:  all
+     ok:    -
+     avoid: brutalist
+     variants: inline (default — label+input+button on a row), stacked (vertical), framed (in a card with heading + supporting)
+     placeholders: heading (optional), supporting (optional), placeholder_text, button_text, action_href, field_name (default 'email'), input_id (default 'cc-signup-email') -->
+<section class="cc-section cc-signup"
+         data-pattern="signup-form"
+         data-variant="inline">
+  <div class="container --regular flow motion-reveal">
+    <h2 class="cc-signup__heading voice-monument --display">{{heading}}</h2>
+    <p class="cc-signup__supporting voice-swiss">{{supporting}}</p>
+    <form class="cc-signup__form" method="POST" action="{{action_href}}" aria-describedby="cc-signup-help">
+      <label class="visually-hidden" for="{{input_id}}">{{placeholder_text}}</label>
+      <input type="email"
+             id="{{input_id}}"
+             name="{{field_name}}"
+             autocomplete="email"
+             required
+             placeholder="{{placeholder_text}}"
+             class="cc-signup__input">
+      <button type="submit" class="cc-signup__button voice-swiss --label">{{button_text}}</button>
+    </form>
+    <small id="cc-signup-help" class="cc-signup__help voice-swiss">
+      No spam. Unsubscribe anytime.
+    </small>
+  </div>
+</section>

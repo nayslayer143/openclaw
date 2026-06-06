@@ -1,0 +1,25 @@
+<!-- cc-section: full-bleed
+     best:  immersive, brutalist, kinetic
+     ok:    swiss
+     avoid: -
+     variants: type, image, color-field
+     placeholders: type variant → content (string)
+                  image variant → slot_name (string)
+                  color-field variant → content (string), optional --bleed-color override -->
+<section class="cc-section cc-bleed"
+         data-pattern="full-bleed"
+         data-variant="type">
+  <!-- TYPE variant: massive bleeding text -->
+  <div class="cc-bleed__content cc-bleed__content--type">
+    <span class="voice-monument" data-bleed-text>{{content}}</span>
+  </div>
+  <!-- IMAGE variant: full-bleed image placeholder
+       <div class="cc-bleed__content cc-bleed__content--image">
+         <div class="cc-img-placeholder" data-slot="{{slot_name}}"></div>
+       </div>
+       (Swap with the type variant above when data-variant="image") -->
+  <!-- COLOR-FIELD variant:
+       <div class="cc-bleed__content cc-bleed__content--color">
+         <span class="voice-monument --massive">{{content}}</span>
+       </div> -->
+</section>

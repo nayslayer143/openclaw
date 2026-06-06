@@ -1,0 +1,59 @@
+{
+  "name": "SF VIBE FEST 2027",
+  "thesis": "Fog City Futurism — a love letter to San Francisco disguised as an operating system for the future.",
+
+  "palette": {
+    "bg":       "#f5efe0",
+    "fg":       "#1a1815",
+    "accent_1": "#ee5e3a",
+    "accent_2": "#b87333",
+    "discord":  "#2b6df0"
+  },
+
+  "typography": {
+    "monument":   { "family": "Playfair Display",     "weights": [400, 700, 900], "google": true },
+    "editorial":  { "family": "Cormorant Garamond",   "weights": [400, 500, 700], "google": true },
+    "swiss":      { "family": "Inter",                "weights": [400, 500, 700], "google": true },
+    "brutalist":  { "family": "Space Mono",           "weights": [400, 700],      "google": true },
+    "expressive": { "family": "DM Sans",              "weights": [400, 500, 700], "google": true }
+  },
+
+  "forces": {
+    "structure":  0.65,
+    "disruption": 0.45,
+    "density":    0.55,
+    "breath":     0.70,
+    "edge":       0.75,
+    "warmth":     0.85,
+    "motion":     0.45,
+    "shout":      0.55,
+    "stillness":  0.55,
+    "whisper":    0.45
+  },
+
+  "motion_intensity": 0.5,
+  "texture": "grain",
+  "mode_id": "immersive",
+
+  "dos": [
+    "editorial serif as the lead voice — Playfair Display in display sizes, Cormorant for quotes",
+    "warm grain across every surface — punk Xerox / halftone lineage",
+    "International orange as civic urgency",
+    "electric blue as the AI / signal discord against warm cream",
+    "data is sourced and visually separated from projections",
+    "every section has one human or place anchor",
+    "use the canonical signature lines verbatim",
+    "1960s optical poster typography energy",
+    "SF VIBE FEST in caps; sentence case inside the editorial flow"
+  ],
+  "donts": [
+    "no generic cyberpunk",
+    "no Burning Man cosplay or cliché",
+    "no SaaS sterility or fake utopian AI gloss",
+    "no random neon circuitry",
+    "no unreadable generated diagrams",
+    "no logo-placement language",
+    "no stock-photo bios",
+    "no headline-talent dependency in copy"
+  ]
+}

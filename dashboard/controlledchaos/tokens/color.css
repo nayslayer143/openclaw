@@ -1,0 +1,238 @@
+/* ============================================
+   COLOR — Mood Palettes, Not Brand Colors
+   ============================================
+   Each mood is a complete emotional world.
+   Apply via data-mood attribute on any container.
+   ============================================ */
+
+:root {
+  /* ============================================
+     STRUCTURAL COLORS (mood-independent)
+     ============================================ */
+  --color-bg:       #ffffff;
+  --color-fg:       #0a0a0a;
+  --color-accent-1: #0a0a0a;
+  --color-accent-2: #555555;
+  --color-muted:    #888888;
+  --color-subtle:   #e5e5e5;
+  --color-surface:  #f5f5f5;
+  --color-border:   #d0d0d0;
+  --color-inverse:  #ffffff;
+
+  /* Discord accent — the one color that doesn't belong */
+  --color-discord:  #ff3d00;
+}
+
+/* ============================================
+   MOOD: VOID — Pure black/white, maximum contrast
+   ============================================
+   Gallery walls. Stark. Absolute.
+   ============================================ */
+[data-mood="void"] {
+  --color-bg:       #000000;
+  --color-fg:       #ffffff;
+  --color-accent-1: #ffffff;
+  --color-accent-2: #888888;
+  --color-muted:    #555555;
+  --color-subtle:   #1a1a1a;
+  --color-surface:  #111111;
+  --color-border:   #333333;
+  --color-inverse:  #000000;
+  --color-discord:  #ff0040;
+}
+
+[data-mood="void-inverse"] {
+  --color-bg:       #ffffff;
+  --color-fg:       #000000;
+  --color-accent-1: #000000;
+  --color-accent-2: #666666;
+  --color-muted:    #999999;
+  --color-subtle:   #f0f0f0;
+  --color-surface:  #fafafa;
+  --color-border:   #e0e0e0;
+  --color-inverse:  #ffffff;
+  --color-discord:  #ff0040;
+}
+
+/* ============================================
+   MOOD: DUSK — Deep navy, amber, cream
+   ============================================
+   Sophisticated warmth. Evening light.
+   ============================================ */
+[data-mood="dusk"] {
+  --color-bg:       #0d1117;
+  --color-fg:       #f0e6d3;
+  --color-accent-1: #d4a574;
+  --color-accent-2: #8b6914;
+  --color-muted:    #6b7280;
+  --color-subtle:   #161b22;
+  --color-surface:  #1c2333;
+  --color-border:   #2d3748;
+  --color-inverse:  #0d1117;
+  --color-discord:  #ff6b35;
+}
+
+/* ============================================
+   MOOD: SIGNAL — Neon on dark, digital energy
+   ============================================
+   Terminal glow. Cyberpunk. Urgency.
+   ============================================ */
+[data-mood="signal"] {
+  --color-bg:       #0a0a0f;
+  --color-fg:       #e0ffe0;
+  --color-accent-1: #00ff88;
+  --color-accent-2: #00ccff;
+  --color-muted:    #4a5568;
+  --color-subtle:   #111118;
+  --color-surface:  #14141f;
+  --color-border:   #1e1e2e;
+  --color-inverse:  #0a0a0f;
+  --color-discord:  #ff0066;
+}
+
+/* ============================================
+   MOOD: EARTH — Ochre, sage, stone, rust
+   ============================================
+   Organic. Material. Grounded.
+   ============================================ */
+[data-mood="earth"] {
+  --color-bg:       #f2ede4;
+  --color-fg:       #2c2416;
+  --color-accent-1: #a0522d;
+  --color-accent-2: #6b7c5e;
+  --color-muted:    #8b7d6b;
+  --color-subtle:   #e8e0d4;
+  --color-surface:  #ebe4d8;
+  --color-border:   #c8bda8;
+  --color-inverse:  #f2ede4;
+  --color-discord:  #c73e1d;
+}
+
+/* ============================================
+   MOOD: FROST — Ice blue, silver, pale violet
+   ============================================
+   Ethereal. Futuristic. Clean.
+   ============================================ */
+[data-mood="frost"] {
+  --color-bg:       #f0f4f8;
+  --color-fg:       #1a1f36;
+  --color-accent-1: #5b6abf;
+  --color-accent-2: #7c8ddb;
+  --color-muted:    #8892b0;
+  --color-subtle:   #e2e8f0;
+  --color-surface:  #edf2f7;
+  --color-border:   #cbd5e0;
+  --color-inverse:  #f0f4f8;
+  --color-discord:  #e53e3e;
+}
+
+/* ============================================
+   MOOD: BLAZE — Vermillion, gold, heat on black
+   ============================================
+   Power. Intensity. Fire.
+   ============================================ */
+[data-mood="blaze"] {
+  --color-bg:       #0a0000;
+  --color-fg:       #fff0e0;
+  --color-accent-1: #ff3d00;
+  --color-accent-2: #ffab00;
+  --color-muted:    #664433;
+  --color-subtle:   #1a0800;
+  --color-surface:  #1f0a00;
+  --color-border:   #331100;
+  --color-inverse:  #0a0000;
+  --color-discord:  #00ff88;
+}
+
+/* ============================================
+   MOOD: BRUISE — Purple, magenta, dark
+   ============================================
+   Moody. Creative. Nocturnal.
+   ============================================ */
+[data-mood="bruise"] {
+  --color-bg:       #0f0a1a;
+  --color-fg:       #e8dff5;
+  --color-accent-1: #a855f7;
+  --color-accent-2: #ec4899;
+  --color-muted:    #6b5b7b;
+  --color-subtle:   #170f26;
+  --color-surface:  #1a1128;
+  --color-border:   #2d1f4e;
+  --color-inverse:  #0f0a1a;
+  --color-discord:  #22d3ee;
+}
+
+/* ============================================
+   MOOD: CONCRETE — Grays, raw, industrial
+   ============================================
+   Brutalist architecture. Honest material.
+   ============================================ */
+[data-mood="concrete"] {
+  --color-bg:       #b8b8b0;
+  --color-fg:       #1a1a18;
+  --color-accent-1: #1a1a18;
+  --color-accent-2: #555550;
+  --color-muted:    #78786e;
+  --color-subtle:   #a8a8a0;
+  --color-surface:  #c2c2ba;
+  --color-border:   #8a8a82;
+  --color-inverse:  #b8b8b0;
+  --color-discord:  #ff4400;
+}
+
+/* ============================================
+   COLOR UTILITIES
+   ============================================ */
+
+/* Apply mood colors to background and text */
+.mood-surface {
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+}
+
+/* Inverted surface */
+.mood-surface-invert {
+  background-color: var(--color-fg);
+  color: var(--color-bg);
+}
+
+/* Accent surface */
+.mood-surface-accent {
+  background-color: var(--color-accent-1);
+  color: var(--color-bg);
+}
+
+/* Discord accent — the rule-breaker */
+.mood-discord {
+  color: var(--color-discord);
+}
+
+/* Gradient backgrounds */
+.mood-gradient-subtle {
+  background: linear-gradient(
+    180deg,
+    var(--color-bg) 0%,
+    var(--color-surface) 100%
+  );
+}
+
+.mood-gradient-accent {
+  background: linear-gradient(
+    135deg,
+    var(--color-accent-1),
+    var(--color-accent-2)
+  );
+}
+
+/* Grain overlay — adds materiality */
+.mood-grain::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  opacity: 0.035;
+  pointer-events: none;
+  z-index: 9999;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+}

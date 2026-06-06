@@ -77,6 +77,7 @@ Lobster runs deterministic workflows. Agents route tasks. Jordan approves via Te
 | Run a model bakeoff or stack evaluation | `benchmark/CONTEXT.md` |
 | Draft a system improvement or postmortem | `improvements/CONTEXT.md` |
 | Run any kind of research task | `autoresearch/CONTEXT.md` |
+| Search agent memory or capture a thought | `python3 -m scripts.openbrain` (CLI), `openbrain/README.md` (ops), `agents/configs/_openbrain.md` (rules) |
 | Route any task you're unsure about | `CONTEXT.md` (this folder) |
 
 ---

@@ -1,0 +1,275 @@
+/* ============================================
+   TYPOGRAPHY — Five Voices, One System
+   ============================================
+   Type is the primary material. Everything else is secondary.
+   ============================================ */
+
+/* --- Font Face Declarations --- */
+/* Using high-quality system + Google Fonts stack.
+   Replace with self-hosted or commercial fonts for production. */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Space+Grotesk:wght@300..700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap');
+
+:root {
+  /* ============================================
+     FONT STACKS — The Five Voices
+     ============================================ */
+
+  /* MONUMENT — Architectural, display, impact */
+  --font-monument: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+
+  /* EDITORIAL — Elegant, literary, refined */
+  --font-editorial: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
+
+  /* SWISS — Systematic, clean, informational */
+  --font-swiss: 'Inter', 'Helvetica Neue', 'Arial', system-ui, sans-serif;
+
+  /* BRUTALIST — Raw, mechanical, unapologetic */
+  --font-brutalist: 'Space Mono', 'Courier New', monospace;
+
+  /* EXPRESSIVE — Versatile, personality-driven */
+  --font-expressive: 'DM Sans', 'Inter', system-ui, sans-serif;
+
+  /* ============================================
+     TYPE SCALE — Non-linear, dramatic jumps
+     ============================================
+     The violence between massive and body IS the design.
+     ============================================ */
+
+  /* Display sizes — these dominate the viewport */
+  --type-massive:    clamp(3.5rem, 8vw + 1rem, 12rem);
+  --type-display:    clamp(2.5rem, 5vw + 1rem, 7rem);
+  --type-headline:   clamp(1.75rem, 3vw + 0.5rem, 3.5rem);
+
+  /* Reading sizes — comfortable, precise */
+  --type-subhead:    clamp(1.125rem, 1.5vw + 0.25rem, 1.5rem);
+  --type-body:       clamp(0.9375rem, 0.5vw + 0.75rem, 1.125rem);
+  --type-body-small: clamp(0.8125rem, 0.4vw + 0.65rem, 0.9375rem);
+
+  /* Micro sizes — metadata, labels, captions */
+  --type-caption:    clamp(0.6875rem, 0.3vw + 0.5rem, 0.8125rem);
+  --type-micro:      clamp(0.5625rem, 0.25vw + 0.4rem, 0.6875rem);
+
+  /* ============================================
+     TRACKING (Letter Spacing)
+     ============================================ */
+  --tracking-tight:    -0.03em;
+  --tracking-snug:     -0.015em;
+  --tracking-normal:    0;
+  --tracking-wide:      0.05em;
+  --tracking-wider:     0.1em;
+  --tracking-widest:    0.2em;
+  --tracking-mega:      0.35em;
+
+  /* ============================================
+     LEADING (Line Height)
+     ============================================ */
+  --leading-crush:   0.85;    /* Massive display, letters touching */
+  --leading-tight:   0.95;    /* Display text */
+  --leading-snug:    1.1;     /* Headlines */
+  --leading-normal:  1.5;     /* Body text */
+  --leading-relaxed: 1.7;     /* Long-form reading */
+  --leading-loose:   2.0;     /* Airy, editorial */
+
+  /* ============================================
+     FONT WEIGHTS
+     ============================================ */
+  --weight-thin:      100;
+  --weight-light:     300;
+  --weight-regular:   400;
+  --weight-medium:    500;
+  --weight-semibold:  600;
+  --weight-bold:      700;
+  --weight-black:     900;
+
+  /* ============================================
+     MEASURE (Max Line Width)
+     ============================================ */
+  --measure-narrow:   35ch;
+  --measure-regular:  55ch;
+  --measure-wide:     75ch;
+  --measure-full:     100%;
+}
+
+/* ============================================
+   TYPOGRAPHIC VOICE CLASSES
+   ============================================ */
+
+/* --- MONUMENT VOICE --- */
+.voice-monument {
+  font-family: var(--font-monument);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-crush);
+  text-transform: uppercase;
+}
+
+.voice-monument.--massive {
+  font-size: var(--type-massive);
+  letter-spacing: var(--tracking-tight);
+  line-height: 0.85;
+}
+
+.voice-monument.--display {
+  font-size: var(--type-display);
+  line-height: var(--leading-tight);
+}
+
+/* --- EDITORIAL VOICE --- */
+.voice-editorial {
+  font-family: var(--font-editorial);
+  font-weight: var(--weight-regular);
+  letter-spacing: var(--tracking-normal);
+  line-height: var(--leading-snug);
+  font-style: normal;
+}
+
+.voice-editorial.--display {
+  font-size: var(--type-display);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-tight);
+  font-style: italic;
+}
+
+.voice-editorial.--body {
+  font-size: var(--type-body);
+  line-height: var(--leading-relaxed);
+  max-width: var(--measure-regular);
+}
+
+/* --- SWISS VOICE --- */
+.voice-swiss {
+  font-family: var(--font-swiss);
+  font-weight: var(--weight-regular);
+  letter-spacing: var(--tracking-normal);
+  line-height: var(--leading-normal);
+}
+
+.voice-swiss.--headline {
+  font-size: var(--type-headline);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-snug);
+  line-height: var(--leading-snug);
+}
+
+.voice-swiss.--label {
+  font-size: var(--type-caption);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}
+
+.voice-swiss.--data {
+  font-size: var(--type-body-small);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- BRUTALIST VOICE --- */
+.voice-brutalist {
+  font-family: var(--font-brutalist);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-normal);
+  line-height: var(--leading-snug);
+  text-transform: uppercase;
+}
+
+.voice-brutalist.--massive {
+  font-size: var(--type-massive);
+  line-height: 0.9;
+  letter-spacing: var(--tracking-tight);
+}
+
+.voice-brutalist.--caption {
+  font-size: var(--type-caption);
+  font-weight: var(--weight-regular);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+}
+
+/* --- EXPRESSIVE VOICE --- */
+.voice-expressive {
+  font-family: var(--font-expressive);
+  font-weight: var(--weight-light);
+  letter-spacing: var(--tracking-normal);
+  line-height: var(--leading-snug);
+}
+
+.voice-expressive.--display {
+  font-size: var(--type-display);
+  font-weight: var(--weight-thin);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-snug);
+}
+
+.voice-expressive.--fluid {
+  font-size: var(--type-headline);
+  font-weight: var(--weight-light);
+  line-height: var(--leading-relaxed);
+  max-width: var(--measure-wide);
+}
+
+/* ============================================
+   TYPOGRAPHIC UTILITIES
+   ============================================ */
+
+/* Optical sizing for massive type */
+.type-optical-correct {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-kerning: normal;
+  font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
+}
+
+/* Text that fills its container width */
+.type-fill {
+  font-size: 10vw;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Text that bleeds off the edge */
+.type-bleed-left {
+  margin-left: -0.05em;
+}
+.type-bleed-right {
+  margin-right: -5vw;
+  text-align: right;
+}
+
+/* Vertical text */
+.type-vertical {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+}
+
+/* Mixed weight in a single line (use with spans) */
+.type-mixed-weight {
+  font-weight: var(--weight-light);
+}
+.type-mixed-weight strong,
+.type-mixed-weight b {
+  font-weight: var(--weight-black);
+}
+
+/* Knockout / outlined text */
+.type-outline {
+  -webkit-text-stroke: 1.5px currentColor;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Gradient text */
+.type-gradient {
+  background: linear-gradient(135deg, var(--color-accent-1), var(--color-accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Selection styling */
+::selection {
+  background: var(--color-accent-1, #000);
+  color: var(--color-bg, #fff);
+}

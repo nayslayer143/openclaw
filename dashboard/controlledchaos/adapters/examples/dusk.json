@@ -1,0 +1,26 @@
+{
+  "name": "Dakota's bedroom",
+  "thesis": "Liminal warmth at the edge of suburban dusk",
+  "palette": {
+    "bg":       "#1a0e08",
+    "fg":       "#f4e8d0",
+    "accent_1": "#d97a2c",
+    "accent_2": "#7a5a3a",
+    "discord":  "#22d3ee"
+  },
+  "typography": {
+    "monument":   { "family": "Bodoni Moda",          "weights": [400, 900], "google": true },
+    "swiss":      { "family": "Inter",                "weights": [400, 600], "google": true },
+    "editorial":  { "family": "Cormorant Garamond",   "weights": [400, 700], "google": true },
+    "brutalist":  { "family": "JetBrains Mono",       "weights": [400, 700], "google": true },
+    "expressive": { "family": "DM Sans",              "weights": [400, 700], "google": true }
+  },
+  "forces": {
+    "structure": 0.7, "breath": 0.7, "warmth": 0.8, "edge": 0.5, "motion": 0.4
+  },
+  "motion_intensity": 0.5,
+  "texture": "grain",
+  "mode_id": "swiss",
+  "dos":   ["lean into warm grain", "type that breathes"],
+  "donts": ["pure black backgrounds", "neon discord"]
+}

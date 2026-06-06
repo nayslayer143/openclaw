@@ -100,6 +100,24 @@ app = FastAPI(title="OpenClaw Dashboard")
 # gzip is redundant. Raising this threshold keeps the middleware registered
 # in case something depends on it, without actually compressing anything.
 app.add_middleware(GZipMiddleware, minimum_size=10_000_000)
+
+
+# ── Subdomain → path routing ─────────────────────────────────────────────────
+# clientmcp.asdfghjk.lol and dossier.asdfghjk.lol are routed (via cloudflared)
+# to this dashboard on :7080. Their apps live under path prefixes (/clientmcp,
+# /dossier). Rewrite ONLY the root path "/" for those hosts so the subdomain
+# lands on the app, while the apps' absolute /clientmcp/... refs keep resolving
+# on the same host. Other hosts and all non-root paths are untouched.
+_SUBDOMAIN_ROOT = {"clientmcp": "/clientmcp/", "dossier": "/dossier/"}
+
+
+@app.middleware("http")
+async def _subdomain_root_router(request: Request, call_next):
+    label = request.headers.get("host", "").split(":")[0].split(".")[0]
+    target = _SUBDOMAIN_ROOT.get(label)
+    if target and request.scope.get("path") == "/":
+        request.scope["path"] = target
+    return await call_next(request)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
                    allow_methods=["*"], allow_headers=["*"])
 
@@ -121,15 +139,21 @@ def is_localhost(request: Request) -> bool:
     return request.client and request.client.host in ("127.0.0.1", "::1")
 
 def get_current_user(request: Request) -> str:
-    token = request.cookies.get("oc_token") or request.headers.get("Authorization", "").removeprefix("Bearer ")
-    if not token:
-        if is_localhost(request):
-            return "nayslayer"
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    user = verify_token(token)
-    if not user:
-        raise HTTPException(status_code=401, detail="Invalid token")
-    return user
+    # Auth gate removed 2026-05-20 (Tier-3 user decision). All endpoints are
+    # public. /auth/* routes remain wired but unreached — re-enable by
+    # restoring the original cookie/token check below if needed.
+    #
+    #   token = request.cookies.get("oc_token") or request.headers.get(
+    #       "Authorization", "").removeprefix("Bearer ")
+    #   if not token:
+    #       if is_localhost(request):
+    #           return "nayslayer"
+    #       raise HTTPException(status_code=401, detail="Not authenticated")
+    #   user = verify_token(token)
+    #   if not user:
+    #       raise HTTPException(status_code=401, detail="Invalid token")
+    #   return user
+    return "nayslayer"
 
 @app.get("/auth/token")
 async def token_login(t: str, response: Response):
@@ -328,15 +352,8 @@ async def event_stream(user: str) -> AsyncGenerator[str, None]:
 
 @app.get("/api/stream")
 async def stream(request: Request):
-    # Auth via cookie or query param token (for EventSource which can't set headers)
-    token = request.cookies.get("oc_token") or request.query_params.get("token")
-    if not token or not verify_token(token):
-        if is_localhost(request):
-            user = "nayslayer"
-        else:
-            raise HTTPException(401, "Not authenticated")
-    else:
-        user = verify_token(token)
+    # Auth gate removed 2026-05-20. Stream is public.
+    user = "nayslayer"
     return StreamingResponse(event_stream(user),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})
@@ -1498,9 +1515,7 @@ async def terminal_events(n: int = 20, errors_only: bool = False,
 @app.get("/api/terminal/stream")
 async def terminal_stream(request: Request):
     """SSE stream of new terminal events."""
-    token = request.cookies.get("oc_token") or request.query_params.get("token")
-    if not token or not verify_token(token):
-        if not is_localhost(request): raise HTTPException(401, "Not authenticated")
+    # Auth gate removed 2026-05-20. Stream is public.
     async def event_gen():
         last_count = sum(1 for _ in open(TERMINAL_LOG)) if TERMINAL_LOG.exists() else 0
         while True:
@@ -2192,10 +2207,7 @@ async def intel_crawler_health(user: str = Depends(get_current_user)):
 @app.get("/api/intel/stream")
 async def intel_stream(request: Request):
     """SSE stream for new recommendations."""
-    token = request.cookies.get("oc_token") or request.query_params.get("token")
-    if not token or not verify_token(token):
-        if not is_localhost(request):
-            raise HTTPException(401, "Not authenticated")
+    # Auth gate removed 2026-05-20. Stream is public.
 
     async def event_gen():
         last_mtime = 0.0
@@ -2317,10 +2329,7 @@ async def signals_stats(user: str = Depends(get_current_user)):
 @app.get("/api/intel/signals/stream/live")
 async def signals_stream(request: Request):
     """SSE for real-time signal updates across all platforms."""
-    token = request.cookies.get("oc_token") or request.query_params.get("token")
-    if not token or not verify_token(token):
-        if not is_localhost(request):
-            raise HTTPException(401, "Not authenticated")
+    # Auth gate removed 2026-05-20. Stream is public.
 
     async def event_gen():
         last_mtimes = {}
@@ -2825,10 +2834,7 @@ async def cinema_serve_render(filename: str, user: str = Depends(get_current_use
 @app.get("/orchestrator-embed")
 async def orchestrator_embed(request: Request):
     """Serve the self-contained orchestrator HTML for iframe embedding."""
-    token = request.cookies.get("oc_token")
-    if not token or not verify_token(token):
-        if not is_localhost(request):
-            return RedirectResponse(url="/login")
+    # Auth gate removed 2026-05-20. Public.
     html = (Path(__file__).parent / "orchestrator-embed.html").read_text()
     return HTMLResponse(content=html, headers={
         "Cache-Control": "no-cache, no-store, must-revalidate",
@@ -2841,6 +2847,235 @@ async def orchestrator_embed(request: Request):
 # calls go to /api/gonzoclaw/* on this same server, which proxies to the
 # gonzoclaw FastAPI backend on localhost:18790. Same-origin = no CORS, no
 # new auth, the existing oc_token gate covers the chat backend automatically.
+# ── /watermark — client-side PDF logo stamper ─────────────────────────────────
+# Cloudflare Access gates this at the edge; no app-level auth here.
+WATERMARK_DIR = Path(__file__).parent / "watermark"
+
+
+@app.get("/watermark", response_class=HTMLResponse)
+@app.get("/watermark/", response_class=HTMLResponse)
+async def watermark_index():
+    return HTMLResponse(
+        content=(WATERMARK_DIR / "index.html").read_text(),
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
+if WATERMARK_DIR.exists():
+    app.mount(
+        "/watermark/static",
+        StaticFiles(directory=str(WATERMARK_DIR)),
+        name="watermark_static",
+    )
+
+
+# ── /aryze — Aryze Eatery A/B/C concept site ─────────────────────────────────
+# Public-facing client demo. Explicit /aryze + /aryze/ routes bypass the SPA
+# catch-all (which would redirect unauthenticated visitors to /login).
+ARYZE_DIR = Path(__file__).parent / "aryze"
+
+
+@app.get("/aryze", response_class=HTMLResponse)
+@app.get("/aryze/", response_class=HTMLResponse)
+async def aryze_index():
+    return HTMLResponse(
+        content=(ARYZE_DIR / "index.html").read_text(),
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
+@app.get("/aryze/a", response_class=HTMLResponse)
+@app.get("/aryze/b", response_class=HTMLResponse)
+@app.get("/aryze/c", response_class=HTMLResponse)
+@app.get("/aryze/d", response_class=HTMLResponse)
+@app.get("/aryze/e", response_class=HTMLResponse)
+@app.get("/aryze/f", response_class=HTMLResponse)
+async def aryze_variant(request: Request):
+    # Direct variant link — serves app.html with ?v= already applied.
+    variant = request.url.path.rsplit("/", 1)[-1]
+    html = (ARYZE_DIR / "app.html").read_text()
+    # Inject default theme so the page renders the right variant if JS lags
+    html = html.replace('class="theme-a"', f'class="theme-{variant}"', 1)
+    return HTMLResponse(content=html, headers={"Cache-Control": "no-cache"})
+
+
+if ARYZE_DIR.exists():
+    app.mount(
+        "/aryze",
+        StaticFiles(directory=str(ARYZE_DIR), html=True),
+        name="aryze_static",
+    )
+
+
+# ── /coven — COVEN.art A/B/C/D/E/F redesign concept ──────────────────────────
+# Public-facing client demo. Three responsive aesthetic modes (Cathedral /
+# Manifesto Journal / Sacred Rave) at /coven/{cathedral,manifesto,rave}.html
+# plus a comparison index at /coven/.
+COVEN_DIR = Path(__file__).parent / "coven"
+
+
+@app.get("/coven", response_class=HTMLResponse)
+@app.get("/coven/", response_class=HTMLResponse)
+async def coven_index():
+    return HTMLResponse(
+        content=(COVEN_DIR / "index.html").read_text(),
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
+if COVEN_DIR.exists():
+    app.mount(
+        "/coven",
+        StaticFiles(directory=str(COVEN_DIR), html=True),
+        name="coven_static",
+    )
+
+
+# ── /coven-next — COVEN.next Next.js evolution ───────────────────────────────
+# Next.js 16 App Router build with five scenes stitched into one journey:
+# Cathedral · Manifesto · Threshold · Sermon · Readymade. Built with
+# `BUILD_STATIC=1 npm run build:static` from ~/code/apps/coven-next, output
+# at ./out, symlinked here. basePath=/coven-next baked into the build.
+COVEN_NEXT_DIR = Path(__file__).parent / "coven-next"
+
+
+@app.get("/coven-next", response_class=HTMLResponse)
+@app.get("/coven-next/", response_class=HTMLResponse)
+async def coven_next_index():
+    return HTMLResponse(
+        content=(COVEN_NEXT_DIR / "index.html").read_text(),
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
+if COVEN_NEXT_DIR.exists():
+    app.mount(
+        "/coven-next",
+        StaticFiles(directory=str(COVEN_NEXT_DIR), html=True),
+        name="coven_next_static",
+    )
+
+
+# ── /controlledchaos — Controlled Chaos design system showcase ────────────────
+# Public-facing landing for the design system itself. Eats its own dog food —
+# the landing page uses the SF Vibe Fest style.json palette and the v2 section
+# library to introduce the system, with links to every showcase mode + the two
+# real-world adapter demos (Lovetel, SF Vibe Fest).
+CONTROLLEDCHAOS_DIR = Path(__file__).parent / "controlledchaos"
+
+
+@app.get("/controlledchaos", response_class=HTMLResponse)
+@app.get("/controlledchaos/", response_class=HTMLResponse)
+async def controlledchaos_index():
+    return HTMLResponse(
+        content=(CONTROLLEDCHAOS_DIR / "index.html").read_text(),
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
+if CONTROLLEDCHAOS_DIR.exists():
+    app.mount(
+        "/controlledchaos",
+        StaticFiles(directory=str(CONTROLLEDCHAOS_DIR), html=True),
+        name="controlledchaos_static",
+    )
+
+
+# ── /clientmcp — Foyer (working name Client MCP) landing concepts ─────────────
+# Public-facing landing for the agentic CRM for creative agencies. Three A/B/C
+# directions: Editorial (a.html), Blueprint (b.html), Demo-first (c.html).
+# Chooser at /clientmcp/ embeds each in an iframe (Aryze pattern).
+# /clientmcp/api/* is a same-origin reverse proxy to the local Foyer Fastify
+# server at :4000, so landing pages can fetch live demo data without CORS or a
+# separate tunnel URL.
+CLIENTMCP_DIR = Path(__file__).parent / "clientmcp"
+CLIENTMCP_API_UPSTREAM = "http://localhost:4000"
+
+
+@app.get("/clientmcp", response_class=HTMLResponse)
+@app.get("/clientmcp/", response_class=HTMLResponse)
+async def clientmcp_index():
+    return HTMLResponse(
+        content=(CLIENTMCP_DIR / "index.html").read_text(),
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
+@app.get("/clientmcp/a", response_class=HTMLResponse)
+@app.get("/clientmcp/b", response_class=HTMLResponse)
+@app.get("/clientmcp/c", response_class=HTMLResponse)
+@app.get("/clientmcp/d", response_class=HTMLResponse)
+@app.get("/clientmcp/e", response_class=HTMLResponse)
+async def clientmcp_variant(request: Request):
+    variant = request.url.path.rsplit("/", 1)[-1]
+    file = CLIENTMCP_DIR / f"{variant}.html"
+    if not file.exists():
+        raise HTTPException(status_code=404, detail=f"clientmcp variant {variant} not found")
+    return HTMLResponse(content=file.read_text(), headers={"Cache-Control": "no-cache"})
+
+
+@app.api_route(
+    "/clientmcp/api/{rest:path}",
+    methods=["GET", "POST", "OPTIONS", "HEAD"],
+)
+async def clientmcp_api_proxy(request: Request, rest: str):
+    upstream = f"{CLIENTMCP_API_UPSTREAM}/{rest}"
+    if request.url.query:
+        upstream = f"{upstream}?{request.url.query}"
+    forward_headers = {
+        k: v
+        for k, v in request.headers.items()
+        if k.lower() not in {"host", "content-length", "connection"}
+    }
+    try:
+        body = await request.body() if request.method == "POST" else None
+        # 90s — LLM-backed demo endpoints (qa, naming, brand-ingest) routinely
+        # take 10–60s on Ollama qwen2.5:7b. 15s was too aggressive.
+        async with httpx.AsyncClient(timeout=90.0) as client:
+            r = await client.request(
+                method=request.method,
+                url=upstream,
+                headers=forward_headers,
+                content=body,
+            )
+        out_headers = {
+            k: v
+            for k, v in r.headers.items()
+            if k.lower()
+            not in {"content-encoding", "transfer-encoding", "content-length", "connection"}
+        }
+        return Response(content=r.content, status_code=r.status_code, headers=out_headers)
+    except httpx.RequestError as e:
+        return JSONResponse(
+            status_code=503,
+            content={"error": "foyer-backend-unreachable", "detail": str(e)},
+        )
+
+
+if CLIENTMCP_DIR.exists():
+    app.mount(
+        "/clientmcp",
+        StaticFiles(directory=str(CLIENTMCP_DIR), html=True),
+        name="clientmcp_static",
+    )
+
+
+# ── /dossier — coming-soon placeholder for the background-search app ──────────
+# Served at the dossier.asdfghjk.lol subdomain root via the
+# _subdomain_root_router middleware (which rewrites "/" → "/dossier/" for that
+# host). Self-contained single file; matches the COSMOS INDEX aesthetic.
+DOSSIER_DIR = Path(__file__).parent / "dossier"
+
+
+@app.get("/dossier", response_class=HTMLResponse)
+@app.get("/dossier/", response_class=HTMLResponse)
+async def dossier_index():
+    return HTMLResponse(
+        content=(DOSSIER_DIR / "index.html").read_text(),
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
 GONZOCLAW_DIST = Path.home() / "gonzoclaw" / "frontend" / "dist"
 GONZOCLAW_ASSETS = GONZOCLAW_DIST / "assets"
 GONZOCLAW_BACKEND = "http://localhost:18790"
@@ -2849,11 +3084,7 @@ GONZOCLAW_BACKEND = "http://localhost:18790"
 @app.get("/chat-app")
 @app.get("/chat-app/")
 async def chat_app_index(request: Request):
-    """Serve the gonzoclaw chat SPA index.html with auth gate."""
-    token = request.cookies.get("oc_token")
-    if not token or not verify_token(token):
-        if not is_localhost(request):
-            return RedirectResponse(url="/login")
+    """Serve the gonzoclaw chat SPA index.html. Auth gate removed 2026-05-20."""
     index = GONZOCLAW_DIST / "index.html"
     if not index.exists():
         return HTMLResponse(
@@ -2884,13 +3115,8 @@ if GONZOCLAW_ASSETS.exists():
     methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
 )
 async def gonzoclaw_proxy(path: str, request: Request):
-    # Auth gate — same as the rest of the dashboard's protected routes.
-    # Return 401 instead of redirecting to /login because EventSource and
-    # fetch can't follow auth redirects in any useful way.
-    token = request.cookies.get("oc_token")
-    if not token or not verify_token(token):
-        if not is_localhost(request):
-            return JSONResponse({"error": "unauthorized"}, status_code=401)
+    # Auth gate removed 2026-05-20. Proxy is public — anyone reaching the
+    # dashboard can hit the gonzoclaw backend through it.
 
     # Build target URL on the gonzoclaw backend, preserving query string.
     target = f"{GONZOCLAW_BACKEND}/api/{path}"
@@ -2936,6 +3162,112 @@ async def gonzoclaw_proxy(path: str, request: Request):
         media_type=upstream.headers.get("content-type"),
     )
 
+
+# ── Streaming proxy: /blackmagic/* → Black Magic Invitations (Next.js) ─────
+# Mirrors the gonzoclaw_proxy pattern. The Next.js app is configured with
+# basePath=/blackmagic so we preserve the prefix when forwarding. After the
+# dashboard's own auth check, we inject X-User-Id so the downstream Next.js
+# app can identify the user without sharing the JWT secret.
+BLACKMAGIC_BACKEND = "http://localhost:3008"
+
+
+@app.api_route(
+    "/blackmagic",
+    methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
+)
+@app.api_route(
+    "/blackmagic/{path:path}",
+    methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
+)
+async def blackmagic_legacy_redirect(path: str = "", request: Request = None):
+    """Legacy /blackmagic/* → temporary redirect to blackmagic.asdfghjk.lol.
+    bmagic.rsvp DNS is still stuck 'initializing' (9+ days), so we point at the
+    working subdomain on the asdfghjk.lol zone instead. The Next.js app serves
+    at root (no basePath), so in-app navigation works there. 302 (not 301)
+    because bmagic.rsvp may yet come alive — we don't want this permanently
+    browser-cached to the subdomain.
+    """
+    suffix = f"/{path}" if path else "/"
+    qs = f"?{request.url.query}" if request and request.url.query else ""
+    return RedirectResponse(
+        url=f"https://blackmagic.asdfghjk.lol{suffix}{qs}", status_code=302
+    )
+
+
+# Kept for reference but unreachable — the route above wins. Remove once
+# bmagic.rsvp DNS has been live for a few weeks and no clients still hit
+# the legacy URL.
+@app.api_route(
+    "/__blackmagic_disabled__",
+    methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
+)
+@app.api_route(
+    "/__blackmagic_disabled__/{path:path}",
+    methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
+)
+async def blackmagic_proxy(request: Request, path: str = ""):
+    # Identify the user opportunistically. Don't block on missing auth —
+    # recipient invitations (/blackmagic/i/[token]) and the marketing landing
+    # are intentionally public. Sender-only routes enforce auth themselves
+    # (Next.js API handlers return 401 when X-User-Id is absent).
+    # Auth gate removed 2026-05-20. Default sender identity to nayslayer when
+    # no token is present (was previously localhost-only).
+    token = request.cookies.get("oc_token")
+    user = verify_token(token) if token else None
+    if not user:
+        user = "nayslayer"
+
+    # Next.js now serves at root (basePath removed when we moved to
+    # bmagic.rsvp). Strip the /blackmagic prefix before forwarding so this
+    # legacy URL still works.
+    suffix = f"/{path}" if path else "/"
+    target = f"{BLACKMAGIC_BACKEND}{suffix}"
+    if request.url.query:
+        target = f"{target}?{request.url.query}"
+
+    # Force upstream to send uncompressed bytes. We stream raw bytes through
+    # (aiter_raw) and strip Content-Encoding from the response — if upstream
+    # gzip-compresses but the encoding header is stripped on the way out, the
+    # browser renders the gzip bytes as text. Identity upstream + Cloudflare
+    # re-compressing on its egress is the cleanest fix.
+    drop_req = {"host", "content-length", "connection", "keep-alive",
+                "transfer-encoding", "upgrade", "accept-encoding"}
+    fwd_headers = {k: v for k, v in request.headers.items()
+                   if k.lower() not in drop_req}
+    fwd_headers["accept-encoding"] = "identity"
+    if user:
+        fwd_headers["X-User-Id"] = user
+
+    body = await request.body() if request.method != "GET" else None
+
+    client = httpx.AsyncClient(timeout=None)
+    upstream_req = client.build_request(
+        method=request.method,
+        url=target,
+        headers=fwd_headers,
+        content=body,
+    )
+    upstream = await client.send(upstream_req, stream=True)
+
+    async def relay():
+        try:
+            async for chunk in upstream.aiter_raw():
+                yield chunk
+        finally:
+            await upstream.aclose()
+            await client.aclose()
+
+    drop_resp = {"content-length", "content-encoding", "transfer-encoding",
+                 "connection", "keep-alive"}
+    resp_headers = {k: v for k, v in upstream.headers.items()
+                    if k.lower() not in drop_resp}
+
+    return StreamingResponse(
+        relay(),
+        status_code=upstream.status_code,
+        headers=resp_headers,
+        media_type=upstream.headers.get("content-type"),
+    )
 
 # ── CodeMonkeyClaw Work Orders ────────────────────────────────────────────────
 _CMC_DB = Path.home() / "codemonkeyclaw" / "codemonkeyclaw.db"
@@ -3015,12 +3347,13 @@ async def spa(path: str, request: Request):
     # Let API and WebSocket routes through
     if path.startswith("api/") or path.startswith("auth/") or path.startswith("ws"):
         raise HTTPException(404)
-    # Check auth — localhost skips OAuth
-    token = request.cookies.get("oc_token")
-    if not token or not verify_token(token):
-        if not is_localhost(request):
-            return RedirectResponse(url="/login")
-    html = (Path(__file__).parent / "index.html").read_text()
+    # Auth gate removed 2026-05-20. Dashboard SPA is public.
+    # 2026-06-05: root "/" now serves the COSMOS INDEX app launcher
+    # (launcher.html). The GONZOCLAW ops dashboard is archived — still fully
+    # live — at /ops and its SPA sub-paths (/chat, /ideas, …), served from the
+    # untouched index.html. Nothing deleted; just re-homed.
+    page = "launcher.html" if path == "" else "index.html"
+    html = (Path(__file__).parent / page).read_text()
     return HTMLResponse(content=html, headers={
         "Cache-Control": "no-cache, no-store, must-revalidate",
         "Pragma": "no-cache",

@@ -72,3 +72,16 @@ Primary job: keep system memory clean, structured, and useful. Compress noise in
 - Never transmit credentials, API keys, memory files externally.
 - Memory files may contain sensitive business patterns — never expose externally.
 - AutoResearch results stay local — never send to external services.
+
+---
+
+## OpenBrain (OB1) memory
+
+This agent: **search + capture (compact only)**.
+
+Recall before non-trivial work, capture per role rules, never store raw
+transcripts or secrets. Full instructions: [_openbrain.md](_openbrain.md).
+
+Quick path:
+
+    python3 -m scripts.openbrain search "<task>" -k 5

@@ -1,0 +1,322 @@
+/* ============================================
+   MOTION — Choreography, Not Animation
+   ============================================
+   The pause between animations matters more
+   than the animation itself.
+   ============================================ */
+
+:root {
+  /* ============================================
+     TIMING FUNCTIONS — The feel of movement
+     ============================================ */
+  --ease-out-expo:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart:   cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-out-back:    cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-in-out-sine: cubic-bezier(0.37, 0, 0.63, 1);
+  --ease-spring:      cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-snap:        cubic-bezier(0.7, 0, 0.3, 1);
+  --ease-drift:       cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
+  /* ============================================
+     DURATIONS — Tempo of the interface
+     ============================================ */
+  --dur-instant:   100ms;
+  --dur-snap:      200ms;
+  --dur-swift:     350ms;
+  --dur-flow:      600ms;
+  --dur-drift:     1000ms;
+  --dur-breathe:   2000ms;
+  --dur-meditate:  4000ms;
+
+  /* Stagger delay between sequential items */
+  --stagger-tight:  30ms;
+  --stagger-normal: 60ms;
+  --stagger-loose:  120ms;
+  --stagger-drama:  200ms;
+}
+
+/* ============================================
+   KEYFRAMES — The vocabulary of movement
+   ============================================ */
+
+/* --- REVEAL: Content emerging into existence --- */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes reveal-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes reveal-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes reveal-clip-up {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes reveal-clip-left {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* --- DRIFT: Subtle continuous movement --- */
+@keyframes drift-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes drift-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes drift-sway {
+  0%, 100% { transform: rotate(-1deg); }
+  50% { transform: rotate(1deg); }
+}
+
+/* --- PULSE: Living, breathing motion --- */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes pulse-scale {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+/* --- KINETIC TYPE: Letters in motion --- */
+@keyframes type-slide-in {
+  from {
+    transform: translateX(-110%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes type-stamp {
+  0% {
+    transform: scale(3);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(0.95);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes type-scramble-in {
+  0% {
+    filter: blur(12px);
+    opacity: 0;
+  }
+  50% {
+    filter: blur(4px);
+    opacity: 0.5;
+  }
+  100% {
+    filter: blur(0);
+    opacity: 1;
+  }
+}
+
+/* --- MARQUEE: Continuous horizontal scroll --- */
+@keyframes marquee-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+/* --- TEXTURE: Grain animation --- */
+@keyframes grain-shift {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -10%); }
+  20% { transform: translate(-15%, 5%); }
+  30% { transform: translate(7%, -25%); }
+  40% { transform: translate(-5%, 25%); }
+  50% { transform: translate(-15%, 10%); }
+  60% { transform: translate(15%, 0%); }
+  70% { transform: translate(0%, 15%); }
+  80% { transform: translate(3%, 35%); }
+  90% { transform: translate(-10%, 10%); }
+}
+
+/* --- LINE DRAW --- */
+@keyframes line-draw {
+  from { stroke-dashoffset: var(--line-length, 1000); }
+  to { stroke-dashoffset: 0; }
+}
+
+/* ============================================
+   MOTION CLASSES — Apply to elements
+   ============================================ */
+
+/* Reveal on scroll (pair with IntersectionObserver) */
+.motion-reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition:
+    opacity var(--dur-flow) var(--ease-out-expo),
+    transform var(--dur-flow) var(--ease-out-expo);
+}
+
+.motion-reveal.--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger children */
+.motion-stagger > * {
+  opacity: 0;
+  transform: translateY(20px);
+  transition:
+    opacity var(--dur-flow) var(--ease-out-expo),
+    transform var(--dur-flow) var(--ease-out-expo);
+}
+
+.motion-stagger.--visible > *:nth-child(1)  { transition-delay: calc(var(--stagger-normal) * 0); }
+.motion-stagger.--visible > *:nth-child(2)  { transition-delay: calc(var(--stagger-normal) * 1); }
+.motion-stagger.--visible > *:nth-child(3)  { transition-delay: calc(var(--stagger-normal) * 2); }
+.motion-stagger.--visible > *:nth-child(4)  { transition-delay: calc(var(--stagger-normal) * 3); }
+.motion-stagger.--visible > *:nth-child(5)  { transition-delay: calc(var(--stagger-normal) * 4); }
+.motion-stagger.--visible > *:nth-child(6)  { transition-delay: calc(var(--stagger-normal) * 5); }
+.motion-stagger.--visible > *:nth-child(7)  { transition-delay: calc(var(--stagger-normal) * 6); }
+.motion-stagger.--visible > *:nth-child(8)  { transition-delay: calc(var(--stagger-normal) * 7); }
+.motion-stagger.--visible > *:nth-child(9)  { transition-delay: calc(var(--stagger-normal) * 8); }
+.motion-stagger.--visible > *:nth-child(10) { transition-delay: calc(var(--stagger-normal) * 9); }
+
+.motion-stagger.--visible > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Clip reveal */
+.motion-clip-up {
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path var(--dur-drift) var(--ease-out-expo);
+}
+.motion-clip-up.--visible {
+  clip-path: inset(0 0 0 0);
+}
+
+/* Continuous marquee */
+.motion-marquee {
+  display: flex;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.motion-marquee > * {
+  display: flex;
+  animation: marquee-scroll 20s linear infinite;
+  flex-shrink: 0;
+}
+
+/* Hover lift */
+.motion-hover-lift {
+  transition: transform var(--dur-swift) var(--ease-out-expo);
+}
+.motion-hover-lift:hover {
+  transform: translateY(-4px);
+}
+
+/* Hover scale */
+.motion-hover-scale {
+  transition: transform var(--dur-swift) var(--ease-spring);
+}
+.motion-hover-scale:hover {
+  transform: scale(1.03);
+}
+
+/* Magnetic cursor attraction (apply via JS) */
+.motion-magnetic {
+  transition: transform var(--dur-swift) var(--ease-out-quart);
+}
+
+/* Smooth image zoom on hover */
+.motion-image-zoom {
+  overflow: hidden;
+}
+.motion-image-zoom img {
+  transition: transform var(--dur-drift) var(--ease-out-expo);
+}
+.motion-image-zoom:hover img {
+  transform: scale(1.08);
+}
+
+/* ============================================
+   SCROLL-DRIVEN ANIMATIONS (CSS-only)
+   ============================================ */
+
+@supports (animation-timeline: scroll()) {
+  .motion-scroll-fade {
+    animation: reveal-fade linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 40%;
+  }
+
+  .motion-scroll-parallax {
+    animation: drift-float linear both;
+    animation-timeline: scroll();
+  }
+}
+
+/* ============================================
+   PREFERS-REDUCED-MOTION — Respect the user
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .motion-reveal,
+  .motion-stagger > * {
+    opacity: 1;
+    transform: none;
+  }
+
+  .motion-clip-up {
+    clip-path: none;
+  }
+
+  .motion-marquee > * {
+    animation: none;
+  }
+}

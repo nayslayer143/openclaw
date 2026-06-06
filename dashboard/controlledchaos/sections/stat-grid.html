@@ -1,0 +1,22 @@
+<!-- cc-section: stat-grid
+     best:  swiss, brutalist, kinetic
+     ok:    immersive
+     avoid: gallery (numbers fight white-cube quiet)
+     variants: default, bleed, vertical
+     placeholders: heading, stats[] (num, label, optional caption) -->
+<section class="cc-section cc-stat-grid"
+         data-pattern="stat-grid"
+         data-variant="default">
+  <div class="container --wide flow">
+    <h2 class="cc-stat-grid__heading voice-monument --display">{{heading}}</h2>
+    <div class="cc-stat-grid__items">
+      {{#stats}}
+      <div class="cc-stat">
+        <span class="cc-stat__num voice-monument --massive">{{num}}</span>
+        <span class="cc-stat__label voice-swiss --label">{{label}}</span>
+        <span class="cc-stat__caption voice-swiss">{{caption}}</span>
+      </div>
+      {{/stats}}
+    </div>
+  </div>
+</section>
