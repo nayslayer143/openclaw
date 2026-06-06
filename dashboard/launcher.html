@@ -95,6 +95,8 @@ main{max-width:1120px;margin:0 auto;padding:0 34px}
 .go{justify-self:end;font-family:'JetBrains Mono';font-size:11px;letter-spacing:2px;color:var(--neon);opacity:0;transform:translateX(-8px);transition:opacity .35s var(--ease),transform .35s var(--ease);white-space:nowrap}
 .row.hot .go{opacity:1;transform:translateX(0)}
 .row.soon .go{color:var(--dim)}
+.divider{display:flex;align-items:center;gap:16px;padding:32px 22px 6px;font-family:'JetBrains Mono';font-size:10px;letter-spacing:3px;color:var(--dim);text-transform:uppercase}
+.divider::after{content:'';flex:1;height:1px;background:var(--hair)}
 .foot{padding:26px 34px;border-top:1px solid var(--hair);font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:1.5px;color:var(--dim);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
 .foot a{color:var(--dim);text-decoration:none;transition:color .3s}
 .foot a:hover{color:var(--ink2)}
@@ -118,7 +120,7 @@ main{max-width:1120px;margin:0 auto;padding:0 34px}
   <div class="tag">// the index</div>
   <div class="sp"></div>
   <button class="pole" id="pole" aria-label="swing pole" title="swing the pole"><i></i></button>
-  <div class="count"><b>2</b> / 4 LIVE</div>
+  <div class="count"><b>6</b> / 8 LIVE</div>
 </header>
 
 <main>
@@ -157,11 +159,42 @@ main{max-width:1120px;margin:0 auto;padding:0 34px}
       <div class="meta"><div class="dom">clientmcp.asdfghjk.lol</div><div class="st"><span class="led"></span>SOON</div></div>
       <span class="go">PREVIEW →</span>
     </a>
+
+    <div class="divider">also shipped · tools &amp; concepts</div>
+
+    <a class="row" data-neon="#2E7BFF" href="https://watermark.asdfghjk.lol" target="_blank" rel="noopener">
+      <span class="wash"></span><span class="edge"></span>
+      <span class="idx">05</span>
+      <div class="meat"><div class="nm">Watermark</div><div class="ds">Stamp any PDF with your logo — fully in-browser, nothing leaves the page.</div></div>
+      <div class="meta"><div class="dom">watermark.asdfghjk.lol</div><div class="st live"><span class="led"></span>LIVE</div></div>
+      <span class="go">OPEN →</span>
+    </a>
+    <a class="row" data-neon="#FF7A1A" href="https://aryze.asdfghjk.lol" target="_blank" rel="noopener">
+      <span class="wash"></span><span class="edge"></span>
+      <span class="idx">06</span>
+      <div class="meat"><div class="nm">Aryze</div><div class="ds">A mobile-first restaurant concept, themed three ways.</div></div>
+      <div class="meta"><div class="dom">aryze.asdfghjk.lol</div><div class="st live"><span class="led"></span>LIVE</div></div>
+      <span class="go">OPEN →</span>
+    </a>
+    <a class="row" data-neon="#FF0033" href="https://coven.asdfghjk.lol" target="_blank" rel="noopener">
+      <span class="wash"></span><span class="edge"></span>
+      <span class="idx">07</span>
+      <div class="meat"><div class="nm">Coven</div><div class="ds">A sacred creative community, reimagined in three modes.</div></div>
+      <div class="meta"><div class="dom">coven.asdfghjk.lol</div><div class="st live"><span class="led"></span>LIVE</div></div>
+      <span class="go">OPEN →</span>
+    </a>
+    <a class="row" data-neon="#FFE600" href="https://controlledchaos.asdfghjk.lol" target="_blank" rel="noopener">
+      <span class="wash"></span><span class="edge"></span>
+      <span class="idx">08</span>
+      <div class="meat"><div class="nm">Controlled Chaos</div><div class="ds">An award-grade design system — five aesthetic modes, nine moods.</div></div>
+      <div class="meta"><div class="dom">controlledchaos.asdfghjk.lol</div><div class="st live"><span class="led"></span>LIVE</div></div>
+      <span class="go">OPEN →</span>
+    </a>
   </section>
 </main>
 
 <footer class="foot">
-  <span>// 4 apps indexed · 2 live · the crons don't stop</span>
+  <span>// 8 apps indexed · 6 live · the crons don't stop</span>
   <a href="/ops" title="ops dashboard">GONZOCLAW © bat country</a>
 </footer>
 
