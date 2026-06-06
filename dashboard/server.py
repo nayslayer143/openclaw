@@ -108,7 +108,14 @@ app.add_middleware(GZipMiddleware, minimum_size=10_000_000)
 # /dossier). Rewrite ONLY the root path "/" for those hosts so the subdomain
 # lands on the app, while the apps' absolute /clientmcp/... refs keep resolving
 # on the same host. Other hosts and all non-root paths are untouched.
-_SUBDOMAIN_ROOT = {"clientmcp": "/clientmcp/", "dossier": "/dossier/"}
+_SUBDOMAIN_ROOT = {
+    "clientmcp": "/clientmcp/",
+    "dossier": "/dossier/",
+    "watermark": "/watermark/",
+    "aryze": "/aryze/",
+    "coven": "/coven/",
+    "controlledchaos": "/controlledchaos/",
+}
 
 
 @app.middleware("http")
