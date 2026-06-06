@@ -100,6 +100,24 @@ app = FastAPI(title="OpenClaw Dashboard")
 # gzip is redundant. Raising this threshold keeps the middleware registered
 # in case something depends on it, without actually compressing anything.
 app.add_middleware(GZipMiddleware, minimum_size=10_000_000)
+
+
+# ── Subdomain → path routing ─────────────────────────────────────────────────
+# clientmcp.asdfghjk.lol and dossier.asdfghjk.lol are routed (via cloudflared)
+# to this dashboard on :7080. Their apps live under path prefixes (/clientmcp,
+# /dossier). Rewrite ONLY the root path "/" for those hosts so the subdomain
+# lands on the app, while the apps' absolute /clientmcp/... refs keep resolving
+# on the same host. Other hosts and all non-root paths are untouched.
+_SUBDOMAIN_ROOT = {"clientmcp": "/clientmcp/", "dossier": "/dossier/"}
+
+
+@app.middleware("http")
+async def _subdomain_root_router(request: Request, call_next):
+    label = request.headers.get("host", "").split(":")[0].split(".")[0]
+    target = _SUBDOMAIN_ROOT.get(label)
+    if target and request.scope.get("path") == "/":
+        request.scope["path"] = target
+    return await call_next(request)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
                    allow_methods=["*"], allow_headers=["*"])
 
@@ -3042,6 +3060,22 @@ if CLIENTMCP_DIR.exists():
     )
 
 
+# ── /dossier — coming-soon placeholder for the background-search app ──────────
+# Served at the dossier.asdfghjk.lol subdomain root via the
+# _subdomain_root_router middleware (which rewrites "/" → "/dossier/" for that
+# host). Self-contained single file; matches the COSMOS INDEX aesthetic.
+DOSSIER_DIR = Path(__file__).parent / "dossier"
+
+
+@app.get("/dossier", response_class=HTMLResponse)
+@app.get("/dossier/", response_class=HTMLResponse)
+async def dossier_index():
+    return HTMLResponse(
+        content=(DOSSIER_DIR / "index.html").read_text(),
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
 GONZOCLAW_DIST = Path.home() / "gonzoclaw" / "frontend" / "dist"
 GONZOCLAW_ASSETS = GONZOCLAW_DIST / "assets"
 GONZOCLAW_BACKEND = "http://localhost:18790"
@@ -3314,7 +3348,12 @@ async def spa(path: str, request: Request):
     if path.startswith("api/") or path.startswith("auth/") or path.startswith("ws"):
         raise HTTPException(404)
     # Auth gate removed 2026-05-20. Dashboard SPA is public.
-    html = (Path(__file__).parent / "index.html").read_text()
+    # 2026-06-05: root "/" now serves the COSMOS INDEX app launcher
+    # (launcher.html). The GONZOCLAW ops dashboard is archived — still fully
+    # live — at /ops and its SPA sub-paths (/chat, /ideas, …), served from the
+    # untouched index.html. Nothing deleted; just re-homed.
+    page = "launcher.html" if path == "" else "index.html"
+    html = (Path(__file__).parent / page).read_text()
     return HTMLResponse(content=html, headers={
         "Cache-Control": "no-cache, no-store, must-revalidate",
         "Pragma": "no-cache",
