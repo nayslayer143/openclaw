@@ -1,47 +1,102 @@
 <!doctype html>
-<html lang="en" data-pole="black">
+<html lang="en" data-pole="black" data-mode="search">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dossier — coming soon</title>
-<meta name="description" content="Background search engine — every digital footprint, one query. Coming soon.">
+<title>Dossier — background search engine</title>
+<meta name="description" content="Every digital footprint, one query. The OSINT engine behind INNERNET — then point it at yourself and take it back.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;900&family=Inter:wght@300;400&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500;700&family=Playfair+Display:ital@1&display=swap" rel="stylesheet">
 <style>
-:root{ --neon:#00E6FF; --ease:cubic-bezier(.16,1,.3,1); }
-html[data-pole="black"]{ --paper:#020202; --ink:#FDFDFD; --ink2:#cfcfcf; --hair:rgba(253,253,253,.10); --hair2:rgba(253,253,253,.18); --dim:#6f6f6f; --vig:rgba(0,0,0,.66); --grain-op:.055; }
-html[data-pole="white"]{ --paper:#FDFDFD; --ink:#020202; --ink2:#2a2a2a; --hair:rgba(2,2,2,.12); --hair2:rgba(2,2,2,.22); --dim:#8a8a8a; --vig:rgba(0,0,0,.10); --grain-op:.038; }
+:root{ --neon:#00E6FF; --warn:#FF1FA4; --ok:#1fd17a; --ease:cubic-bezier(.16,1,.3,1); }
+html[data-pole="black"]{ --paper:#020202; --ink:#FDFDFD; --ink2:#cfcfcf; --hair:rgba(253,253,253,.10); --hair2:rgba(253,253,253,.18); --dim:#6f6f6f; --glass:rgba(253,253,253,.030); --card:rgba(253,253,253,.022); --vig:rgba(0,0,0,.66); --grain-op:.05; }
+html[data-pole="white"]{ --paper:#FDFDFD; --ink:#020202; --ink2:#2a2a2a; --hair:rgba(2,2,2,.12); --hair2:rgba(2,2,2,.22); --dim:#8a8a8a; --glass:rgba(2,2,2,.022); --card:rgba(2,2,2,.026); --vig:rgba(0,0,0,.10); --grain-op:.035; }
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%}
-body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif;font-weight:300;overflow:hidden;
-  transition:background .9s var(--ease),color .9s var(--ease);display:flex;flex-direction:column;min-height:100vh}
+html,body{min-height:100%}
+body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif;font-weight:300;overflow-x:hidden;
+  transition:background .9s var(--ease),color .9s var(--ease)}
 .grain{position:fixed;inset:-50%;z-index:60;pointer-events:none;opacity:var(--grain-op);
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");animation:grain 6s steps(6) infinite}
 @keyframes grain{0%{transform:translate(0,0)}25%{transform:translate(-4%,3%)}50%{transform:translate(3%,-4%)}75%{transform:translate(-3%,3%)}100%{transform:translate(0,0)}}
 .vignette{position:fixed;inset:0;z-index:55;pointer-events:none;box-shadow:inset 0 0 240px 40px var(--vig);transition:box-shadow .9s var(--ease)}
-.bar{position:fixed;top:0;left:0;right:0;z-index:40;display:flex;align-items:center;gap:18px;padding:20px 34px;border-bottom:1px solid var(--hair)}
-.brand{font-family:'JetBrains Mono';font-size:11px;letter-spacing:2px;color:var(--dim);text-transform:uppercase}
-.brand a{color:var(--dim);text-decoration:none;transition:color .3s}.brand a:hover{color:var(--ink2)}
-.sp{flex:1}
-.pole{width:46px;height:24px;border-radius:13px;border:1px solid var(--hair2);background:transparent;cursor:pointer;display:flex;align-items:center;padding:0 3px}
-.pole i{width:16px;height:16px;border-radius:50%;background:var(--ink);transition:transform .6s var(--ease),background .6s var(--ease)}
-html[data-pole="white"] .pole i{transform:translateX(22px)}
-.wrap{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:1000px;margin:0 auto;padding:0 34px;width:100%}
-.kicker{font-family:'JetBrains Mono';font-size:11px;letter-spacing:5px;color:var(--neon);text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:28px}
-.kicker .rule{height:1px;width:54px;background:var(--neon);opacity:.5}
-.title{font-family:'Archivo';font-weight:900;letter-spacing:-1.5px;line-height:.95;font-size:clamp(2.6rem,8vw,6rem)}
+
+.bar{position:sticky;top:0;z-index:40;display:flex;align-items:center;gap:16px;padding:18px 30px;backdrop-filter:blur(7px);border-bottom:1px solid var(--hair);background:var(--glass)}
+.bar .back{font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:1.5px;color:var(--dim);text-decoration:none;text-transform:uppercase;transition:color .3s}
+.bar .back:hover{color:var(--ink2)}
+.bar .brand{font-family:'Archivo';font-weight:900;font-size:14px;letter-spacing:.5px}
+.bar .sp{flex:1}
+.modesw{display:flex;border:1px solid var(--hair2);border-radius:3px;overflow:hidden;font-family:'JetBrains Mono';font-size:10px;letter-spacing:1.5px}
+.modesw button{background:transparent;color:var(--dim);border:0;padding:7px 13px;cursor:pointer;font:inherit;transition:all .25s}
+.modesw button.on{background:var(--neon);color:#001016}
+.pole{width:42px;height:22px;border-radius:12px;border:1px solid var(--hair2);background:transparent;cursor:pointer;display:flex;align-items:center;padding:0 3px}
+.pole i{width:14px;height:14px;border-radius:50%;background:var(--ink);transition:transform .6s var(--ease)}
+html[data-pole="white"] .pole i{transform:translateX(20px)}
+
+main{max-width:1080px;margin:0 auto;padding:0 30px}
+.hero{padding:70px 0 30px}
+.kicker{font-family:'JetBrains Mono';font-size:11px;letter-spacing:5px;color:var(--neon);text-transform:uppercase;display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.kicker .rule{height:1px;width:50px;background:var(--neon);opacity:.5}
+.title{font-family:'Archivo';font-weight:900;letter-spacing:-1.4px;line-height:.96;font-size:clamp(2.3rem,6.5vw,4.6rem)}
 .title em{font-family:'Playfair Display';font-style:italic;font-weight:400;font-size:.92em}
-.lede{margin-top:26px;max-width:52ch;font-size:15px;line-height:1.7;color:var(--ink2)}
-.soon{margin-top:40px;display:inline-flex;align-items:center;gap:10px;font-family:'JetBrains Mono';font-size:11px;letter-spacing:3px;
-  color:var(--neon);border:1px solid color-mix(in srgb,var(--neon) 40%,transparent);padding:9px 18px;border-radius:2px;width:max-content;
-  background:color-mix(in srgb,var(--neon) 6%,transparent)}
-.soon .led{width:7px;height:7px;border-radius:50%;background:var(--neon);box-shadow:0 0 10px var(--neon);animation:pulse 1.8s ease-in-out infinite}
-@keyframes pulse{50%{opacity:.35}}
-.foot{padding:24px 34px;border-top:1px solid var(--hair);font-family:'JetBrains Mono';font-size:10.5px;letter-spacing:1.5px;color:var(--dim)}
-.foot a{color:var(--neon);text-decoration:none}.foot a:hover{text-decoration:underline}
-@media(prefers-reduced-motion:reduce){.grain,.soon .led{animation:none}}
-@media(max-width:600px){.bar{padding:16px 18px}.wrap,.foot{padding-left:18px;padding-right:18px}}
+.searchwrap{margin-top:34px;max-width:720px}
+.searchform{display:flex;gap:10px;border:1px solid var(--hair2);border-radius:4px;padding:7px 7px 7px 18px;background:var(--card);align-items:center;transition:border-color .3s,box-shadow .3s}
+.searchform:focus-within{border-color:var(--neon);box-shadow:0 0 0 1px var(--neon),0 0 30px color-mix(in srgb,var(--neon) 25%,transparent)}
+.searchform .mag{color:var(--dim);font-size:15px}
+.searchform input{flex:1;background:transparent;border:0;outline:0;color:var(--ink);font-family:'JetBrains Mono';font-size:14px;padding:10px 0}
+.searchform input::placeholder{color:var(--dim)}
+.searchform button{background:var(--neon);color:#001016;border:0;border-radius:3px;padding:11px 20px;font-family:'JetBrains Mono';font-size:11px;letter-spacing:2px;font-weight:700;cursor:pointer;transition:filter .2s}
+.searchform button:hover{filter:brightness(1.12)}
+.chips{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chips .lbl{font-family:'JetBrains Mono';font-size:10px;letter-spacing:1.5px;color:var(--dim)}
+.chip{font-family:'JetBrains Mono';font-size:11px;color:var(--ink2);border:1px solid var(--hair2);border-radius:20px;padding:5px 13px;cursor:pointer;background:transparent;transition:all .25s}
+.chip:hover{border-color:var(--neon);color:var(--neon)}
+.disc{margin-top:18px;font-family:'JetBrains Mono';font-size:10px;letter-spacing:1px;color:var(--dim)}
+
+/* results */
+.results{padding:10px 0 90px;opacity:0;transform:translateY(14px);transition:opacity .5s var(--ease),transform .5s var(--ease)}
+.results.on{opacity:1;transform:none}
+.scan{display:none;align-items:center;gap:14px;padding:40px 0;font-family:'JetBrains Mono';font-size:12px;letter-spacing:2px;color:var(--neon)}
+.scan.on{display:flex}
+.scan .dot{width:8px;height:8px;border-radius:50%;background:var(--neon);box-shadow:0 0 10px var(--neon);animation:blip .9s ease-in-out infinite}
+@keyframes blip{50%{opacity:.25;transform:scale(.7)}}
+.scanbar{flex:1;height:1px;background:var(--hair);position:relative;overflow:hidden}
+.scanbar::after{content:'';position:absolute;inset:0;width:35%;background:linear-gradient(90deg,transparent,var(--neon),transparent);animation:sweep 1.1s linear infinite}
+@keyframes sweep{0%{transform:translateX(-120%)}100%{transform:translateX(360%)}}
+
+.subject{display:grid;grid-template-columns:1fr auto;gap:24px;align-items:center;border:1px solid var(--hair2);border-radius:6px;padding:24px 26px;background:var(--card);margin:8px 0 26px}
+.subject .nm{font-family:'Archivo';font-weight:900;font-size:clamp(1.5rem,4vw,2.4rem);letter-spacing:-.5px}
+.subject .meta{margin-top:8px;font-family:'JetBrains Mono';font-size:12px;color:var(--dim);letter-spacing:.3px}
+.gauge{text-align:right;min-width:150px}
+.gauge .lab{font-family:'JetBrains Mono';font-size:9.5px;letter-spacing:2px;color:var(--dim);text-transform:uppercase}
+.gauge .val{font-family:'Archivo';font-weight:900;font-size:2.6rem;line-height:1;color:var(--neon)}
+.gauge .val.hi{color:var(--warn)}
+.gbar{height:5px;border-radius:3px;background:var(--hair);margin-top:8px;overflow:hidden}
+.gbar i{display:block;height:100%;border-radius:3px;background:var(--neon);transition:width 1s var(--ease)}
+.gbar i.hi{background:var(--warn)}
+
+.sections{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+.sec{border:1px solid var(--hair);border-radius:6px;background:var(--card);padding:18px 20px;opacity:0;transform:translateY(16px)}
+.sec.in{opacity:1;transform:none;transition:opacity .5s var(--ease),transform .5s var(--ease)}
+.sec h3{font-family:'JetBrains Mono';font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink2);display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.sec h3 .ct{color:var(--neon);font-weight:700}
+.item{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--hair)}
+.item:first-of-type{border-top:0}
+.item .src{font-family:'JetBrains Mono';font-size:12px;color:var(--ink)}
+.item .snip{font-size:12px;color:var(--dim);margin-top:3px;line-height:1.5}
+.item .tag{font-family:'JetBrains Mono';font-size:9px;letter-spacing:1px;padding:2px 7px;border-radius:2px;border:1px solid var(--hair2);color:var(--dim);white-space:nowrap;flex-shrink:0;text-transform:uppercase}
+.item .tag.exp{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,transparent)}
+.rm{font-family:'JetBrains Mono';font-size:9.5px;letter-spacing:1px;padding:4px 10px;border-radius:2px;border:1px solid color-mix(in srgb,var(--neon) 45%,transparent);background:color-mix(in srgb,var(--neon) 8%,transparent);color:var(--neon);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .2s}
+.rm:hover{background:var(--neon);color:#001016}
+.rm.done{border-color:color-mix(in srgb,var(--ok) 50%,transparent);background:color-mix(in srgb,var(--ok) 12%,transparent);color:var(--ok);cursor:default}
+.scrubbanner{display:none;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;border:1px solid color-mix(in srgb,var(--neon) 35%,transparent);border-radius:6px;padding:14px 20px;background:color-mix(in srgb,var(--neon) 6%,transparent);margin-bottom:18px;font-family:'JetBrains Mono';font-size:12px;color:var(--ink2)}
+html[data-mode="scrub"] .scrubbanner{display:flex}
+.scrubbanner b{color:var(--neon)}
+
+.foot{padding:24px 30px;border-top:1px solid var(--hair);font-family:'JetBrains Mono';font-size:10px;letter-spacing:1.2px;color:var(--dim);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.foot a{color:var(--neon);text-decoration:none}
+@media(prefers-reduced-motion:reduce){.grain,.scan .dot,.scanbar::after{animation:none}}
+@media(max-width:620px){.bar{padding:14px 16px}main{padding:0 16px}.subject{grid-template-columns:1fr}.gauge{text-align:left}}
 </style>
 </head>
 <body>
@@ -49,26 +104,183 @@ html[data-pole="white"] .pole i{transform:translateX(22px)}
 <div class="vignette"></div>
 
 <header class="bar">
-  <div class="brand"><a href="https://asdfghjk.lol">← GONZOCLAW · the index</a></div>
+  <a class="back" href="https://asdfghjk.lol">← the index</a>
+  <div class="brand">DOSSIER</div>
   <div class="sp"></div>
+  <div class="modesw">
+    <button id="mSearch" class="on" data-m="search">SEARCH</button>
+    <button id="mScrub" data-m="scrub">SCRUB ME</button>
+  </div>
   <button class="pole" id="pole" aria-label="swing pole" title="swing the pole"><i></i></button>
 </header>
 
-<div class="wrap">
-  <div class="kicker"><span class="rule"></span>DOSSIER · GONZOCLAW</div>
-  <h1 class="title">Every footprint,<br><em>one query.</em></h1>
-  <p class="lede">A background search engine — the open-web intelligence layer behind INNERNET. Point it at a name and watch the internet's memory assemble itself. Then point it at yourself, and take it back.</p>
-  <div class="soon"><span class="led"></span>WIRING UP — COMING SOON</div>
-</div>
+<main>
+  <section class="hero">
+    <div class="kicker"><span class="rule"></span>DOSSIER · OSINT ENGINE</div>
+    <h1 class="title" id="title">Every footprint,<br><em>one query.</em></h1>
+    <div class="searchwrap">
+      <form class="searchform" id="form" autocomplete="off">
+        <span class="mag">⌕</span>
+        <input id="q" name="q" placeholder="Search anyone — name, @handle, or email" aria-label="search query">
+        <button type="submit">ASSEMBLE</button>
+      </form>
+      <div class="chips">
+        <span class="lbl">TRY:</span>
+        <button class="chip" data-q="Riley Okonkwo">Riley Okonkwo</button>
+        <button class="chip" data-q="@m_delacroix">@m_delacroix</button>
+        <button class="chip" id="chipMe" data-q="your own name">point it at yourself →</button>
+      </div>
+      <div class="disc">⚠ Demo — sample/synthetic data only. No real records are queried or stored.</div>
+    </div>
+  </section>
+
+  <section class="results" id="results">
+    <div class="scan" id="scan"><span class="dot"></span>ASSEMBLING DOSSIER<span class="scanbar"></span></div>
+    <div class="scrubbanner">
+      <span>This is your exposure. <b id="rmCount">0</b> of <b id="rmTotal">0</b> removals filed.</span>
+      <span style="color:var(--dim)">Filing a removal sends an opt-out request to the broker (demo).</span>
+    </div>
+    <div class="subject" id="subject" style="display:none">
+      <div>
+        <div class="nm" id="sNm">—</div>
+        <div class="meta" id="sMeta">—</div>
+      </div>
+      <div class="gauge"><div class="lab">Exposure score</div><div class="val" id="sScore">0</div><div class="gbar"><i id="sBar"></i></div></div>
+    </div>
+    <div class="sections" id="sections"></div>
+  </section>
+</main>
 
 <footer class="foot">
-  // dossier.asdfghjk.lol · back to <a href="https://asdfghjk.lol">the index</a>
+  <span>// dossier.asdfghjk.lol · OSINT engine behind INNERNET · sample data</span>
+  <span>back to <a href="https://asdfghjk.lol">the index</a></span>
 </footer>
 
 <script>
+(function(){
+  var root=document.documentElement, reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  /* pole */
   document.getElementById('pole').addEventListener('click',function(){
-    var r=document.documentElement; r.setAttribute('data-pole', r.getAttribute('data-pole')==='black'?'white':'black');
+    root.setAttribute('data-pole', root.getAttribute('data-pole')==='black'?'white':'black');
   });
+
+  /* mode toggle */
+  var title=document.getElementById('title'), q=document.getElementById('q');
+  function setMode(m){
+    root.setAttribute('data-mode',m);
+    document.getElementById('mSearch').classList.toggle('on',m==='search');
+    document.getElementById('mScrub').classList.toggle('on',m==='scrub');
+    if(m==='scrub'){
+      title.innerHTML='Find what they have.<br><em>Take it back.</em>';
+      q.placeholder='Enter your name — see where you’re exposed';
+    }else{
+      title.innerHTML='Every footprint,<br><em>one query.</em>';
+      q.placeholder='Search anyone — name, @handle, or email';
+    }
+  }
+  document.getElementById('mSearch').addEventListener('click',function(){setMode('search')});
+  document.getElementById('mScrub').addEventListener('click',function(){setMode('scrub')});
+  document.getElementById('chipMe').addEventListener('click',function(){ setMode('scrub'); q.value=''; q.focus(); });
+
+  /* deterministic pseudo-random from a string so any query gives stable results */
+  function seed(s){ var h=2166136261; for(var i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,16777619); } return (h>>>0); }
+  function rng(s){ var x=seed(s)||123456789; return function(){ x^=x<<13;x^=x>>>17;x^=x<<5;x>>>=0; return x/4294967296; }; }
+  function pick(r,arr,n){ var a=arr.slice(),o=[]; n=Math.min(n,a.length); for(var i=0;i<n;i++){ o.push(a.splice(Math.floor(r()*a.length),1)[0]); } return o; }
+
+  var BROKERS=['Spokeo','BeenVerified','Whitepages','Radaris','PeopleFinders','Intelius','MyLife','TruePeopleSearch','Acxiom','PeekYou'];
+  var SOCIALS=['LinkedIn','Instagram','GitHub','X / Twitter','Pinterest','Behance','TikTok','Reddit','Medium','Strava'];
+  var BREACHES=[['LinkedIn','2021','700M records · emails, phones'],['Dropbox','2012','68M records · emails, hashes'],['Adobe','2013','153M records · emails, hints'],['Canva','2019','137M records · names, emails'],['MyFitnessPal','2018','144M records · emails, hashes'],['Twitter','2022','5.4M records · emails, phones']];
+  var CITIES=['Austin, TX','Brooklyn, NY','Portland, OR','Oakland, CA','Denver, CO','Chicago, IL','Atlanta, GA'];
+  var ROLES=['Product designer','Software engineer','Founder','Photographer','Writer','Art director','Researcher'];
+  var MENTIONS=['Speaker bio · DesignWeek 2023','Podcast guest · The Long Game ep.142','Alumni directory · class of ’16','Conference panel · archived','GitHub commit history · public','Local news mention · 2021'];
+
+  function build(query){
+    var r=rng(query.toLowerCase().trim()||'anon');
+    var nProfiles=3+Math.floor(r()*5), nMentions=8+Math.floor(r()*40), nBroker=4+Math.floor(r()*5), nBreach=1+Math.floor(r()*4), nRec=1+Math.floor(r()*3);
+    var score=Math.min(96, 38+nBroker*6+nBreach*5+Math.floor(r()*10));
+    var pretty=query.trim().replace(/^@/,'').replace(/\b\w/g,function(c){return c.toUpperCase()})||'Unknown Subject';
+    return {
+      name:pretty, city:pick(r,CITIES,1)[0], role:pick(r,ROLES,1)[0], age:26+Math.floor(r()*22),
+      score:score,
+      profiles:pick(r,SOCIALS,nProfiles),
+      mentions:nMentions, mentionSamples:pick(r,MENTIONS,3),
+      brokers:pick(r,BROKERS,nBroker),
+      breaches:pick(r,BREACHES,nBreach),
+      records:pick(r,['Voter registration','Property record','Court record (civil)','Business filing','Marriage index'],nRec)
+    };
+  }
+
+  var results=document.getElementById('results'), scan=document.getElementById('scan'),
+      subject=document.getElementById('subject'), sections=document.getElementById('sections');
+  var rmCount=0, rmTotal=0;
+
+  function row(src,snip,tagHtml){ return '<div class="item"><div><div class="src">'+src+'</div>'+(snip?'<div class="snip">'+snip+'</div>':'')+'</div>'+tagHtml+'</div>'; }
+
+  function render(d){
+    var scrub = root.getAttribute('data-mode')==='scrub';
+    document.getElementById('sNm').textContent = scrub ? (d.name==='Unknown Subject'?'YOUR EXPOSURE':d.name) : d.name;
+    document.getElementById('sMeta').textContent = d.role+' · '+d.age+' · '+d.city+' · '+d.profiles.length+' linked accounts · '+d.breaches.length+' breaches';
+    var hi=d.score>=65;
+    var val=document.getElementById('sScore'); val.textContent=d.score; val.classList.toggle('hi',hi);
+    var bar=document.getElementById('sBar'); bar.classList.toggle('hi',hi); bar.style.width='0%';
+    subject.style.display='';
+    requestAnimationFrame(function(){ setTimeout(function(){ bar.style.width=d.score+'%'; },60); });
+
+    // build sections
+    var secs=[];
+    secs.push(['Profiles', d.profiles.length, d.profiles.map(function(p){return row(p,'Public account matched',' <span class="tag">match</span>')}).join('')]);
+    secs.push(['Web mentions', d.mentions, d.mentionSamples.map(function(m){return row(m,'',' <span class="tag">indexed</span>')}).join('')+row('+ '+(d.mentions-3)+' more results','','')]);
+
+    // brokers — actionable in scrub mode
+    rmTotal = scrub ? d.brokers.length : 0; rmCount=0;
+    var brokerRows=d.brokers.map(function(b){
+      if(scrub){ return '<div class="item" data-broker="1"><div><div class="src">'+b+'</div><div class="snip">Name, age, address history, relatives, phone listed for sale</div></div><button class="rm">Request removal →</button></div>'; }
+      return row(b,'Name, address history, relatives, phone',' <span class="tag exp">exposed</span>');
+    }).join('');
+    secs.push(['Data brokers', d.brokers.length, brokerRows]);
+
+    secs.push(['Breaches', d.breaches.length, d.breaches.map(function(b){return row(b[0]+' ('+b[1]+')',b[2],' <span class="tag exp">breach</span>')}).join('')]);
+    secs.push(['Public records', d.records.length, d.records.map(function(p){return row(p,'Government / public source',' <span class="tag">public</span>')}).join('')]);
+
+    sections.innerHTML = secs.map(function(s){
+      return '<div class="sec"><h3>'+s[0]+'<span class="ct">'+s[1]+'</span></h3>'+s[2]+'</div>';
+    }).join('');
+
+    // wire removal buttons
+    document.getElementById('rmTotal').textContent=rmTotal; document.getElementById('rmCount').textContent=rmCount;
+    sections.querySelectorAll('.rm').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        if(btn.classList.contains('done'))return;
+        btn.classList.add('done'); btn.textContent='Removal requested ✓';
+        rmCount++; document.getElementById('rmCount').textContent=rmCount;
+        var val=document.getElementById('sScore'), s=Math.max(0,parseInt(val.textContent,10)-Math.ceil(60/Math.max(rmTotal,1)));
+        val.textContent=s; document.getElementById('sBar').style.width=s+'%';
+        if(s<65){ val.classList.remove('hi'); document.getElementById('sBar').classList.remove('hi'); }
+      });
+    });
+
+    // staggered reveal
+    var cards=sections.querySelectorAll('.sec');
+    cards.forEach(function(c,i){ setTimeout(function(){ c.classList.add('in'); }, reduce?0:120+i*110); });
+  }
+
+  function run(query){
+    results.classList.add('on'); subject.style.display='none'; sections.innerHTML='';
+    scan.classList.add('on');
+    results.scrollIntoView({behavior:reduce?'auto':'smooth',block:'start'});
+    var d=build(query);
+    setTimeout(function(){ scan.classList.remove('on'); render(d); }, reduce?0:900);
+  }
+
+  document.getElementById('form').addEventListener('submit',function(e){
+    e.preventDefault(); var v=q.value.trim(); if(!v){ v = root.getAttribute('data-mode')==='scrub' ? 'your name' : 'Riley Okonkwo'; q.value=v; } run(v);
+  });
+  document.querySelectorAll('.chip[data-q]').forEach(function(ch){
+    if(ch.id==='chipMe')return;
+    ch.addEventListener('click',function(){ q.value=ch.getAttribute('data-q'); run(q.value); });
+  });
+})();
 </script>
 </body>
 </html>
