@@ -140,50 +140,54 @@ body {
   min-height: 0;
 }
 
-/* ── Thought crawl — words recede in 3D into deep space (forgetting) ── */
+/* ── Thought stream — a scrollable cosmic feed.
+   Newest sits near the orb; new lines push old ones up; old thoughts rise and
+   dissolve into the starfield (top mask). Scroll up/down to read the history. ── */
 .crawl {
   position: relative;
   align-self: stretch;
-  justify-self: stretch;
-  width: 100%;
-  height: 100%;
-  perspective: 44vmin;
-  perspective-origin: 50% 2%;
-  pointer-events: none;
-  -webkit-mask-image: linear-gradient(to top, #000 44%, rgba(0,0,0,.8) 64%, transparent 93%);
-          mask-image: linear-gradient(to top, #000 44%, rgba(0,0,0,.8) 64%, transparent 93%);
+  justify-self: center;
+  width: 100%; max-width: 720px; height: 100%;
+  margin: 0 auto;
+  display: flex; flex-direction: column;
+  overflow-y: auto; overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: 0 4vw 1.5vh;
+  /* old thoughts dissolve into space at the top */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 16%, #000 100%);
+          mask-image: linear-gradient(to bottom, transparent 0%, #000 16%, #000 100%);
 }
-/* the tilted plane the thoughts live on */
-.crawl__deep {
-  position: absolute; left: 0; right: 0; bottom: 3%;
-  transform-style: preserve-3d;
-  transform: rotateX(41deg);
-  transition: transform .6s var(--ease);
-}
+.crawl::-webkit-scrollbar { display: none; }
+/* margin-top:auto keeps the feed pinned to the bottom until it overflows,
+   then natural upward scroll reveals history — no top clipping */
+.crawl__deep { margin-top: auto; display: flex; flex-direction: column; }
+
 .crawl__line {
-  position: absolute; left: 0; right: 0; bottom: 0;
-  margin: 0 auto; max-width: 90%; padding: 0 4vw;
   text-align: center;
-  font-size: clamp(16px, 4.4vw, 25px);
-  font-weight: 600; line-height: 1.2; letter-spacing: .005em;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;  /* one row each → clean recede */
-  transform: translateY(calc(var(--d, 0) * -9.4vmin));
-  transform-origin: 50% 100%;
-  opacity: var(--o, 1);
-  color: var(--c, var(--moon));
-  text-shadow: 0 0 calc(8px + var(--d, 0) * 2.4px) var(--g, rgba(60,224,255,.45));
-  transition: transform .9s var(--ease), opacity .9s ease, color .9s ease, text-shadow .9s ease;
-  will-change: transform, opacity;
+  margin: 0 auto .5em; max-width: 32ch;
+  font-size: clamp(15px, 4.1vw, 22px);
+  font-weight: 600; line-height: 1.32; letter-spacing: .005em;
+  color: var(--moon-dim); opacity: .4;
+  text-shadow: 0 0 10px rgba(60,224,255,.16);
+  transition: opacity .55s ease, color .55s ease, text-shadow .55s ease;
+  animation: lineRise .5s var(--ease-out) both;
 }
-/* the thought currently forming — nearest, brightest, in front of the plane */
+@keyframes lineRise { from { opacity: 0; transform: translateY(16px); } }
+/* recency gradient — nearest thoughts brightest, fading upward (CSS-only) */
+.crawl__line:nth-last-child(1) { opacity: 1;   color: var(--gold);  text-shadow: 0 0 16px rgba(255,215,106,.5); }
+.crawl__line:nth-last-child(2) { opacity: .92; color: #dff0ff; }
+.crawl__line:nth-last-child(3) { opacity: .74; color: #bfe6ff; }
+.crawl__line:nth-last-child(4) { opacity: .58; }
+.crawl__line:nth-last-child(5) { opacity: .48; }
+
+/* the thought currently forming — pinned nearest the orb, with a caret */
 .crawl__now {
-  position: absolute; left: 0; right: 0; bottom: 1.5%;
-  margin: 0 auto; max-width: 24ch; padding: 0 5vw;
   text-align: center;
-  font-size: clamp(18px, 5vw, 28px); font-weight: 700; line-height: 1.25;
+  margin: .1em auto 0; max-width: 32ch;
+  font-size: clamp(17px, 4.7vw, 25px); font-weight: 700; line-height: 1.3;
   color: var(--moon);
   text-shadow: 0 0 20px rgba(60,224,255,.55), 0 0 42px rgba(164,114,255,.3);
-  min-height: 1.3em;
 }
 .crawl__now::after {
   content: ""; display: inline-block;
@@ -194,21 +198,19 @@ body {
 .crawl__now:empty::after { display: none; }
 @keyframes caret { 50% { opacity: 0; } }
 .crawl__hint {
-  position: absolute; left: 0; right: 0; bottom: 1%;
-  text-align: center; padding: 0 6vw;
+  text-align: center; margin: 1.2em auto 0; padding: 0 6vw;
   color: var(--moon-dim); font-size: 14px; line-height: 1.55;
   opacity: .8; transition: opacity .5s;
 }
-/* Recall warp — the thread flattens and surges back toward the viewer */
-.crawl.is-recalling .crawl__deep {
-  transform: rotateX(7deg) translateZ(36px) scale(1.05);
-  transition: transform .55s cubic-bezier(.3, .9, .25, 1);
-}
-.crawl.is-recalling .crawl__line {
+/* Recall warp — the whole thread surges and brightens (the "remembering" pulse) */
+.crawl.is-recalling .crawl__line,
+.crawl.is-recalling .crawl__now {
   opacity: 1; color: var(--cyan);
-  text-shadow: 0 0 18px var(--cyan), 0 0 38px rgba(60,224,255,.5);
-  transition: transform .5s var(--ease), opacity .5s, color .5s, text-shadow .5s;
+  text-shadow: 0 0 18px var(--cyan), 0 0 36px rgba(60,224,255,.5);
+  transition: opacity .4s, color .4s, text-shadow .4s;
 }
+.crawl.is-recalling .crawl__deep { animation: surge .5s var(--ease-out); }
+@keyframes surge { 0% { transform: translateY(0); } 42% { transform: translateY(-7px) scale(1.02); } 100% { transform: translateY(0); } }
 
 /* Orb */
 .orbwrap {
@@ -524,22 +526,16 @@ body {
 @media (max-height: 720px) {
   .orb { --size: 122px; }
   .card__said { font-size: 19px; }
-  .crawl { perspective: 38vmin; }
-  .crawl__line { transform: translateY(calc(var(--d, 0) * -7vmin)); }
+  .crawl__line { font-size: clamp(14px, 4vw, 20px); margin-bottom: .4em; }
 }
 @media (min-width: 760px) {
   .wordmark { font-size: 22px; }
   .orb { --size: 184px; }
-  .crawl { perspective: 52vmin; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; }
   .orb__core, .nebula { animation: none; }
-  /* flatten the crawl into a readable stack — no 3D, no warp */
-  .crawl { perspective: none; -webkit-mask-image: none; mask-image: none; }
-  .crawl__deep { transform: none; bottom: auto; top: 0; }
-  .crawl__line { transform: translateY(calc(var(--d, 0) * -1.7em)); text-shadow: none; }
-  .crawl.is-recalling .crawl__deep { transform: none; }
+  .crawl { scroll-behavior: auto; }
   .grain { display: none; }
 }

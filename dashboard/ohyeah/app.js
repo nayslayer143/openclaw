@@ -132,30 +132,30 @@ function pushUtterance(text) {
 
 function setInterim(text) {
   el.interim.textContent = text || '';
+  if (text) scrollFeedToBottom();
 }
 
-const CRAWL_MAX = 6;
+let renderedCount = 0;
 function renderStream() {
-  if (state.utterances.length) el.streamHint.style.opacity = '0';
-  const recent = state.utterances.slice(-CRAWL_MAX);
-  const n = recent.length;
-  el.crawlPlane.innerHTML = '';
-  recent.forEach((u, i) => {
-    const d = n - 1 - i;                       // newest → depth 0 (nearest)
+  const u = state.utterances;
+  if (u.length < renderedCount) { el.crawlPlane.innerHTML = ''; renderedCount = 0; }  // reset/cleared
+  el.streamHint.style.display = u.length ? 'none' : '';
+  for (let i = renderedCount; i < u.length; i++) {          // append only new lines (push old up)
     const line = document.createElement('p');
     line.className = 'crawl__line';
-    line.textContent = u.text;
-    // depth → recede + dim + gold(near)→cyan(far)
-    const tcol = Math.min(1, d / 5);
-    const r = Math.round(255 + (60 - 255) * tcol);
-    const g = Math.round(215 + (224 - 215) * tcol);
-    const b = Math.round(106 + (255 - 106) * tcol);
-    line.style.setProperty('--d', d);
-    line.style.setProperty('--o', Math.max(0.06, 1 - d * 0.145).toFixed(2));
-    line.style.setProperty('--c', `rgb(${r},${g},${b})`);
-    line.style.setProperty('--g', `rgba(${r},${g},${b},${Math.max(0.12, 0.55 - d * 0.06).toFixed(2)})`);
+    line.textContent = u[i].text;
     el.crawlPlane.appendChild(line);
-  });
+  }
+  renderedCount = u.length;
+  while (el.crawlPlane.children.length > 200) el.crawlPlane.removeChild(el.crawlPlane.firstChild);  // bound DOM
+  scrollFeedToBottom();
+}
+
+/* auto-scroll to newest — but only if the user is already near the bottom,
+   so scrolling up to read history isn't yanked back down */
+function scrollFeedToBottom(force) {
+  const c = el.crawl; if (!c) return;
+  if (force || c.scrollHeight - c.scrollTop - c.clientHeight < 140) c.scrollTop = c.scrollHeight;
 }
 
 /* ═══════════════════════ 2. NLP (retrieval) ═══════════════════════ */
@@ -396,6 +396,7 @@ const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').match
 
 /* The recall warp: flatten the crawl toward the viewer, streak the stars, flash. */
 function triggerWarp() {
+  scrollFeedToBottom(true);     // snap to the newest thread on recall
   if (reducedMotion()) return;
   if (el.crawl) {
     el.crawl.classList.add('is-recalling');
