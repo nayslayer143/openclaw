@@ -1,0 +1,569 @@
+/* OH YEAH™ — core recovery loop prototype
+ * Architecture:
+ *   1. Thought stream   — captures utterances (demo player OR live Web Speech API)
+ *   2. Retrieval layer  — instant (<300ms): last utterance, topic, thread
+ *   3. Smart layer      — streams in a beat later: prediction + next thoughts
+ *                         (heuristic by default; optional local Ollama hook)
+ */
+
+/* ─────────────────────────── DOM ─────────────────────────── */
+const $ = (id) => document.getElementById(id);
+const el = {
+  orb: $('orb'), recall: $('recall'),
+  streamLines: $('streamLines'), interim: $('interim'), streamHint: $('streamHint'),
+  topicChip: $('topicChip'), topicValue: $('topicValue'), status: $('status'),
+  scrim: $('cardScrim'), card: $('card'), cardClose: $('cardClose'),
+  cardSaid: $('cardSaid'), cardTopic: $('cardTopic'), cardThread: $('cardThread'),
+  recallMs: $('recallMs'),
+  smartBadge: $('smartBadge'), cardPredict: $('cardPredict'), cardNext: $('cardNext'),
+  ohyeah: $('ohyeah'),
+  modeBtns: [...document.querySelectorAll('.mode__btn')],
+};
+
+/* ─────────────────────────── State ─────────────────────────── */
+const state = {
+  mode: 'demo',          // 'demo' | 'live'
+  listening: false,
+  utterances: [],        // { text, t } finalized
+  startedAt: 0,
+};
+
+const OLLAMA = {
+  enabled: false,                          // flip true to use a real local model
+  url: 'http://localhost:11434/api/generate',
+  model: 'llama3.2:3b',
+};
+
+/* ═══════════════════════ 0. CONSTELLATION ═══════════════════════ */
+(function sky() {
+  const cv = document.getElementById('sky');
+  const ctx = cv.getContext('2d');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let stars = [], W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+  function resize() {
+    W = cv.clientWidth = innerWidth; H = cv.clientHeight = innerHeight;
+    cv.width = W * dpr; cv.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const count = Math.round((W * H) / 9000);
+    stars = Array.from({ length: count }, (_, i) => {
+      const big = i % 11 === 0;
+      return {
+        x: Math.random() * W, y: Math.random() * H,
+        r: big ? 1.1 + Math.random() * 1.3 : 0.4 + Math.random() * 0.9,
+        a: 0.25 + Math.random() * 0.6,
+        // deterministic-ish phase so we don't need Math.random in the loop
+        ph: (i * 1.7) % (Math.PI * 2),
+        sp: 0.6 + (i % 7) * 0.18,
+        dx: (Math.random() - 0.5) * 0.04,
+        dy: 0.02 + Math.random() * 0.04,
+        hue: big ? (i % 2 ? 'rgba(60,224,255,' : 'rgba(164,114,255,') : 'rgba(244,246,251,',
+      };
+    });
+  }
+
+  let t = 0;
+  function frame() {
+    t += 0.016;
+    ctx.clearRect(0, 0, W, H);
+    for (const s of stars) {
+      if (!reduce) {
+        s.y += s.dy; s.x += s.dx;
+        if (s.y > H + 2) { s.y = -2; s.x = Math.random() * W; }
+        if (s.x < -2) s.x = W + 2; else if (s.x > W + 2) s.x = -2;
+      }
+      const tw = reduce ? 1 : 0.55 + 0.45 * Math.sin(t * s.sp + s.ph);
+      const alpha = (s.a * tw).toFixed(3);
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = s.hue + alpha + ')';
+      if (s.r > 1) { ctx.shadowBlur = 8; ctx.shadowColor = s.hue + '0.7)'; }
+      else ctx.shadowBlur = 0;
+      ctx.fill();
+    }
+    ctx.shadowBlur = 0;
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  addEventListener('resize', resize, { passive: true });
+  resize();
+  frame();
+})();
+
+/* ═══════════════════════ 1. THOUGHT STREAM ═══════════════════════ */
+
+function pushUtterance(text) {
+  text = text.trim();
+  if (!text) return;
+  state.utterances.push({ text, t: Date.now() });
+  renderStream();
+  updateTopicChip();
+}
+
+function setInterim(text) {
+  el.interim.textContent = text || '';
+}
+
+function renderStream() {
+  if (state.utterances.length) el.streamHint.style.opacity = '0';
+  // keep last 6 in the DOM for the fade stack
+  const recent = state.utterances.slice(-6);
+  el.streamLines.innerHTML = '';
+  for (const u of recent) {
+    const p = document.createElement('p');
+    p.className = 'stream__line';
+    p.textContent = u.text;
+    el.streamLines.appendChild(p);
+  }
+}
+
+/* ═══════════════════════ 2. NLP (retrieval) ═══════════════════════ */
+
+const STOP = new Set(('a about above after again against all am an and any are arent as at be because been before being below between both but by cant cannot could couldnt did didnt do does doesnt doing dont down during each few for from further had hadnt has hasnt have havent having he her here hers herself him himself his how i im id if in into is isnt it its itself just like me more most my myself no nor not of off on once only or other ought our ours ourselves out over own really same she should shouldnt so some such than that thats the their theirs them themselves then there theres these they theyre this those through to too under until up very was wasnt we were werent what whats when where which while who whom why will with wont would wouldnt you youre your yours yourself yourselves oh okay ok um uh so wait sorry kind sort thing things gonna wanna got get really actually honestly maybe probably basically yeah right now one two also even still well ' +
+  // discourse fillers & connectors that masquerade as topics
+  'whole point side idea ideas core lot bit part parts stuff way ways much many big plus reminds means make makes made need needs want wants going stuff thats theres heres everywhere obviously ' +
+  'instead becomes become already around across without within toward towards along among able actual probably basically literally').split(' '));
+
+function tokenize(s) {
+  return (s.toLowerCase().match(/[a-z][a-z'’]+/g) || []).map(w => w.replace(/['’]/g, ''));
+}
+
+/** Score keywords across a window. recencyStrength=0 → pure frequency (stable topic);
+ *  higher → favors recently-opened threads. */
+function keywordScores(utterances, windowSize = 10, recencyStrength = 0.25) {
+  const win = utterances.slice(-windowSize);
+  const scores = new Map();
+  win.forEach((u, idx) => {
+    const r = win.length > 1 ? idx / (win.length - 1) : 1;   // 0 oldest … 1 newest
+    const recency = 1 + recencyStrength * r;
+    for (const w of tokenize(u.text)) {
+      if (w.length < 4 || STOP.has(w)) continue;
+      scores.set(w, (scores.get(w) || 0) + recency);
+    }
+  });
+  return scores;
+}
+
+/** Find the strongest noun-ish bigram for a nicer topic label.
+ *  Only trusts a bigram that actually RECURS (count>=2) — this blocks single-shot
+ *  discourse/adjacency phrases ("whole point", "institutions people") from hijacking
+ *  the topic via recency. Non-recurring conversations fall back to the keyword form. */
+function topBigram(utterances, scores, windowSize = 10) {
+  const win = utterances.slice(-windowSize);
+  const counts = new Map();
+  for (const u of win) {
+    const toks = tokenize(u.text);
+    for (let i = 0; i < toks.length - 1; i++) {
+      const [a, b] = [toks[i], toks[i + 1]];
+      if (a.length < 4 || b.length < 4 || STOP.has(a) || STOP.has(b)) continue;
+      counts.set(a + ' ' + b, (counts.get(a + ' ' + b) || 0) + 1);
+    }
+  }
+  let best = null, bestScore = 0;
+  for (const [bg, c] of counts) {
+    if (c < 2) continue;                       // must recur to be trusted
+    const [a, b] = bg.split(' ');
+    const s = c * 3 + (scores.get(a) || 0) + (scores.get(b) || 0);
+    if (s > bestScore) { best = bg; bestScore = s; }
+  }
+  return best;
+}
+
+function titleCase(s) { return s.replace(/\b\w/g, c => c.toUpperCase()); }
+
+function rankedKeywords(scores, n) {
+  return [...scores.entries()].sort((a, b) => b[1] - a[1]).slice(0, n).map(e => e[0]);
+}
+
+/** The instant retrieval payload. Pure synchronous JS → effectively 0ms. */
+function retrieve() {
+  const u = state.utterances;
+  const last = u.length ? u[u.length - 1].text : '';
+
+  // TOPIC = stable subject → frequency-dominant
+  const topicScores = keywordScores(u, 10, 0.25);
+  const bg = topBigram(u, topicScores);
+  const top = rankedKeywords(topicScores, 3);
+  const topic = bg ? titleCase(bg) : (top.slice(0, 2).map(titleCase).join(' · ') || '—');
+  // only the *shown* topic words are off-limits as "next thoughts"
+  const topicTokens = new Set(bg ? bg.split(' ') : top.slice(0, 2));
+
+  const thread = u.slice(-4, -1).map(x => x.text);   // fragments just before the last
+  return { last, topic, thread, topicScores, keywords: top, topicTokens };
+}
+
+/* ═══════════════════════ 3. SMART LAYER ═══════════════════════ */
+
+/** The headline of a single utterance = its strongest content word.
+ *  Tiebreak by earliest position (the object usually leads the clause). */
+function utteranceHead(text, topicScores) {
+  const toks = tokenize(text);
+  const cand = [];
+  toks.forEach((w, i) => { if (!STOP.has(w) && w.length >= 4) cand.push({ w, i }); });
+  if (!cand.length) return null;
+  cand.sort((a, b) => (topicScores.get(b.w) || 0) - (topicScores.get(a.w) || 0) || a.i - b.i);
+  return cand[0].w;
+}
+
+/** Headlines of recent thoughts you opened but didn't close — most recent first.
+ *  Excludes the just-said thought and the main topic. */
+function recentThreadHeads(r) {
+  const u = state.utterances;
+  const heads = [], seen = new Set(tokenize(r.last));
+  for (let i = u.length - 2; i >= 0; i--) {
+    const h = utteranceHead(u[i].text, r.topicScores);
+    if (!h || seen.has(h) || r.topicTokens.has(h)) continue;
+    seen.add(h); heads.push(h);
+  }
+  return heads;
+}
+
+function last_trailing(s) {
+  s = s.trim();
+  return s.endsWith('…') || s.endsWith('-') || s.endsWith('—') ||
+         /\b(but|and|so|because|which|then|plus|like)\s*[.,…-]*$/i.test(s);
+}
+
+/** Heuristic "where you were going" — built from open threads, not canned. */
+function predictContinuation(r) {
+  const heads = recentThreadHeads(r);
+  const nextThread = titleCase(heads[0] || r.keywords[1] || r.keywords[0] || 'where it leads');
+
+  if (last_trailing(r.last)) {
+    // what were they mid-sentence ON? → strongest topical word in the last utterance
+    const inLast = tokenize(r.last)
+      .filter(w => !STOP.has(w) && w.length >= 4)
+      .sort((a, b) => (r.topicScores.get(b) || 0) - (r.topicScores.get(a) || 0));
+    const anchor = titleCase(inLast[0] || r.keywords[0] || 'it');
+    return `You trailed off on ${anchor} — you were about to tie it back to ${nextThread}.`;
+  }
+  const anchor = titleCase(r.keywords[0] || 'this');
+  return `You were building toward ${nextThread}, with ${anchor} as the anchor — the next move was connecting them.`;
+}
+
+/** 2–3 "potential next thoughts" — headlines of recent open threads. */
+function nextThoughts(r) {
+  let picks = recentThreadHeads(r).slice(0, 3).map(titleCase);
+  if (picks.length < 2) {                                  // very short conversation → backfill
+    const seen = new Set(picks.map(p => p.toLowerCase()));
+    for (const kw of r.keywords) {
+      if (!seen.has(kw)) { seen.add(kw); picks.push(titleCase(kw)); }
+      if (picks.length >= 3) break;
+    }
+  }
+  const frames = [
+    (k) => `Back to ${k} — you opened that and never closed it`,
+    (k) => `The ${k} angle`,
+    (k) => `What about ${k}?`,
+  ];
+  return picks.map((k, i) => frames[i % frames.length](k));
+}
+
+/** Optional: ask a local Ollama model for the smart layer. Falls back silently. */
+async function askOllama(payload) {
+  if (!OLLAMA.enabled) return null;
+  const transcript = state.utterances.map(u => u.text).join(' ');
+  const prompt =
+    `Someone was talking and lost their train of thought. Here is what they said:\n"""${transcript}"""\n\n` +
+    `In one short sentence, tell them where they were going next. Then list 3 short bullet "next thoughts". ` +
+    `Reply as JSON: {"prediction": "...", "next": ["...","...","..."]}`;
+  try {
+    const ctrl = new AbortController();
+    const to = setTimeout(() => ctrl.abort(), 8000);
+    const res = await fetch(OLLAMA.url, {
+      method: 'POST', signal: ctrl.signal,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: OLLAMA.model, prompt, stream: false, format: 'json' }),
+    });
+    clearTimeout(to);
+    if (!res.ok) return null;
+    const data = await res.json();
+    const parsed = JSON.parse(data.response);
+    if (parsed && parsed.prediction) return parsed;
+  } catch (_) { /* fall back to heuristic */ }
+  return null;
+}
+
+/* ═══════════════════════ RECOVERY — the moment ═══════════════════════ */
+
+let cardOpenedAt = 0;   // guards against the opening tap also closing the scrim
+
+async function recover() {
+  if (!state.utterances.length) {
+    flashStatus('Nothing captured yet — start talking first');
+    return;
+  }
+  const t0 = performance.now();
+  const r = retrieve();
+  const ms = Math.max(1, Math.round(performance.now() - t0));
+
+  // ── instant retrieval layer ──
+  el.cardSaid.textContent = r.last || '—';
+  el.cardTopic.textContent = r.topic;
+  el.cardThread.innerHTML = '';
+  (r.thread.length ? r.thread : ['(this was the start of the thread)']).forEach(t => {
+    const li = document.createElement('li'); li.textContent = t; el.cardThread.appendChild(li);
+  });
+  el.recallMs.textContent = `· ${ms}ms`;
+
+  // reset smart layer
+  el.cardPredict.innerHTML = '<span class="cursor"></span>';
+  el.cardNext.innerHTML = '';
+  el.smartBadge.textContent = '✦ thinking…';
+  el.smartBadge.classList.add('is-thinking');
+
+  cardOpenedAt = performance.now();
+  el.scrim.hidden = false;
+
+  // ── smart layer, a beat later (dramatizes 300ms retrieval vs generation) ──
+  const smart = (await askOllama(r)) || {
+    prediction: predictContinuation(r),
+    next: nextThoughts(r),
+  };
+
+  await wait(420);
+  el.smartBadge.textContent = OLLAMA.enabled ? '✦ local model' : '✦ predicted';
+  el.smartBadge.classList.remove('is-thinking');
+  await typeInto(el.cardPredict, smart.prediction, 16);
+
+  smart.next.forEach((txt, i) => {
+    const li = document.createElement('li');
+    li.style.animationDelay = (i * 90) + 'ms';
+    li.innerHTML = `<span class="spark">✦</span><span>${escapeHtml(txt)}</span>`;
+    el.cardNext.appendChild(li);
+  });
+
+  fireOhYeah();
+}
+
+function closeCard() { el.scrim.hidden = true; }
+
+/* ═══════════════════════ The brand beat ═══════════════════════ */
+function fireOhYeah() {
+  el.ohyeah.classList.remove('is-on');
+  void el.ohyeah.offsetWidth;          // reflow → restart animation
+  el.ohyeah.classList.add('is-on');
+  setTimeout(() => el.ohyeah.classList.remove('is-on'), 1700);
+}
+
+/* ═══════════════════════ INPUT: demo player ═══════════════════════ */
+
+const DEMO_SCRIPT = [
+  "Okay so the core idea is a citywide festival that connects museums and neighborhoods.",
+  "Instead of one big venue, the whole city becomes the venue for a weekend.",
+  "Each neighborhood hosts its own thing — galleries, food, local artists, music on the corners.",
+  "And the museums act as anchors, so there's a spine of institutions people already know.",
+  "Which means we'd need sponsors, obviously, probably tiered, civic plus corporate.",
+  "Oh and ticketing — it should be one pass that works everywhere, tap to enter, no paper.",
+  "That reminds me, the app could do wayfinding too, a living map of what's happening right now.",
+  "And then there's the community side, which is honestly the whole point, but…",
+];
+
+let demoTimer = null;
+let demoIdx = 0;
+
+function startDemo() {
+  if (demoIdx >= DEMO_SCRIPT.length) { demoIdx = 0; state.utterances = []; renderStream(); }
+  streamNextDemoLine();
+}
+
+function streamNextDemoLine() {
+  if (demoIdx >= DEMO_SCRIPT.length) {
+    setInterim('');
+    setStatus('Demo · you lost the thread. Hit the button ↓');
+    stopListeningVisual();
+    return;
+  }
+  const line = DEMO_SCRIPT[demoIdx];
+  const words = line.split(' ');
+  let i = 0;
+  const tick = () => {
+    if (!state.listening) return;             // paused
+    i++;
+    setInterim(words.slice(0, i).join(' '));
+    if (i >= words.length) {
+      pushUtterance(line);
+      setInterim('');
+      demoIdx++;
+      demoTimer = setTimeout(streamNextDemoLine, 650 + Math.random() * 500);
+    } else {
+      demoTimer = setTimeout(tick, 95 + Math.random() * 120);
+    }
+  };
+  demoTimer = setTimeout(tick, 250);
+}
+
+function pauseDemo() { clearTimeout(demoTimer); }
+
+/* ═══════════════════════ INPUT: live Web Speech API ═══════════════════════ */
+
+let recog = null;
+function getRecognizer() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return null;
+  const r = new SR();
+  r.continuous = true;
+  r.interimResults = true;
+  r.lang = 'en-US';
+  r.onresult = (e) => {
+    let interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      const res = e.results[i];
+      if (res.isFinal) pushUtterance(res[0].transcript);
+      else interim += res[0].transcript;
+    }
+    setInterim(interim);
+  };
+  r.onerror = (e) => {
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+      flashStatus('Mic blocked — allow microphone, or use Demo mode', true);
+      stopAll();
+    } else if (e.error === 'no-speech') {
+      setStatus('Listening… (say something)');
+    }
+  };
+  r.onend = () => { if (state.listening && state.mode === 'live') { try { r.start(); } catch (_) {} } };
+  return r;
+}
+
+/* ═══════════════════════ Listening control ═══════════════════════ */
+
+function startListening() {
+  state.listening = true;
+  if (!state.startedAt) state.startedAt = Date.now();
+  el.orb.classList.add('is-live');
+  el.orb.setAttribute('aria-label', 'Stop listening');
+
+  if (state.mode === 'demo') {
+    setStatus('Demo · listening…');
+    startDemo();
+  } else {
+    if (!recog) recog = getRecognizer();
+    if (!recog) { flashStatus('Live mic unsupported in this browser — use Demo', true); stopListeningVisual(); state.listening = false; return; }
+    try { recog.start(); setStatus('Live · listening…'); }
+    catch (_) { /* already started */ }
+  }
+}
+
+function stopListeningVisual() {
+  el.orb.classList.remove('is-live');
+  el.orb.setAttribute('aria-label', 'Start listening');
+}
+
+function stopAll() {
+  state.listening = false;
+  stopListeningVisual();
+  pauseDemo();
+  if (recog) { try { recog.stop(); } catch (_) {} }
+  setInterim('');
+}
+
+function toggleListening() {
+  if (state.listening) {
+    stopAll();
+    setStatus(state.mode === 'demo' ? 'Demo · paused' : 'Live · paused');
+  } else {
+    startListening();
+  }
+}
+
+/* ═══════════════════════ Mode switching ═══════════════════════ */
+function setMode(mode) {
+  if (mode === state.mode) return;
+  stopAll();
+  state.mode = mode;
+  state.utterances = [];
+  demoIdx = 0;
+  state.startedAt = 0;
+  renderStream();
+  el.streamHint.style.opacity = '0.8';
+  updateTopicChip();
+  el.modeBtns.forEach(b => {
+    const active = b.dataset.mode === mode;
+    b.classList.toggle('is-active', active);
+    b.setAttribute('aria-selected', String(active));
+  });
+  setStatus(mode === 'demo' ? 'Demo mode · ready' : 'Live mic · ready');
+}
+
+/* ═══════════════════════ Topic chip ═══════════════════════ */
+function updateTopicChip() {
+  if (state.utterances.length < 1) { el.topicChip.hidden = true; return; }
+  const { topic } = retrieve();
+  if (topic && topic !== '—') {
+    el.topicValue.textContent = topic;
+    el.topicChip.hidden = false;
+  }
+}
+
+/* ═══════════════════════ Status helpers ═══════════════════════ */
+let statusTimer = null;
+function setStatus(t) { el.status.textContent = t; el.status.classList.remove('is-error'); }
+function flashStatus(t, isError = false) {
+  el.status.textContent = t;
+  el.status.classList.toggle('is-error', isError);
+  clearTimeout(statusTimer);
+  statusTimer = setTimeout(() => {
+    setStatus(state.listening ? (state.mode === 'demo' ? 'Demo · listening…' : 'Live · listening…')
+                              : (state.mode === 'demo' ? 'Demo mode · ready' : 'Live mic · ready'));
+  }, 3200);
+}
+
+/* ═══════════════════════ Utils ═══════════════════════ */
+const wait = (ms) => new Promise(r => setTimeout(r, ms));
+function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+function typeInto(node, text, speed = 18) {
+  return new Promise(resolve => {
+    node.innerHTML = '';
+    const cursor = document.createElement('span'); cursor.className = 'cursor';
+    node.appendChild(cursor);
+    let i = 0;
+    const step = () => {
+      if (i >= text.length) { cursor.remove(); resolve(); return; }
+      cursor.insertAdjacentText('beforebegin', text[i]);
+      i++;
+      setTimeout(step, speed + (text[i - 1] === ' ' ? 18 : 0));
+    };
+    step();
+  });
+}
+
+/* ═══════════════════════ Wiring ═══════════════════════ */
+el.orb.addEventListener('click', toggleListening);
+el.recall.addEventListener('click', recover);
+el.cardClose.addEventListener('click', closeCard);
+el.scrim.addEventListener('click', (e) => {
+  // ignore the click that opened the card (its release can land on the fresh scrim)
+  if (e.target === el.scrim && performance.now() - cardOpenedAt > 350) closeCard();
+});
+el.modeBtns.forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode)));
+
+document.addEventListener('keydown', (e) => {
+  if (e.code === 'Space' && !e.repeat) {
+    if (document.activeElement && /BUTTON/.test(document.activeElement.tagName)) document.activeElement.blur();
+    e.preventDefault();
+    if (!el.scrim.hidden) return;
+    recover();
+  } else if (e.code === 'Escape') {
+    if (!el.scrim.hidden) closeCard();
+  } else if (e.code === 'Enter' && e.target === document.body) {
+    toggleListening();
+  }
+});
+
+/* ═══════════════════════ Intro splash ═══════════════════════ */
+const splash = document.getElementById('splash');
+function hideSplash() {
+  if (!splash || splash.classList.contains('is-hiding')) return;
+  splash.classList.add('is-hiding');
+  setTimeout(() => { splash.style.display = 'none'; }, 650);
+}
+if (splash) {
+  splash.addEventListener('click', hideSplash);
+  setTimeout(hideSplash, 2000);
+}
+
+// expose a tiny hook for tinkering / enabling the local model from the console
+window.OHYEAH = { state, OLLAMA, recover, setMode, pushUtterance, retrieve, DEMO_SCRIPT, hideSplash };
+
+setStatus('Demo mode · ready');
