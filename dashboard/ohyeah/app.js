@@ -563,6 +563,13 @@ if (splash) {
   setTimeout(hideSplash, 2000);
 }
 
+/* ═══════════════════════ PWA service worker ═══════════════════════ */
+if ('serviceWorker' in navigator) {
+  addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => { /* offline/unsupported — app still runs */ });
+  });
+}
+
 // expose a tiny hook for tinkering / enabling the local model from the console
 window.OHYEAH = { state, OLLAMA, recover, setMode, pushUtterance, retrieve, DEMO_SCRIPT, hideSplash };
 
