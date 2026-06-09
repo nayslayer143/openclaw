@@ -1,11 +1,11 @@
-/* OH YEAH™ service worker — installable + offline app shell.
- * navigations: network-first (so updates show), fall back to cached shell offline.
- * other GETs: cache-first, then network (and cache it).
- * Bump CACHE to invalidate on a new release. */
-const CACHE = 'ohyeah-v2';
+/* OH YEAH™ service worker — installable + offline, but never stale.
+ * navigation + CSS/JS: network-first (always fresh when online, cache fallback offline).
+ * images/icons/manifest: cache-first (instant; rarely change + are URL-versioned when they do).
+ * Asset URLs are also query-versioned (styles.css?v=N) so updates bypass every cache layer.
+ * Bump CACHE to evict the offline copies on a release. */
+const CACHE = 'ohyeah-v3';
 const SHELL = [
-  '/', '/index.html', '/styles.css', '/app.js',
-  '/manifest.json', '/assets/logo.png',
+  '/', '/index.html', '/manifest.json', '/assets/logo.png',
   '/icons/icon-192.png', '/icons/icon-512.png', '/icons/apple-touch-icon.png',
 ];
 
@@ -14,7 +14,7 @@ self.addEventListener('install', (e) => {
     caches.open(CACHE)
       .then((c) => c.addAll(SHELL))
       .then(() => self.skipWaiting())
-      .catch(() => self.skipWaiting())   // never block install on a single 404
+      .catch(() => self.skipWaiting())
   );
 });
 
@@ -26,33 +26,40 @@ self.addEventListener('activate', (e) => {
   );
 });
 
+function networkFirst(req, fallbackKey) {
+  return fetch(req)
+    .then((resp) => {
+      if (resp && resp.ok && resp.type === 'basic') {
+        const copy = resp.clone();
+        caches.open(CACHE).then((c) => c.put(fallbackKey || req, copy));
+      }
+      return resp;
+    })
+    .catch(() => caches.match(fallbackKey || req).then((r) => r || (fallbackKey ? caches.match('/index.html') : undefined)));
+}
+
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  const path = url.pathname;
 
-  if (req.mode === 'navigate') {
-    e.respondWith(
-      fetch(req)
-        .then((resp) => {
-          const copy = resp.clone();
-          caches.open(CACHE).then((c) => c.put('/', copy));
-          return resp;
-        })
-        .catch(() => caches.match('/').then((r) => r || caches.match('/index.html')))
-    );
-    return;
+  // HTML navigations — always try the network so updates show
+  if (req.mode === 'navigate') { e.respondWith(networkFirst(req, '/')); return; }
+
+  // CSS / JS — network-first so a deploy is never masked by a cached asset
+  if (url.origin === location.origin && (path.endsWith('.css') || path.endsWith('.js'))) {
+    e.respondWith(networkFirst(req)); return;
   }
 
+  // everything else (images, icons, manifest, fonts) — cache-first
   e.respondWith(
-    caches.match(req).then((cached) => {
-      if (cached) return cached;
-      return fetch(req).then((resp) => {
-        if (resp.ok && resp.type === 'basic') {
-          const copy = resp.clone();
-          caches.open(CACHE).then((c) => c.put(req, copy));
-        }
-        return resp;
-      });
-    })
+    caches.match(req).then((cached) => cached || fetch(req).then((resp) => {
+      if (resp.ok && resp.type === 'basic') {
+        const copy = resp.clone();
+        caches.open(CACHE).then((c) => c.put(req, copy));
+      }
+      return resp;
+    }))
   );
 });
