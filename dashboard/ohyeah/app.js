@@ -10,7 +10,8 @@
 const $ = (id) => document.getElementById(id);
 const el = {
   orb: $('orb'), recall: $('recall'),
-  streamLines: $('streamLines'), interim: $('interim'), streamHint: $('streamHint'),
+  crawl: $('crawl'), crawlPlane: $('crawlPlane'), interim: $('interim'), streamHint: $('streamHint'),
+  warpflash: $('warpflash'),
   topicChip: $('topicChip'), topicValue: $('topicValue'), status: $('status'),
   scrim: $('cardScrim'), card: $('card'), cardClose: $('cardClose'),
   cardSaid: $('cardSaid'), cardTopic: $('cardTopic'), cardThread: $('cardThread'),
@@ -34,59 +35,89 @@ const OLLAMA = {
   model: 'llama3.2:3b',
 };
 
-/* ═══════════════════════ 0. CONSTELLATION ═══════════════════════ */
+/* ═══════════════════════ 0. STARFIELD (parallax + hyperspace warp) ═══════════════════════ */
+let warpStars = () => {};            // assigned by sky(); recover() calls it
 (function sky() {
   const cv = document.getElementById('sky');
   const ctx = cv.getContext('2d');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let stars = [], W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let cx = 0, cy = 0;                 // warp/vanishing center
+  let px = 0, py = 0, tpx = 0, tpy = 0;  // parallax offset (smoothed) + target
+  let warpStart = 0, warpEnd = 0;
 
   function resize() {
     W = cv.clientWidth = innerWidth; H = cv.clientHeight = innerHeight;
     cv.width = W * dpr; cv.height = H * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const count = Math.round((W * H) / 9000);
+    cx = W / 2; cy = H * 0.42;        // a touch above center, toward the crawl/orb
+    const count = Math.round((W * H) / 8200);
     stars = Array.from({ length: count }, (_, i) => {
-      const big = i % 11 === 0;
+      const depth = 0.35 + Math.random();                 // parallax depth far→near
+      const big = i % 9 === 0;
       return {
         x: Math.random() * W, y: Math.random() * H,
-        r: big ? 1.1 + Math.random() * 1.3 : 0.4 + Math.random() * 0.9,
+        r: (big ? 1.1 + Math.random() * 1.4 : 0.4 + Math.random() * 0.9) * (0.6 + depth * 0.5),
         a: 0.25 + Math.random() * 0.6,
-        // deterministic-ish phase so we don't need Math.random in the loop
         ph: (i * 1.7) % (Math.PI * 2),
-        sp: 0.6 + (i % 7) * 0.18,
-        dx: (Math.random() - 0.5) * 0.04,
-        dy: 0.02 + Math.random() * 0.04,
+        sp: 0.5 + (i % 7) * 0.16,
+        dx: (Math.random() - 0.5) * 0.03,
+        dy: 0.015 + Math.random() * 0.035,
+        depth,
         hue: big ? (i % 2 ? 'rgba(60,224,255,' : 'rgba(164,114,255,') : 'rgba(244,246,251,',
       };
     });
   }
 
+  warpStars = (ms = 760) => { if (reduce) return; warpStart = performance.now(); warpEnd = warpStart + ms; };
+
   let t = 0;
-  function frame() {
+  function frame(now) {
     t += 0.016;
+    px += (tpx - px) * 0.06; py += (tpy - py) * 0.06;
     ctx.clearRect(0, 0, W, H);
+    const warping = now < warpEnd;
+    const wp = warping ? 1 - (warpEnd - now) / (warpEnd - warpStart) : 0;   // 0→1
     for (const s of stars) {
       if (!reduce) {
         s.y += s.dy; s.x += s.dx;
         if (s.y > H + 2) { s.y = -2; s.x = Math.random() * W; }
         if (s.x < -2) s.x = W + 2; else if (s.x > W + 2) s.x = -2;
       }
+      const sx = s.x + px * s.depth, sy = s.y + py * s.depth;   // parallax by depth
       const tw = reduce ? 1 : 0.55 + 0.45 * Math.sin(t * s.sp + s.ph);
-      const alpha = (s.a * tw).toFixed(3);
-      ctx.beginPath();
-      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-      ctx.fillStyle = s.hue + alpha + ')';
-      if (s.r > 1) { ctx.shadowBlur = 8; ctx.shadowColor = s.hue + '0.7)'; }
-      else ctx.shadowBlur = 0;
-      ctx.fill();
+      if (warping) {
+        // streak outward from the warp center (lightspeed)
+        const ease = Math.sin(wp * Math.PI);                    // ramp up then down
+        const stretch = 1 + ease * 7 * s.depth;
+        const ex = cx + (sx - cx) * stretch, ey = cy + (sy - cy) * stretch;
+        ctx.strokeStyle = s.hue + (s.a * tw * 0.85).toFixed(3) + ')';
+        ctx.lineWidth = Math.max(0.6, s.r);
+        ctx.beginPath(); ctx.moveTo(sx, sy); ctx.lineTo(ex, ey); ctx.stroke();
+      } else {
+        ctx.beginPath();
+        ctx.arc(sx, sy, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = s.hue + (s.a * tw).toFixed(3) + ')';
+        if (s.r > 1) { ctx.shadowBlur = 8; ctx.shadowColor = s.hue + '0.7)'; }
+        else ctx.shadowBlur = 0;
+        ctx.fill();
+      }
     }
     ctx.shadowBlur = 0;
     if (!reduce) requestAnimationFrame(frame);
   }
+
+  if (!reduce) {
+    addEventListener('pointermove', (e) => { tpx = (e.clientX / W - 0.5) * 30; tpy = (e.clientY / H - 0.5) * 22; }, { passive: true });
+    addEventListener('deviceorientation', (e) => {
+      if (e.gamma == null) return;
+      tpx = Math.max(-1, Math.min(1, e.gamma / 30)) * 26;
+      tpy = Math.max(-1, Math.min(1, (e.beta - 45) / 30)) * 20;
+    }, { passive: true });
+  }
   addEventListener('resize', resize, { passive: true });
   resize();
-  frame();
+  frame(performance.now());          // draws once; self-schedules only if !reduce
 })();
 
 /* ═══════════════════════ 1. THOUGHT STREAM ═══════════════════════ */
@@ -103,17 +134,28 @@ function setInterim(text) {
   el.interim.textContent = text || '';
 }
 
+const CRAWL_MAX = 6;
 function renderStream() {
   if (state.utterances.length) el.streamHint.style.opacity = '0';
-  // keep last 6 in the DOM for the fade stack
-  const recent = state.utterances.slice(-6);
-  el.streamLines.innerHTML = '';
-  for (const u of recent) {
-    const p = document.createElement('p');
-    p.className = 'stream__line';
-    p.textContent = u.text;
-    el.streamLines.appendChild(p);
-  }
+  const recent = state.utterances.slice(-CRAWL_MAX);
+  const n = recent.length;
+  el.crawlPlane.innerHTML = '';
+  recent.forEach((u, i) => {
+    const d = n - 1 - i;                       // newest → depth 0 (nearest)
+    const line = document.createElement('p');
+    line.className = 'crawl__line';
+    line.textContent = u.text;
+    // depth → recede + dim + gold(near)→cyan(far)
+    const tcol = Math.min(1, d / 5);
+    const r = Math.round(255 + (60 - 255) * tcol);
+    const g = Math.round(215 + (224 - 215) * tcol);
+    const b = Math.round(106 + (255 - 106) * tcol);
+    line.style.setProperty('--d', d);
+    line.style.setProperty('--o', Math.max(0.06, 1 - d * 0.145).toFixed(2));
+    line.style.setProperty('--c', `rgb(${r},${g},${b})`);
+    line.style.setProperty('--g', `rgba(${r},${g},${b},${Math.max(0.12, 0.55 - d * 0.06).toFixed(2)})`);
+    el.crawlPlane.appendChild(line);
+  });
 }
 
 /* ═══════════════════════ 2. NLP (retrieval) ═══════════════════════ */
@@ -296,7 +338,10 @@ async function recover() {
   const r = retrieve();
   const ms = Math.max(1, Math.round(performance.now() - t0));
 
-  // ── instant retrieval layer ──
+  // ── THE WARP: yank the lost thread back out of deep space ──
+  triggerWarp();
+
+  // ── instant retrieval layer (prepped now, revealed out of the warp) ──
   el.cardSaid.textContent = r.last || '—';
   el.cardTopic.textContent = r.topic;
   el.cardThread.innerHTML = '';
@@ -311,6 +356,8 @@ async function recover() {
   el.smartBadge.textContent = '✦ thinking…';
   el.smartBadge.classList.add('is-thinking');
 
+  // card materializes a beat later, out of the lightspeed streak
+  await wait(reducedMotion() ? 0 : 380);
   cardOpenedAt = performance.now();
   el.scrim.hidden = false;
 
@@ -320,7 +367,7 @@ async function recover() {
     next: nextThoughts(r),
   };
 
-  await wait(420);
+  await wait(reducedMotion() ? 0 : 420);
   el.smartBadge.textContent = OLLAMA.enabled ? '✦ local model' : '✦ predicted';
   el.smartBadge.classList.remove('is-thinking');
   await typeInto(el.cardPredict, smart.prediction, 16);
@@ -343,6 +390,24 @@ function fireOhYeah() {
   void el.ohyeah.offsetWidth;          // reflow → restart animation
   el.ohyeah.classList.add('is-on');
   setTimeout(() => el.ohyeah.classList.remove('is-on'), 1700);
+}
+
+const reducedMotion = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* The recall warp: flatten the crawl toward the viewer, streak the stars, flash. */
+function triggerWarp() {
+  if (reducedMotion()) return;
+  if (el.crawl) {
+    el.crawl.classList.add('is-recalling');
+    setTimeout(() => el.crawl && el.crawl.classList.remove('is-recalling'), 900);
+  }
+  warpStars(760);
+  if (el.warpflash) {
+    el.warpflash.classList.remove('is-on');
+    void el.warpflash.offsetWidth;
+    el.warpflash.classList.add('is-on');
+    setTimeout(() => el.warpflash.classList.remove('is-on'), 760);
+  }
 }
 
 /* ═══════════════════════ INPUT: demo player ═══════════════════════ */
@@ -565,6 +630,13 @@ if (splash) {
 
 /* ═══════════════════════ PWA service worker ═══════════════════════ */
 if ('serviceWorker' in navigator) {
+  // when a NEW worker takes control, reload once so updates show immediately
+  const hadController = !!navigator.serviceWorker.controller;
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController || reloaded) return;     // skip the first-ever install
+    reloaded = true; location.reload();
+  });
   addEventListener('load', () => {
     navigator.serviceWorker.register('sw.js').catch(() => { /* offline/unsupported — app still runs */ });
   });

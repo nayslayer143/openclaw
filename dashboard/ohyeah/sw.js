@@ -2,7 +2,7 @@
  * navigations: network-first (so updates show), fall back to cached shell offline.
  * other GETs: cache-first, then network (and cache it).
  * Bump CACHE to invalidate on a new release. */
-const CACHE = 'ohyeah-v1';
+const CACHE = 'ohyeah-v2';
 const SHELL = [
   '/', '/index.html', '/styles.css', '/app.js',
   '/manifest.json', '/assets/logo.png',
