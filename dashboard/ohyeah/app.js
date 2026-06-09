@@ -131,8 +131,24 @@ function pushUtterance(text) {
 }
 
 function setInterim(text) {
-  el.interim.textContent = text || '';
-  if (text) scrollFeedToBottom();
+  el.interim.textContent = text || '';   // flat sibling near the orb — not part of the 3D scroller
+}
+
+/* ── 3D crawl engine ──────────────────────────────────────────────────────────
+ * The scroller (.crawl) is UNtransformed — only `perspective` — so native scroll
+ * stays vanilla. Each line gets a per-frame translateZ/rotateX/opacity from its
+ * cached offsetTop vs scrollTop → a true ascending recede. Lines are in normal
+ * flow, so they can never overlap. CSS :nth-last-child is the always-correct floor;
+ * JS refines the depth on top. */
+const CRAWL = { ZMAX: 560, ROT: 16, DIM: 0.62, GAIN: 1.7, HALO: 170 };
+let crawlDirty = true, crawlStick = true, crawlRAF = 0;
+const crawlReduce = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function measureLine(ln) { ln._top = ln.offsetTop; ln._h = ln.offsetHeight; }
+function remeasureCrawl() {
+  for (const ln of el.crawlPlane.children) measureLine(ln);
+  crawlDirty = true;
+  scrollFeedToBottom();        // re-pin when the viewport resolves its height (0 → real)
 }
 
 let renderedCount = 0;
@@ -145,17 +161,50 @@ function renderStream() {
     line.className = 'crawl__line';
     line.textContent = u[i].text;
     el.crawlPlane.appendChild(line);
+    measureLine(line);                                       // cache before first paint
   }
   renderedCount = u.length;
-  while (el.crawlPlane.children.length > 200) el.crawlPlane.removeChild(el.crawlPlane.firstChild);  // bound DOM
+  while (el.crawlPlane.children.length > 240) el.crawlPlane.removeChild(el.crawlPlane.firstChild);  // bound DOM
+  crawlDirty = true;
   scrollFeedToBottom();
 }
 
-/* auto-scroll to newest — but only if the user is already near the bottom,
-   so scrolling up to read history isn't yanked back down */
+/* pin to newest unless the user has scrolled up to read history */
 function scrollFeedToBottom(force) {
   const c = el.crawl; if (!c) return;
-  if (force || c.scrollHeight - c.scrollTop - c.clientHeight < 140) c.scrollTop = c.scrollHeight;
+  if (force) crawlStick = true;
+  if (crawlStick) c.scrollTop = c.scrollHeight;
+  crawlDirty = true;
+}
+
+function onCrawlScroll() {
+  const c = el.crawl;
+  crawlStick = (c.scrollHeight - c.scrollTop - c.clientHeight) < 60;
+  crawlDirty = true;
+}
+
+/* the per-line foreshortening pass — only repaints on a dirty frame */
+function crawlTick() {
+  if (crawlDirty && !crawlReduce()) {
+    const c = el.crawl, H = c.clientHeight, st = c.scrollTop, lines = el.crawlPlane.children;
+    for (let i = 0; i < lines.length; i++) {
+      const ln = lines[i];
+      if (ln._top == null) measureLine(ln);
+      const yTop = ln._top - st, yc = yTop + ln._h * 0.5;          // center vs viewport
+      if (yc < -CRAWL.HALO || yTop > H + CRAWL.HALO) {             // off-halo → strip transform
+        if (ln._on) { ln.style.transform = ''; ln.style.opacity = ''; ln.style.willChange = 'auto'; ln._on = false; }
+        continue;
+      }
+      ln._on = true; ln.style.willChange = 'transform, opacity';
+      // 0 = near (bottom/orb) → 1 = far. GAIN makes the recede fully develop over the
+      // bottom ~60% of the viewport, so it reads strong on tall desktop windows too.
+      const d = Math.min(1, Math.max(0, (1 - yc / H) * CRAWL.GAIN));
+      ln.style.transform = `translateZ(${(-CRAWL.ZMAX * d).toFixed(1)}px) rotateX(${(CRAWL.ROT * d).toFixed(1)}deg)`;
+      ln.style.opacity = (1 - CRAWL.DIM * d).toFixed(2);
+    }
+    crawlDirty = false;
+  }
+  crawlRAF = requestAnimationFrame(crawlTick);
 }
 
 /* ═══════════════════════ 2. NLP (retrieval) ═══════════════════════ */
@@ -616,6 +665,13 @@ document.addEventListener('keydown', (e) => {
     toggleListening();
   }
 });
+
+/* ═══════════════════════ Crawl engine wiring ═══════════════════════ */
+el.crawl.addEventListener('scroll', onCrawlScroll, { passive: true });
+if ('ResizeObserver' in window) new ResizeObserver(remeasureCrawl).observe(el.crawl);
+addEventListener('orientationchange', () => requestAnimationFrame(remeasureCrawl));
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(remeasureCrawl);
+crawlTick();
 
 /* ═══════════════════════ Intro splash ═══════════════════════ */
 const splash = document.getElementById('splash');

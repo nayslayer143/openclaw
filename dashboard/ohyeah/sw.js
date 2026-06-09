@@ -3,7 +3,7 @@
  * images/icons/manifest: cache-first (instant; rarely change + are URL-versioned when they do).
  * Asset URLs are also query-versioned (styles.css?v=N) so updates bypass every cache layer.
  * Bump CACHE to evict the offline copies on a release. */
-const CACHE = 'ohyeah-v4';
+const CACHE = 'ohyeah-v8';
 const SHELL = [
   '/', '/index.html', '/manifest.json', '/assets/logo.png',
   '/icons/icon-192.png', '/icons/icon-512.png', '/icons/apple-touch-icon.png',

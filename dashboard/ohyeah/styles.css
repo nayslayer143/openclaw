@@ -132,62 +132,80 @@ body {
 .stage {
   position: relative; z-index: 4;
   flex: 1;
-  display: grid;
-  grid-template-rows: 1fr auto auto;
-  align-items: center; justify-items: center;
+  display: flex; flex-direction: column; align-items: center;
   padding: 8px 22px calc(26px + var(--safe-b));
   gap: 14px;
   min-height: 0;
 }
 
-/* ── Thought stream — a scrollable cosmic feed.
-   Newest sits near the orb; new lines push old ones up; old thoughts rise and
-   dissolve into the starfield (top mask). Scroll up/down to read the history. ── */
+/* ── Thought stream — a Star-Wars ASCENDING crawl that is ALSO natively scrollable.
+   The scroller itself is UNtransformed (only `perspective`), so touch/wheel momentum
+   stays vanilla. Each line gets a per-frame translateZ/rotateX/opacity from its scroll
+   offset → a true converging recede. Lines stay in NORMAL FLOW, so wrapping reserves
+   real height and they can never overlap. ── */
 .crawl {
   position: relative;
-  align-self: stretch;
-  justify-self: center;
-  width: 100%; max-width: 720px; height: 100%;
-  margin: 0 auto;
+  flex: 1 1 auto; min-height: 0;          /* fills remaining stage height → real clientHeight */
+  width: 100%; max-width: 720px; margin: 0 auto;
   display: flex; flex-direction: column;
   overflow-y: auto; overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
   scrollbar-width: none;
-  padding: 0 4vw 1.5vh;
-  /* old thoughts dissolve into space at the top */
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 16%, #000 100%);
-          mask-image: linear-gradient(to bottom, transparent 0%, #000 16%, #000 100%);
+  /* perspective = a 3D context for the LINES only; the scroll surface is untouched.
+     Smaller = more dramatic foreshortening; capped low enough to stay punchy on desktop. */
+  perspective: clamp(300px, 62vmin, 480px);
+  perspective-origin: 50% -4%;            /* vanishing point just above the top → recedes UP */
+  /* far convergence dissolves into the starfield */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 100%);
+          mask-image: linear-gradient(to bottom, transparent 0%, #000 18%, #000 100%);
 }
 .crawl::-webkit-scrollbar { display: none; }
-/* margin-top:auto keeps the feed pinned to the bottom until it overflows,
-   then natural upward scroll reveals history — no top clipping */
-.crawl__deep { margin-top: auto; display: flex; flex-direction: column; }
-
-.crawl__line {
-  text-align: center;
-  margin: 0 auto .5em; max-width: 32ch;
-  font-size: clamp(15px, 4.1vw, 22px);
-  font-weight: 600; line-height: 1.32; letter-spacing: .005em;
-  color: var(--moon-dim); opacity: .4;
-  text-shadow: 0 0 10px rgba(60,224,255,.16);
-  transition: opacity .55s ease, color .55s ease, text-shadow .55s ease;
-  animation: lineRise .5s var(--ease-out) both;
+/* preserve-3d so lines keep their depth; margin-top:auto pins newest near the orb */
+.crawl__deep {
+  margin-top: auto;
+  display: flex; flex-direction: column;
+  transform-style: preserve-3d;
+  padding: 16vh 0 0;                      /* runway so the far end has room under the mask */
 }
-@keyframes lineRise { from { opacity: 0; transform: translateY(16px); } }
-/* recency gradient — nearest thoughts brightest, fading upward (CSS-only) */
-.crawl__line:nth-last-child(1) { opacity: 1;   color: var(--gold);  text-shadow: 0 0 16px rgba(255,215,106,.5); }
-.crawl__line:nth-last-child(2) { opacity: .92; color: #dff0ff; }
-.crawl__line:nth-last-child(3) { opacity: .74; color: #bfe6ff; }
-.crawl__line:nth-last-child(4) { opacity: .58; }
-.crawl__line:nth-last-child(5) { opacity: .48; }
-
-/* the thought currently forming — pinned nearest the orb, with a caret */
-.crawl__now {
+.crawl__line {
+  margin: 0 auto .55em; max-width: 30ch; padding: 0 4vw;
   text-align: center;
-  margin: .1em auto 0; max-width: 32ch;
-  font-size: clamp(17px, 4.7vw, 25px); font-weight: 700; line-height: 1.3;
+  font-size: clamp(16px, 4.5vw, 22px);
+  font-weight: 600; line-height: 1.3; letter-spacing: .005em;
+  color: var(--moon-dim);
+  transform-origin: 50% 100%;            /* pivot on own bottom edge */
+  backface-visibility: hidden;
+  text-shadow: 0 0 10px rgba(60,224,255,.18);
+  /* JS writes transform + opacity per frame — transition opacity/color ONLY, never transform */
+  transition: opacity .25s linear, color .35s linear, text-shadow .35s linear;
+  will-change: auto;
+}
+/* CSS depth FLOOR — recency tint/opacity always correct even on a dropped frame;
+   JS refines the Z-shrink on top of this */
+.crawl__line:nth-last-child(1)  { color: var(--gold); opacity: 1;   text-shadow: 0 0 16px rgba(255,215,106,.5); }
+.crawl__line:nth-last-child(2)  { color: #fbe9b0; opacity: .94; }
+.crawl__line:nth-last-child(3)  { color: #dfe6ff; opacity: .82; }
+.crawl__line:nth-last-child(n+4){ color: #cdd8ff; opacity: .6; }
+.crawl__line:nth-last-child(n+7){ opacity: .42; }
+.crawl__line:nth-last-child(n+11){ opacity: .26; }
+
+/* Recall warp — surge the whole plane toward the viewer (3D translateZ keyframe so the
+   per-line 3D context is preserved) + brighten */
+.crawl.is-recalling .crawl__deep { animation: surge .6s cubic-bezier(.22, 1, .36, 1); }
+@keyframes surge {
+  0%   { transform: translateZ(0);    filter: brightness(1); }
+  42%  { transform: translateZ(62px); filter: brightness(1.6); }
+  100% { transform: translateZ(0);    filter: brightness(1); }
+}
+
+/* the thought currently forming — a FLAT sibling near the orb (outside the 3D scroller) */
+.crawl__now {
+  text-align: center; margin: 0 auto; max-width: 32ch; padding: 0 5vw;
+  font-size: clamp(17px, 4.7vw, 24px); font-weight: 700; line-height: 1.3;
   color: var(--moon);
   text-shadow: 0 0 20px rgba(60,224,255,.55), 0 0 42px rgba(164,114,255,.3);
+  min-height: 1.3em;
 }
 .crawl__now::after {
   content: ""; display: inline-block;
@@ -202,19 +220,11 @@ body {
   color: var(--moon-dim); font-size: 14px; line-height: 1.55;
   opacity: .8; transition: opacity .5s;
 }
-/* Recall warp — the whole thread surges and brightens (the "remembering" pulse) */
-.crawl.is-recalling .crawl__line,
-.crawl.is-recalling .crawl__now {
-  opacity: 1; color: var(--cyan);
-  text-shadow: 0 0 18px var(--cyan), 0 0 36px rgba(60,224,255,.5);
-  transition: opacity .4s, color .4s, text-shadow .4s;
-}
-.crawl.is-recalling .crawl__deep { animation: surge .5s var(--ease-out); }
-@keyframes surge { 0% { transform: translateY(0); } 42% { transform: translateY(-7px) scale(1.02); } 100% { transform: translateY(0); } }
 
 /* Orb */
 .orbwrap {
-  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  flex: 0 0 auto;
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
 }
 .orb {
   --size: 168px;
@@ -310,7 +320,8 @@ body {
 
 /* Recall (panic) button */
 .recall {
-  align-self: start;
+  flex: 0 0 auto;
+  align-self: center;
   display: inline-flex; align-items: center; gap: 12px;
   appearance: none; cursor: pointer;
   font: inherit;
@@ -536,6 +547,10 @@ body {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001s !important; animation-iteration-count: 1 !important; }
   .orb__core, .nebula { animation: none; }
-  .crawl { scroll-behavior: auto; }
+  /* flatten the crawl to a plain fading column — CSS floor keeps recency legible */
+  .crawl { scroll-behavior: auto; perspective: none; }
+  .crawl__deep { padding-top: 14px; }
+  .crawl__line { transform: none !important; }
+  .crawl.is-recalling .crawl__deep { animation: none; }
   .grain { display: none; }
 }

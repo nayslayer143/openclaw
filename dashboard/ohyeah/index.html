@@ -18,7 +18,7 @@
   <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png" />
 
   <link rel="preload" as="image" href="assets/logo.png" />
-  <link rel="stylesheet" href="styles.css?v=4" />
+  <link rel="stylesheet" href="styles.css?v=8" />
 </head>
 <body>
   <!-- Cosmic background -->
@@ -48,15 +48,16 @@
 
   <!-- Stage -->
   <main class="stage">
-    <!-- Live thought crawl — recedes into deep space (forgetting) -->
+    <!-- Live thought crawl — ascends + recedes into deep space (forgetting) -->
     <section class="crawl" id="crawl" aria-live="polite" aria-label="Thought stream">
       <div class="crawl__deep" id="crawlPlane"></div>
-      <p class="crawl__now" id="interim"></p>
       <p class="crawl__hint" id="streamHint">Tap the orb and start talking.<br />When you lose the thread, hit the button.</p>
     </section>
 
     <!-- Mic orb -->
     <div class="orbwrap">
+      <!-- the forming thought — FLAT, pinned near the orb, outside the 3D crawl -->
+      <p class="crawl__now" id="interim"></p>
       <button class="orb" id="orb" aria-label="Start listening">
         <span class="orb__core"></span>
         <span class="orb__ring orb__ring--1"></span>
@@ -118,6 +119,6 @@
   <!-- The brand beat -->
   <div class="ohyeah" id="ohyeah" aria-hidden="true"><img src="assets/logo.png" alt="" /></div>
 
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=8"></script>
 </body>
 </html>
