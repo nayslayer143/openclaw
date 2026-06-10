@@ -126,19 +126,35 @@ _SUBDOMAIN_APP = {
 }
 
 
-@app.middleware("http")
-async def _subdomain_root_router(request: Request, call_next):
-    label = request.headers.get("host", "").split(":")[0].split(".")[0]
-    prefix = _SUBDOMAIN_APP.get(label)
-    if prefix:
-        path = request.scope.get("path", "/")
-        if not (path == prefix or path.startswith(prefix + "/")):
-            request.scope["path"] = prefix + path
-    else:
-        target = _SUBDOMAIN_ROOT.get(label)
-        if target and request.scope.get("path") == "/":
-            request.scope["path"] = target
-    return await call_next(request)
+# Pure ASGI (NOT BaseHTTPMiddleware, which buffered the response and raised
+# "RuntimeError: No response returned." whenever the client disconnected
+# mid-request — the source of the transient Cloudflare 502s/timeouts on the
+# subdomains). This version mutates scope["path"] up front and delegates;
+# there is no response object to lose, so disconnects simply propagate.
+class _SubdomainRootRouter:
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] == "http":
+            host = b""
+            for k, v in scope.get("headers") or ():
+                if k == b"host":
+                    host = v
+                    break
+            label = host.decode("latin-1").split(":")[0].split(".")[0]
+            prefix = _SUBDOMAIN_APP.get(label)
+            if prefix:
+                path = scope.get("path", "/")
+                if not (path == prefix or path.startswith(prefix + "/")):
+                    scope["path"] = prefix + path
+            else:
+                target = _SUBDOMAIN_ROOT.get(label)
+                if target and scope.get("path") == "/":
+                    scope["path"] = target
+        await self.app(scope, receive, send)
+
+app.add_middleware(_SubdomainRootRouter)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
                    allow_methods=["*"], allow_headers=["*"])
 
