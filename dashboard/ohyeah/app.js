@@ -37,6 +37,7 @@ const OLLAMA = {
 
 /* ═══════════════════════ 0. STARFIELD (parallax + hyperspace warp) ═══════════════════════ */
 let warpStars = () => {};            // assigned by sky(); recover() calls it
+let burstSky = () => {};             // assigned by sky(); the knock delighter calls it
 (function sky() {
   const cv = document.getElementById('sky');
   const ctx = cv.getContext('2d');
@@ -71,6 +72,22 @@ let warpStars = () => {};            // assigned by sky(); recover() calls it
 
   warpStars = (ms = 760) => { if (reduce) return; warpStart = performance.now(); warpEnd = warpStart + ms; };
 
+  /* short-lived spark particles (the knock delighter) — drawn in the same frame loop */
+  const sparks = [];
+  burstSky = (x, y, n = 24, power = 3, gold = false) => {
+    if (reduce) return;
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2, v = power * (0.35 + Math.random());
+      sparks.push({
+        x, y,
+        vx: Math.cos(a) * v, vy: Math.sin(a) * v - power * 0.18,
+        life: 1, dk: 0.012 + Math.random() * 0.022,
+        r: 0.8 + Math.random() * (gold ? 2.6 : 1.8),
+        hue: gold && i % 3 !== 2 ? 'rgba(255,215,106,' : (i % 2 ? 'rgba(60,224,255,' : 'rgba(164,114,255,'),
+      });
+    }
+  };
+
   let t = 0;
   function frame(now) {
     t += 0.016;
@@ -102,6 +119,15 @@ let warpStars = () => {};            // assigned by sky(); recover() calls it
         else ctx.shadowBlur = 0;
         ctx.fill();
       }
+    }
+    for (let i = sparks.length - 1; i >= 0; i--) {
+      const p = sparks[i];
+      p.x += p.vx; p.y += p.vy; p.vy += 0.05; p.vx *= 0.985; p.vy *= 0.985;
+      p.life -= p.dk;
+      if (p.life <= 0) { sparks.splice(i, 1); continue; }
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fillStyle = p.hue + (p.life * 0.9).toFixed(3) + ')';
+      ctx.fill();
     }
     ctx.shadowBlur = 0;
     if (!reduce) requestAnimationFrame(frame);
@@ -661,6 +687,7 @@ document.addEventListener('keydown', (e) => {
     recover();
   } else if (e.code === 'Escape') {
     if (!el.scrim.hidden) closeCard();
+    dismissNova();
   } else if (e.code === 'Enter' && e.target === document.body) {
     toggleListening();
   }
@@ -685,6 +712,111 @@ if (splash) {
   setTimeout(hideSplash, 2000);
 }
 
+/* ═══════════════ HIDDEN DELIGHTER: knock on the edge of now ═══════════════
+ * Bounce the crawl at its BOTTOM edge (past the newest thought) and stardust
+ * pops near the orb. Seven knocks inside a rolling window charge a supernova:
+ * flash + spark storm, then a typed cosmic poem and a hidden code.
+ * Sound is synth-only, fires on user gestures, kill switch: OHYEAH.NOVA.sound=false */
+const NOVA = {
+  KNOCKS: 7, WINDOW: 2600, THROTTLE: 240,
+  sound: true,
+  combo: 0, lastKnock: 0, busy: false,
+};
+const novaEl = { wrap: $('nova'), poem: $('novaPoem'), code: $('novaCode'), flash: $('novaflash') };
+const NOVA_POEM = 'You reached the edge of now.\nNothing past this point is lost —\nit was just waiting to be said.\n— the sky';
+const NOVA_CODE = '✦ OHYEAH-NOVA · constellations are coming';
+const NOVA_SCALE = [0, 3, 5, 7, 10, 12, 15];   // pentatonic-ish rise, one step per knock
+
+let audioCtx = null;
+function tone(freq, dur = 0.2, gain = 0.04, delay = 0, type = 'sine') {
+  if (!NOVA.sound) return;
+  try {
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume().catch(() => {});
+    const t0 = audioCtx.currentTime + delay;
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(gain, t0);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    o.connect(g); g.connect(audioCtx.destination);
+    o.start(t0); o.stop(t0 + dur + 0.03);
+  } catch (_) { /* no audio — the delighter stays visual */ }
+}
+
+function orbCenter() {
+  const r = el.orb.getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+}
+
+function knock() {
+  const now = performance.now();
+  if (NOVA.busy || now - NOVA.lastKnock < NOVA.THROTTLE) return;
+  if (!state.utterances.length || !el.scrim.hidden) return;
+  NOVA.combo = (now - NOVA.lastKnock > NOVA.WINDOW) ? 1 : NOVA.combo + 1;
+  NOVA.lastKnock = now;
+
+  const { x, y } = orbCenter();
+  burstSky(x, y, 10 + NOVA.combo * 5, 2.4 + NOVA.combo * 0.55);
+  tone(392 * Math.pow(2, NOVA_SCALE[Math.min(NOVA.combo - 1, 6)] / 12), 0.22);
+  if (!reducedMotion()) {
+    el.orb.style.transform = `scale(${(1 + 0.04 * NOVA.combo).toFixed(2)})`;
+    setTimeout(() => { el.orb.style.transform = ''; }, 150);
+  }
+  if (NOVA.combo >= NOVA.KNOCKS) { NOVA.busy = true; setTimeout(supernova, 260); }
+}
+
+async function supernova() {
+  const { x, y } = orbCenter();
+  [392, 494, 587, 784].forEach((f, i) => tone(f, 0.9, 0.04, i * 0.07));
+  tone(98, 1.2, 0.05, 0, 'triangle');
+  if (!reducedMotion()) {
+    burstSky(x, y, 90, 8, true);
+    burstSky(x, y, 70, 4.5);
+    if (novaEl.flash) {
+      novaEl.flash.classList.remove('is-on'); void novaEl.flash.offsetWidth;
+      novaEl.flash.classList.add('is-on');
+      setTimeout(() => novaEl.flash.classList.remove('is-on'), 950);
+    }
+    await wait(700);
+  }
+  novaEl.code.style.opacity = '0';
+  novaEl.poem.textContent = '';
+  novaEl.wrap.hidden = false;
+  await typeInto(novaEl.poem, NOVA_POEM, 26);
+  novaEl.code.textContent = NOVA_CODE;
+  novaEl.code.style.opacity = '1';
+}
+
+function dismissNova() {
+  if (novaEl.wrap.hidden) return;
+  novaEl.wrap.hidden = true;
+  NOVA.busy = false; NOVA.combo = 0; NOVA.lastKnock = 0;
+}
+
+/* knock detection — wheel (desktop), touch pull (mobile), iOS momentum overshoot */
+el.crawl.addEventListener('wheel', (e) => {
+  const c = el.crawl;
+  if (e.deltaY > 18 && c.scrollTop + c.clientHeight >= c.scrollHeight - 2) knock();
+}, { passive: true });
+
+let novaTouchY = 0, novaTouchArmed = false, novaTouchSpent = false;
+el.crawl.addEventListener('touchstart', (e) => {
+  const c = el.crawl;
+  novaTouchY = e.touches[0].clientY;
+  novaTouchArmed = c.scrollTop + c.clientHeight >= c.scrollHeight - 2;
+  novaTouchSpent = false;
+}, { passive: true });
+el.crawl.addEventListener('touchmove', (e) => {
+  if (!novaTouchArmed || novaTouchSpent) return;
+  if (novaTouchY - e.touches[0].clientY > 26) { novaTouchSpent = true; knock(); }
+}, { passive: true });
+el.crawl.addEventListener('scroll', () => {
+  const c = el.crawl;
+  if (c.scrollTop + c.clientHeight - c.scrollHeight > 6) knock();
+}, { passive: true });
+
+novaEl.wrap.addEventListener('click', dismissNova);
+
 /* ═══════════════════════ PWA service worker ═══════════════════════ */
 if ('serviceWorker' in navigator) {
   // when a NEW worker takes control, reload once so updates show immediately
@@ -700,6 +832,6 @@ if ('serviceWorker' in navigator) {
 }
 
 // expose a tiny hook for tinkering / enabling the local model from the console
-window.OHYEAH = { state, OLLAMA, recover, setMode, pushUtterance, retrieve, DEMO_SCRIPT, hideSplash };
+window.OHYEAH = { state, OLLAMA, NOVA, recover, setMode, pushUtterance, retrieve, DEMO_SCRIPT, hideSplash };
 
 setStatus('Demo mode · ready');

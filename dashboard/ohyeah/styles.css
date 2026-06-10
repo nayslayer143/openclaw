@@ -434,7 +434,8 @@ body {
   font-size: 16px; line-height: 1.5; color: var(--ink);
   margin-bottom: 18px; min-height: 1.5em;
 }
-.card__predict .cursor {
+.card__predict .cursor,
+.nova__poem .cursor {
   display: inline-block; width: 2px; height: 1.05em;
   vertical-align: -2px; background: var(--gold);
   box-shadow: 0 0 8px var(--gold);
@@ -528,6 +529,52 @@ body {
   0%   { opacity: 0; transform: scale(.5); }
   18%  { opacity: .9; }
   100% { opacity: 0; transform: scale(1.45); }
+}
+
+/* ───────────── Hidden delighter — supernova at the edge of now ───────────── */
+.novaflash {
+  position: fixed; inset: 0; z-index: 39;
+  pointer-events: none; opacity: 0;
+  background: radial-gradient(circle at 50% 78%,
+    rgba(255,246,220,.98), rgba(255,215,106,.5) 22%, rgba(60,224,255,.18) 46%, transparent 66%);
+}
+.novaflash.is-on { animation: novaflash .95s var(--ease-out); }
+@keyframes novaflash {
+  0%   { opacity: 0; transform: scale(.4); }
+  16%  { opacity: 1; }
+  100% { opacity: 0; transform: scale(1.6); }
+}
+.nova {
+  position: fixed; inset: 0; z-index: 44;
+  display: grid; place-items: center;
+  background: rgba(4, 5, 10, .72);
+  backdrop-filter: blur(6px);
+  animation: scrimIn .6s var(--ease) both;
+  cursor: pointer;
+}
+.nova__inner { text-align: center; padding: 0 8vw; max-width: 560px; }
+.nova__poem {
+  font-size: clamp(18px, 4.6vw, 26px); font-weight: 600; line-height: 1.85;
+  color: var(--moon);
+  white-space: pre-line;
+  text-shadow: 0 0 24px rgba(255,215,106,.35), 0 0 50px rgba(60,224,255,.18);
+  min-height: 7.4em;
+}
+.nova__code {
+  display: inline-block;
+  margin-top: 22px;
+  font-size: 12.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--gold);
+  padding: 9px 18px; border-radius: 999px;
+  border: 1px solid rgba(255,215,106,.45);
+  background: rgba(255,215,106,.08);
+  box-shadow: 0 0 30px -6px rgba(255,215,106,.45);
+  opacity: 0; transition: opacity .8s var(--ease);
+}
+.nova__hint {
+  margin-top: 26px;
+  font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--moon-dim); opacity: .6;
 }
 
 /* hidden util */
