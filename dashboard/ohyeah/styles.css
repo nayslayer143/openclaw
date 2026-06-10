@@ -220,6 +220,18 @@ body {
   color: var(--moon-dim); font-size: 14px; line-height: 1.55;
   opacity: .8; transition: opacity .5s;
 }
+/* the brand hero — lives in the empty state, gone the moment thoughts stream */
+.hint__logo {
+  display: block;
+  width: min(44vw, 230px);
+  margin: 0 auto 18px;
+  filter: drop-shadow(0 10px 38px rgba(255,80,150,.32)) drop-shadow(0 0 24px rgba(120,180,255,.22));
+  animation: heroFloat 6.5s var(--ease) infinite;
+}
+@keyframes heroFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50%      { transform: translateY(-7px) scale(1.018); }
+}
 
 /* Orb */
 .orbwrap {
