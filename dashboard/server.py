@@ -3066,6 +3066,32 @@ async def clientmcp_api_proxy(request: Request, rest: str):
     }
     try:
         body = await request.body() if request.method == "POST" else None
+        # Streaming endpoints (NDJSON/SSE, path ends in "-stream") are passed
+        # through chunk-by-chunk — buffering them would defeat the point.
+        if rest.endswith("-stream"):
+            client = httpx.AsyncClient(timeout=httpx.Timeout(95.0))
+            sreq = client.build_request(
+                request.method, upstream, headers=forward_headers, content=body
+            )
+            r = await client.send(sreq, stream=True)
+            stream_headers = {
+                k: v
+                for k, v in r.headers.items()
+                if k.lower()
+                not in {"content-encoding", "transfer-encoding", "content-length", "connection"}
+            }
+
+            async def passthrough():
+                try:
+                    async for chunk in r.aiter_raw():
+                        yield chunk
+                finally:
+                    await r.aclose()
+                    await client.aclose()
+
+            return StreamingResponse(
+                passthrough(), status_code=r.status_code, headers=stream_headers
+            )
         # 90s — LLM-backed demo endpoints (qa, naming, brand-ingest) routinely
         # take 10–60s on Ollama qwen2.5:7b. 15s was too aggressive.
         async with httpx.AsyncClient(timeout=90.0) as client:

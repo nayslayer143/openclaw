@@ -256,6 +256,12 @@ html.dooropen .screen.on,html.dooropen .switch{filter:blur(14px) saturate(.8);tr
 .toast{z-index:300}
 .seedchip{margin-left:auto;font-size:8.5px;letter-spacing:1px;text-transform:uppercase;border:1px solid var(--line-2);border-radius:999px;padding:2px 8px;color:var(--muted)}
 .seedchip.live{color:var(--green);border-color:color-mix(in srgb,var(--green) 40%,transparent)}
+.wire{font-family:'JetBrains Mono',monospace;font-size:10.5px;line-height:1.7;color:var(--muted);white-space:pre-wrap;max-height:150px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-top:12px;mask-image:linear-gradient(to bottom,transparent,#000 18%)}
+.since{margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--accent)}
+.pres{width:8px;height:8px;border-radius:50%;background:var(--line-2);display:inline-block;flex-shrink:0}
+.pres.on{background:var(--green);animation:presPulse 2.4s ease-out infinite}
+@keyframes presPulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--green) 55%,transparent)}70%{box-shadow:0 0 0 9px transparent}100%{box-shadow:0 0 0 0 transparent}}
+.pres-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1.2px;text-transform:uppercase;color:var(--green)}
 @media (prefers-reduced-motion:reduce){
   #dustfx{display:none}
   html.knock-b .screen.on,html.knock-t .screen.on{animation:none}
@@ -292,6 +298,7 @@ html.dooropen .screen.on,html.dooropen .switch{filter:blur(14px) saturate(.8);tr
       <a class="brandmark" href="#/">Foyer</a>
       <span class="crumb">the Stage / <b id="crumb-client">—</b></span>
       <div class="who">
+        <span class="pres off" id="presence"></span><span class="pres-lbl" id="presence-lbl"></span>
         <span class="avatar" id="who-av">—</span>
         <span id="who-name">—</span>
         <button class="leave" onclick="location.hash='#/'">↩ switch</button>
@@ -479,6 +486,73 @@ function sendDecision(decision,d){
     .catch(e=>toast('Saved on your Stage — studio sync failed: '+agentError(e)));
 }
 
+/* "Since you last looked" — computed once per client per page-load, from real
+   feed timestamps vs localStorage last-seen. */
+const SINCE_DONE={};
+function renderSince(fd){
+  const c=current; if(!c||SINCE_DONE[c.id])return; SINCE_DONE[c.id]=1;
+  const key='foyer-last-seen-'+c.id;
+  let last=0; try{last=+localStorage.getItem(key)||0}catch(e){}
+  const dNew=(fd.decisions||[]).filter(x=>x.clientContainerId===c.id&&+new Date(x.occurredAt)>last).length;
+  const mNew=(fd.messages||[]).filter(m=>m.clientContainerId===c.id&&+new Date(m.ingestedAt)>last).length;
+  if(last&&(dNew+mNew)>0){
+    const el=document.createElement('div'); el.id='since'; el.className='since';
+    const bits=[]; if(dNew)bits.push(dNew+' decision'+(dNew>1?'s':'')+' logged'); if(mNew)bits.push(mNew+' new message'+(mNew>1?'s':''));
+    el.textContent='✦ since you last looked — '+bits.join(' · ');
+    const hero=$('.stage-hero'); if(hero&&!$('#since'))hero.appendChild(el);
+  }
+  try{localStorage.setItem(key,String(Date.now()+SKEW))}catch(e){}
+}
+
+/* Presence — honest signal: latest real activity (messages+decisions) within
+   10 minutes lights the dot. No faking. */
+function renderPresence(fd){
+  const el=$('#presence'); if(!el)return;
+  const ts=[...(fd.messages||[]),...(fd.decisions||[])]
+    .filter(x=>!current||x.clientContainerId===current.id)
+    .map(x=>+new Date(x.ingestedAt||x.occurredAt)).filter(Boolean);
+  const latest=ts.length?Math.max(...ts):0;
+  const mins=latest?((Date.now()+SKEW)-latest)/6e4:Infinity;
+  const on=mins<=10;
+  el.className='pres '+(on?'on':'off');
+  el.title=on?'your studio is here now':(latest?'studio last active '+relTime(new Date(latest).toISOString())+' ago':'');
+  const lbl=$('#presence-lbl'); if(lbl)lbl.textContent=on?'studio is here':'';
+}
+
+/* Streaming naming agent — NDJSON over fetch; raw model tokens render live
+   in a wire view, parsed candidates land at the end. */
+function renderCands(out,mode,cands){
+  out.innerHTML=`<div class="meta"><span class="live">● live</span> ${esc(mode||'draft')} · ${cands.length} candidates · star your favourites</div>`+
+    cands.map((c,i)=>`<div class="cand" data-i="${i}">
+      <div class="nm">${esc(c.candidate)}</div>
+      <div class="rat">${esc(c.rationale||'')}</div>
+      <div class="acts"><button class="icbtn fav" title="Favourite">♡</button></div>
+    </div>`).join('');
+  $$('.cand .fav',out).forEach(b=>b.onclick=()=>{b.classList.toggle('on');b.textContent=b.classList.contains('on')?'♥':'♡';b.closest('.cand').classList.toggle('pick');});
+}
+async function streamNaming(payload,out){
+  const r=await fetch(API+'/naming-stream',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)});
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw Object.assign(new Error(e.error||('http '+r.status)),{status:r.status,body:e});}
+  if(!r.body)return postJSON(API+'/naming',payload);
+  out.innerHTML=`<div class="meta"><span class="live">● live</span> the naming agent is writing — raw wire</div><div class="wire"></div>`;
+  const wire=$('.wire',out);
+  const reader=r.body.getReader(),dec=new TextDecoder();
+  let buf='',result=null;
+  for(;;){
+    const {done,value}=await reader.read(); if(done)break;
+    buf+=dec.decode(value,{stream:true}); let nl;
+    while((nl=buf.indexOf('\n'))>=0){
+      const line=buf.slice(0,nl).trim(); buf=buf.slice(nl+1); if(!line)continue;
+      let evt=null; try{evt=JSON.parse(line)}catch(e){continue}
+      if(evt.type==='token'&&wire){wire.textContent=(wire.textContent+evt.text).slice(-900);wire.scrollTop=wire.scrollHeight;}
+      else if(evt.type==='result')result=evt;
+      else if(evt.type==='error')throw new Error(evt.error||'agent failed');
+    }
+  }
+  if(!result)throw new Error('stream ended without a result');
+  return result;
+}
+
 /* ── Theme ──────────────────────────────────────────────────────────────── */
 const THEMES=['atrium','nocturne','doorway'];
 function setTheme(t){
@@ -600,12 +674,14 @@ function renderHill(stops){
 }
 async function hydrateThread(){
   const c=current, box=$('#thread');
-  box.innerHTML=`<div class="tmsg"><div class="av"><span class="spin"></span></div><div><div class="txt" style="color:var(--muted)">loading your conversation…</div></div></div>`;
+  if(!box.dataset.loaded)box.innerHTML=`<div class="tmsg"><div class="av"><span class="spin"></span></div><div><div class="txt" style="color:var(--muted)">loading your conversation…</div></div></div>`;
   let msgs=[];
   const fd=await getFeed();
   msgs=(fd.messages||[]).filter(m=>m.clientContainerId===c.id);
   applyDecisions(fd);
+  renderSince(fd); renderPresence(fd);
   if(document.querySelector('.screen.on')?.id==='stage')renderDeliverables();
+  box.dataset.loaded='1';
   msgs=(localMsgs[c.id]||[]).concat(msgs);
   if(!msgs.length){box.innerHTML=`<div class="tmsg"><div class="av">··</div><div><div class="txt" style="color:var(--muted)">No messages yet. Say hello to your studio below.</div></div></div>`;return;}
   box.innerHTML=msgs.slice(0,10).map(m=>{
@@ -702,15 +778,8 @@ function wireReview(d,s){
       btn.disabled=true; const orig=btn.textContent; btn.textContent='Generating…';
       out.innerHTML=`<div class="meta"><span class="spin"></span>running naming agent · draft mode · 8 candidates</div>`;
       try{
-        const data=await postJSON(API+'/naming',{brief,mode:'draft',count:8});
-        const cands=data.candidates||[];
-        out.innerHTML=`<div class="meta"><span class="live">● live</span> ${esc(data.mode||'draft')} · ${cands.length} candidates · star your favourites</div>`+
-          cands.map((c,i)=>`<div class="cand" data-i="${i}">
-            <div class="nm">${esc(c.candidate)}</div>
-            <div class="rat">${esc(c.rationale||'')}</div>
-            <div class="acts"><button class="icbtn fav" title="Favourite">♡</button></div>
-          </div>`).join('');
-        $$('#naming-out .cand .fav').forEach(b=>b.onclick=()=>{b.classList.toggle('on');b.textContent=b.classList.contains('on')?'♥':'♡';b.closest('.cand').classList.toggle('pick');});
+        const data=await streamNaming({brief,mode:'draft',count:8},out);
+        renderCands(out,data.mode,data.candidates||[]);
       }catch(e){out.innerHTML=`<div class="err">${esc(agentError(e))}</div>`;}
       finally{btn.disabled=false;btn.textContent=orig;}
     };
@@ -826,6 +895,12 @@ function thump(f,g,t){if(!actx||actx.state!=='running')return;try{
 
 /* ── boot ───────────────────────────────────────────────────────────────── */
 loadClients().then(route);
+fetch(API+'/warmup').catch(()=>{});           // pre-warm the local model
+setInterval(()=>{                              // live-ish feed: visibility-aware refresh
+  if(document.hidden||!current)return;
+  if(document.querySelector('.screen.on')?.id!=='stage')return;
+  FEED_CACHE.t=0; hydrateThread();
+},15000);
 })();
 </script>
 </body>

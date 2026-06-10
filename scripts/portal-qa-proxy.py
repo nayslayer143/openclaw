@@ -36,12 +36,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         )
         try:
             with urllib.request.urlopen(req, timeout=95) as r:
-                data = r.read()
                 self.send_response(r.status)
                 self.send_header("content-type", r.headers.get("content-type", "application/json"))
-                self.send_header("content-length", str(len(data)))
                 self.end_headers()
-                self.wfile.write(data)
+                # chunked copy so -stream endpoints arrive live (HTTP/1.0
+                # close-delimited; no content-length needed)
+                while True:
+                    chunk = r.read(512)
+                    if not chunk:
+                        break
+                    self.wfile.write(chunk)
+                    self.wfile.flush()
         except urllib.error.HTTPError as e:
             data = e.read()
             self.send_response(e.code)
