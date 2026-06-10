@@ -254,6 +254,8 @@ html.dooropen .screen.on,html.dooropen .switch{filter:blur(14px) saturate(.8);tr
 #backroom .pass:hover{border-style:solid}
 #backroom .hintline{font-size:12.5px;color:var(--muted);margin-bottom:30px}
 .toast{z-index:300}
+.seedchip{margin-left:auto;font-size:8.5px;letter-spacing:1px;text-transform:uppercase;border:1px solid var(--line-2);border-radius:999px;padding:2px 8px;color:var(--muted)}
+.seedchip.live{color:var(--green);border-color:color-mix(in srgb,var(--green) 40%,transparent)}
 @media (prefers-reduced-motion:reduce){
   #dustfx{display:none}
   html.knock-b .screen.on,html.knock-t .screen.on{animation:none}
@@ -306,10 +308,10 @@ html.dooropen .screen.on,html.dooropen .switch{filter:blur(14px) saturate(.8);tr
 
     <div class="cols">
       <div>
-        <div class="sec-h">Deliverables for your review</div>
+        <div class="sec-h">Deliverables for your review<span class="seedchip" id="seed-chip">demo seed</span></div>
         <div class="deliv" id="deliverables"><!-- rendered --></div>
 
-        <div class="sec-h" style="margin-top:34px">Conversation</div>
+        <div class="sec-h" style="margin-top:34px">Conversation<span class="seedchip live">live</span></div>
         <div class="thread" id="thread"><!-- hydrated from /feed --></div>
         <div class="composer">
           <input id="composer-input" type="text" placeholder="Message your studio…" maxlength="300">
@@ -439,6 +441,43 @@ let CLIENTS = [];
 let current = null;          // current client {id,name,slug}
 const approvals = {};        // deliverableId -> 'approved'|'changes'
 const localMsgs = {};        // clientId -> [extra messages added in-session]
+let SKEW = 0;                // serverNow - clientNow, from /feed generatedAt
+
+/* Honest empty state — unknown clients get a truthful blank Stage, never
+   another client's seed data. */
+const EMPTY_SEED = {
+  name:'', tagline:'', brief:'', voice:'', palette:[], hill:[], deliverables:[],
+  title:'Welcome to <em>your Stage</em>.',
+  lede:'Your studio is setting the stage — deliverables will appear here the moment something is ready for your eyes.',
+};
+
+/* Shared feed fetch (8s cache) + decision hydration. Decisions are append-only
+   audit events from /v1/demo/feed; latest per deliverable wins. */
+const FEED_CACHE = { t:0, data:null };
+async function getFeed(){
+  if(FEED_CACHE.data && Date.now()-FEED_CACHE.t<8000) return FEED_CACHE.data;
+  try{
+    const r=await fetch(API+'/feed',{headers:{Accept:'application/json'}});
+    const d=await r.json();
+    FEED_CACHE.t=Date.now(); FEED_CACHE.data=d;
+    const sk=Date.parse(d.generatedAt)-Date.now(); if(isFinite(sk)) SKEW=sk;
+    return d;
+  }catch(e){ return FEED_CACHE.data||{messages:[],decisions:[]}; }
+}
+function applyDecisions(fd){
+  if(!current) return;
+  const seen={};
+  (fd.decisions||[]).filter(x=>x.clientContainerId===current.id).forEach(x=>{
+    if(seen[x.deliverableId]) return; seen[x.deliverableId]=1;
+    if(!approvals[x.deliverableId]) approvals[x.deliverableId]=(x.decision==='approved')?'approved':'changes';
+  });
+}
+function sendDecision(decision,d){
+  const note=($('#note')&&$('#note').value||'').trim();
+  postJSON(API+'/decision',{clientContainerId:current.id,deliverableId:d.id,deliverableTitle:d.title,decision,note})
+    .then(()=>{FEED_CACHE.t=0;})
+    .catch(e=>toast('Saved on your Stage — studio sync failed: '+agentError(e)));
+}
 
 /* ── Theme ──────────────────────────────────────────────────────────────── */
 const THEMES=['atrium','nocturne','doorway'];
@@ -458,7 +497,7 @@ $$('[data-theme-btn]').forEach(b=>b.addEventListener('click',()=>setTheme(b.data
 
 /* ── helpers ────────────────────────────────────────────────────────────── */
 function initials(n){const p=String(n||'').trim().split(/\s+/);return((p[0]||'')[0]||'').toUpperCase()+((p[1]||'')[0]||'').toUpperCase()||'··';}
-function relTime(iso){const d=Date.now()-new Date(iso).getTime();const m=Math.round(d/6e4);if(m<1)return'now';if(m<60)return m+'m';const h=Math.round(m/60);if(h<24)return h+'h';const dy=Math.round(h/24);if(dy<7)return dy+'d';return new Date(iso).toLocaleDateString(undefined,{month:'short',day:'numeric'});}
+function relTime(iso){const d=(Date.now()+SKEW)-new Date(iso).getTime();const m=Math.round(d/6e4);if(m<1)return'now';if(m<60)return m+'m';const h=Math.round(m/60);if(h<24)return h+'h';const dy=Math.round(h/24);if(dy<7)return dy+'d';return new Date(iso).toLocaleDateString(undefined,{month:'short',day:'numeric'});}
 function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2600);}
 async function postJSON(path,body){
   const r=await fetch(path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
@@ -484,7 +523,7 @@ function route(){
   show('entry');
 }
 function findClient(id){return CLIENTS.find(c=>c.id===id||c.slug===id)||FALLBACK_CLIENTS.find(c=>c.id===id||c.slug===id);}
-function seedFor(c){return SEED[c.id]||SEED['44444444-4444-4444-4444-444444444444'];}
+function seedFor(c){return SEED[c.id]||EMPTY_SEED;}
 window.addEventListener('hashchange',route);
 
 /* ── ENTRY ──────────────────────────────────────────────────────────────── */
@@ -514,21 +553,33 @@ function renderStage(){
   $('#stage-title').innerHTML=s.title;
   $('#stage-lede').textContent=s.lede;
   // deliverables
-  $('#deliverables').innerHTML=s.deliverables.map(d=>`
-    <div class="dcard" data-deliv="${d.id}">
-      <div class="ic">${d.icon}</div>
-      <div class="body"><div class="ttl">${esc(d.title)}</div><div class="sub">${esc(d.sub)}</div></div>
-      <span class="tag ${d.status}">${approvals[d.id]==='approved'?'approved by you':d.status.replace('-',' ')}</span>
-      <span class="arrow">→</span>
-    </div>`).join('');
-  $$('#deliverables .dcard').forEach(el=>el.addEventListener('click',()=>{location.hash=`#/review/${encodeURIComponent(c.id)}/${el.dataset.deliv}`;}));
+  const sc=$('#seed-chip'); if(sc)sc.style.display=SEED[c.id]?'':'none';
+  renderDeliverables();
   // brand
   $('#brand-swatches').innerHTML=s.palette.map(h=>`<span class="sw" style="background:${esc(h)}" title="${esc(h)}"></span>`).join('');
-  $('#brand-voice').textContent='“'+s.voice+'”';
+  $('#brand-voice').textContent=s.voice?'“'+s.voice+'”':'— your brand kit will appear here —';
   // hill chart
   renderHill(s.hill);
   // conversation (live)
   hydrateThread();
+}
+function renderDeliverables(){
+  const c=current, s=seedFor(c);
+  if(!s.deliverables.length){
+    $('#deliverables').innerHTML=`<div class="dcard" style="cursor:default">
+      <div class="ic">◌</div>
+      <div class="body"><div class="ttl">Nothing waiting on you</div><div class="sub">when your studio stages work for review, it lands here first</div></div>
+    </div>`;
+    return;
+  }
+  $('#deliverables').innerHTML=s.deliverables.map(d=>`
+    <div class="dcard" data-deliv="${d.id}">
+      <div class="ic">${d.icon}</div>
+      <div class="body"><div class="ttl">${esc(d.title)}</div><div class="sub">${esc(d.sub)}</div></div>
+      <span class="tag ${approvals[d.id]==='approved'?'approved':d.status}">${approvals[d.id]==='approved'?'approved by you':(approvals[d.id]==='changes'?'changes requested':d.status.replace('-',' '))}</span>
+      <span class="arrow">→</span>
+    </div>`).join('');
+  $$('#deliverables .dcard').forEach(el=>el.addEventListener('click',()=>{location.hash=`#/review/${encodeURIComponent(c.id)}/${el.dataset.deliv}`;}));
 }
 function renderHill(stops){
   const w=280,h=90;
@@ -551,11 +602,10 @@ async function hydrateThread(){
   const c=current, box=$('#thread');
   box.innerHTML=`<div class="tmsg"><div class="av"><span class="spin"></span></div><div><div class="txt" style="color:var(--muted)">loading your conversation…</div></div></div>`;
   let msgs=[];
-  try{
-    const r=await fetch(API+'/feed',{headers:{Accept:'application/json'}});
-    const d=await r.json();
-    msgs=(d.messages||[]).filter(m=>m.clientContainerId===c.id);
-  }catch(e){}
+  const fd=await getFeed();
+  msgs=(fd.messages||[]).filter(m=>m.clientContainerId===c.id);
+  applyDecisions(fd);
+  if(document.querySelector('.screen.on')?.id==='stage')renderDeliverables();
   msgs=(localMsgs[c.id]||[]).concat(msgs);
   if(!msgs.length){box.innerHTML=`<div class="tmsg"><div class="av">··</div><div><div class="txt" style="color:var(--muted)">No messages yet. Say hello to your studio below.</div></div></div>`;return;}
   box.innerHTML=msgs.slice(0,10).map(m=>{
@@ -577,7 +627,8 @@ function sendMsg(){
 /* ── REVIEW ─────────────────────────────────────────────────────────────── */
 function renderReview(delivId){
   const c=current, s=seedFor(c);
-  const d=s.deliverables.find(x=>x.id===delivId)||s.deliverables[0];
+  const d=s.deliverables.find(x=>x.id===delivId)||s.deliverables[0]
+    ||{id:delivId,type:'generic',icon:'◌',title:'Not staged yet',sub:'this deliverable isn’t on your Stage',status:'in-progress'};
   $('#rcrumb-client').textContent=c.name; $('#rcrumb-deliv').textContent=d.title; $('#rwho-av').textContent=initials(c.name);
   $('#review-title').textContent=d.title;
   $('#review-sub').textContent=d.sub;
@@ -586,6 +637,15 @@ function renderReview(delivId){
   $('#review-main').innerHTML=mainFor(d,s);
   $('#review-rail').innerHTML=railFor(d);
   wireReview(d,s);
+  // hydrate persisted decisions (deep links land here without stage hydration)
+  getFeed().then(fd=>{
+    applyDecisions(fd);
+    if(document.querySelector('.screen.on')?.id!=='review')return;
+    const cur=approvals[d.id]==='approved'?'approved':d.status;
+    const stE2=$('#review-status'); stE2.className='tag '+cur;
+    stE2.textContent=approvals[d.id]==='approved'?'approved by you':(approvals[d.id]==='changes'?'changes requested':cur.replace('-',' '));
+    $('#review-rail').innerHTML=railFor(d); wireReview(d,s);
+  });
 }
 function mainFor(d,s){
   if(d.type==='naming')return `
@@ -627,11 +687,13 @@ function wireReview(d,s){
   $('#rback').onclick=()=>{location.hash='#/stage/'+encodeURIComponent(current.id);};
   $('#rback-top').onclick=()=>{location.hash='#/stage/'+encodeURIComponent(current.id);};
   const ap=$('#approve-btn'), ch=$('#changes-btn');
-  if(ap)ap.onclick=(ev)=>{approvals[d.id]='approved';
+  if(ap)ap.onclick=(ev)=>{
     dust.burst(ev.clientX||innerWidth/2,ev.clientY||innerHeight/2,90,-1);
-    (localMsgs[current.id]=localMsgs[current.id]||[]).unshift({senderDisplayName:current.name,body:'Approved “'+d.title+'” ✦',intent:'approved',ingestedAt:new Date().toISOString()});
+    sendDecision('approved',d); approvals[d.id]='approved';
     toast('“'+d.title+'” approved — sent to your studio');renderReview(d.id);};
-  if(ch)ch.onclick=()=>{approvals[d.id]='changes';toast('Changes requested — your studio has been notified');renderReview(d.id);};
+  if(ch)ch.onclick=()=>{
+    sendDecision('changes',d); approvals[d.id]='changes';
+    toast('Changes requested — your studio has been notified');renderReview(d.id);};
 
   if(d.type==='naming'){
     const btn=$('#gen-btn'), out=$('#naming-out');
