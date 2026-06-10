@@ -231,6 +231,35 @@ button{font-family:inherit}
 footer.foot{border-top:1px solid var(--line);padding:26px 0;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.5px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
 footer.foot a{color:var(--ink-soft);text-decoration:none}
 footer.foot a:hover{color:var(--accent)}
+
+/* ── stash: knock at the threshold · the back room ── */
+#dustfx{position:fixed;inset:0;z-index:150;pointer-events:none}
+.seam{position:fixed;left:0;right:0;height:0;z-index:140;pointer-events:none;opacity:0;transition:opacity .4s,height .25s;background:linear-gradient(to top,color-mix(in srgb,var(--accent) 90%,#fff),transparent);box-shadow:0 0 18px color-mix(in srgb,var(--accent) 55%,transparent)}
+#seam-top{top:0;transform:scaleY(-1)}
+#seam-bottom{bottom:0}
+.seam.answer{animation:seampulse .9s ease-in-out 2}
+@keyframes seampulse{0%,100%{filter:brightness(1)}50%{filter:brightness(2.4)}}
+@keyframes thud{0%{transform:translateY(0)}35%{transform:translateY(5px)}100%{transform:translateY(0)}}
+@keyframes thudtop{0%{transform:translateY(0)}35%{transform:translateY(-5px)}100%{transform:translateY(0)}}
+html.knock-b .screen.on{animation:thud .3s cubic-bezier(.2,.7,.2,1)}
+html.knock-t .screen.on{animation:thudtop .3s cubic-bezier(.2,.7,.2,1)}
+#backroom{position:fixed;inset:0;z-index:200;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px 24px;background:radial-gradient(1200px 800px at 50% 118%,color-mix(in srgb,var(--accent) 26%,var(--bg)) 0%,var(--bg) 72%);clip-path:inset(0 50% 0 50%);visibility:hidden;transition:clip-path 1.4s cubic-bezier(.7,0,.2,1),visibility 0s linear 1.4s}
+#backroom.open{clip-path:inset(0 0 0 0);visibility:visible;transition:clip-path 1.4s cubic-bezier(.7,0,.2,1)}
+html.dooropen .screen.on,html.dooropen .switch{filter:blur(14px) saturate(.8);transform:scale(.985);transition:filter 1.2s,transform 1.2s}
+#backroom .inner{max-width:560px}
+#backroom .bstar{font-size:30px;color:var(--accent);text-shadow:0 0 26px color-mix(in srgb,var(--accent) 60%,transparent);display:block;margin-bottom:18px}
+#backroom .bkick{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);margin-bottom:22px}
+#backroom .poem{font-family:var(--display);font-style:italic;font-size:21px;line-height:1.85;color:var(--ink);white-space:pre-line;margin-bottom:26px}
+#backroom .pass{display:inline-flex;align-items:center;gap:10px;border:1px dashed color-mix(in srgb,var(--accent) 55%,transparent);background:none;border-radius:999px;padding:10px 20px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:2px;color:var(--accent);margin-bottom:14px;cursor:pointer}
+#backroom .pass:hover{border-style:solid}
+#backroom .hintline{font-size:12.5px;color:var(--muted);margin-bottom:30px}
+.toast{z-index:300}
+@media (prefers-reduced-motion:reduce){
+  #dustfx{display:none}
+  html.knock-b .screen.on,html.knock-t .screen.on{animation:none}
+  #backroom{clip-path:none;opacity:0;transition:opacity .4s,visibility 0s linear .4s}
+  #backroom.open{opacity:1;transition:opacity .4s}
+}
 </style>
 </head>
 <body>
@@ -330,6 +359,29 @@ footer.foot a:hover{color:var(--accent)}
       <div id="review-main"><!-- per-type --></div>
       <div class="rail" id="review-rail"><!-- approval rail --></div>
     </div>
+  </div>
+</section>
+
+<!-- stash: knock at the threshold (scroll-bounce 7x · or find the side door) -->
+<canvas id="dustfx"></canvas>
+<div class="seam" id="seam-top"></div>
+<div class="seam" id="seam-bottom"></div>
+<section id="backroom" role="dialog" aria-label="The back room" aria-hidden="true">
+  <div class="inner">
+    <span class="bstar">✦</span>
+    <div class="bkick">you found the back room</div>
+    <div class="poem">Every door is a promise the wall makes —
+a place the world agrees to thin.
+You knocked like someone meant to be here,
+so the room has let you in.
+
+Whatever your studio is building,
+it is building it twice:
+once in the work, once in the welcome.
+This second one was always yours.</div>
+    <button class="pass" id="br-pass" title="copy it">✦ FIRSTLIGHT · founding rate — whisper it when Foyer opens its doors</button>
+    <div class="hintline">psst — the Stage is learning to answer back. Soon: ask your brief a question, hear it reply.</div>
+    <button class="btn" id="br-close">↩ step back through</button>
   </div>
 </section>
 
@@ -483,8 +535,9 @@ function renderHill(stops){
   const path=`M 0 ${h-10} Q 70 ${h-10} ${w/2} 18 Q ${w-70} ${h-10} ${w} ${h-10}`;
   const dots=stops.map((st,i)=>{
     const x=18+ (st.v)*(w-36); const y=(h-14)-Math.sin(Math.min(st.v,1)*Math.PI)*(h-34);
+    const ly=(y-9<20)?y+16:y-9; // keep dot labels clear of the FIGURE OUT / MAKE IT HAPPEN captions
     return `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="5" fill="${COLOR[st.c]||'var(--accent)'}"/>
-            <text x="${x.toFixed(0)}" y="${(y-9).toFixed(0)}" text-anchor="middle" fill="var(--ink-soft)" font-family="Inter" font-size="7">${esc(st.k)}</text>`;
+            <text x="${x.toFixed(0)}" y="${ly.toFixed(0)}" text-anchor="middle" fill="var(--ink-soft)" font-family="Inter" font-size="7">${esc(st.k)}</text>`;
   }).join('');
   $('#hill').innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
     <path d="${path}" fill="none" stroke="var(--line-2)" stroke-width="1.5"/>
@@ -574,7 +627,10 @@ function wireReview(d,s){
   $('#rback').onclick=()=>{location.hash='#/stage/'+encodeURIComponent(current.id);};
   $('#rback-top').onclick=()=>{location.hash='#/stage/'+encodeURIComponent(current.id);};
   const ap=$('#approve-btn'), ch=$('#changes-btn');
-  if(ap)ap.onclick=()=>{approvals[d.id]='approved';toast('“'+d.title+'” approved — sent to your studio');renderReview(d.id);};
+  if(ap)ap.onclick=(ev)=>{approvals[d.id]='approved';
+    dust.burst(ev.clientX||innerWidth/2,ev.clientY||innerHeight/2,90,-1);
+    (localMsgs[current.id]=localMsgs[current.id]||[]).unshift({senderDisplayName:current.name,body:'Approved “'+d.title+'” ✦',intent:'approved',ingestedAt:new Date().toISOString()});
+    toast('“'+d.title+'” approved — sent to your studio');renderReview(d.id);};
   if(ch)ch.onclick=()=>{approvals[d.id]='changes';toast('Changes requested — your studio has been notified');renderReview(d.id);};
 
   if(d.type==='naming'){
@@ -633,6 +689,78 @@ function wireReview(d,s){
     };
   }
 }
+
+/* ── stash: knock at the threshold ─────────────────────────────────────────
+   Bounce the scroll at a page edge to knock. The seam of light grows; at 3
+   a whisper, at 5 the other side answers, at 7 the doors part. Side door:
+   triple-click the Foyer brandmark. Honors prefers-reduced-motion.        */
+const dust=(()=>{
+  const cv=$('#dustfx'),cx=cv.getContext('2d');let P=[],raf=0;const DPR=Math.min(devicePixelRatio||1,2);
+  function size(){cv.width=innerWidth*DPR;cv.height=innerHeight*DPR;}
+  addEventListener('resize',size);size();
+  function cols(){const s=getComputedStyle(document.documentElement);return['--accent','--accent-deep','--ink-soft'].map(v=>s.getPropertyValue(v).trim()).filter(Boolean);}
+  function tick(){cx.setTransform(DPR,0,0,DPR,0,0);cx.clearRect(0,0,innerWidth,innerHeight);
+    P=P.filter(p=>p.l>0);
+    for(const p of P){p.x+=p.vx+Math.sin(p.tw+=.08)*.4;p.y+=p.vy;p.vy*=.985;p.l-=p.d;
+      cx.globalAlpha=Math.max(p.l,0)*(.7+Math.sin(p.tw*2)*.3);cx.fillStyle=p.c;
+      if(p.star){cx.fillRect(p.x-p.s*1.6,p.y-.5,p.s*3.2,1);cx.fillRect(p.x-.5,p.y-p.s*1.6,1,p.s*3.2);}
+      else{cx.beginPath();cx.arc(p.x,p.y,Math.max(p.s*p.l,.2),0,7);cx.fill();}}
+    cx.globalAlpha=1;raf=P.length?requestAnimationFrame(tick):0;}
+  function burst(x,y,n,dir){if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    const C=cols();for(let i=0;i<n&&P.length<420;i++){
+      P.push({x:x+(Math.random()-.5)*160,y,vx:(Math.random()-.5)*2.4,vy:dir*(1.2+Math.random()*2.8),
+        s:1+Math.random()*2.4,l:1,d:.012+Math.random()*.02,c:C[i%C.length],tw:Math.random()*6,star:Math.random()<.08});}
+    if(!raf)raf=requestAnimationFrame(tick);}
+  return {burst};
+})();
+
+let actx=null;addEventListener('pointerdown',()=>{try{actx=actx||new (window.AudioContext||window.webkitAudioContext)()}catch(e){}},{once:true});
+function thump(f,g,t){if(!actx||actx.state!=='running')return;try{
+  const o=actx.createOscillator(),v=actx.createGain();o.type='sine';o.frequency.value=f;
+  v.gain.setValueAtTime(g,actx.currentTime);v.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+t);
+  o.connect(v);v.connect(actx.destination);o.start();o.stop(actx.currentTime+t);}catch(e){}}
+
+(function THRESHOLD(){
+  const KEY='foyer-knocks',FOUND='foyer-backroom-found',NEED=7;
+  let k=+(sessionStorage.getItem(KEY)||0),last=0,open=false;
+  const sb=$('#seam-bottom'),st=$('#seam-top'),br=$('#backroom');
+  function seam(el){el.style.opacity=Math.min(.25+k*.11,1);el.style.height=Math.min(2+k*1.3,12)+'px';}
+  function knock(edge){const now=Date.now();if(open||now-last<450)return;last=now;
+    k++;try{sessionStorage.setItem(KEY,k)}catch(e){}
+    const bottom=edge!=='top',el=bottom?sb:st;seam(el);
+    document.documentElement.classList.add(bottom?'knock-b':'knock-t');
+    setTimeout(()=>document.documentElement.classList.remove('knock-b','knock-t'),320);
+    dust.burst(innerWidth/2,bottom?innerHeight-6:6,Math.min(34+k*14,150),bottom?-1:1);
+    thump(64,.14,.22);
+    if(k===3)toast('…did you hear that?');
+    if(k===5){el.classList.add('answer');setTimeout(()=>el.classList.remove('answer'),2000);thump(96,.08,.5);}
+    if(k>=NEED)openDoor();}
+  function openDoor(){if(open)return;open=true;try{sessionStorage.setItem(FOUND,'1')}catch(e){}
+    br.setAttribute('aria-hidden','false');br.classList.add('open');document.documentElement.classList.add('dooropen');
+    dust.burst(innerWidth/2,innerHeight*.7,180,-1);dust.burst(innerWidth/2,innerHeight*.3,120,1);
+    [220,277,330].forEach((f,i)=>setTimeout(()=>thump(f,.07,1.6),i*140));}
+  function closeDoor(){open=false;k=0;try{sessionStorage.setItem(KEY,0)}catch(e){}
+    br.classList.remove('open');br.setAttribute('aria-hidden','true');document.documentElement.classList.remove('dooropen');
+    [sb,st].forEach(el=>{el.style.height='0px';el.style.opacity='0';});
+    sb.style.opacity='.18';sb.style.height='1px'; /* a scar of light stays — you were here */ }
+  $('#br-close').addEventListener('click',closeDoor);
+  $('#br-pass').addEventListener('click',()=>{try{navigator.clipboard.writeText('FIRSTLIGHT')}catch(e){}
+    toast('FIRSTLIGHT copied — keep it secret, keep it lit');});
+  addEventListener('wheel',e=>{const max=document.documentElement.scrollHeight-innerHeight;
+    if(max<=2){if(e.deltaY>60)knock('bottom');return;}
+    if(e.deltaY>34&&scrollY>=max-2)knock('bottom');
+    else if(e.deltaY<-34&&scrollY<=2)knock('top');},{passive:true});
+  let tY=null;
+  addEventListener('touchstart',e=>{tY=e.touches[0].clientY},{passive:true});
+  addEventListener('touchmove',e=>{if(tY==null)return;const dy=tY-e.touches[0].clientY;
+    const max=Math.max(document.documentElement.scrollHeight-innerHeight,0);
+    if(dy>26&&scrollY>=max-2)knock('bottom');else if(dy<-26&&scrollY<=2)knock('top');},{passive:true});
+  let bm=0,bt=0; /* side door */
+  $$('.brandmark').forEach(b=>b.addEventListener('click',()=>{const n=Date.now();bm=(n-bt<650)?bm+1:1;bt=n;
+    if(bm>=3){bm=0;k=NEED;openDoor();}}));
+  if(sessionStorage.getItem(FOUND)){sb.style.opacity='.18';sb.style.height='1px';}
+  window.__threshold={knock,openDoor,closeDoor};
+})();
 
 /* ── boot ───────────────────────────────────────────────────────────────── */
 loadClients().then(route);
