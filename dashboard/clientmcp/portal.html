@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="nocturne">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0c">
+<title>Foyer · the Stage — client portal</title>
+<meta name="description" content="The Stage: your private, branded projection of the work. Review deliverables, approve naming, ask questions — powered by live Foyer agents.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap" rel="stylesheet">
+<style>
+/* ─────────────────────────────────────────────────────────────────────────
+   FOYER · THE STAGE — client-facing portal
+   Single-file. Three themes via [data-theme]. Wired to /clientmcp/api/* .
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Theme: NOCTURNE (default) — dark, gold, the product cockpit aesthetic */
+:root, [data-theme="nocturne"]{
+  --bg:#0a0a0c; --surface:#131316; --card:#1a1a1f; --card-2:#222229;
+  --ink:#f5f5f1; --ink-soft:#a8a8a3; --muted:#6d6d68;
+  --line:rgba(245,245,241,0.08); --line-2:rgba(245,245,241,0.14);
+  --accent:#e9c97b; --accent-ink:#1a1815; --accent-deep:#a17a3a;
+  --green:#7bc99b; --amber:#e6b067; --red:#e07c7c; --blue:#7ab0e0; --violet:#b58bd6;
+  --display:'Inter',system-ui,sans-serif; --display-spacing:-0.02em; --display-style:normal;
+  --shadow:0 30px 80px rgba(0,0,0,0.55),0 12px 32px rgba(0,0,0,0.4);
+  --glow:radial-gradient(1200px 600px at 80% -10%, rgba(233,201,123,0.10), transparent 60%);
+}
+/* Theme: ATRIUM — cream, serif display, editorial calm */
+[data-theme="atrium"]{
+  --bg:#fdf9f0; --surface:#fffdf7; --card:#ffffff; --card-2:#f6f1e4;
+  --ink:#1a1815; --ink-soft:#5c574d; --muted:#9a9385;
+  --line:rgba(26,24,21,0.10); --line-2:rgba(26,24,21,0.18);
+  --accent:#a8772e; --accent-ink:#fffdf7; --accent-deep:#7c581f;
+  --green:#3f8f63; --amber:#b07d2c; --red:#bd5151; --blue:#3f72a8; --violet:#7d54a8;
+  --display:'Cormorant Garamond',Georgia,serif; --display-spacing:0; --display-style:normal;
+  --shadow:0 24px 60px rgba(83,67,40,0.12),0 8px 22px rgba(83,67,40,0.08);
+  --glow:radial-gradient(1200px 600px at 80% -10%, rgba(168,119,46,0.08), transparent 60%);
+}
+/* Theme: DOORWAY — warm architectural amber, threshold glow */
+[data-theme="doorway"]{
+  --bg:#17120c; --surface:#1f1810; --card:#271e13; --card-2:#322615;
+  --ink:#f4ead6; --ink-soft:#c4b393; --muted:#8a795c;
+  --line:rgba(244,234,214,0.09); --line-2:rgba(244,234,214,0.16);
+  --accent:#e9a23b; --accent-ink:#1c1408; --accent-deep:#b97c25;
+  --green:#86c07a; --amber:#e9a23b; --red:#e08a6a; --blue:#86a9c0; --violet:#c08ad0;
+  --display:'Inter',system-ui,sans-serif; --display-spacing:-0.02em; --display-style:normal;
+  --shadow:0 30px 80px rgba(0,0,0,0.5),0 12px 30px rgba(40,24,0,0.5);
+  --glow:radial-gradient(900px 520px at 50% -5%, rgba(233,162,59,0.16), transparent 60%);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--ink);
+  -webkit-font-smoothing:antialiased;line-height:1.5;font-size:14px;min-height:100vh;
+  background-image:var(--glow);background-attachment:fixed;
+  transition:background-color .4s ease,color .4s ease;
+}
+.mono{font-family:'JetBrains Mono',monospace}
+.display{font-family:var(--display);letter-spacing:var(--display-spacing)}
+a{color:inherit}
+button{font-family:inherit}
+
+/* ── Theme switcher (fixed) ─────────────────────────────────────────────── */
+.switch{position:fixed;top:14px;right:14px;z-index:80;display:flex;align-items:center;gap:4px;
+  background:color-mix(in srgb,var(--surface) 86%,transparent);backdrop-filter:blur(12px);
+  border:1px solid var(--line-2);border-radius:999px;padding:5px;box-shadow:var(--shadow)}
+.switch .star{font-size:12px;color:var(--accent);padding:0 6px 0 8px;user-select:none}
+.switch button{background:transparent;border:0;color:var(--ink-soft);cursor:pointer;
+  font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;
+  padding:6px 10px;border-radius:999px;transition:all .15s;display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1.1}
+.switch button .lbl{font-size:8px;opacity:.6;letter-spacing:.3px;text-transform:none}
+.switch button:hover{color:var(--ink)}
+.switch button.active{background:var(--accent);color:var(--accent-ink)}
+.switch button.active .lbl{opacity:.7}
+@media(max-width:560px){.switch button .lbl{display:none}}
+
+/* ── Shared shell ───────────────────────────────────────────────────────── */
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.brandmark{display:inline-flex;align-items:center;gap:9px;font-weight:700;font-size:15px;letter-spacing:-0.3px;color:var(--ink);text-decoration:none}
+.brandmark::before{content:'';width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 20%,transparent)}
+.screen{display:none;animation:rise .5s cubic-bezier(.2,.7,.2,1)}
+.screen.on{display:block}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.tag{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:4px;text-transform:uppercase;font-weight:600;white-space:nowrap}
+.tag.needs-review{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent)}
+.tag.in-review{background:color-mix(in srgb,var(--blue) 16%,transparent);color:var(--blue)}
+.tag.in-progress{background:color-mix(in srgb,var(--amber) 16%,transparent);color:var(--amber)}
+.tag.approved{background:color-mix(in srgb,var(--green) 16%,transparent);color:var(--green)}
+.tag.feedback{background:color-mix(in srgb,var(--blue) 15%,transparent);color:var(--blue)}
+.tag.question{background:color-mix(in srgb,var(--amber) 15%,transparent);color:var(--amber)}
+.tag.approval{background:color-mix(in srgb,var(--green) 15%,transparent);color:var(--green)}
+.tag.high,.tag.urgent{background:color-mix(in srgb,var(--red) 16%,transparent);color:var(--red)}
+
+/* ── ENTRY (threshold) ──────────────────────────────────────────────────── */
+#entry{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:60px 24px}
+#entry .door{width:46px;height:46px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 8px color-mix(in srgb,var(--accent) 16%,transparent),0 0 60px color-mix(in srgb,var(--accent) 40%,transparent);margin-bottom:30px}
+#entry .kicker{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
+#entry h1{font-family:var(--display);font-style:var(--display-style);font-weight:600;font-size:clamp(36px,6vw,64px);line-height:1.04;letter-spacing:var(--display-spacing);max-width:16ch;margin-bottom:18px}
+[data-theme="atrium"] #entry h1{font-weight:600}
+#entry .sub{font-size:16px;color:var(--ink-soft);max-width:48ch;line-height:1.6;margin-bottom:40px}
+#entry .pickline{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+.clients{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;max-width:640px}
+.client-card{background:var(--card);border:1px solid var(--line-2);border-radius:14px;padding:22px 26px;min-width:220px;cursor:pointer;text-align:left;transition:all .18s;display:flex;flex-direction:column;gap:6px}
+.client-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:var(--shadow)}
+.client-card .nm{font-family:var(--display);font-style:var(--display-style);font-size:22px;font-weight:600;display:flex;align-items:center;gap:10px}
+.client-card .nm .dot{width:10px;height:10px;border-radius:50%;background:var(--accent)}
+.client-card .meta{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.5px}
+.client-card .go{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin-top:8px}
+#entry .fineprint{margin-top:42px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;color:var(--muted);max-width:44ch;line-height:1.7}
+
+/* ── STAGE topbar ───────────────────────────────────────────────────────── */
+.topbar{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--bg) 90%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:13px 0}
+.topbar .row{display:flex;align-items:center;gap:18px}
+.topbar .who{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:12px;color:var(--ink-soft)}
+.topbar .who .avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--accent-deep));color:var(--accent-ink);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px}
+.topbar .leave{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);background:none;border:1px solid var(--line-2);padding:6px 11px;border-radius:7px;cursor:pointer;transition:all .15s}
+.topbar .leave:hover{color:var(--accent);border-color:var(--accent)}
+.crumb{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.4px}
+.crumb b{color:var(--ink-soft);font-weight:500}
+
+/* ── STAGE hero ─────────────────────────────────────────────────────────── */
+.stage-hero{padding:44px 0 8px}
+.stage-hero .priv{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);border:1px solid var(--line-2);padding:5px 12px;border-radius:999px;margin-bottom:18px}
+.stage-hero .priv::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green)}
+.stage-hero h2{font-family:var(--display);font-style:var(--display-style);font-weight:600;font-size:clamp(28px,4.4vw,46px);line-height:1.06;letter-spacing:var(--display-spacing);max-width:20ch}
+.stage-hero h2 em{font-style:normal;color:var(--accent)}
+.stage-hero .lede{font-size:15px;color:var(--ink-soft);max-width:54ch;margin-top:14px;line-height:1.6}
+
+/* ── grid ───────────────────────────────────────────────────────────────── */
+.cols{display:grid;grid-template-columns:1fr 340px;gap:22px;padding:30px 0 80px;align-items:start}
+@media(max-width:900px){.cols{grid-template-columns:1fr}}
+.sec-h{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.sec-h::after{content:'';flex:1;height:1px;background:var(--line)}
+
+/* deliverable cards */
+.deliv{display:grid;gap:12px}
+.dcard{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:all .16s}
+.dcard:hover{border-color:var(--line-2);background:var(--card-2);transform:translateX(2px)}
+.dcard .ic{width:40px;height:40px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:18px;background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--accent)}
+.dcard .body{flex:1;min-width:0}
+.dcard .ttl{font-weight:600;font-size:15px;margin-bottom:3px}
+.dcard .sub{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.3px}
+.dcard .arrow{color:var(--muted);font-size:18px;transition:all .16s}
+.dcard:hover .arrow{color:var(--accent);transform:translateX(3px)}
+
+/* side panels */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:18px}
+.panel h4{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.swatches{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap}
+.swatches .sw{width:30px;height:30px;border-radius:7px;border:1px solid var(--line-2)}
+.voice{font-size:13px;color:var(--ink-soft);line-height:1.55;font-style:italic}
+[data-theme="atrium"] .voice{font-family:var(--display);font-size:16px}
+
+/* hill chart */
+.hill{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px}
+.hill svg{width:100%;height:96px;display:block}
+.hill-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)}
+.hill-legend span{display:flex;align-items:center;gap:5px}
+.hill-legend i{width:8px;height:8px;border-radius:50%;display:inline-block}
+
+/* conversation */
+.thread{display:flex;flex-direction:column;gap:2px}
+.tmsg{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:13px 4px;border-bottom:1px solid var(--line)}
+.tmsg:last-child{border-bottom:0}
+.tmsg .av{width:30px;height:30px;border-radius:50%;background:var(--card-2);color:var(--ink-soft);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.tmsg .meta{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.tmsg .meta .nm{font-weight:600;font-size:13px}
+.tmsg .meta .t{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted)}
+.tmsg .txt{font-size:13px;color:var(--ink-soft);line-height:1.5}
+.composer{display:flex;gap:8px;margin-top:14px}
+.composer input{flex:1;background:var(--surface);border:1px solid var(--line-2);border-radius:8px;padding:10px 13px;color:var(--ink);font-family:inherit;font-size:13px}
+.composer input:focus{outline:none;border-color:var(--accent)}
+
+/* buttons */
+.btn{background:var(--accent);color:var(--accent-ink);border:0;padding:10px 18px;border-radius:8px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.2px;font-weight:600;text-transform:uppercase;cursor:pointer;transition:all .15s}
+.btn:hover:not(:disabled){filter:brightness(1.08);transform:translateY(-1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line-2)}
+.btn.ghost:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.btn.sm{padding:7px 12px;font-size:10px}
+
+/* ── REVIEW screen ──────────────────────────────────────────────────────── */
+#review .back{display:inline-flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);background:none;border:0;cursor:pointer;margin:28px 0 18px;transition:color .15s}
+#review .back:hover{color:var(--accent)}
+.review-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:22px;margin-bottom:26px}
+.review-head h2{font-family:var(--display);font-style:var(--display-style);font-weight:600;font-size:clamp(26px,3.6vw,38px);letter-spacing:var(--display-spacing);line-height:1.1}
+.review-head .rsub{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted);margin-top:6px}
+.review-body{display:grid;grid-template-columns:1fr 300px;gap:28px;padding-bottom:90px;align-items:start}
+@media(max-width:860px){.review-body{grid-template-columns:1fr}}
+.field{margin-bottom:14px}
+.field label{display:block;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.field textarea,.field input{width:100%;background:var(--surface);border:1px solid var(--line-2);border-radius:8px;padding:11px 13px;color:var(--ink);font-family:inherit;font-size:13px;line-height:1.55;resize:vertical}
+.field textarea{min-height:80px}
+.field textarea:focus,.field input:focus{outline:none;border-color:var(--accent)}
+
+.out{margin-top:18px;min-height:40px}
+.out .meta{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.out .meta .live{color:var(--green)}
+.cand{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;gap:14px;align-items:flex-start;transition:all .15s}
+.cand:hover{border-color:var(--line-2)}
+.cand.pick{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,var(--card))}
+.cand .nm{font-family:var(--display);font-style:var(--display-style);font-size:20px;font-weight:600;min-width:120px}
+.cand .rat{font-size:12.5px;color:var(--ink-soft);line-height:1.5;flex:1}
+.cand .acts{display:flex;gap:6px;flex-shrink:0}
+.icbtn{width:30px;height:30px;border-radius:7px;border:1px solid var(--line-2);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .14s}
+.icbtn:hover{color:var(--accent);border-color:var(--accent)}
+.icbtn.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.answer{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;font-size:14px;line-height:1.6;color:var(--ink)}
+.cite{margin-top:8px;padding:8px 11px;background:var(--surface);border-left:2px solid var(--accent);border-radius:0 6px 6px 0;font-size:12px;color:var(--ink-soft);font-style:italic}
+.cite .k{font-family:'JetBrains Mono',monospace;font-style:normal;font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-right:7px}
+.err{color:var(--red);font-size:12px;font-family:'JetBrains Mono',monospace;padding:10px 0}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid var(--line-2);border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;vertical-align:-1px;margin-right:7px}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* approval rail */
+.rail{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;position:sticky;top:80px}
+.rail h4{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.rail .status-now{font-size:14px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.rail .status-sub{font-size:12px;color:var(--ink-soft);line-height:1.5;margin-bottom:18px}
+.rail textarea{width:100%;background:var(--surface);border:1px solid var(--line-2);border-radius:8px;padding:10px 12px;color:var(--ink);font-family:inherit;font-size:12.5px;min-height:64px;resize:vertical;margin-bottom:12px}
+.rail textarea:focus{outline:none;border-color:var(--accent)}
+.rail .stack{display:flex;flex-direction:column;gap:8px}
+
+/* toast */
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:13px 22px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:all .35s cubic-bezier(.2,.7,.2,1);z-index:90;display:flex;align-items:center;gap:10px;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast::before{content:'✓';color:var(--accent);font-weight:700}
+
+footer.foot{border-top:1px solid var(--line);padding:26px 0;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.5px;color:var(--muted);display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+footer.foot a{color:var(--ink-soft);text-decoration:none}
+footer.foot a:hover{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<!-- Theme switcher -->
+<div class="switch" role="tablist" aria-label="Theme">
+  <span class="star">✦</span>
+  <button data-theme-btn="atrium">A<span class="lbl">Atrium</span></button>
+  <button data-theme-btn="nocturne" class="active">B<span class="lbl">Nocturne</span></button>
+  <button data-theme-btn="doorway">C<span class="lbl">Doorway</span></button>
+</div>
+
+<!-- ───────────── ENTRY / THRESHOLD ───────────── -->
+<section class="screen on" id="entry">
+  <div class="door"></div>
+  <div class="kicker">the foyer · client stage</div>
+  <h1 class="display">Step into the work.</h1>
+  <p class="sub">This is your <b>Stage</b> — a private, branded projection of everything your studio is making for you. Review deliverables, approve naming, ask questions. Same source of truth as the agency, curated for you.</p>
+  <div class="pickline">— enter your stage —</div>
+  <div class="clients" id="client-list"><!-- hydrated --></div>
+  <p class="fineprint">Demo mode · in production each client receives a private magic-link to their own Stage. Pick a workspace above to explore the live workflow.</p>
+</section>
+
+<!-- ───────────── STAGE / DASHBOARD ───────────── -->
+<section class="screen" id="stage">
+  <div class="topbar">
+    <div class="wrap row">
+      <a class="brandmark" href="#/">Foyer</a>
+      <span class="crumb">the Stage / <b id="crumb-client">—</b></span>
+      <div class="who">
+        <span class="avatar" id="who-av">—</span>
+        <span id="who-name">—</span>
+        <button class="leave" onclick="location.hash='#/'">↩ switch</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="stage-hero">
+      <span class="priv">private projection · live</span>
+      <h2 class="display" id="stage-title">—</h2>
+      <p class="lede" id="stage-lede">—</p>
+    </div>
+
+    <div class="cols">
+      <div>
+        <div class="sec-h">Deliverables for your review</div>
+        <div class="deliv" id="deliverables"><!-- rendered --></div>
+
+        <div class="sec-h" style="margin-top:34px">Conversation</div>
+        <div class="thread" id="thread"><!-- hydrated from /feed --></div>
+        <div class="composer">
+          <input id="composer-input" type="text" placeholder="Message your studio…" maxlength="300">
+          <button class="btn" id="composer-send">Send</button>
+        </div>
+      </div>
+
+      <aside>
+        <div class="panel">
+          <h4>Project status</h4>
+          <div class="hill" id="hill"></div>
+          <div class="hill-legend" id="hill-legend"></div>
+        </div>
+        <div class="panel">
+          <h4>Your brand</h4>
+          <div class="swatches" id="brand-swatches"></div>
+          <div class="voice" id="brand-voice">—</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── REVIEW / DELIVERABLE ───────────── -->
+<section class="screen" id="review">
+  <div class="topbar">
+    <div class="wrap row">
+      <a class="brandmark" href="#/">Foyer</a>
+      <span class="crumb">the Stage / <b id="rcrumb-client">—</b> / <b id="rcrumb-deliv">—</b></span>
+      <div class="who">
+        <span class="avatar" id="rwho-av">—</span>
+        <button class="leave" id="rback-top">↩ stage</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <button class="back" id="rback">← back to your stage</button>
+    <div class="review-head">
+      <div>
+        <h2 class="display" id="review-title">—</h2>
+        <div class="rsub" id="review-sub">—</div>
+      </div>
+      <span class="tag" id="review-status">—</span>
+    </div>
+    <div class="review-body">
+      <div id="review-main"><!-- per-type --></div>
+      <div class="rail" id="review-rail"><!-- approval rail --></div>
+    </div>
+  </div>
+</section>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+"use strict";
+const API = '/clientmcp/api/v1/demo';
+const $ = (s,r)=> (r||document).querySelector(s);
+const $$ = (s,r)=> Array.from((r||document).querySelectorAll(s));
+const esc = (s)=> String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ── Per-client seed (deliverables / brand / brief are demo-seeded; feed is live) ── */
+const SEED = {
+  '44444444-4444-4444-4444-444444444444':{
+    name:'Foyer Co', tagline:'Brand identity · launches July 8',
+    title:'Your rebrand is <em>taking shape</em>.',
+    lede:'Discovery is locked, the brief is in your hands, and a naming shortlist is ready for your eyes. Three things waiting on you below.',
+    brief:'A Brooklyn-based design studio doing cinematic web work for indie hospitality brands. Confident, slightly literary, not corporate.',
+    voice:'Confident, slightly literary. Leans on threshold & hospitality metaphors. Never corporate, never cute.',
+    palette:['#e9c97b','#1a1815','#f5f5f1','#a17a3a'],
+    hill:[{k:'Discovery',v:0.42,c:'green'},{k:'Brief',v:0.62,c:'accent'},{k:'Styleguide',v:0.18,c:'blue'}],
+    deliverables:[
+      {id:'naming',type:'naming',icon:'✦',title:'Naming shortlist',sub:'8 candidates · draft mode',status:'needs-review'},
+      {id:'brief',type:'brief',icon:'◇',title:'Discovery brief',sub:'v1.3 · client-visible',status:'in-review'},
+      {id:'brand',type:'brand',icon:'⌬',title:'Brand kit',sub:'voice · palette · vocabulary',status:'approved'},
+      {id:'styleguide',type:'generic',icon:'⊟',title:'Styleguide',sub:'tokens + components',status:'in-progress'},
+    ],
+  },
+  '55555555-5555-5555-5555-555555555555':{
+    name:'Coven', tagline:'Community platform · three modes',
+    title:'Three modes, <em>one threshold</em>.',
+    lede:'Cathedral is approved, the rave variant is exploring, and we need you to name the three modes. Your Stage, your call.',
+    brief:'A sacred community space and creative collective with three modes — Cathedral, Manifesto, and Rave. Mystical, communal, a little dangerous. Not corporate, not cute.',
+    voice:'Mystical, communal, a little dangerous. Ritual language over marketing language. Typography: Inter + Cormorant.',
+    palette:['#b58bd6','#0e0b14','#f4ecd9','#6d4a8f'],
+    hill:[{k:'Concept',v:0.55,c:'accent'},{k:'Cathedral',v:0.7,c:'green'},{k:'Rave mode',v:0.3,c:'violet'}],
+    deliverables:[
+      {id:'naming',type:'naming',icon:'✦',title:'Name the three modes',sub:'Cathedral / Manifesto / Rave',status:'needs-review'},
+      {id:'brief',type:'brief',icon:'◇',title:'Community brief',sub:'v2.0',status:'in-review'},
+      {id:'brand',type:'brand',icon:'⌬',title:'Brand kit · dark variant',sub:'late-night flow exploration',status:'in-review'},
+      {id:'styleguide',type:'generic',icon:'⊟',title:'Typography stack',sub:'Inter + Cormorant',status:'approved'},
+    ],
+  },
+};
+const FALLBACK_CLIENTS = [
+  {id:'44444444-4444-4444-4444-444444444444',name:'Foyer Co',slug:'foyer-co'},
+  {id:'55555555-5555-5555-5555-555555555555',name:'Coven',slug:'coven'},
+];
+const COLOR = {green:'var(--green)',accent:'var(--accent)',blue:'var(--blue)',violet:'var(--violet)',amber:'var(--amber)'};
+
+/* state */
+let CLIENTS = [];
+let current = null;          // current client {id,name,slug}
+const approvals = {};        // deliverableId -> 'approved'|'changes'
+const localMsgs = {};        // clientId -> [extra messages added in-session]
+
+/* ── Theme ──────────────────────────────────────────────────────────────── */
+const THEMES=['atrium','nocturne','doorway'];
+function setTheme(t){
+  if(!THEMES.includes(t)) t='nocturne';
+  document.documentElement.dataset.theme=t;
+  $$('[data-theme-btn]').forEach(b=>b.classList.toggle('active',b.dataset.themeBtn===t));
+  try{localStorage.setItem('foyer-stage-theme',t);}catch(e){}
+  const u=new URL(location.href); u.searchParams.set('v',t); history.replaceState(null,'',u);
+}
+$$('[data-theme-btn]').forEach(b=>b.addEventListener('click',()=>setTheme(b.dataset.themeBtn)));
+(function initTheme(){
+  const url=new URLSearchParams(location.search).get('v');
+  let saved=null; try{saved=localStorage.getItem('foyer-stage-theme');}catch(e){}
+  setTheme(url||saved||'nocturne');
+})();
+
+/* ── helpers ────────────────────────────────────────────────────────────── */
+function initials(n){const p=String(n||'').trim().split(/\s+/);return((p[0]||'')[0]||'').toUpperCase()+((p[1]||'')[0]||'').toUpperCase()||'··';}
+function relTime(iso){const d=Date.now()-new Date(iso).getTime();const m=Math.round(d/6e4);if(m<1)return'now';if(m<60)return m+'m';const h=Math.round(m/60);if(h<24)return h+'h';const dy=Math.round(h/24);if(dy<7)return dy+'d';return new Date(iso).toLocaleDateString(undefined,{month:'short',day:'numeric'});}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2600);}
+async function postJSON(path,body){
+  const r=await fetch(path,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(body)});
+  const data=await r.json().catch(()=>({}));
+  if(!r.ok)throw Object.assign(new Error(data.error||('http '+r.status)),{status:r.status,body:data});
+  return data;
+}
+function agentError(e){
+  if(e.status===429)return'Rate-limited — this Stage is a public demo (per-IP cap). Try again in a few minutes.';
+  if(e.body&&e.body.error==='demo_budget_exhausted_today')return'Demo budget spent for today (resets midnight UTC).';
+  if(e.status===503||/foyer-backend/.test(e.message||''))return'The Foyer backend is waking up — give it a moment and retry.';
+  return e.message||'request failed';
+}
+
+/* ── screen routing ─────────────────────────────────────────────────────── */
+function show(id){$$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));window.scrollTo(0,0);}
+function route(){
+  const h=location.hash||'#/';
+  const m=h.match(/^#\/stage\/([^/]+)$/);
+  const r=h.match(/^#\/review\/([^/]+)\/([^/]+)$/);
+  if(r){const c=findClient(r[1]); if(!c){location.hash='#/';return;} current=c; renderReview(r[2]); show('review'); return;}
+  if(m){const c=findClient(m[1]); if(!c){location.hash='#/';return;} current=c; renderStage(); show('stage'); return;}
+  show('entry');
+}
+function findClient(id){return CLIENTS.find(c=>c.id===id||c.slug===id)||FALLBACK_CLIENTS.find(c=>c.id===id||c.slug===id);}
+function seedFor(c){return SEED[c.id]||SEED['44444444-4444-4444-4444-444444444444'];}
+window.addEventListener('hashchange',route);
+
+/* ── ENTRY ──────────────────────────────────────────────────────────────── */
+async function loadClients(){
+  try{const r=await fetch(API+'/clients',{headers:{Accept:'application/json'}});const d=await r.json();CLIENTS=(d.clients&&d.clients.length)?d.clients:FALLBACK_CLIENTS;}
+  catch(e){CLIENTS=FALLBACK_CLIENTS;}
+  renderClientCards();
+}
+function renderClientCards(){
+  const wrap=$('#client-list');
+  wrap.innerHTML=CLIENTS.map(c=>{
+    const s=SEED[c.id]; const tag=s?s.tagline:('workspace · '+esc(c.slug||''));
+    return `<div class="client-card" data-id="${esc(c.id)}">
+      <div class="nm"><span class="dot"></span>${esc(c.name)}</div>
+      <div class="meta">${esc(tag)}</div>
+      <div class="go">enter your stage →</div>
+    </div>`;
+  }).join('');
+  $$('.client-card',wrap).forEach(card=>card.addEventListener('click',()=>{location.hash='#/stage/'+encodeURIComponent(card.dataset.id);}));
+}
+
+/* ── STAGE ──────────────────────────────────────────────────────────────── */
+function renderStage(){
+  const c=current, s=seedFor(c);
+  $('#crumb-client').textContent=c.name;
+  $('#who-name').textContent=c.name; $('#who-av').textContent=initials(c.name);
+  $('#stage-title').innerHTML=s.title;
+  $('#stage-lede').textContent=s.lede;
+  // deliverables
+  $('#deliverables').innerHTML=s.deliverables.map(d=>`
+    <div class="dcard" data-deliv="${d.id}">
+      <div class="ic">${d.icon}</div>
+      <div class="body"><div class="ttl">${esc(d.title)}</div><div class="sub">${esc(d.sub)}</div></div>
+      <span class="tag ${d.status}">${approvals[d.id]==='approved'?'approved by you':d.status.replace('-',' ')}</span>
+      <span class="arrow">→</span>
+    </div>`).join('');
+  $$('#deliverables .dcard').forEach(el=>el.addEventListener('click',()=>{location.hash=`#/review/${encodeURIComponent(c.id)}/${el.dataset.deliv}`;}));
+  // brand
+  $('#brand-swatches').innerHTML=s.palette.map(h=>`<span class="sw" style="background:${esc(h)}" title="${esc(h)}"></span>`).join('');
+  $('#brand-voice').textContent='“'+s.voice+'”';
+  // hill chart
+  renderHill(s.hill);
+  // conversation (live)
+  hydrateThread();
+}
+function renderHill(stops){
+  const w=280,h=90;
+  const path=`M 0 ${h-10} Q 70 ${h-10} ${w/2} 18 Q ${w-70} ${h-10} ${w} ${h-10}`;
+  const dots=stops.map((st,i)=>{
+    const x=18+ (st.v)*(w-36); const y=(h-14)-Math.sin(Math.min(st.v,1)*Math.PI)*(h-34);
+    return `<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="5" fill="${COLOR[st.c]||'var(--accent)'}"/>
+            <text x="${x.toFixed(0)}" y="${(y-9).toFixed(0)}" text-anchor="middle" fill="var(--ink-soft)" font-family="Inter" font-size="7">${esc(st.k)}</text>`;
+  }).join('');
+  $('#hill').innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+    <path d="${path}" fill="none" stroke="var(--line-2)" stroke-width="1.5"/>
+    <line x1="${w/2}" y1="6" x2="${w/2}" y2="${h-4}" stroke="var(--line)" stroke-dasharray="2 4"/>
+    <text x="${w/4}" y="12" text-anchor="middle" fill="var(--muted)" font-family="JetBrains Mono" font-size="7" letter-spacing="1.5">FIGURE OUT</text>
+    <text x="${w*3/4}" y="12" text-anchor="middle" fill="var(--muted)" font-family="JetBrains Mono" font-size="7" letter-spacing="1.5">MAKE IT HAPPEN</text>
+    ${dots}</svg>`;
+  $('#hill-legend').innerHTML=stops.map(st=>`<span><i style="background:${COLOR[st.c]||'var(--accent)'}"></i>${esc(st.k)} ${st.v.toFixed(2)}</span>`).join('');
+}
+async function hydrateThread(){
+  const c=current, box=$('#thread');
+  box.innerHTML=`<div class="tmsg"><div class="av"><span class="spin"></span></div><div><div class="txt" style="color:var(--muted)">loading your conversation…</div></div></div>`;
+  let msgs=[];
+  try{
+    const r=await fetch(API+'/feed',{headers:{Accept:'application/json'}});
+    const d=await r.json();
+    msgs=(d.messages||[]).filter(m=>m.clientContainerId===c.id);
+  }catch(e){}
+  msgs=(localMsgs[c.id]||[]).concat(msgs);
+  if(!msgs.length){box.innerHTML=`<div class="tmsg"><div class="av">··</div><div><div class="txt" style="color:var(--muted)">No messages yet. Say hello to your studio below.</div></div></div>`;return;}
+  box.innerHTML=msgs.slice(0,10).map(m=>{
+    const intent=m.intent?`<span class="tag ${m.intent==='scope_change'?'feedback':esc(m.intent)}">${esc(m.intent)}</span>`:'';
+    const urg=m.urgency==='high'||m.urgency==='urgent'?`<span class="tag high">${esc(m.urgency)}</span>`:'';
+    return `<div class="tmsg"><div class="av">${esc(initials(m.senderDisplayName))}</div>
+      <div><div class="meta"><span class="nm">${esc(m.senderDisplayName||'You')}</span>${intent}${urg}<span class="t">${esc(relTime(m.ingestedAt||new Date().toISOString()))}</span></div>
+      <div class="txt">${esc(m.body)}</div></div></div>`;
+  }).join('');
+}
+$('#composer-send').addEventListener('click',sendMsg);
+$('#composer-input').addEventListener('keydown',e=>{if(e.key==='Enter')sendMsg();});
+function sendMsg(){
+  const inp=$('#composer-input'); const v=inp.value.trim(); if(!v||!current)return;
+  (localMsgs[current.id]=localMsgs[current.id]||[]).unshift({senderDisplayName:current.name,body:v,intent:'feedback',ingestedAt:new Date().toISOString()});
+  inp.value=''; hydrateThread(); toast('Message sent to your studio');
+}
+
+/* ── REVIEW ─────────────────────────────────────────────────────────────── */
+function renderReview(delivId){
+  const c=current, s=seedFor(c);
+  const d=s.deliverables.find(x=>x.id===delivId)||s.deliverables[0];
+  $('#rcrumb-client').textContent=c.name; $('#rcrumb-deliv').textContent=d.title; $('#rwho-av').textContent=initials(c.name);
+  $('#review-title').textContent=d.title;
+  $('#review-sub').textContent=d.sub;
+  const st=approvals[d.id]==='approved'?'approved':d.status;
+  const stEl=$('#review-status'); stEl.className='tag '+st; stEl.textContent=(approvals[d.id]==='approved'?'approved by you':st.replace('-',' '));
+  $('#review-main').innerHTML=mainFor(d,s);
+  $('#review-rail').innerHTML=railFor(d);
+  wireReview(d,s);
+}
+function mainFor(d,s){
+  if(d.type==='naming')return `
+    <div class="field"><label>The brief your studio is working from</label>
+      <textarea id="brief-input">${esc(s.brief)}</textarea></div>
+    <button class="btn" id="gen-btn">✦ Generate the shortlist</button>
+    <div class="out" id="naming-out"><div class="meta" style="margin-top:14px">Press generate — runs the live naming agent on Ollama. Star the ones you love; approve the shortlist on the right.</div></div>`;
+  if(d.type==='brief')return `
+    <div class="answer" style="margin-bottom:18px"><b>Discovery brief — ${esc(current.name)}</b><br><br>${esc(s.brief)}<br><br>
+      <span style="color:var(--ink-soft)">Deliverable: full styleguide + landing page. Timeline shown on your Stage. This brief is client-visible and versioned.</span></div>
+    <div class="field"><label>Ask anything about your project</label>
+      <input id="qa-input" type="text" value="What was approved about naming?" maxlength="300"></div>
+    <button class="btn" id="qa-btn">Ask your workspace</button>
+    <div class="out" id="qa-out"></div>`;
+  if(d.type==='brand')return `
+    <div class="field"><label>Your brand kit — extracted & maintained by Foyer</label>
+      <div class="answer">${esc(s.voice)}</div></div>
+    <div class="swatches" style="margin:16px 0">${s.palette.map(h=>`<span class="sw" style="background:${esc(h)};width:38px;height:38px"></span>`).join('')}</div>
+    <div class="field"><label>Refresh the kit from a reference URL (live brand-ingest agent)</label>
+      <input id="brand-input" type="url" value="https://basecamp.com"></div>
+    <button class="btn" id="brand-btn">Ingest brand</button>
+    <div class="out" id="brand-out"></div>`;
+  return `<div class="answer">This deliverable — <b>${esc(d.title)}</b> — is <b>${esc(d.status.replace('-',' '))}</b>. Your studio will move it to your Stage for review when it's ready. You can approve or request changes on the right at any time.</div>`;
+}
+function railFor(d){
+  const approved=approvals[d.id]==='approved', changes=approvals[d.id]==='changes';
+  const nowTxt=approved?'Approved by you':changes?'Changes requested':d.status.replace('-',' ');
+  const dot=approved?'var(--green)':changes?'var(--amber)':'var(--accent)';
+  return `<h4>Your decision</h4>
+    <div class="status-now"><span style="width:8px;height:8px;border-radius:50%;background:${dot};display:inline-block"></span>${nowTxt}</div>
+    <div class="status-sub">Nothing is final until you say so. Your call is sent straight to the studio and logged on the artifact.</div>
+    <textarea id="note" placeholder="Add a note for your studio (optional)…"></textarea>
+    <div class="stack">
+      <button class="btn" id="approve-btn">✓ Approve</button>
+      <button class="btn ghost" id="changes-btn">↻ Request changes</button>
+    </div>`;
+}
+function wireReview(d,s){
+  $('#rback').onclick=()=>{location.hash='#/stage/'+encodeURIComponent(current.id);};
+  $('#rback-top').onclick=()=>{location.hash='#/stage/'+encodeURIComponent(current.id);};
+  const ap=$('#approve-btn'), ch=$('#changes-btn');
+  if(ap)ap.onclick=()=>{approvals[d.id]='approved';toast('“'+d.title+'” approved — sent to your studio');renderReview(d.id);};
+  if(ch)ch.onclick=()=>{approvals[d.id]='changes';toast('Changes requested — your studio has been notified');renderReview(d.id);};
+
+  if(d.type==='naming'){
+    const btn=$('#gen-btn'), out=$('#naming-out');
+    btn.onclick=async()=>{
+      const brief=$('#brief-input').value.trim()||s.brief;
+      btn.disabled=true; const orig=btn.textContent; btn.textContent='Generating…';
+      out.innerHTML=`<div class="meta"><span class="spin"></span>running naming agent · draft mode · 8 candidates</div>`;
+      try{
+        const data=await postJSON(API+'/naming',{brief,mode:'draft',count:8});
+        const cands=data.candidates||[];
+        out.innerHTML=`<div class="meta"><span class="live">● live</span> ${esc(data.mode||'draft')} · ${cands.length} candidates · star your favourites</div>`+
+          cands.map((c,i)=>`<div class="cand" data-i="${i}">
+            <div class="nm">${esc(c.candidate)}</div>
+            <div class="rat">${esc(c.rationale||'')}</div>
+            <div class="acts"><button class="icbtn fav" title="Favourite">♡</button></div>
+          </div>`).join('');
+        $$('#naming-out .cand .fav').forEach(b=>b.onclick=()=>{b.classList.toggle('on');b.textContent=b.classList.contains('on')?'♥':'♡';b.closest('.cand').classList.toggle('pick');});
+      }catch(e){out.innerHTML=`<div class="err">${esc(agentError(e))}</div>`;}
+      finally{btn.disabled=false;btn.textContent=orig;}
+    };
+  }
+  if(d.type==='brief'){
+    const btn=$('#qa-btn'), out=$('#qa-out');
+    btn.onclick=async()=>{
+      const q=$('#qa-input').value.trim(); if(!q){out.innerHTML=`<div class="err">Type a question first.</div>`;return;}
+      btn.disabled=true; const orig=btn.textContent; btn.textContent='Thinking…';
+      out.innerHTML=`<div class="meta"><span class="spin"></span>permission-aware retrieval…</div>`;
+      try{
+        const data=await postJSON(API+'/qa',{question:q});
+        const cites=(data.citations||[]).map(c=>`<div class="cite"><span class="k">${esc(c.kind||'')}</span>${esc(c.snippet||'')}</div>`).join('');
+        out.innerHTML=`<div class="meta"><span class="live">● live</span> source: ${esc(data.source||'?')} · ${esc(data.retrieved??0)} retrieved</div>
+          <div class="answer">${esc(data.answer||'(no answer)')}</div>${cites?`<div style="margin-top:10px">${cites}</div>`:''}`;
+      }catch(e){out.innerHTML=`<div class="err">${esc(agentError(e))}</div>`;}
+      finally{btn.disabled=false;btn.textContent=orig;}
+    };
+  }
+  if(d.type==='brand'){
+    const btn=$('#brand-btn'), out=$('#brand-out');
+    btn.onclick=async()=>{
+      const url=$('#brand-input').value.trim(); if(!url){out.innerHTML=`<div class="err">Paste a URL first.</div>`;return;}
+      btn.disabled=true; const orig=btn.textContent; btn.textContent='Ingesting…';
+      out.innerHTML=`<div class="meta"><span class="spin"></span>fetching + inferring brand…</div>`;
+      try{
+        const data=await postJSON(API+'/brand-ingest',{url});
+        const ext=data.extracted||{};
+        const sw=(ext.colorPalette||[]).slice(0,8).map(c=>`<span class="sw" style="background:${esc(c.hex)};width:30px;height:30px" title="${esc(c.hex)}"></span>`).join('');
+        const dos=(ext.vocabularyDo||[]).slice(0,4).map(v=>`<li style="color:var(--green)">do · ${esc(v.phrase)}</li>`).join('');
+        const donts=(ext.vocabularyDont||[]).slice(0,4).map(v=>`<li style="color:var(--red)">don't · ${esc(v.phrase)}</li>`).join('');
+        out.innerHTML=`<div class="meta"><span class="live">● live</span> archetype: ${esc(ext.archetype||'undetected')} · v${esc(data.version??'?')}</div>
+          <div class="answer">${esc((ext.voiceDescription||'').slice(0,400))}</div>
+          ${sw?`<div class="swatches" style="margin-top:14px">${sw}</div>`:''}
+          ${(dos||donts)?`<ul style="list-style:none;margin-top:12px;font-size:12.5px;line-height:1.9">${dos}${donts}</ul>`:''}`;
+      }catch(e){out.innerHTML=`<div class="err">${esc(agentError(e))}</div>`;}
+      finally{btn.disabled=false;btn.textContent=orig;}
+    };
+  }
+}
+
+/* ── boot ───────────────────────────────────────────────────────────────── */
+loadClients().then(route);
+})();
+</script>
+</body>
+</html>
