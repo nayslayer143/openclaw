@@ -57,12 +57,12 @@ Tracking convention: edit this file, flip `- [ ]` → `- [x]`, commit (`megaplan
   - [x] "demo seed" chip on deliverables + "live" chip on conversation (hidden for non-seeded clients).
   - [x] `relTime` skew fix via feed `generatedAt` → global SKEW.
   - [x] (bonus) `scripts/portal-qa-proxy.py` — isolated portal+API QA loop on :8771 (launch.json `clientmcp-api`); cold-load screenshot shows all three decisions hydrated server-side.
-- **Phase 2 — Alive (speed & presence)**
-  - [ ] Stream naming candidates (SSE/chunked) — names appear one-by-one with rationales; kill the 15s spinner.
-  - [ ] Model warmup noop on portal load (RAM-aware; `pse health --for-model qwen2.5:7b` first).
-  - [ ] Live conversation via SSE (the LIVE badge becomes true).
-  - [ ] "Since you last looked…" diff greeting (localStorage lastVisit vs event log).
-  - [ ] Ambient presence dot ("your studio is here now").
+- **Phase 2 — Alive (speed & presence)** — ✦ SHIPPED 2026-06-09 (`df23caf` client-mcp · `7481027` openclaw)
+  - [x] Streaming naming: `llm.ts` onToken (Ollama NDJSON) → `POST /v1/demo/naming-stream` (start/token/result events) → portal live "wire" view + parsed cards; dashboard proxy passes `*-stream` through chunked (token arrival timestamped at :4000 and :7080). Warm model returns 8 candidates in ~2-3s. NOTE: per-IP rate bucket sees the proxy's 127.0.0.1 for all public users (shared bucket) — fwd X-Forwarded-For + trustProxy when it matters.
+  - [x] Model warmup: `GET /v1/demo/warmup` (num_predict:1, keep_alive 15m, 6/5min cap) pinged on portal boot.
+  - [x] Live-ish conversation: visibility-aware 15s feed refresh, no spinner flicker. True SSE deferred (proxy already streams; natural follow-up).
+  - [x] "Since you last looked — N decisions · M messages" greeting (localStorage last-seen vs feed timestamps, once per visit). Verified: "4 decisions logged · 4 new messages".
+  - [x] Honest presence dot + "studio is here" label (real activity ≤10min, from feed timestamps; never faked).
 - **Phase 3 — Ceremony & craft (design upscale)**
   - [ ] Approval ceremony v2: receipt moment in rail + soft chime + thread artifact.
   - [ ] Motion grammar pass: staggered dcard entrances, hill chart draw-on.
