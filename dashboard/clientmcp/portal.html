@@ -63,7 +63,7 @@ a{color:inherit}
 button{font-family:inherit}
 
 /* ── Theme switcher (fixed) ─────────────────────────────────────────────── */
-.switch{position:fixed;top:14px;right:14px;z-index:80;display:flex;align-items:center;gap:4px;
+.switch{position:fixed;bottom:14px;right:14px;z-index:80;display:flex;align-items:center;gap:4px;
   background:color-mix(in srgb,var(--surface) 86%,transparent);backdrop-filter:blur(12px);
   border:1px solid var(--line-2);border-radius:999px;padding:5px;box-shadow:var(--shadow)}
 .switch .star{font-size:12px;color:var(--accent);padding:0 6px 0 8px;user-select:none}
@@ -94,7 +94,7 @@ button{font-family:inherit}
 .tag.high,.tag.urgent{background:color-mix(in srgb,var(--red) 16%,transparent);color:var(--red)}
 
 /* ── ENTRY (threshold) ──────────────────────────────────────────────────── */
-#entry{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:60px 24px}
+#entry.on{min-height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;padding:60px 24px}
 #entry .door{width:46px;height:46px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 8px color-mix(in srgb,var(--accent) 16%,transparent),0 0 60px color-mix(in srgb,var(--accent) 40%,transparent);margin-bottom:30px}
 #entry .kicker{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:18px}
 #entry h1{font-family:var(--display);font-style:var(--display-style);font-weight:600;font-size:clamp(36px,6vw,64px);line-height:1.04;letter-spacing:var(--display-spacing);max-width:16ch;margin-bottom:18px}
