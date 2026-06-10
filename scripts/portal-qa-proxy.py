@@ -41,8 +41,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 # chunked copy so -stream endpoints arrive live (HTTP/1.0
                 # close-delimited; no content-length needed)
+                read = getattr(r, "read1", r.read)  # read1 = return what's available
                 while True:
-                    chunk = r.read(512)
+                    chunk = read(8192)
                     if not chunk:
                         break
                     self.wfile.write(chunk)
