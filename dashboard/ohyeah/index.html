@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#05060a" />
+  <title>OH YEAH™ — never lose a thought</title>
+  <meta name="description" content="A memory prosthetic. The moment you forget, glance — and continue the thought you were having 3 seconds ago." />
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="OH YEAH" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png" />
+
+  <link rel="preload" as="image" href="assets/logo.png" />
+  <link rel="stylesheet" href="styles.css?v=8" />
+</head>
+<body>
+  <!-- Cosmic background -->
+  <canvas id="sky" aria-hidden="true"></canvas>
+  <div class="nebula nebula--purple" aria-hidden="true"></div>
+  <div class="nebula nebula--cyan" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="warpflash" id="warpflash" aria-hidden="true"></div>
+
+  <!-- Intro splash -->
+  <div class="splash" id="splash">
+    <img class="splash__logo" src="assets/logo.png" alt="OH YEAH" />
+  </div>
+
+  <!-- Top bar -->
+  <header class="topbar">
+    <div class="wordmark">
+      OH&nbsp;YEAH<span class="tm">™</span>
+      <span class="tagline">never lose a thought</span>
+    </div>
+    <div class="mode" role="tablist" aria-label="Input mode">
+      <button class="mode__btn is-active" data-mode="demo" role="tab" aria-selected="true">Demo</button>
+      <button class="mode__btn" data-mode="live" role="tab" aria-selected="false">Live mic</button>
+    </div>
+  </header>
+
+  <!-- Stage -->
+  <main class="stage">
+    <!-- Live thought crawl — ascends + recedes into deep space (forgetting) -->
+    <section class="crawl" id="crawl" aria-live="polite" aria-label="Thought stream">
+      <div class="crawl__deep" id="crawlPlane"></div>
+      <p class="crawl__hint" id="streamHint">Tap the orb and start talking.<br />When you lose the thread, hit the button.</p>
+    </section>
+
+    <!-- Mic orb -->
+    <div class="orbwrap">
+      <!-- the forming thought — FLAT, pinned near the orb, outside the 3D crawl -->
+      <p class="crawl__now" id="interim"></p>
+      <button class="orb" id="orb" aria-label="Start listening">
+        <span class="orb__core"></span>
+        <span class="orb__ring orb__ring--1"></span>
+        <span class="orb__ring orb__ring--2"></span>
+        <span class="orb__ring orb__ring--3"></span>
+        <svg class="orb__mic" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 14a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v5a3 3 0 0 0 3 3Z"/>
+          <path d="M18 11a6 6 0 0 1-12 0M12 17v4M8 21h8" fill="none"/>
+        </svg>
+      </button>
+      <div class="topicchip" id="topicChip" hidden>
+        <span class="topicchip__dot"></span>
+        <span class="topicchip__label">Topic</span>
+        <span class="topicchip__value" id="topicValue">—</span>
+      </div>
+      <p class="status" id="status">Demo mode · ready</p>
+    </div>
+
+    <!-- The panic button -->
+    <button class="recall" id="recall">
+      <span class="recall__q">What was I saying?</span>
+      <kbd class="recall__kbd">space</kbd>
+    </button>
+  </main>
+
+  <!-- Recovery card -->
+  <div class="cardscrim" id="cardScrim" hidden>
+    <article class="card" id="card" role="dialog" aria-modal="true" aria-label="Thought recovery">
+      <button class="card__close" id="cardClose" aria-label="Dismiss">×</button>
+
+      <!-- Instant retrieval layer -->
+      <div class="card__instant" id="cardInstant">
+        <div class="card__badge card__badge--instant">⚡ instant recall <em id="recallMs"></em></div>
+        <p class="card__eyebrow">You were saying…</p>
+        <p class="card__said" id="cardSaid"></p>
+        <div class="card__meta">
+          <div class="card__metacol">
+            <p class="card__eyebrow">Topic</p>
+            <p class="card__topic" id="cardTopic"></p>
+          </div>
+          <div class="card__metacol">
+            <p class="card__eyebrow">The thread</p>
+            <ul class="card__thread" id="cardThread"></ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Smart layer (streams in a beat later) -->
+      <div class="card__smart" id="cardSmart">
+        <div class="card__badge card__badge--smart" id="smartBadge">✦ thinking…</div>
+        <p class="card__eyebrow">Where you were going</p>
+        <p class="card__predict" id="cardPredict"></p>
+        <p class="card__eyebrow">Potential next thoughts</p>
+        <ul class="card__next" id="cardNext"></ul>
+      </div>
+    </article>
+  </div>
+
+  <!-- The brand beat -->
+  <div class="ohyeah" id="ohyeah" aria-hidden="true"><img src="assets/logo.png" alt="" /></div>
+
+  <script src="app.js?v=8"></script>
+</body>
+</html>

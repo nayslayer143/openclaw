@@ -117,13 +117,27 @@ _SUBDOMAIN_ROOT = {
     "controlledchaos": "/controlledchaos/",
 }
 
+# Self-contained static apps whose HTML uses *relative* asset paths. For these
+# the WHOLE path tree (not just "/") is rewritten under the app's mount, so a
+# request for /styles.css on the subdomain resolves to /ohyeah/styles.css. This
+# keeps the app portable (works standalone at root AND here on its subdomain).
+_SUBDOMAIN_APP = {
+    "ohyeah": "/ohyeah",
+}
+
 
 @app.middleware("http")
 async def _subdomain_root_router(request: Request, call_next):
     label = request.headers.get("host", "").split(":")[0].split(".")[0]
-    target = _SUBDOMAIN_ROOT.get(label)
-    if target and request.scope.get("path") == "/":
-        request.scope["path"] = target
+    prefix = _SUBDOMAIN_APP.get(label)
+    if prefix:
+        path = request.scope.get("path", "/")
+        if not (path == prefix or path.startswith(prefix + "/")):
+            request.scope["path"] = prefix + path
+    else:
+        target = _SUBDOMAIN_ROOT.get(label)
+        if target and request.scope.get("path") == "/":
+            request.scope["path"] = target
     return await call_next(request)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True,
                    allow_methods=["*"], allow_headers=["*"])
@@ -3080,6 +3094,20 @@ async def dossier_index():
     return HTMLResponse(
         content=(DOSSIER_DIR / "index.html").read_text(),
         headers={"Cache-Control": "no-cache"},
+    )
+
+
+# ── /ohyeah — OH YEAH™ thought-recovery prototype ────────────────────────────
+# Self-contained static app (relative asset paths). Served at the
+# ohyeah.asdfghjk.lol subdomain root via _subdomain_root_router, which prefixes
+# the whole path tree with /ohyeah for that host. Mounted before any root
+# catch-all so /ohyeah/* wins.
+OHYEAH_DIR = Path(__file__).parent / "ohyeah"
+if OHYEAH_DIR.exists():
+    app.mount(
+        "/ohyeah",
+        StaticFiles(directory=str(OHYEAH_DIR), html=True),
+        name="ohyeah_static",
     )
 
 
