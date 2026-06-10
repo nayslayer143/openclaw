@@ -123,6 +123,7 @@ _SUBDOMAIN_ROOT = {
 # keeps the app portable (works standalone at root AND here on its subdomain).
 _SUBDOMAIN_APP = {
     "ohyeah": "/ohyeah",
+    "partyship": "/partyship",
 }
 
 
@@ -3150,6 +3151,22 @@ if OHYEAH_DIR.exists():
         "/ohyeah",
         StaticFiles(directory=str(OHYEAH_DIR), html=True),
         name="ohyeah_static",
+    )
+
+
+# ── /partyship — Lime Ledger (Partyship Ledger) PWA ──────────────────────────
+# Production Vite build (absolute asset paths + service worker), so the WHOLE
+# path tree is rewritten via _SUBDOMAIN_APP for partyship.asdfghjk.lol —
+# /sw.js, /manifest.webmanifest and /assets/* all resolve under this mount.
+# Dist is referenced in place; deploy = `pnpm build` in ~/code/apps/lime-ledger.
+# If the dist is missing at server start, the mount is skipped (rebuild, then
+# kickstart com.openclaw.dashboard).
+PARTYSHIP_DIST = Path.home() / "code" / "apps" / "lime-ledger" / "apps" / "web" / "dist"
+if PARTYSHIP_DIST.exists():
+    app.mount(
+        "/partyship",
+        StaticFiles(directory=str(PARTYSHIP_DIST), html=True),
+        name="partyship_static",
     )
 
 
