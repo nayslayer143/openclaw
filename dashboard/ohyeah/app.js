@@ -74,13 +74,13 @@ let burstSky = () => {};             // assigned by sky(); the knock delighter c
 
   /* short-lived spark particles (the knock delighter) — drawn in the same frame loop */
   const sparks = [];
-  burstSky = (x, y, n = 24, power = 3, gold = false) => {
+  burstSky = (x, y, n = 24, power = 3, gold = false, drift = -0.18) => {
     if (reduce) return;
     for (let i = 0; i < n; i++) {
       const a = Math.random() * Math.PI * 2, v = power * (0.35 + Math.random());
       sparks.push({
         x, y,
-        vx: Math.cos(a) * v, vy: Math.sin(a) * v - power * 0.18,
+        vx: Math.cos(a) * v, vy: Math.sin(a) * v + power * drift,
         life: 1, dk: 0.012 + Math.random() * 0.022,
         r: 0.8 + Math.random() * (gold ? 2.6 : 1.8),
         hue: gold && i % 3 !== 2 ? 'rgba(255,215,106,' : (i % 2 ? 'rgba(60,224,255,' : 'rgba(164,114,255,'),
@@ -787,32 +787,98 @@ async function supernova() {
   novaEl.code.style.opacity = '1';
 }
 
+/* ── the mirror egg: knock on the EVENT HORIZON (top edge = the past) ──
+ * Bouncing at the very top of history sends ghost-dust drifting down and a
+ * DESCENDING plink (going back in time). Seven knocks → time echo: a rewind
+ * wave travels newest→oldest, your actual first thought of the session turns
+ * gold, and the overlay returns it to you. */
+const ECHO = { combo: 0, lastKnock: 0 };
+const ECHO_CODE = '✦ OHYEAH-ECHO · nothing said is ever gone';
+let echoGoldLine = null;
+
+function echoKnock() {
+  const now = performance.now();
+  if (NOVA.busy || now - ECHO.lastKnock < NOVA.THROTTLE) return;
+  if (!state.utterances.length || !el.scrim.hidden) return;
+  ECHO.combo = (now - ECHO.lastKnock > NOVA.WINDOW) ? 1 : ECHO.combo + 1;
+  ECHO.lastKnock = now;
+
+  const r = el.crawl.getBoundingClientRect();
+  burstSky(r.left + r.width / 2, r.top + 24, 8 + ECHO.combo * 4, 1.6 + ECHO.combo * 0.4, false, 0.35);
+  tone(392 * Math.pow(2, -NOVA_SCALE[Math.min(ECHO.combo - 1, 6)] / 12), 0.24);
+  const first = el.crawlPlane.firstElementChild;          // the past flickers awake
+  if (first && !reducedMotion()) {
+    first.style.color = '#dfe6ff';
+    setTimeout(() => { if (first !== echoGoldLine) first.style.color = ''; }, 250);
+  }
+  if (ECHO.combo >= NOVA.KNOCKS) { NOVA.busy = true; setTimeout(timeEcho, 260); }
+}
+
+async function timeEcho() {
+  [784, 587, 494, 392].forEach((f, i) => tone(f, 0.8, 0.04, i * 0.08));
+  tone(98, 1.2, 0.05, 0, 'triangle');
+  const lines = [...el.crawlPlane.children];
+  if (!reducedMotion() && lines.length) {
+    el.crawl.scrollTo({ top: 0, behavior: 'smooth' });
+    const stagger = Math.min(60, 1600 / lines.length);      // rewind wave, newest → oldest
+    lines.slice().reverse().forEach((ln, i) => {
+      setTimeout(() => {
+        ln.style.color = '#dfe6ff';
+        setTimeout(() => { if (ln !== echoGoldLine) ln.style.color = ''; }, 280);
+      }, i * stagger);
+    });
+    await wait(lines.length * stagger + 300);
+    echoGoldLine = lines[0];
+    echoGoldLine.style.color = 'var(--gold)';
+    echoGoldLine.style.textShadow = '0 0 18px rgba(255,215,106,.55)';
+    const r = el.crawl.getBoundingClientRect();
+    burstSky(r.left + r.width / 2, r.top + 60, 40, 3, true, 0.1);
+    await wait(550);
+  }
+  const firstSaid = state.utterances[0].text;
+  const shown = firstSaid.length > 80 ? firstSaid.slice(0, 80).trimEnd() + '…' : firstSaid;
+  novaEl.code.style.opacity = '0';
+  novaEl.poem.textContent = '';
+  novaEl.wrap.hidden = false;
+  await typeInto(novaEl.poem, `Time echo.\nThe past kept every word you gave it —\nyour first thought tonight, returned:\n“${shown}”`, 26);
+  novaEl.code.textContent = ECHO_CODE;
+  novaEl.code.style.opacity = '1';
+}
+
 function dismissNova() {
   if (novaEl.wrap.hidden) return;
   novaEl.wrap.hidden = true;
   NOVA.busy = false; NOVA.combo = 0; NOVA.lastKnock = 0;
+  ECHO.combo = 0; ECHO.lastKnock = 0;
+  if (echoGoldLine) { echoGoldLine.style.color = ''; echoGoldLine.style.textShadow = ''; echoGoldLine = null; }
 }
 
-/* knock detection — wheel (desktop), touch pull (mobile), iOS momentum overshoot */
+/* knock detection — wheel (desktop), touch pull (mobile), iOS momentum overshoot.
+ * Direction picks the egg: down past the newest = nova, up past the oldest = echo. */
 el.crawl.addEventListener('wheel', (e) => {
   const c = el.crawl;
   if (e.deltaY > 18 && c.scrollTop + c.clientHeight >= c.scrollHeight - 2) knock();
+  else if (e.deltaY < -18 && c.scrollTop <= 1) echoKnock();
 }, { passive: true });
 
-let novaTouchY = 0, novaTouchArmed = false, novaTouchSpent = false;
+let novaTouchY = 0, novaTouchArmed = false, echoTouchArmed = false, novaTouchSpent = false;
 el.crawl.addEventListener('touchstart', (e) => {
   const c = el.crawl;
   novaTouchY = e.touches[0].clientY;
   novaTouchArmed = c.scrollTop + c.clientHeight >= c.scrollHeight - 2;
+  echoTouchArmed = c.scrollTop <= 1;
   novaTouchSpent = false;
 }, { passive: true });
 el.crawl.addEventListener('touchmove', (e) => {
-  if (!novaTouchArmed || novaTouchSpent) return;
-  if (novaTouchY - e.touches[0].clientY > 26) { novaTouchSpent = true; knock(); }
+  if (novaTouchSpent) return;
+  const dy = e.touches[0].clientY - novaTouchY;
+  if (novaTouchArmed && dy < -26) { novaTouchSpent = true; knock(); }
+  else if (echoTouchArmed && dy > 26) { novaTouchSpent = true; echoKnock(); }
 }, { passive: true });
 el.crawl.addEventListener('scroll', () => {
   const c = el.crawl;
   if (c.scrollTop + c.clientHeight - c.scrollHeight > 6) knock();
+  else if (c.scrollTop < -6) echoKnock();
 }, { passive: true });
 
 novaEl.wrap.addEventListener('click', dismissNova);
@@ -832,6 +898,6 @@ if ('serviceWorker' in navigator) {
 }
 
 // expose a tiny hook for tinkering / enabling the local model from the console
-window.OHYEAH = { state, OLLAMA, NOVA, recover, setMode, pushUtterance, retrieve, DEMO_SCRIPT, hideSplash };
+window.OHYEAH = { state, OLLAMA, NOVA, ECHO, recover, setMode, pushUtterance, retrieve, DEMO_SCRIPT, hideSplash };
 
 setStatus('Demo mode · ready');
