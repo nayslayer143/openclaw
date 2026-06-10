@@ -37,6 +37,7 @@ const OLLAMA = {
 
 /* ═══════════════════════ 0. STARFIELD (parallax + hyperspace warp) ═══════════════════════ */
 let warpStars = () => {};            // assigned by sky(); recover() calls it
+let constellationLayer = () => {};   // assigned by the memory module; sky() calls it per frame
 let burstSky = () => {};             // assigned by sky(); the knock delighter calls it
 (function sky() {
   const cv = document.getElementById('sky');
@@ -130,6 +131,7 @@ let burstSky = () => {};             // assigned by sky(); the knock delighter c
       ctx.fill();
     }
     ctx.shadowBlur = 0;
+    constellationLayer(ctx, W, H, px, py, t);
     if (!reduce) requestAnimationFrame(frame);
   }
 
@@ -151,9 +153,11 @@ let burstSky = () => {};             // assigned by sky(); the knock delighter c
 function pushUtterance(text) {
   text = text.trim();
   if (!text) return;
-  state.utterances.push({ text, t: Date.now() });
+  const ut = { text, t: Date.now() };
+  state.utterances.push(ut);
   renderStream();
   updateTopicChip();
+  memAdd(ut.text, ut.t);
 }
 
 function setInterim(text) {
@@ -503,7 +507,7 @@ let demoTimer = null;
 let demoIdx = 0;
 
 function startDemo() {
-  if (demoIdx >= DEMO_SCRIPT.length) { demoIdx = 0; state.utterances = []; renderStream(); }
+  if (demoIdx >= DEMO_SCRIPT.length) { demoIdx = 0; state.utterances = []; memRollover(); renderStream(); }
   streamNextDemoLine();
 }
 
@@ -615,6 +619,7 @@ function setMode(mode) {
   state.utterances = [];
   demoIdx = 0;
   state.startedAt = 0;
+  memRollover();               // the finished thread crystallizes into the sky
   renderStream();
   el.streamHint.style.opacity = '0.8';
   updateTopicChip();
@@ -711,6 +716,161 @@ if (splash) {
   splash.addEventListener('click', hideSplash);
   setTimeout(hideSplash, 2000);
 }
+
+/* ═══════════════════════ 4. MEMORY — constellations ═══════════════════════
+ * The app's promise is "never lose a thought" — so the app itself must not
+ * forget. Every utterance is appended to an IndexedDB event log
+ * ({session, text, t} — the portable schema; see .design/northstar.md).
+ * Finished sessions render as faint constellations in the sky: connected
+ * star-threads, shape and position deterministic from the session id.
+ * Tap one and it returns its memory. All best-effort: if IndexedDB is
+ * unavailable (private browsing), capture and recall work exactly as before. */
+const MEM = { db: null, sessionId: null, constellations: [], hits: [], MAXSKY: 12 };
+
+function memOpen() {
+  return new Promise((res) => {
+    try {
+      const rq = indexedDB.open('ohyeah', 1);
+      rq.onupgradeneeded = () => {
+        const db = rq.result;
+        db.createObjectStore('utterances', { autoIncrement: true }).createIndex('by-session', 'session');
+        db.createObjectStore('sessions', { keyPath: 'id' });
+      };
+      rq.onsuccess = () => res(rq.result);
+      rq.onerror = () => res(null);
+    } catch (_) { res(null); }
+  });
+}
+
+function memAdd(text, t) {
+  if (!MEM.db) return;
+  try {
+    if (!MEM.sessionId) MEM.sessionId = 's' + t.toString(36) + Math.random().toString(36).slice(2, 6);
+    const topic = retrieve().topic;
+    const tx = MEM.db.transaction(['utterances', 'sessions'], 'readwrite');
+    tx.objectStore('utterances').add({ session: MEM.sessionId, text, t });
+    const ss = tx.objectStore('sessions');
+    const g = ss.get(MEM.sessionId);
+    g.onsuccess = () => {
+      const row = g.result || { id: MEM.sessionId, startedAt: t, mode: state.mode, count: 0, first: text };
+      row.endedAt = t; row.count += 1; row.topic = topic;
+      ss.put(row);
+    };
+  } catch (_) { /* memory is best-effort; capture never blocks on it */ }
+}
+
+function memRollover() {
+  MEM.sessionId = null;
+  memLoadConstellations();
+}
+
+function hash32(str) {
+  let h = 2166136261;
+  for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+
+/* A constellation is a thread: stars connected in the order the walk lays them
+ * down. Everything derives from the session id, so a thread always rises in
+ * the same place in your sky. */
+function buildConstellation(row) {
+  let h = hash32(row.id) || 1;
+  const rnd = () => (h = (Math.imul(h, 1664525) + 1013904223) >>> 0) / 4294967296;
+  const cx = 0.07 + rnd() * 0.86;          // fraction of viewport width
+  const cy = 0.06 + rnd() * 0.30;          // upper sky band, above the orb
+  const n = Math.min(8, Math.max(3, Math.round(2 + Math.log2(row.count + 1))));
+  const pts = [];
+  let x = 0, y = 0;
+  for (let i = 0; i < n; i++) {
+    x = Math.max(-90, Math.min(90, x + (rnd() - 0.5) * 76));
+    y = Math.max(-55, Math.min(55, y + (rnd() - 0.5) * 52));
+    pts.push({ x, y, r: 0.9 + rnd() * 1.5 });
+  }
+  return { row, cx, cy, pts, ph: rnd() * Math.PI * 2 };
+}
+
+function memLoadConstellations() {
+  if (!MEM.db) return;
+  try {
+    const rq = MEM.db.transaction('sessions').objectStore('sessions').getAll();
+    rq.onsuccess = () => {
+      MEM.constellations = (rq.result || [])
+        .filter(s => s.count >= 2 && s.id !== MEM.sessionId)
+        .sort((a, b) => b.endedAt - a.endedAt)
+        .slice(0, MEM.MAXSKY)
+        .map(buildConstellation);
+    };
+  } catch (_) {}
+}
+
+constellationLayer = (ctx, W, H, px, py, t) => {
+  MEM.hits.length = 0;
+  for (const c of MEM.constellations) {
+    const bx = c.cx * W + px * 0.5, by = c.cy * H + py * 0.5;   // mid-field parallax
+    const tw = 0.5 + 0.5 * Math.sin(t * 0.4 + c.ph);
+    ctx.strokeStyle = 'rgba(140,170,255,' + (0.07 + 0.06 * tw).toFixed(3) + ')';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    c.pts.forEach((p, i) => { i ? ctx.lineTo(bx + p.x, by + p.y) : ctx.moveTo(bx + p.x, by + p.y); });
+    ctx.stroke();
+    ctx.fillStyle = 'rgba(244,240,220,' + (0.35 + 0.3 * tw).toFixed(3) + ')';
+    for (const p of c.pts) {
+      ctx.beginPath();
+      ctx.arc(bx + p.x, by + p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    MEM.hits.push({ x: bx, y: by, c });
+  }
+};
+
+async function showConstellation(row) {
+  if (NOVA.busy) return;
+  NOVA.busy = true;
+  tone(523, 0.5, 0.035); tone(659, 0.6, 0.03, 0.12);
+  const d = new Date(row.startedAt);
+  const when = d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) +
+               ' · ' + d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  const first = row.first.length > 70 ? row.first.slice(0, 70).trimEnd() + '…' : row.first;
+  novaEl.code.style.opacity = '0';
+  novaEl.poem.textContent = '';
+  novaEl.wrap.hidden = false;
+  await typeInto(novaEl.poem, `${row.topic || 'A thread'}\n${row.count} thoughts · ${when}\nit began: “${first}”`, 22);
+  novaEl.code.textContent = '✦ constellation · this thread lives in your sky';
+  novaEl.code.style.opacity = '1';
+}
+
+addEventListener('click', (e) => {
+  if (!novaEl.wrap.hidden || !el.scrim.hidden || !MEM.hits.length) return;
+  if (e.target.closest('button, .card, .topbar, .orbwrap, .recall, .nova')) return;
+  const hit = MEM.hits.find(p => Math.hypot(e.clientX - p.x, e.clientY - p.y) < 72);
+  if (hit) showConstellation(hit.c.row);
+});
+
+/** Export the entire memory as a plain object — the portability promise. */
+function exportMemory() {
+  return new Promise((res) => {
+    if (!MEM.db) return res({ sessions: [], utterances: [] });
+    try {
+      const tx = MEM.db.transaction(['sessions', 'utterances']);
+      const out = {};
+      tx.objectStore('sessions').getAll().onsuccess = (e) => { out.sessions = e.target.result; };
+      tx.objectStore('utterances').getAll().onsuccess = (e) => { out.utterances = e.target.result; };
+      tx.oncomplete = () => res(out);
+      tx.onerror = () => res({ sessions: [], utterances: [] });
+    } catch (_) { res({ sessions: [], utterances: [] }); }
+  });
+}
+
+/** Clear the sky (dev/QA utility — destructive, console-only on purpose). */
+function forgetSky() {
+  if (!MEM.db) return;
+  const tx = MEM.db.transaction(['sessions', 'utterances'], 'readwrite');
+  tx.objectStore('sessions').clear();
+  tx.objectStore('utterances').clear();
+  tx.oncomplete = () => { MEM.constellations = []; MEM.hits.length = 0; MEM.sessionId = null; };
+}
+
+memOpen().then((db) => { MEM.db = db; if (db) memLoadConstellations(); });
 
 /* ═══════════════ HIDDEN DELIGHTER: knock on the edge of now ═══════════════
  * Bounce the crawl at its BOTTOM edge (past the newest thought) and stardust
@@ -898,6 +1058,6 @@ if ('serviceWorker' in navigator) {
 }
 
 // expose a tiny hook for tinkering / enabling the local model from the console
-window.OHYEAH = { state, OLLAMA, NOVA, ECHO, recover, setMode, pushUtterance, retrieve, DEMO_SCRIPT, hideSplash };
+window.OHYEAH = { state, OLLAMA, NOVA, ECHO, MEM, recover, setMode, pushUtterance, retrieve, DEMO_SCRIPT, hideSplash, exportMemory, forgetSky };
 
 setStatus('Demo mode · ready');
