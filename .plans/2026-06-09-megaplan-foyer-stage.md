@@ -46,16 +46,17 @@ Evolve Foyer's live client portal ("the Stage", [clientmcp.asdfghjk.lol/clientmc
 Tracking convention: edit this file, flip `- [ ]` → `- [x]`, commit (`megaplan: cross off <task>`).
 
 - **Phase 0 — Solid ground (infra hygiene)**
-  - [ ] Zero-downtime landing on `main`: `git worktree add /tmp/oc-main main && git -C /tmp/oc-main cherry-pick 5611cd0 9189439 8676637 && git -C /tmp/oc-main pushall && git worktree remove /tmp/oc-main`, then `git switch main` in the live checkout (portal survives the switch only after the cherry-picks land).
-  - [ ] `_subdomain_root_router` → pure-ASGI middleware (`dashboard/server.py:115-127`; spawn-chip task_45452573 exists). Restart only via `launchctl kickstart -k gui/$UID/com.openclaw.dashboard`. Abort-test (`curl --max-time 0.2`) shows no `RuntimeError` in `logs/dashboard.log`.
+  - [ ] ~~Cherry-pick onto `main`~~ **AMENDED 2026-06-09:** `main` is 6 weeks stale (`5072d89`, 2026-04-23) — cherry-picking 3 portal commits onto it does NOT make the live tree safe, because the live dashboard can't run old main (missing ohyeah, landings a–e, newer server.py routes). Real fix = a deliberate merge/fast-forward of `feat/foyer-stage-portal` (which contains the ohyeah ancestry) into `main` — Jordan's call. Until then: live checkout stays on `feat/foyer-stage-portal`; do not switch it.
+  - [x] `_subdomain_root_router` → pure-ASGI middleware — DONE `aedc495` 2026-06-09. Kickstarted + verified: apex/portal/clientmcp-root/dossier/ohyeah all 200; abort sweep produced no new `RuntimeError` (296 historical in log for contrast). Failure class structurally removed (no response buffering).
   - [ ] GitLab re-auth (`glab auth login`) **as part of rotating all ~25 leaked creds** (memory `project_openclaw_env_bak_leak`); consider un-silencing `pushall`.
-  - [ ] Backend deep-read: map Fastify demo routes + Ollama adapter; locate the streaming seam for P2.
-- **Phase 1 — The honest core (truth loop)** ← START HERE
-  - [ ] `POST /clientmcp/api/v1/demo/decision` — append-only event `{clientContainerId, deliverableId, decision, note, ts}`; portal approve/changes calls it; survives reload.
-  - [ ] Decisions render in the agency-side feed (operator sees the ribbon cut).
-  - [ ] `seedFor()` honest empty state for unknown clients (kill the Foyer-Co-data-for-everyone fallback, portal.html `seedFor`).
-  - [ ] "demo seed" micro-chips on seeded deliverables vs live data.
-  - [ ] `relTime` server-clock skew fix.
+  - [x] Backend deep-read — DONE 2026-06-09: Fastify monorepo `apps/server/src/routes/{demo,demo-agents}.ts`, drizzle schema in `packages/db/src/schema/` (audit_log is ADR-009 append-only, monthly-partitioned; inbound_messages needs channelId FK), per-IP limiter + daily budget idioms in demo-agents.ts. Streaming seam for P2 = the Ollama call inside demo-agents.ts naming handler.
+- **Phase 1 — The honest core (truth loop)** — ✦ SHIPPED 2026-06-09 (`93e5a6a` client-mcp · `dc3e99f` openclaw)
+  - [x] `POST /v1/demo/decision` — append-only audit_log event (client_user/update/stage_deliverable + diff) + stage-platform message into inbound_messages; demo-ID allowlist + 30/5min rate cap; `/v1/demo/feed` returns `decisions[]`. Verified: direct :4000, live proxy path, and UI click all landed events.
+  - [x] Decisions render in the agency-side feed — server writes the conversation message ("Approved “Naming shortlist” — …", intent approval/feedback); portal local echo removed.
+  - [x] `seedFor()` honest empty state (EMPTY_SEED + guards: empty deliverables card, review fallback, brand placeholder).
+  - [x] "demo seed" chip on deliverables + "live" chip on conversation (hidden for non-seeded clients).
+  - [x] `relTime` skew fix via feed `generatedAt` → global SKEW.
+  - [x] (bonus) `scripts/portal-qa-proxy.py` — isolated portal+API QA loop on :8771 (launch.json `clientmcp-api`); cold-load screenshot shows all three decisions hydrated server-side.
 - **Phase 2 — Alive (speed & presence)**
   - [ ] Stream naming candidates (SSE/chunked) — names appear one-by-one with rationales; kill the 15s spinner.
   - [ ] Model warmup noop on portal load (RAM-aware; `pse health --for-model qwen2.5:7b` first).
