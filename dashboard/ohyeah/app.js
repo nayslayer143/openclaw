@@ -17,7 +17,7 @@ const el = {
   cardSaid: $('cardSaid'), cardTopic: $('cardTopic'), cardThread: $('cardThread'),
   recallMs: $('recallMs'),
   smartBadge: $('smartBadge'), cardPredict: $('cardPredict'), cardNext: $('cardNext'),
-  ohyeah: $('ohyeah'),
+  ohyeah: $('ohyeah'), wave: $('wave'),
   modeBtns: [...document.querySelectorAll('.mode__btn')],
 };
 
@@ -560,14 +560,91 @@ function getRecognizer() {
   };
   r.onerror = (e) => {
     if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
-      flashStatus('Mic blocked — allow microphone, or use Demo mode', true);
       stopAll();
+      setStatusError('Mic blocked — click the mic/🔒 icon in the address bar, allow it, then tap the orb');
+    } else if (e.error === 'network') {
+      stopAll();
+      setStatusError('Speech service unreachable — check your connection, then tap the orb');
+    } else if (e.error === 'audio-capture') {
+      stopAll();
+      setStatusError('No microphone found — plug one in, then tap the orb');
     } else if (e.error === 'no-speech') {
       setStatus('Listening… (say something)');
     }
   };
   r.onend = () => { if (state.listening && state.mode === 'live') { try { r.start(); } catch (_) {} } };
   return r;
+}
+
+/* ═══════════ Live mic meter — waveform proof the mic hears you ═══════════
+ * getUserMedia forces a clean permission flow (SpeechRecognition alone can sit
+ * in "listening" forever with the prompt unresolved and zero audio flowing).
+ * Granted → AnalyserNode drives the wave + the orb swells with your voice.
+ * Denied → a PERSISTENT error with instructions (never a self-erasing flash). */
+let micStream = null, micAnalyser = null, micAC = null, waveRAF = 0;
+
+async function startMicMeter() {
+  try {
+    micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  } catch (err) {
+    stopAll();
+    setStatusError(err && (err.name === 'NotFoundError' || err.name === 'OverconstrainedError')
+      ? 'No microphone found — plug one in, then tap the orb'
+      : 'Mic blocked — click the mic/🔒 icon in the address bar, allow it, then tap the orb');
+    return false;
+  }
+  try {
+    micAC = micAC || new (window.AudioContext || window.webkitAudioContext)();
+    if (micAC.state === 'suspended') micAC.resume().catch(() => {});
+    micAnalyser = micAC.createAnalyser();
+    micAnalyser.fftSize = 512;
+    micAC.createMediaStreamSource(micStream).connect(micAnalyser);
+    el.wave.hidden = false;
+    cancelAnimationFrame(waveRAF);
+    waveTick();
+  } catch (_) { /* meter is feedback, not capture — recognition still runs */ }
+  return true;
+}
+
+function waveTick() {
+  if (!micAnalyser || el.wave.hidden) return;
+  const cv = el.wave, ctx = cv.getContext('2d');
+  const data = new Uint8Array(micAnalyser.fftSize);
+  micAnalyser.getByteTimeDomainData(data);
+  const W = cv.width, H = cv.height, mid = H / 2;
+  let sum = 0;
+  ctx.clearRect(0, 0, W, H);
+  const grad = ctx.createLinearGradient(0, 0, W, 0);
+  grad.addColorStop(0, 'rgba(60,224,255,.9)');
+  grad.addColorStop(0.5, 'rgba(255,215,106,.95)');
+  grad.addColorStop(1, 'rgba(164,114,255,.9)');
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  for (let i = 0; i < data.length; i++) {
+    const v = (data[i] - 128) / 128;          // -1 … 1
+    sum += v * v;
+    const x = (i / (data.length - 1)) * W;
+    const y = mid + v * (mid - 4);
+    i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+  }
+  ctx.stroke();
+  const rms = Math.sqrt(sum / data.length);   // 0 quiet … ~0.5 loud
+  ctx.shadowBlur = 0;
+  if (!reducedMotion()) el.orb.style.transform = `scale(${(1 + Math.min(rms * 0.6, 0.12)).toFixed(3)})`;
+  waveRAF = requestAnimationFrame(waveTick);
+}
+
+function stopMicMeter() {
+  cancelAnimationFrame(waveRAF);
+  if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+  micAnalyser = null;
+  if (el.wave) {
+    el.wave.hidden = true;
+    const ctx = el.wave.getContext('2d');
+    ctx.clearRect(0, 0, el.wave.width, el.wave.height);
+  }
+  el.orb.style.transform = '';
 }
 
 /* ═══════════════════════ Listening control ═══════════════════════ */
@@ -584,8 +661,12 @@ function startListening() {
   } else {
     if (!recog) recog = getRecognizer();
     if (!recog) { flashStatus('Live mic unsupported in this browser — use Demo', true); stopListeningVisual(); state.listening = false; return; }
-    try { recog.start(); setStatus('Live · listening…'); }
-    catch (_) { /* already started */ }
+    setStatus('Live · requesting microphone…');
+    startMicMeter().then((ok) => {
+      if (!ok || !state.listening) return;   // denied (error shown) or user toggled off meanwhile
+      try { recog.start(); } catch (_) { /* already started */ }
+      setStatus('Live · listening — talk and watch the wave');
+    });
   }
 }
 
@@ -598,6 +679,7 @@ function stopAll() {
   state.listening = false;
   stopListeningVisual();
   pauseDemo();
+  stopMicMeter();
   if (recog) { try { recog.stop(); } catch (_) {} }
   setInterim('');
 }
@@ -644,6 +726,12 @@ function updateTopicChip() {
 /* ═══════════════════════ Status helpers ═══════════════════════ */
 let statusTimer = null;
 function setStatus(t) { el.status.textContent = t; el.status.classList.remove('is-error'); }
+/* persistent error — stays until the next real state change, never auto-reverts */
+function setStatusError(t) {
+  clearTimeout(statusTimer);
+  el.status.textContent = t;
+  el.status.classList.add('is-error');
+}
 function flashStatus(t, isError = false) {
   el.status.textContent = t;
   el.status.classList.toggle('is-error', isError);

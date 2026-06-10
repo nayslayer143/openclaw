@@ -300,6 +300,14 @@ body {
   100% { opacity: 0;   transform: scale(1.35); }
 }
 
+/* Live voice waveform — proof the mic is hearing you */
+.wave {
+  width: min(64vw, 260px); height: 44px;
+  margin-top: -4px;
+  opacity: .92;
+  filter: drop-shadow(0 0 12px rgba(60,224,255,.35));
+}
+
 /* Topic chip */
 .topicchip {
   display: inline-flex; align-items: center; gap: 9px;
